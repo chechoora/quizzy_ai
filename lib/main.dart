@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:poc_ai_quiz/poc_widget.dart';
+import 'package:poc_ai_quiz/quiz_widget/quiz_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: const PocWidget(), // This trailing comma makes auto-formatting nicer for build methods.
+      body: const QuizWidget(), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
