@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chopper/chopper.dart';
+import 'package:poc_ai_quiz/text_similarity/api/util.dart';
 
 class TextSimilarityHeaderInterceptor implements RequestInterceptor {
   @override
@@ -13,5 +14,3 @@ class TextSimilarityHeaderInterceptor implements RequestInterceptor {
     return newRequest;
   }
 }
-
-const apiKey = '15483a67e7mshdfc12f77cdecd50p146efcjsnc42dcc6d2d8f';
