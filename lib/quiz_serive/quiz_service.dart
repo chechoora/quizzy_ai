@@ -5,7 +5,7 @@ class QuizService {
 
   QuizService(this.textSimilarityService);
 
-  Future<bool> isSimilarEnough({
+  Future<double> isSimilarEnough({
     required String initialText,
     required String inputText,
   }) async {
@@ -13,7 +13,6 @@ class QuizService {
       initialText: initialText,
       inputText: inputText,
     );
-    // TODO change this logic to return full response.
-    return howSimilar.similarity >= 0.7;
+    return howSimilar.similarity;
   }
 }

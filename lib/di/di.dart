@@ -15,7 +15,7 @@ void setupDi() {
 
 void _setupAPI() {
   final textSimilarityApiClient = ChopperClient(
-    baseUrl: Uri.parse('https://twinword-text-similarity-v1.p.rapidapi.com/'),
+    baseUrl: Uri.parse('https://twinword-text-similarity-v1.p.rapidapi.com/similarity/'),
     services: [
       TextSimilarityApiService.create(),
     ],

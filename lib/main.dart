@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/quiz_widget/quiz_widget.dart';
 
 void main() {
+  setupDi();
   runApp(const MyApp());
 }
 

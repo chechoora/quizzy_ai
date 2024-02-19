@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/quiz_serive/quiz_service.dart';
 import 'package:poc_ai_quiz/quiz_widget/cubit/quiz_cubit.dart';
+import 'package:poc_ai_quiz/util/alert_util.dart';
 
 class QuizWidget extends StatefulWidget {
   const QuizWidget({super.key});
@@ -27,8 +28,11 @@ class _QuizWidgetState extends State<QuizWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer(
+    return BlocConsumer<QuizCubit, QuizState>(
       bloc: cubit,
+      buildWhen: (oldState, newState) {
+        return newState is QuizIdleState;
+      },
       builder: (BuildContext context, state) {
         return Column(
           children: [
@@ -53,13 +57,23 @@ class _QuizWidgetState extends State<QuizWidget> {
             ElevatedButton(
               child: const Text('Test'),
               onPressed: () {
-                cubit.checkText(initialText: textToCompare, inputText: editController.text);
+                cubit.checkText(
+                  initialText: textToCompare,
+                  inputText: editController.text,
+                );
               },
             )
           ],
         );
       },
-      listener: (BuildContext context, Object? state) {},
+      listenWhen: (oldState, newState) {
+        return newState is QuizResultState;
+      },
+      listener: (BuildContext context, QuizState state) {
+        if (state is QuizResultState) {
+          context.showSnackBar(state.isSimilarEnough ? "yay" : "nay");
+        }
+      },
     );
   }
 }

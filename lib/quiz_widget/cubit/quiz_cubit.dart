@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/quiz_serive/quiz_service.dart';
 
 class QuizCubit extends Cubit<QuizState> {
-  QuizCubit(this.quizService) : super(QuizState());
+  QuizCubit(this.quizService) : super(const QuizIdleState());
 
   final QuizService quizService;
 
@@ -10,15 +10,25 @@ class QuizCubit extends Cubit<QuizState> {
     required String initialText,
     required String inputText,
   }) async {
-    final bool isSimilarEnough = await quizService.isSimilarEnough(initialText: initialText, inputText: inputText);
+    final bool isSimilarEnough = await quizService.isSimilarEnough(
+          initialText: initialText,
+          inputText: inputText,
+        ) >=
+        0.7;
     emit(QuizResultState(isSimilarEnough));
   }
 }
 
-class QuizState {}
+abstract class QuizState {
+  const QuizState();
+}
+
+class QuizIdleState extends QuizState {
+  const QuizIdleState();
+}
 
 class QuizResultState extends QuizState {
   final bool isSimilarEnough;
 
-  QuizResultState(this.isSimilarEnough);
+  const QuizResultState(this.isSimilarEnough);
 }
