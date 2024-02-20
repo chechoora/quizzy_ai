@@ -1,4 +1,4 @@
-import 'package:poc_ai_quiz/text_similarity/text_similarity_service.dart';
+import 'package:poc_ai_quiz/domain/text_similarity_service.dart';
 
 class QuizService {
   final TextSimilarityService textSimilarityService;

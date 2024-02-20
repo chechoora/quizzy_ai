@@ -1,5 +1,5 @@
-import 'package:poc_ai_quiz/text_similarity/api/text_similarity_api_service.dart';
-import 'package:poc_ai_quiz/text_similarity/api/text_similiarity_api_mapper.dart';
+import 'package:poc_ai_quiz/data/text_similarity/api/text_similarity_api_service.dart';
+import 'package:poc_ai_quiz/data/text_similarity/api/text_similiarity_api_mapper.dart';
 
 class TextSimilarityService {
   final TextSimilarityApiService apiService;

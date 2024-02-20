@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poc_ai_quiz/quiz_serive/quiz_service.dart';
+import 'package:poc_ai_quiz/domain/quiz_service.dart';
 
 class QuizCubit extends Cubit<QuizState> {
   QuizCubit(this.quizService) : super(const QuizIdleState());

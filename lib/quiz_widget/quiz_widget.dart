@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/di/di.dart';
-import 'package:poc_ai_quiz/quiz_serive/quiz_service.dart';
+import 'package:poc_ai_quiz/domain/quiz_service.dart';
 import 'package:poc_ai_quiz/quiz_widget/cubit/quiz_cubit.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 
+// TODO Pass Quiz object
 class QuizWidget extends StatefulWidget {
   const QuizWidget({super.key});
 
@@ -28,52 +29,58 @@ class _QuizWidgetState extends State<QuizWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<QuizCubit, QuizState>(
-      bloc: cubit,
-      buildWhen: (oldState, newState) {
-        return newState is QuizIdleState;
-      },
-      builder: (BuildContext context, state) {
-        return Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(2),
-              child: Text(textToCompare),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Theme.of(context).primaryColor),
-                borderRadius: BorderRadius.circular(10),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text("Deck Name"),
+      ),
+      body: BlocConsumer<QuizCubit, QuizState>(
+        bloc: cubit,
+        buildWhen: (oldState, newState) {
+          return newState is QuizIdleState;
+        },
+        builder: (BuildContext context, state) {
+          return Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(2),
+                child: Text(textToCompare),
               ),
-              margin: const EdgeInsets.all(8),
-              alignment: Alignment.topLeft,
-              height: 120,
-              child: TextField(
-                maxLines: null,
-                controller: editController,
-                decoration: const InputDecoration(hintText: 'Type similar answer', border: InputBorder.none),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).primaryColor),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                margin: const EdgeInsets.all(8),
+                alignment: Alignment.topLeft,
+                height: 120,
+                child: TextField(
+                  maxLines: null,
+                  controller: editController,
+                  decoration: const InputDecoration(hintText: 'Type similar answer', border: InputBorder.none),
+                ),
               ),
-            ),
-            ElevatedButton(
-              child: const Text('Test'),
-              onPressed: () {
-                cubit.checkText(
-                  initialText: textToCompare,
-                  inputText: editController.text,
-                );
-              },
-            )
-          ],
-        );
-      },
-      listenWhen: (oldState, newState) {
-        return newState is QuizResultState;
-      },
-      listener: (BuildContext context, QuizState state) {
-        if (state is QuizResultState) {
-          context.showSnackBar(state.isSimilarEnough ? "yay" : "nay");
-        }
-      },
+              ElevatedButton(
+                child: const Text('Test'),
+                onPressed: () {
+                  cubit.checkText(
+                    initialText: textToCompare,
+                    inputText: editController.text,
+                  );
+                },
+              )
+            ],
+          );
+        },
+        listenWhen: (oldState, newState) {
+          return newState is QuizResultState;
+        },
+        listener: (BuildContext context, QuizState state) {
+          if (state is QuizResultState) {
+            context.showSnackBar(state.isSimilarEnough ? "yay" : "nay");
+          }
+        },
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
