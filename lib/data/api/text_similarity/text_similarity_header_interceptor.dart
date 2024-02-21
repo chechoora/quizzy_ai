@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:chopper/chopper.dart';
-import 'package:poc_ai_quiz/data/text_similarity/api/util.dart';
+import 'package:poc_ai_quiz/data/api/text_similarity/util.dart';
 
 class TextSimilarityHeaderInterceptor implements RequestInterceptor {
   @override

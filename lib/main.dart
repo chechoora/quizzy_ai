@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/di/di.dart';
-import 'package:poc_ai_quiz/quiz_widget/quiz_widget.dart';
+import 'package:poc_ai_quiz/ui/deck_widget/deck_widget.dart';
 
 Future<void> main() async {
   await setupDi();
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightGreenAccent),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -36,6 +36,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return const QuizWidget();
+    return const DeckWidget();
   }
 }

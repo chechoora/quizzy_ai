@@ -1,14 +1,14 @@
-import 'package:poc_ai_quiz/data/text_similarity/api/text_similarity_api_service.dart';
-import 'package:poc_ai_quiz/data/text_similarity/api/text_similiarity_api_mapper.dart';
+import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_api_service.dart';
+import 'package:poc_ai_quiz/domain/text_similiarity/text_similiarity_api_mapper.dart';
 
 class TextSimilarityService {
-  final TextSimilarityApiService apiService;
-  final TextSimilarityApiMapper apiMapper;
-
   TextSimilarityService({
     required this.apiService,
     required this.apiMapper,
   });
+
+  final TextSimilarityApiService apiService;
+  final TextSimilarityApiMapper apiMapper;
 
   Future<TextSimilarityResponseModel> checkSimilarity({
     required String initialText,

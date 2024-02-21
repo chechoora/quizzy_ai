@@ -1,4 +1,4 @@
-import 'package:poc_ai_quiz/domain/text_similarity_service.dart';
+import 'package:poc_ai_quiz/domain/text_similiarity/text_similarity_service.dart';
 
 class TextSimilarityApiMapper {
   TextSimilarityResponseModel mapSimilarity(dynamic jsonResponse) {

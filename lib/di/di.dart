@@ -1,18 +1,28 @@
 import 'package:chopper/chopper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:isolates/isolate_runner.dart';
-import 'package:poc_ai_quiz/data/text_similarity/api/text_similarity_api_service.dart';
-import 'package:poc_ai_quiz/data/text_similarity/api/text_similarity_header_interceptor.dart';
-import 'package:poc_ai_quiz/data/text_similarity/api/text_similiarity_api_mapper.dart';
-import 'package:poc_ai_quiz/domain/text_similarity_service.dart';
+import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_api_service.dart';
+import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_header_interceptor.dart';
+import 'package:poc_ai_quiz/data/db/database.dart';
+import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
+import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
+import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
+import 'package:poc_ai_quiz/domain/text_similiarity/text_similiarity_api_mapper.dart';
+import 'package:poc_ai_quiz/domain/text_similiarity/text_similarity_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_service.dart';
 import 'package:poc_ai_quiz/util/api/isolate_converter.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setupDi() async {
+  await _setupDataBase();
   await _setupAPI();
   _setupServices();
+}
+
+Future<void> _setupDataBase() async {
+  final database = AppDatabase();
+  getIt.registerSingleton<AppDatabase>(database);
 }
 
 Future<void> _setupAPI() async {
@@ -38,4 +48,13 @@ void _setupServices() {
   );
   getIt.registerSingleton<TextSimilarityService>(textSimilarityService);
   getIt.registerSingleton<QuizService>(QuizService(textSimilarityService));
+
+  final database = getIt.get<AppDatabase>();
+  final deckDataBaseRepository = DeckDataBaseRepository(database);
+  getIt.registerSingleton<DeckDataBaseRepository>(deckDataBaseRepository);
+  final deckRepository = DeckRepository(
+    dataBaseRepository: deckDataBaseRepository,
+    deckDatBaseMapper: DeckDatBaseMapper(),
+  );
+  getIt.registerSingleton<DeckRepository>(deckRepository);
 }

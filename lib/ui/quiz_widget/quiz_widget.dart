@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/quiz_service.dart';
-import 'package:poc_ai_quiz/quiz_widget/cubit/quiz_cubit.dart';
+import 'package:poc_ai_quiz/ui/quiz_widget/cubit/quiz_cubit.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 
 // TODO Pass Quiz object

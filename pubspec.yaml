@@ -55,6 +55,8 @@ dependencies:
   path_provider: ^2.0.0
   path: ^1.8.3
 
+  alert_dialog: ^1.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
