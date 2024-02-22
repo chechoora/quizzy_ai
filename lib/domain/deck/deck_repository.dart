@@ -19,4 +19,12 @@ class DeckRepository {
   Future<bool> saveDeck(String deckName) {
     return dataBaseRepository.saveDeck(deckName);
   }
+
+  Future<bool> deleteDeck(DeckItem deck) {
+    return dataBaseRepository.deleteDeck(deck.id);
+  }
+
+  Future<bool> editDeckName(DeckItem deck, String deckName) {
+    return dataBaseRepository.editDeckName(deck, deckName);
+  }
 }

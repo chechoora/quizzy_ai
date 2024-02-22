@@ -1,13 +1,16 @@
-import 'package:alert_dialog/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
+import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 import 'package:poc_ai_quiz/ui/deck_widget/cubit/deck_cubit.dart';
 import 'package:poc_ai_quiz/ui/deck_widget/deck_list_display_widget.dart';
 import 'package:poc_ai_quiz/ui/deck_widget/fill_deck_data_widget.dart';
+import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
 
+//TODO Add validation for dialogs.
+// TODO Add error messages
 class DeckWidget extends StatefulWidget {
   const DeckWidget({super.key});
 
@@ -50,6 +53,12 @@ class _DeckWidgetState extends State<DeckWidget> {
           if (state is DeckDataState) {
             return DeckListDisplayWidget(
               deckList: state.deckList,
+              onDeckRemoveRequest: (deck) {
+                _launchConfirmDeleteRequest(deck);
+              },
+              onDeckEditRequest: (deck) {
+                _launchEditDeckTitleRequest(deck);
+              },
             );
           }
           if (state is DeckLoadingState) {
@@ -80,7 +89,45 @@ class _DeckWidgetState extends State<DeckWidget> {
         },
       ),
     ).then((value) {
-      cubit.createDeck(deckName);
+      if (value ?? false) {
+        cubit.createDeck(deckName);
+      }
     });
+  }
+
+  void _launchConfirmDeleteRequest(DeckItem deck) {
+    alert(
+      context,
+      content: Text(
+        "Are you sure you want to delete ${deck.title}, all your quiz cards also will be deleted",
+      ),
+    ).then(
+      (value) {
+        if (value ?? false) {
+          cubit.deleteDeck(deck);
+        }
+      },
+    );
+  }
+
+  void _launchEditDeckTitleRequest(DeckItem deck) {
+    var newDeckName = '';
+    alert(
+      context,
+      title: Text(
+        "Enter new name for ${deck.title}",
+      ),
+      content: FillDeckDataWidget(
+        onValueChange: (text) {
+          newDeckName = text;
+        },
+      ),
+    ).then(
+      (value) {
+        if (value ?? false) {
+          cubit.editDeck(deck, newDeckName);
+        }
+      },
+    );
   }
 }

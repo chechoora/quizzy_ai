@@ -20,6 +20,18 @@ class DeckCubit extends Cubit<DeckState> {
     deckRepository.saveDeck(deckName);
     fetchDecks();
   }
+
+  void deleteDeck(DeckItem deck) {
+    emit(const DeckLoadingState());
+    deckRepository.deleteDeck(deck);
+    fetchDecks();
+  }
+
+  void editDeck(DeckItem deck, String deckName) {
+    emit(const DeckLoadingState());
+    deckRepository.editDeckName(deck, deckName);
+    fetchDecks();
+  }
 }
 
 abstract class DeckState {

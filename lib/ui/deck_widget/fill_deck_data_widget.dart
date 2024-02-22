@@ -18,7 +18,6 @@ class _FillDeckDataWidgetState extends State<FillDeckDataWidget> {
     return TextField(
       decoration: const InputDecoration(
         labelText: "Enter deck name",
-        hintText: "Flutter",
         border: OutlineInputBorder(),
       ),
       onChanged: widget.onValueChange,

@@ -4,6 +4,9 @@ class DeckTable extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   TextColumn get title => text().withLength(min: 3)();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
 class QuizCardTable extends Table {
@@ -14,4 +17,7 @@ class QuizCardTable extends Table {
   TextColumn get questionText => text().withLength(min: 3)();
 
   TextColumn get answerText => text().withLength(min: 3)();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

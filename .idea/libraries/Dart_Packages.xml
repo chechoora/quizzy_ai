@@ -9,13 +9,6 @@
             </list>
           </value>
         </entry>
-        <entry key="alert_dialog">
-          <value>
-            <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/alert_dialog-1.0.2/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="analyzer">
           <value>
             <list>
@@ -818,7 +811,6 @@
     </properties>
     <CLASSES>
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/_fe_analyzer_shared-67.0.0/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/alert_dialog-1.0.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/analyzer-6.4.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/analyzer_plugin-0.11.3/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/args-2.4.2/lib" />
