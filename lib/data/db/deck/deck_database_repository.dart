@@ -7,8 +7,8 @@ class DeckDataBaseRepository {
 
   DeckDataBaseRepository(this.appDatabase);
 
-  Future<List<DeckTableData>> fetchAllDecks() async {
-    return await appDatabase.select(appDatabase.deckTable).get();
+  Future<List<DeckTableData>> fetchAllDecks() {
+    return appDatabase.select(appDatabase.deckTable).get();
   }
 
   Future<bool> saveDeck(String deckName) async {

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
-import 'package:poc_ai_quiz/ui/deck_widget/cubit/deck_cubit.dart';
-import 'package:poc_ai_quiz/ui/deck_widget/deck_list_display_widget.dart';
-import 'package:poc_ai_quiz/ui/deck_widget/fill_deck_data_widget.dart';
+import 'package:poc_ai_quiz/view/deck_widget/cubit/deck_cubit.dart';
+import 'package:poc_ai_quiz/view/deck_widget/deck_list_display_widget.dart';
+import 'package:poc_ai_quiz/view/deck_widget/fill_deck_data_widget.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
 
@@ -58,6 +59,9 @@ class _DeckWidgetState extends State<DeckWidget> {
               },
               onDeckEditRequest: (deck) {
                 _launchEditDeckTitleRequest(deck);
+              },
+              onDeckClicked: (deck) {
+                _openDeck(deck);
               },
             );
           }
@@ -129,5 +133,9 @@ class _DeckWidgetState extends State<DeckWidget> {
         }
       },
     );
+  }
+
+  void _openDeck(DeckItem deck) {
+    context.go("/quizCardList", extra: deck);
   }
 }

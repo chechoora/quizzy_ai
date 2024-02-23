@@ -5,8 +5,11 @@ import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_api_service
 import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
+import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
+import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_database_mapper.dart';
+import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similiarity_api_mapper.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similarity_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_service.dart';
@@ -50,6 +53,8 @@ void _setupServices() {
   getIt.registerSingleton<QuizService>(QuizService(textSimilarityService));
 
   final database = getIt.get<AppDatabase>();
+
+  // deck
   final deckDataBaseRepository = DeckDataBaseRepository(database);
   getIt.registerSingleton<DeckDataBaseRepository>(deckDataBaseRepository);
   final deckRepository = DeckRepository(
@@ -57,4 +62,13 @@ void _setupServices() {
     deckDatBaseMapper: DeckDatBaseMapper(),
   );
   getIt.registerSingleton<DeckRepository>(deckRepository);
+
+  // quizcardlist
+  final quizCardDataBaseRepository = QuizCardDataBaseRepository(database);
+  getIt.registerSingleton<QuizCardDataBaseRepository>(quizCardDataBaseRepository);
+  final quizCardRepository = QuizCardRepository(
+    dataBaseRepository: quizCardDataBaseRepository,
+    dataBaseMapper: QuizCardDataBaseMapper(),
+  );
+  getIt.registerSingleton<QuizCardRepository>(quizCardRepository);
 }
