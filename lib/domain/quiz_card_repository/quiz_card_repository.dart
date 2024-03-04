@@ -1,5 +1,6 @@
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/model/deck_request_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_database_mapper.dart';
 
 class QuizCardRepository {
@@ -30,5 +31,15 @@ class QuizCardRepository {
 
   Future<bool> deleteQuizCard(QuizCardItem quizCard) {
     return dataBaseRepository.deleteQuizCard(quizCard.id);
+  }
+
+  Future<bool> editQuizCard({
+    required QuizCardItem currentCard,
+    required QuizCardRequestItem request,
+  }) {
+    return dataBaseRepository.editQuizCard(
+      currentCard: currentCard,
+      request: request,
+    );
   }
 }

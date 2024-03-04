@@ -1,4 +1,7 @@
+import 'package:drift/drift.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
+import 'package:poc_ai_quiz/domain/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/model/deck_request_item.dart';
 
 class QuizCardDataBaseRepository {
   final AppDatabase appDatabase;
@@ -38,6 +41,25 @@ class QuizCardDataBaseRepository {
             ),
           ))
         .go();
+    return result >= 0;
+  }
+
+  Future<bool> editQuizCard({
+    required QuizCardItem currentCard,
+    required QuizCardRequestItem request,
+  }) async {
+    final result = await (appDatabase.update(appDatabase.quizCardTable)
+          ..where(
+            (table) => table.id.isValue(
+              currentCard.id,
+            ),
+          ))
+        .write(
+      QuizCardTableCompanion(
+        questionText: Value(request.question),
+        answerText: Value(request.answer),
+      ),
+    );
     return result >= 0;
   }
 }

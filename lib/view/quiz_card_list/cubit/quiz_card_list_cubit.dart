@@ -34,6 +34,25 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     );
     fetchQuizCardList();
   }
+
+  void deleteCard(QuizCardItem card) {
+    emit(
+      QuizCardListLoadingState(),
+    );
+    quizCardRepository.deleteQuizCard(card);
+    fetchQuizCardList();
+  }
+
+  void editQuizCard(QuizCardItem card, QuizCardRequestItem quizCardRequestItem) {
+    emit(
+      QuizCardListLoadingState(),
+    );
+    quizCardRepository.editQuizCard(
+      currentCard: card,
+      request: quizCardRequestItem,
+    );
+    fetchQuizCardList();
+  }
 }
 
 abstract class QuizCardListState {}

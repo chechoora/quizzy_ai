@@ -58,6 +58,12 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
           if (state is QuizCardListDataState) {
             return QuizCardListDisplayWidget(
               quizCarList: state.quizCarList,
+              onQuizCardEditRequest: (card) {
+                _launchEditCardRequest(card);
+              },
+              onQuizCardRemoveRequest: (card) {
+                _launchConfirmDeleteRequest(card);
+              },
             );
           }
           if (state is QuizCardListLoadingState) {
@@ -99,5 +105,38 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
     return quizCardRequestItem != null &&
         quizCardRequestItem.question.isNotEmpty &&
         quizCardRequestItem.answer.isNotEmpty;
+  }
+
+  void _launchConfirmDeleteRequest(QuizCardItem card) {
+    alert(
+      context,
+      content: const Text(
+        "Are you sure you want to delete current card?",
+      ),
+    ).then(
+      (value) {
+        if (value ?? false) {
+          cubit.deleteCard(card);
+        }
+      },
+    );
+  }
+
+  void _launchEditCardRequest(QuizCardItem card) {
+    QuizCardRequestItem? quizCardRequestItem;
+    alert(
+      context,
+      title: const Text("Edit Quiz Card"),
+      content: FillQuizCardData(
+        cardItemForEdit: card,
+        onValueChange: (cardRequestItem) {
+          quizCardRequestItem = cardRequestItem;
+        },
+      ),
+    ).then((value) {
+      if (validateQuizCard(quizCardRequestItem) && (value ?? false)) {
+        cubit.editQuizCard(card, quizCardRequestItem!);
+      }
+    });
   }
 }
