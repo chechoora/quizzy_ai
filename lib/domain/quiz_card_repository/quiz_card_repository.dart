@@ -11,8 +11,24 @@ class QuizCardRepository {
   final QuizCardDataBaseRepository dataBaseRepository;
   final QuizCardDataBaseMapper dataBaseMapper;
 
-  Future<List<QuizCardItem>> fetchDecks(DeckItem deckItem) async {
+  Future<List<QuizCardItem>> fetchQuizCardItem(DeckItem deckItem) async {
     final databaseData = await dataBaseRepository.fetchQuizCardList(deckItem.id);
     return dataBaseMapper.mapToQuizCardItemList(databaseData);
+  }
+
+  Future<bool> saveQuizCard({
+    required String question,
+    required String answer,
+    required int deckId,
+  }) {
+    return dataBaseRepository.saveQuizCard(
+      question: question,
+      answer: answer,
+      deckId: deckId,
+    );
+  }
+
+  Future<bool> deleteQuizCard(QuizCardItem quizCard) {
+    return dataBaseRepository.deleteQuizCard(quizCard.id);
   }
 }

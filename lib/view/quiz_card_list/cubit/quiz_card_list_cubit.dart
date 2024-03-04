@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/model/deck_request_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_repository.dart';
 
 class QuizCardListCubit extends Cubit<QuizCardListState> {
@@ -11,15 +12,27 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
 
-  void fetchQuizCardList() {
+  Future<void> fetchQuizCardList() async {
     emit(
       QuizCardListLoadingState(),
     );
     emit(
       QuizCardListDataState(
-        quizCarList: const [],
+        quizCarList: await quizCardRepository.fetchQuizCardItem(deckItem),
       ),
     );
+  }
+
+  void createQuizCardItem(QuizCardRequestItem requestItem) {
+    emit(
+      QuizCardListLoadingState(),
+    );
+    quizCardRepository.saveQuizCard(
+      question: requestItem.question,
+      answer: requestItem.answer,
+      deckId: deckItem.id,
+    );
+    fetchQuizCardList();
   }
 }
 
