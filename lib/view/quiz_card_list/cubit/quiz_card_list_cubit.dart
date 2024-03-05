@@ -11,16 +11,23 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
 
   final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
+  final items = <QuizCardItem>[];
 
-  Future<void> fetchQuizCardList() async {
+  Future<void> fetchQuizCardListRequest() async {
     emit(
       QuizCardListLoadingState(),
     );
     emit(
       QuizCardListDataState(
-        quizCarList: await quizCardRepository.fetchQuizCardItem(deckItem),
+        quizCarList: await _fetchCards(),
       ),
     );
+  }
+
+  Future<List<QuizCardItem>> _fetchCards() async {
+    return items
+      ..clear()
+      ..addAll(await quizCardRepository.fetchQuizCardItem(deckItem));
   }
 
   void createQuizCardItem(QuizCardRequestItem requestItem) {
@@ -32,7 +39,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       answer: requestItem.answer,
       deckId: deckItem.id,
     );
-    fetchQuizCardList();
+    fetchQuizCardListRequest();
   }
 
   void deleteCard(QuizCardItem card) {
@@ -40,7 +47,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       QuizCardListLoadingState(),
     );
     quizCardRepository.deleteQuizCard(card);
-    fetchQuizCardList();
+    fetchQuizCardListRequest();
   }
 
   void editQuizCard(QuizCardItem card, QuizCardRequestItem quizCardRequestItem) {
@@ -51,7 +58,15 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       currentCard: card,
       request: quizCardRequestItem,
     );
-    fetchQuizCardList();
+    fetchQuizCardListRequest();
+  }
+
+  void launchQuizRequest() {
+    emit(
+      QuizCardLaunchState(
+        quizCarList: items,
+      ),
+    );
   }
 }
 
@@ -61,6 +76,12 @@ class QuizCardListLoadingState extends QuizCardListState {}
 
 class QuizCardListDataState extends QuizCardListState {
   QuizCardListDataState({required this.quizCarList});
+
+  final List<QuizCardItem> quizCarList;
+}
+
+class QuizCardLaunchState extends QuizCardListState {
+  QuizCardLaunchState({required this.quizCarList});
 
   final List<QuizCardItem> quizCarList;
 }

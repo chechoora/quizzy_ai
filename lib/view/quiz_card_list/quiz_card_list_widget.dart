@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/model/deck_request_item.dart';
@@ -30,7 +31,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
 
   @override
   void initState() {
-    cubit.fetchQuizCardList();
+    cubit.fetchQuizCardListRequest();
     super.initState();
   }
 
@@ -54,6 +55,9 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
       ),
       body: BlocConsumer<QuizCardListCubit, QuizCardListState>(
         bloc: cubit,
+        buildWhen: (oldState, newState) {
+          return newState is! QuizCardLaunchState;
+        },
         builder: (context, state) {
           if (state is QuizCardListDataState) {
             return QuizCardListDisplayWidget(
@@ -71,14 +75,25 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
           }
           throw ArgumentError('Wrong state');
         },
-        listener: (context, state) {},
+        listenWhen: (oldState, newState) {
+          return newState is QuizCardLaunchState;
+        },
+        listener: (context, state) {
+          if (state is QuizCardLaunchState) {
+            context.push(
+              '/quizExe',
+              extra: state.quizCarList,
+            );
+          }
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Add Card',
-        onPressed: () {
+      bottomNavigationBar: _BottomQuizCardBar(
+        onAddCardRequest: () {
           _addCardRequest();
         },
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
+        onLaunchQuizRequest: () {
+          cubit.launchQuizRequest();
+        },
       ),
     );
   }
@@ -138,5 +153,35 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
         cubit.editQuizCard(card, quizCardRequestItem!);
       }
     });
+  }
+}
+
+class _BottomQuizCardBar extends StatelessWidget {
+  const _BottomQuizCardBar({
+    this.onAddCardRequest,
+    this.onLaunchQuizRequest,
+  });
+
+  final VoidCallback? onAddCardRequest;
+  final VoidCallback? onLaunchQuizRequest;
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomAppBar(
+      child: Row(
+        children: <Widget>[
+          IconButton(
+            tooltip: 'Add Card',
+            icon: const Icon(Icons.add),
+            onPressed: onAddCardRequest,
+          ),
+          IconButton(
+            tooltip: 'Launch Deck',
+            icon: const Icon(Icons.play_arrow),
+            onPressed: onLaunchQuizRequest,
+          ),
+        ],
+      ),
+    );
   }
 }
