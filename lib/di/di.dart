@@ -12,7 +12,7 @@ import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_database_mappe
 import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similiarity_api_mapper.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similarity_service.dart';
-import 'package:poc_ai_quiz/domain/quiz_service.dart';
+import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/util/api/isolate_converter.dart';
 
 final getIt = GetIt.instance;

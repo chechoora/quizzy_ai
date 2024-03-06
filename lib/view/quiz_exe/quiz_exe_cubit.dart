@@ -1,16 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
-import 'package:poc_ai_quiz/domain/quiz_engine.dart';
-import 'package:poc_ai_quiz/domain/quiz_service.dart';
+import 'package:poc_ai_quiz/domain/model/quiz_results.dart';
+import 'package:poc_ai_quiz/domain/quiz/quiz_engine.dart';
+import 'package:poc_ai_quiz/domain/quiz/quiz_match_builder.dart';
+import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 
 class QuizExeCubit extends Cubit<QuizExeState> {
   QuizExeCubit({
     required this.quizCardItems,
     required this.quizService,
+    required this.quizMatchBuilder,
   }) : super(QuizExeLoadingState());
 
   final List<QuizCardItem> quizCardItems;
   final QuizService quizService;
+  final QuizMatchBuilder quizMatchBuilder;
 
   late final quizEngine = QuizEngine(
     cards: quizCardItems,
@@ -24,16 +28,23 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     },
   );
 
+  void launchQuiz() {
+    if (quizEngine.hasNext) {
+      quizEngine.nextCard();
+    }
+  }
+
   void checkTheAnswer(
     QuizCardItem quizCardItem,
     String possibleAnswer,
   ) async {
     final result = await quizEngine.checkPossibleAnswer(quizCardItem, possibleAnswer);
+    quizMatchBuilder.saveResult(quizCardItem, possibleAnswer, result);
     emit(QuizCardResultState(isCorrect: result >= 0.6));
     if (quizEngine.hasNext) {
       quizEngine.nextCard();
     } else {
-      emit(QuizCardDoneState());
+      emit(QuizDoneState(quizResults: quizMatchBuilder.getResults()));
     }
   }
 }
@@ -58,4 +69,8 @@ class QuizCardResultState extends QuizExeState {
   final bool isCorrect;
 }
 
-class QuizCardDoneState extends QuizExeState {}
+class QuizDoneState extends QuizExeState {
+  QuizDoneState({required this.quizResults});
+
+  final QuizResults quizResults;
+}

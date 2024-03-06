@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
-import 'package:poc_ai_quiz/domain/quiz_service.dart';
+import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 
 class QuizEngine {
   QuizEngine({
@@ -21,12 +21,7 @@ class QuizEngine {
     if (_currentCardIndex >= cards.length) {
       throw Exception('Overflow');
     }
-    if (_currentCardIndex == 0) {
-      onTestNewCard.call(cards[_currentCardIndex]);
-    } else {
-      _currentCardIndex++;
-      onTestNewCard.call(cards[_currentCardIndex]);
-    }
+    onTestNewCard.call(cards[_currentCardIndex++]);
   }
 
   Future<double> checkPossibleAnswer(

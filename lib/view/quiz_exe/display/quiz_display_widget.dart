@@ -4,9 +4,9 @@ import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 class QuizDisplayWidget extends StatefulWidget {
   const QuizDisplayWidget({
     required this.quizCardItem,
-    super.key,
     this.onTextPassed,
     this.onSkipPassed,
+    super.key,
   });
 
   final QuizCardItem quizCardItem;

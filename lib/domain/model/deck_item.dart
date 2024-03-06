@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+
 class DeckItem {
   final int id;
   final String title;
@@ -5,16 +7,24 @@ class DeckItem {
   DeckItem(this.id, this.title);
 }
 
-class QuizCardItem {
+class QuizCardItem extends Equatable {
   final int id;
   final int deckId;
   final String questionText;
   final String answerText;
 
-  QuizCardItem(
+  const QuizCardItem(
     this.id,
     this.deckId,
     this.questionText,
     this.answerText,
   );
+
+  @override
+  List<Object?> get props => [
+        id,
+        deckId,
+        questionText,
+        answerText,
+      ];
 }
