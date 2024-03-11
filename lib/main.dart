@@ -5,6 +5,7 @@ import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 import 'package:poc_ai_quiz/view/deck_widget/deck_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
+import 'package:poc_ai_quiz/view/settings/premium_settings/premium_settings_widget.dart';
 
 Future<void> main() async {
   await setupDi();
@@ -42,6 +43,13 @@ class MyApp extends StatelessWidget {
           return QuizExeWidget(
             cards: quizCards,
           );
+        },
+      ),
+      GoRoute(
+        name: 'premiumSettings',
+        path: '/premiumSettings',
+        builder: (context, state) {
+          return const PremiumSettingsWidget();
         },
       )
     ],

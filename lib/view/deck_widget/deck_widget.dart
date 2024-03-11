@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
@@ -9,6 +10,7 @@ import 'package:poc_ai_quiz/view/deck_widget/deck_list_display_widget.dart';
 import 'package:poc_ai_quiz/view/deck_widget/fill_deck_data_widget.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
+import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
 
 //TODO Add validation for dialogs.
 // TODO Add error messages
@@ -23,6 +25,8 @@ class _DeckWidgetState extends State<DeckWidget> {
   final DeckCubit cubit = DeckCubit(
     deckRepository: getIt<DeckRepository>(),
   );
+
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -52,18 +56,23 @@ class _DeckWidgetState extends State<DeckWidget> {
         bloc: cubit,
         builder: (BuildContext context, state) {
           if (state is DeckDataState) {
-            return DeckListDisplayWidget(
-              deckList: state.deckList,
-              onDeckRemoveRequest: (deck) {
-                _launchConfirmDeleteRequest(deck);
-              },
-              onDeckEditRequest: (deck) {
-                _launchEditDeckTitleRequest(deck);
-              },
-              onDeckClicked: (deck) {
-                _openDeck(deck);
-              },
-            );
+            if (_selectedIndex == 0) {
+              return DeckListDisplayWidget(
+                deckList: state.deckList,
+                onDeckRemoveRequest: (deck) {
+                  _launchConfirmDeleteRequest(deck);
+                },
+                onDeckEditRequest: (deck) {
+                  _launchEditDeckTitleRequest(deck);
+                },
+                onDeckClicked: (deck) {
+                  _openDeck(deck);
+                },
+              );
+            } else if (_selectedIndex == 1) {
+              return const SettingsWidget();
+            }
+            throw ArgumentError('Wrong index');
           }
           if (state is DeckLoadingState) {
             return const SimpleLoadingWidget();
@@ -72,13 +81,42 @@ class _DeckWidgetState extends State<DeckWidget> {
         },
         listener: (BuildContext context, DeckState state) {},
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Add Deck',
-        onPressed: () {
-          _addDockRequest();
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              'assets/icons/deck_icon.svg',
+              colorFilter: ColorFilter.mode(
+                _selectedIndex == 0 ? Theme.of(context).colorScheme.primary : Colors.black,
+                BlendMode.srcIn,
+              ),
+              semanticsLabel: 'Decks',
+            ),
+            label: 'Decks',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.settings,
+              color: _selectedIndex == 1 ? Theme.of(context).colorScheme.primary : Colors.black,
+            ),
+            label: 'Settings',
+          ),
+        ],
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
         },
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
+      floatingActionButton: _selectedIndex == 0
+          ? FloatingActionButton(
+              tooltip: 'Add Deck',
+              onPressed: () {
+                _addDockRequest();
+              },
+              child: const Icon(Icons.add, color: Colors.white, size: 28),
+            )
+          : null,
     );
   }
 
