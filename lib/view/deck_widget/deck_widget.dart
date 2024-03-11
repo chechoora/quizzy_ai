@@ -121,20 +121,25 @@ class _DeckWidgetState extends State<DeckWidget> {
   }
 
   void _addDockRequest() {
-    var deckName = '';
-    alert(
-      context,
-      title: const Text("Add Deck"),
-      content: FillDeckDataWidget(
-        onValueChange: (text) {
-          deckName = text;
-        },
-      ),
-    ).then((value) {
-      if (value ?? false) {
+    context.push('/createDeck').then((deckName) {
+      if (deckName is String) {
         cubit.createDeck(deckName);
       }
     });
+    // var deckName = '';
+    // alert(
+    //   context,
+    //   title: const Text("Add Deck"),
+    //   content: FillDeckDataWidget(
+    //     onValueChange: (text) {
+    //       deckName = text;
+    //     },
+    //   ),
+    // ).then((value) {
+    //   if (value ?? false) {
+    //     cubit.createDeck(deckName);
+    //   }
+    // });
   }
 
   void _launchConfirmDeleteRequest(DeckItem deck) {

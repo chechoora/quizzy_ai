@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
+import 'package:poc_ai_quiz/view/create_card/create_card_widget.dart';
+import 'package:poc_ai_quiz/view/create_deck/create_deck_widget.dart';
 import 'package:poc_ai_quiz/view/deck_widget/deck_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
@@ -50,6 +52,20 @@ class MyApp extends StatelessWidget {
         path: '/premiumSettings',
         builder: (context, state) {
           return const PremiumSettingsWidget();
+        },
+      ),
+      GoRoute(
+        name: 'createDeck',
+        path: '/createDeck',
+        builder: (context, state) {
+          return const CreateDeckWidget();
+        },
+      ),
+      GoRoute(
+        name: 'createCard',
+        path: '/createCard',
+        builder: (context, state) {
+          return const CreateCardWidget();
         },
       )
     ],

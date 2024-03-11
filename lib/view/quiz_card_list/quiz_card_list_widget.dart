@@ -8,7 +8,6 @@ import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_repository.dar
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
-import 'package:poc_ai_quiz/view/quiz_card_list/fill_quiz_card_data.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_display_widget.dart';
 
 class QuizCardListWidget extends StatefulWidget {
@@ -99,18 +98,9 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
   }
 
   void _addCardRequest() {
-    QuizCardRequestItem? quizCardRequestItem;
-    alert(
-      context,
-      title: const Text("Add Quiz Card"),
-      content: FillQuizCardData(
-        onValueChange: (cardRequestItem) {
-          quizCardRequestItem = cardRequestItem;
-        },
-      ),
-    ).then((value) {
-      if (validateQuizCard(quizCardRequestItem) && (value ?? false)) {
-        cubit.createQuizCardItem(quizCardRequestItem!);
+    context.push('/createCard').then((cardRequest) {
+      if (cardRequest is QuizCardRequestItem) {
+        cubit.createQuizCardItem(cardRequest);
       }
     });
   }
@@ -138,19 +128,9 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
   }
 
   void _launchEditCardRequest(QuizCardItem card) {
-    QuizCardRequestItem? quizCardRequestItem;
-    alert(
-      context,
-      title: const Text("Edit Quiz Card"),
-      content: FillQuizCardData(
-        cardItemForEdit: card,
-        onValueChange: (cardRequestItem) {
-          quizCardRequestItem = cardRequestItem;
-        },
-      ),
-    ).then((value) {
-      if (validateQuizCard(quizCardRequestItem) && (value ?? false)) {
-        cubit.editQuizCard(card, quizCardRequestItem!);
+    context.push('/createCard').then((cardRequest) {
+      if (cardRequest is QuizCardRequestItem) {
+        cubit.editQuizCard(card, cardRequest);
       }
     });
   }
