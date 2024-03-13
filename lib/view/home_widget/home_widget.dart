@@ -5,24 +5,22 @@ import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
-import 'package:poc_ai_quiz/view/deck_widget/cubit/deck_cubit.dart';
-import 'package:poc_ai_quiz/view/deck_widget/deck_list_display_widget.dart';
-import 'package:poc_ai_quiz/view/deck_widget/fill_deck_data_widget.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
+import 'package:poc_ai_quiz/view/home_widget/cubit/deck_cubit.dart';
+import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
 
-//TODO Add validation for dialogs.
 // TODO Add error messages
-class DeckWidget extends StatefulWidget {
-  const DeckWidget({super.key});
+class HomeWidget extends StatefulWidget {
+  const HomeWidget({super.key});
 
   @override
-  State<DeckWidget> createState() => _DeckWidgetState();
+  State<HomeWidget> createState() => _HomeWidgetState();
 }
 
-class _DeckWidgetState extends State<DeckWidget> {
-  final DeckCubit cubit = DeckCubit(
+class _HomeWidgetState extends State<HomeWidget> {
+  final HomeCubit cubit = HomeCubit(
     deckRepository: getIt<DeckRepository>(),
   );
 
@@ -44,15 +42,14 @@ class _DeckWidgetState extends State<DeckWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text(
-          "Deck List",
+        title: Text(
+          "Quiz Decks",
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
       ),
-      body: BlocConsumer<DeckCubit, DeckState>(
+      body: BlocConsumer<HomeCubit, DeckState>(
         bloc: cubit,
         builder: (BuildContext context, state) {
           if (state is DeckDataState) {
@@ -87,7 +84,9 @@ class _DeckWidgetState extends State<DeckWidget> {
             icon: SvgPicture.asset(
               'assets/icons/deck_icon.svg',
               colorFilter: ColorFilter.mode(
-                _selectedIndex == 0 ? Theme.of(context).colorScheme.primary : Colors.black,
+                _selectedIndex == 0
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.inversePrimary,
                 BlendMode.srcIn,
               ),
               semanticsLabel: 'Decks',
@@ -97,7 +96,9 @@ class _DeckWidgetState extends State<DeckWidget> {
           BottomNavigationBarItem(
             icon: Icon(
               Icons.settings,
-              color: _selectedIndex == 1 ? Theme.of(context).colorScheme.primary : Colors.black,
+              color: _selectedIndex == 1
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.inversePrimary,
             ),
             label: 'Settings',
           ),
@@ -126,20 +127,6 @@ class _DeckWidgetState extends State<DeckWidget> {
         cubit.createDeck(deckName);
       }
     });
-    // var deckName = '';
-    // alert(
-    //   context,
-    //   title: const Text("Add Deck"),
-    //   content: FillDeckDataWidget(
-    //     onValueChange: (text) {
-    //       deckName = text;
-    //     },
-    //   ),
-    // ).then((value) {
-    //   if (value ?? false) {
-    //     cubit.createDeck(deckName);
-    //   }
-    // });
   }
 
   void _launchConfirmDeleteRequest(DeckItem deck) {
@@ -158,21 +145,10 @@ class _DeckWidgetState extends State<DeckWidget> {
   }
 
   void _launchEditDeckTitleRequest(DeckItem deck) {
-    var newDeckName = '';
-    alert(
-      context,
-      title: Text(
-        "Enter new name for ${deck.title}",
-      ),
-      content: FillDeckDataWidget(
-        onValueChange: (text) {
-          newDeckName = text;
-        },
-      ),
-    ).then(
-      (value) {
-        if (value ?? false) {
-          cubit.editDeck(deck, newDeckName);
+    context.push('/createDeck', extra: deck.title).then(
+      (deckName) {
+        if (deckName is String) {
+          cubit.editDeck(deck, deckName);
         }
       },
     );

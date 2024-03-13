@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 
 class QuizDisplayWidget extends StatefulWidget {
@@ -24,33 +25,87 @@ class _QuizDisplayWidgetState extends State<QuizDisplayWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(2),
-          child: Text(
-            widget.quizCardItem.questionText,
+        Expanded(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 8),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget.quizCardItem.questionText,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).primaryColor),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                margin: const EdgeInsets.all(8),
+                alignment: Alignment.topLeft,
+                height: 120,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 4,
+                ),
+                child: TextField(
+                  maxLines: null,
+                  controller: editController,
+                  decoration: const InputDecoration(hintText: 'Type answer', border: InputBorder.none),
+                ),
+              ),
+            ],
           ),
         ),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).primaryColor),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: const EdgeInsets.all(8),
-          alignment: Alignment.topLeft,
-          height: 120,
-          child: TextField(
-            maxLines: null,
-            controller: editController,
-            decoration: const InputDecoration(hintText: 'Type answer', border: InputBorder.none),
-          ),
-        ),
-        ElevatedButton(
-          child: const Text('Test'),
-          onPressed: () {
+        _BottomQuizExeBar(
+          onCloseRequest: () {
+            context.pop();
+          },
+          onCheckRequest: () {
             widget.onTextPassed?.call(editController.text);
           },
-        )
+        ),
       ],
+    );
+  }
+}
+
+class _BottomQuizExeBar extends StatelessWidget {
+  const _BottomQuizExeBar({
+    this.onCloseRequest,
+    this.onCheckRequest,
+    super.key,
+  });
+
+  final VoidCallback? onCloseRequest;
+  final VoidCallback? onCheckRequest;
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomAppBar(
+      color: Colors.white,
+      child: Row(
+        children: <Widget>[
+          IconButton(
+            tooltip: 'Close',
+            icon: Icon(
+              Icons.close,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onPressed: onCloseRequest,
+          ),
+          IconButton(
+            tooltip: 'Check',
+            icon: Icon(
+              Icons.check_circle_outline,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onPressed: onCheckRequest,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -44,11 +46,11 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text(
-          "Deck Cards",
+        automaticallyImplyLeading: false,
+        title: Text(
+          widget.deckItem.title,
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
       ),
@@ -87,6 +89,9 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
         },
       ),
       bottomNavigationBar: _BottomQuizCardBar(
+        onBackRequest: () {
+          context.pop();
+        },
         onAddCardRequest: () {
           _addCardRequest();
         },
@@ -128,7 +133,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
   }
 
   void _launchEditCardRequest(QuizCardItem card) {
-    context.push('/createCard').then((cardRequest) {
+    context.push('/createCard', extra: card).then((cardRequest) {
       if (cardRequest is QuizCardRequestItem) {
         cubit.editQuizCard(card, cardRequest);
       }
@@ -138,26 +143,43 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
 
 class _BottomQuizCardBar extends StatelessWidget {
   const _BottomQuizCardBar({
+    this.onBackRequest,
     this.onAddCardRequest,
     this.onLaunchQuizRequest,
   });
 
+  final VoidCallback? onBackRequest;
   final VoidCallback? onAddCardRequest;
   final VoidCallback? onLaunchQuizRequest;
 
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
+      color: Colors.white,
       child: Row(
         children: <Widget>[
           IconButton(
+            tooltip: 'Back',
+            icon: Icon(
+              Icons.arrow_back_rounded,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onPressed: onBackRequest,
+          ),
+          IconButton(
             tooltip: 'Add Card',
-            icon: const Icon(Icons.add),
+            icon: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             onPressed: onAddCardRequest,
           ),
           IconButton(
             tooltip: 'Launch Deck',
-            icon: const Icon(Icons.play_arrow),
+            icon: Icon(
+              Icons.play_arrow,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             onPressed: onLaunchQuizRequest,
           ),
         ],

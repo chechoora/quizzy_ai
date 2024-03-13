@@ -17,8 +17,14 @@ class _SettingsWidgetState extends State<SettingsWidget> {
       itemBuilder: (BuildContext context, int index) {
         // This function returns a ListTile for each setting item
         return ListTile(
-          title: const Text('Premium Settings'),
-          leading: const Icon(Icons.workspace_premium), // You can change the icon as per your requirement
+          title: Text(
+            'Premium Settings',
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
+          leading: Icon(
+            Icons.workspace_premium,
+            color: Theme.of(context).colorScheme.primary,
+          ), // You can change the icon as per your requirement
           onTap: () {
             context.push(
               '/premiumSettings',

@@ -2,8 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 
-class DeckCubit extends Cubit<DeckState> {
-  DeckCubit({
+class HomeCubit extends Cubit<DeckState> {
+  HomeCubit({
     required this.deckRepository,
   }) : super(const DeckLoadingState());
 

@@ -1,24 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:poc_ai_quiz/util/view/bottom_save_bar.dart';
 
 class CreateDeckDisplay extends StatefulWidget {
-  const CreateDeckDisplay({super.key});
+  const CreateDeckDisplay({
+    this.deckName,
+    super.key,
+  });
+
+  final String? deckName;
 
   @override
   State<CreateDeckDisplay> createState() => _CreateDeckDisplayState();
 }
 
 class _CreateDeckDisplayState extends State<CreateDeckDisplay> {
+  late final controller = TextEditingController(text: widget.deckName);
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text('Title of the deck'),
-        TextFormField(),
+        const SizedBox(height: 12),
         Expanded(
-          child: ElevatedButton(
-            onPressed: () {},
-            child: const Text('Save'),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 8),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Title of the deck',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(8),
+                child: TextFormField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+        ),
+        BottomSaveBar(
+          onBackRequest: () {
+            context.pop();
+          },
+          onSaveRequest: () {
+            final text = controller.text;
+            if (text.isNotEmpty) {
+              context.pop(text);
+            }
+          },
         ),
       ],
     );

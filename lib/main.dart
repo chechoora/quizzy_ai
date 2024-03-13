@@ -4,7 +4,7 @@ import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 import 'package:poc_ai_quiz/view/create_card/create_card_widget.dart';
 import 'package:poc_ai_quiz/view/create_deck/create_deck_widget.dart';
-import 'package:poc_ai_quiz/view/deck_widget/deck_widget.dart';
+import 'package:poc_ai_quiz/view/home_widget/home_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
 import 'package:poc_ai_quiz/view/settings/premium_settings/premium_settings_widget.dart';
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         name: 'home', // Optional, add name to your routes. Allows you navigate by name instead of path
         path: '/',
         builder: (context, state) {
-          return const DeckWidget();
+          return const HomeWidget();
         },
         routes: [
           GoRoute(
@@ -58,14 +58,20 @@ class MyApp extends StatelessWidget {
         name: 'createDeck',
         path: '/createDeck',
         builder: (context, state) {
-          return const CreateDeckWidget();
+          final deckName = state.extra as String?;
+          return CreateDeckWidget(
+            deckName: deckName,
+          );
         },
       ),
       GoRoute(
         name: 'createCard',
         path: '/createCard',
         builder: (context, state) {
-          return const CreateCardWidget();
+          final card = state.extra as QuizCardItem?;
+          return CreateCardWidget(
+            cardToEdit: card,
+          );
         },
       )
     ],

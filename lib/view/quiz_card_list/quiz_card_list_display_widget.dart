@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 
 // TODO change UI
@@ -54,40 +56,64 @@ class QuizCardWidget extends StatefulWidget {
 class _QuizCardWidgetState extends State<QuizCardWidget> {
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      margin: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Theme.of(context).primaryColor,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Column(
         children: [
-          Text(widget.quizCardItem.questionText),
-          const Divider(
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 4,
+              ),
+              alignment: Alignment.center,
+              child: Text(widget.quizCardItem.questionText),
+            ),
+          ),
+          Divider(
+            color: Theme.of(context).colorScheme.primary,
             thickness: 1.0,
           ),
-          Text(widget.quizCardItem.answerText),
           Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.edit,
-                    size: 16,
-                  ),
-                  onPressed: () {
-                    widget.onQuizCardEditRequest?.call();
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.delete,
-                    size: 16,
-                  ),
-                  onPressed: () {
-                    widget.onQuizCardRemoveRequest?.call();
-                  },
-                ),
-              ],
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 4,
+              ),
+              alignment: Alignment.center,
+              child: Text(widget.quizCardItem.answerText),
             ),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.edit,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                onPressed: () {
+                  widget.onQuizCardEditRequest?.call();
+                },
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.delete,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                onPressed: () {
+                  widget.onQuizCardRemoveRequest?.call();
+                },
+              ),
+            ],
           ),
         ],
       ),

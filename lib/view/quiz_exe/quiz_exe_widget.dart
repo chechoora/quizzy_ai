@@ -6,7 +6,7 @@ import 'package:poc_ai_quiz/domain/quiz/quiz_match_builder.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/display/quiz_display_widget.dart';
-import 'package:poc_ai_quiz/view/quiz_exe/quiz_done_widget.dart';
+import 'package:poc_ai_quiz/view/quiz_exe/done/quiz_done_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_cubit.dart';
 
 class QuizExeWidget extends StatefulWidget {
@@ -38,7 +38,13 @@ class _QuizExeWidgetState extends State<QuizExeWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(
+          "Quiz in Progress",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        automaticallyImplyLeading: false,
       ),
       body: BlocConsumer<QuizExeCubit, QuizExeState>(
         bloc: cubit,

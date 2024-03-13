@@ -20,8 +20,14 @@ class DeckListDisplayWidget extends StatelessWidget {
     return ListView.separated(
       itemBuilder: (context, index) {
         final deck = deckList[index];
-        return Card(
-          elevation: 4,
+        return Container(
+          margin: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).primaryColor,
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: InkWell(
             child: Row(
               children: [
@@ -30,7 +36,13 @@ class DeckListDisplayWidget extends StatelessWidget {
                     vertical: 24,
                     horizontal: 16,
                   ),
-                  child: Text(deck.title),
+                  child: Text(
+                    deck.title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
                 ),
                 Expanded(
                   child: Container(
@@ -42,13 +54,19 @@ class DeckListDisplayWidget extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit),
+                          icon: Icon(
+                            Icons.edit,
+                            color: Theme.of(context).primaryColor,
+                          ),
                           onPressed: () {
                             onDeckEditRequest?.call(deck);
                           },
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete),
+                          icon: Icon(
+                            Icons.delete,
+                            color: Theme.of(context).primaryColor,
+                          ),
                           onPressed: () {
                             onDeckRemoveRequest?.call(deck);
                           },

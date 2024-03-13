@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 
 import 'display/create_deck_display_widget.dart';
 
-class CreateDeckWidget extends StatefulWidget {
-  const CreateDeckWidget({super.key});
+class CreateDeckWidget extends StatelessWidget {
+  const CreateDeckWidget({
+    this.deckName,
+    super.key,
+  });
 
-  @override
-  State<CreateDeckWidget> createState() => _CreateDeckWidgetState();
-}
+  final String? deckName;
 
-class _CreateDeckWidgetState extends State<CreateDeckWidget> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: CreateDeckDisplay(),
+    return Scaffold(
+      body: SafeArea(
+        child: CreateDeckDisplay(
+          deckName: deckName,
+        ),
+      ),
     );
   }
 }
