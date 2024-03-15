@@ -51,6 +51,7 @@ class _QuizDisplayWidgetState extends State<QuizDisplayWidget> {
                   horizontal: 4,
                 ),
                 child: TextField(
+                  autofocus: true,
                   maxLines: null,
                   controller: editController,
                   decoration: const InputDecoration(hintText: 'Type answer', border: InputBorder.none),
@@ -76,11 +77,14 @@ class _BottomQuizExeBar extends StatelessWidget {
   const _BottomQuizExeBar({
     this.onCloseRequest,
     this.onCheckRequest,
-    super.key,
+    this.onBackRequest,
+    this.onForwardRequest,
   });
 
   final VoidCallback? onCloseRequest;
   final VoidCallback? onCheckRequest;
+  final VoidCallback? onBackRequest;
+  final VoidCallback? onForwardRequest;
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +108,22 @@ class _BottomQuizExeBar extends StatelessWidget {
             ),
             onPressed: onCheckRequest,
           ),
+          // IconButton(
+          //   tooltip: 'Backwards',
+          //   icon: Icon(
+          //     Icons.arrow_back_rounded,
+          //     color: Theme.of(context).colorScheme.primary,
+          //   ),
+          //   onPressed: onBackRequest,
+          // ),
+          // IconButton(
+          //   tooltip: 'Forward',
+          //   icon: Icon(
+          //     Icons.arrow_forward_rounded,
+          //     color: Theme.of(context).colorScheme.primary,
+          //   ),
+          //   onPressed: onForwardRequest,
+          // ),
         ],
       ),
     );

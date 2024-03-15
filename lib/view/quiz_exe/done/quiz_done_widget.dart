@@ -15,7 +15,6 @@ class QuizDoneWidget extends StatelessWidget {
     final quizMatchList = quizResults.quizMatchList;
     return Column(
       children: [
-        const Text('Cards done, here is your results'),
         Expanded(
           child: ListView.builder(
             itemCount: quizMatchList.length,
@@ -26,10 +25,11 @@ class QuizDoneWidget extends StatelessWidget {
             },
           ),
         ),
-        TextButton(
-          onPressed: () => context.pop(),
-          child: Text(MaterialLocalizations.of(context).okButtonLabel),
-        )
+        _BottomQuizDoneBar(
+          onCloseRequest: () {
+            context.pop();
+          },
+        ),
       ],
     );
   }
@@ -45,8 +45,18 @@ class QuizMatchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      padding: const EdgeInsets.all(4),
+      margin: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Theme.of(context).primaryColor,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
@@ -60,6 +70,34 @@ class QuizMatchWidget extends StatelessWidget {
           ),
           Text(
             "Match: ${(quizAnswerMatch.ratio * 100).toInt()}",
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomQuizDoneBar extends StatelessWidget {
+  const _BottomQuizDoneBar({
+    this.onCloseRequest,
+  });
+
+  final VoidCallback? onCloseRequest;
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomAppBar(
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          IconButton(
+            tooltip: 'Close',
+            icon: Icon(
+              Icons.close,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onPressed: onCloseRequest,
           ),
         ],
       ),

@@ -38,11 +38,17 @@ class _QuizExeWidgetState extends State<QuizExeWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Quiz in Progress",
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.primary,
-          ),
+        title: BlocBuilder<QuizExeCubit, QuizExeState>(
+          bloc: cubit,
+          builder: (BuildContext context, state) {
+            final isQuizDone = state is QuizDoneState;
+            return Text(
+              isQuizDone ? "Quiz Finished" : "Quiz in Progress",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            );
+          },
         ),
         automaticallyImplyLeading: false,
       ),

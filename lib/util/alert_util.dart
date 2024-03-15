@@ -15,6 +15,7 @@ Future alert(
   Widget? title,
   Widget? content,
   Widget? textOK,
+  Widget? textCancel,
 }) =>
     showDialog(
       context: context,
@@ -25,6 +26,10 @@ Future alert(
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: textOK ?? Text(MaterialLocalizations.of(context).okButtonLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
           ),
         ],
       ),
