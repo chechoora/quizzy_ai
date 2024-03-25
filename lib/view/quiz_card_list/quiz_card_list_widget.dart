@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/model/deck_request_item.dart';
+import 'package:poc_ai_quiz/domain/quiz_card_repository/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
@@ -28,6 +29,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
   late final QuizCardListCubit cubit = QuizCardListCubit(
     deckItem: widget.deckItem,
     quizCardRepository: getIt<QuizCardRepository>(),
+    quizCardPremiumManager: getIt<QuizCardPremiumManager>(),
   );
 
   @override

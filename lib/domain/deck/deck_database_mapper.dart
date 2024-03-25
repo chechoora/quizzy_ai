@@ -6,8 +6,9 @@ class DeckDatBaseMapper {
     return dataBaseDeckItems
         .map(
           (e) => DeckItem(
-            e.id,
-            e.title,
+            id: e.id,
+            title: e.title,
+            isArchive: e.isArchive,
           ),
         )
         .toList();

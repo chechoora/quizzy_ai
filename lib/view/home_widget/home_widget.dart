@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
+import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
@@ -22,6 +23,7 @@ class HomeWidget extends StatefulWidget {
 class _HomeWidgetState extends State<HomeWidget> {
   final HomeCubit cubit = HomeCubit(
     deckRepository: getIt<DeckRepository>(),
+    deckPremiumManager: getIt<DeckPremiumManager>(),
   );
 
   int _selectedIndex = 0;

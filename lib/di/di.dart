@@ -6,13 +6,18 @@ import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_header_inte
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
+import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
+import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz_card_repository/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similiarity_api_mapper.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similarity_service.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
+import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
+import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/util/api/isolate_converter.dart';
 
 final getIt = GetIt.instance;
@@ -26,6 +31,15 @@ Future<void> setupDi() async {
 Future<void> _setupDataBase() async {
   final database = AppDatabase();
   getIt.registerSingleton<AppDatabase>(database);
+
+  final deckDataBaseRepository = DeckDataBaseRepository(database);
+  getIt.registerSingleton<DeckDataBaseRepository>(deckDataBaseRepository);
+
+  final quizCardDataBaseRepository = QuizCardDataBaseRepository(database);
+  getIt.registerSingleton<QuizCardDataBaseRepository>(quizCardDataBaseRepository);
+
+  final userDataBaseRepository = UserDataBaseRepository(database);
+  getIt.registerSingleton<UserDataBaseRepository>(userDataBaseRepository);
 }
 
 Future<void> _setupAPI() async {
@@ -52,23 +66,37 @@ void _setupServices() {
   getIt.registerSingleton<TextSimilarityService>(textSimilarityService);
   getIt.registerSingleton<QuizService>(QuizService(textSimilarityService));
 
-  final database = getIt.get<AppDatabase>();
-
   // deck
-  final deckDataBaseRepository = DeckDataBaseRepository(database);
-  getIt.registerSingleton<DeckDataBaseRepository>(deckDataBaseRepository);
   final deckRepository = DeckRepository(
-    dataBaseRepository: deckDataBaseRepository,
+    dataBaseRepository: getIt.get<DeckDataBaseRepository>(),
     deckDatBaseMapper: DeckDatBaseMapper(),
   );
   getIt.registerSingleton<DeckRepository>(deckRepository);
 
   // quizcardlist
-  final quizCardDataBaseRepository = QuizCardDataBaseRepository(database);
-  getIt.registerSingleton<QuizCardDataBaseRepository>(quizCardDataBaseRepository);
   final quizCardRepository = QuizCardRepository(
-    dataBaseRepository: quizCardDataBaseRepository,
+    dataBaseRepository: getIt.get<QuizCardDataBaseRepository>(),
     dataBaseMapper: QuizCardDataBaseMapper(),
   );
   getIt.registerSingleton<QuizCardRepository>(quizCardRepository);
+
+  // user
+  final userRepository = UserRepository(
+    dataBaseRepository: getIt.get<UserDataBaseRepository>(),
+    userDataBaseMapper: UserDataBaseMapper(),
+  );
+  getIt.registerSingleton<UserRepository>(userRepository);
+
+  // premium
+  final deckManager = DeckPremiumManager(
+    userRepository: userRepository,
+    deckRepository: deckRepository,
+  );
+  getIt.registerSingleton<DeckPremiumManager>(deckManager);
+
+  final quizManager = QuizCardPremiumManager(
+    userRepository: userRepository,
+    quizCardRepository: quizCardRepository,
+  );
+  getIt.registerSingleton<QuizCardPremiumManager>(quizManager);
 }

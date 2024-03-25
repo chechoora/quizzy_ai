@@ -28,6 +28,7 @@ class QuizCardDataBaseRepository {
             deckId: deckId,
             questionText: question,
             answerText: answer,
+            isArchive: false,
           ),
         );
     return result != -1;

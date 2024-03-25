@@ -1,16 +1,19 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/model/deck_request_item.dart';
+import 'package:poc_ai_quiz/domain/quiz_card_repository/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_repository.dart';
 
 class QuizCardListCubit extends Cubit<QuizCardListState> {
   QuizCardListCubit({
     required this.deckItem,
     required this.quizCardRepository,
+    required this.quizCardPremiumManager,
   }) : super(QuizCardListLoadingState());
 
   final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
+  final QuizCardPremiumManager quizCardPremiumManager;
   final items = <QuizCardItem>[];
 
   Future<void> fetchQuizCardListRequest() async {
@@ -27,7 +30,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   Future<List<QuizCardItem>> _fetchCards() async {
     return items
       ..clear()
-      ..addAll(await quizCardRepository.fetchQuizCardItem(deckItem));
+      ..addAll(await quizCardPremiumManager.fetchAllowedQuizCard(deckItem));
   }
 
   void createQuizCardItem(QuizCardRequestItem requestItem) {

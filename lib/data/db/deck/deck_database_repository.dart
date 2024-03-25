@@ -15,6 +15,7 @@ class DeckDataBaseRepository {
     final result = await appDatabase.into(appDatabase.deckTable).insert(
           DeckTableCompanion.insert(
             title: deckName,
+            isArchive: false,
           ),
         );
     return result != -1;

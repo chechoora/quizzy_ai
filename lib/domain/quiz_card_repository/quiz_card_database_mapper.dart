@@ -6,10 +6,11 @@ class QuizCardDataBaseMapper {
     return dataBaseQuizCardItems
         .map(
           (e) => QuizCardItem(
-            e.id,
-            e.deckId,
-            e.questionText,
-            e.answerText,
+            id: e.id,
+            deckId: e.deckId,
+            questionText: e.questionText,
+            answerText: e.answerText,
+            isArchive: e.isArchive,
           ),
         )
         .toList();

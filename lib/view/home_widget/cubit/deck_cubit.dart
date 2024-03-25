@@ -1,17 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
+import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/model/deck_item.dart';
 
 class HomeCubit extends Cubit<DeckState> {
   HomeCubit({
     required this.deckRepository,
+    required this.deckPremiumManager,
   }) : super(const DeckLoadingState());
 
   final DeckRepository deckRepository;
+  final DeckPremiumManager deckPremiumManager;
 
   Future<void> fetchDecks() async {
     emit(const DeckLoadingState());
-    final data = await deckRepository.fetchDecks();
+    final data = await deckPremiumManager.fetchAllowedDecks();
     emit(DeckDataState(data));
   }
 

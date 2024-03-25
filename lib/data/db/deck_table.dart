@@ -5,6 +5,8 @@ class DeckTable extends Table {
 
   TextColumn get title => text().withLength(min: 3)();
 
+  BoolColumn get isArchive => boolean()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -17,6 +19,8 @@ class QuizCardTable extends Table {
   TextColumn get questionText => text().withLength(min: 3)();
 
   TextColumn get answerText => text().withLength(min: 3)();
+
+  BoolColumn get isArchive => boolean()();
 
   @override
   Set<Column> get primaryKey => {id};
