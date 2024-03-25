@@ -1,5 +1,5 @@
 import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
-import 'package:poc_ai_quiz/domain/model/user_item.dart';
+import 'package:poc_ai_quiz/domain/user/model/user_item.dart';
 import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
 
 class UserRepository {

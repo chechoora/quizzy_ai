@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:poc_ai_quiz/domain/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/view/create_card/display/create_card_display_widget.dart';
 
 class CreateCardWidget extends StatefulWidget {

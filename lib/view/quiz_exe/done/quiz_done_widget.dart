@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:poc_ai_quiz/domain/model/quiz_results.dart';
+import 'package:poc_ai_quiz/domain/quiz/model/quiz_results.dart';
 
 class QuizDoneWidget extends StatelessWidget {
   const QuizDoneWidget({

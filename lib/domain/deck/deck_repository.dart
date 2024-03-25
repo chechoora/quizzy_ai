@@ -1,6 +1,6 @@
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
-import 'package:poc_ai_quiz/domain/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 
 class DeckRepository {
   DeckRepository({

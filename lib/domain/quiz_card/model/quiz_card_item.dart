@@ -1,23 +1,5 @@
 import 'package:equatable/equatable.dart';
-
-class DeckItem extends Equatable {
-  final int id;
-  final String title;
-  final bool isArchive;
-
-  const DeckItem({
-    required this.id,
-    required this.title,
-    required this.isArchive,
-  });
-
-  @override
-  List<Object?> get props => [
-        id,
-        title,
-        isArchive,
-      ];
-}
+import 'package:poc_ai_quiz/domain/premium_info.dart';
 
 class QuizCardItem extends Equatable {
   final int id;
@@ -44,38 +26,6 @@ class QuizCardItem extends Equatable {
       ];
 }
 
-mixin PremiumInfo {
-  late final bool _isLocked;
-
-  bool get isLocked => _isLocked;
-}
-
-class DeckItemWithPremium extends DeckItem with PremiumInfo {
-  DeckItemWithPremium({
-    required super.id,
-    required super.title,
-    required super.isArchive,
-    required bool isLocked,
-  }) {
-    _isLocked = isLocked;
-  }
-
-  factory DeckItemWithPremium.fromDeck({
-    required DeckItem deckItem,
-    required bool isLocked,
-  }) {
-    return DeckItemWithPremium(
-      id: deckItem.id,
-      title: deckItem.title,
-      isArchive: deckItem.isArchive,
-      isLocked: isLocked,
-    );
-  }
-
-  @override
-  List<Object?> get props => super.props..add(_isLocked);
-}
-
 class QuizCardItemWithPremium extends QuizCardItem with PremiumInfo {
   QuizCardItemWithPremium({
     required super.id,
@@ -85,7 +35,7 @@ class QuizCardItemWithPremium extends QuizCardItem with PremiumInfo {
     required super.isArchive,
     required bool isLocked,
   }) {
-    _isLocked = isLocked;
+    isObjectLocked = isLocked;
   }
 
   factory QuizCardItemWithPremium.fromQuizCard({
@@ -103,5 +53,5 @@ class QuizCardItemWithPremium extends QuizCardItem with PremiumInfo {
   }
 
   @override
-  List<Object?> get props => super.props..add(_isLocked);
+  List<Object?> get props => super.props..add(isObjectLocked);
 }

@@ -1,5 +1,5 @@
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
-import 'package:poc_ai_quiz/domain/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 
 import 'package:poc_ai_quiz/data/premium/premium_info.dart';
@@ -23,5 +23,10 @@ class DeckPremiumManager {
         isLocked: !user.isPremium && ++count < PremiumLimitInfo.deckLimit,
       );
     }).toList();
+  }
+
+  Future<bool> canAddDeck() async {
+    final allDecks = await deckRepository.fetchDecks();
+    return allDecks.length < PremiumLimitInfo.deckLimit;
   }
 }

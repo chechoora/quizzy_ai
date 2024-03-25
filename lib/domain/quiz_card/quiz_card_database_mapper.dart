@@ -1,5 +1,5 @@
 import 'package:poc_ai_quiz/data/db/database.dart';
-import 'package:poc_ai_quiz/domain/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 
 class QuizCardDataBaseMapper {
   List<QuizCardItem> mapToQuizCardItemList(List<QuizCardTableData> dataBaseQuizCardItems) {

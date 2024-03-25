@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
-import 'package:poc_ai_quiz/domain/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 
 class DeckDataBaseRepository {
   final AppDatabase appDatabase;

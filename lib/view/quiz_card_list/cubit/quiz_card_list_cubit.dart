@@ -1,8 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poc_ai_quiz/domain/model/deck_item.dart';
-import 'package:poc_ai_quiz/domain/model/deck_request_item.dart';
-import 'package:poc_ai_quiz/domain/quiz_card_repository/premium/quiz_card_premium_manager.dart';
-import 'package:poc_ai_quiz/domain/quiz_card_repository/quiz_card_repository.dart';
+import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 
 class QuizCardListCubit extends Cubit<QuizCardListState> {
   QuizCardListCubit({
