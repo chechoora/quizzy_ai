@@ -1,15 +1,15 @@
 <component name="libraryTable">
   <library name="Flutter Plugins" type="FlutterPluginsLibraryType">
     <CLASSES>
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/in_app_purchase-3.1.13" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/in_app_purchase_android-0.3.1" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_android-2.2.2" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/in_app_purchase_storekit-0.3.13+1" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/sqlite3_flutter_libs-0.5.20" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_foundation-2.3.2" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider-2.1.2" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_windows-2.2.1" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/in_app_purchase-3.1.13" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/in_app_purchase_android-0.3.1" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/in_app_purchase_storekit-0.3.13+1" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
