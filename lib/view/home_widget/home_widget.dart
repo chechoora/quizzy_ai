@@ -53,6 +53,9 @@ class _HomeWidgetState extends State<HomeWidget> {
       ),
       body: BlocConsumer<HomeCubit, DeckState>(
         bloc: cubit,
+        buildWhen: (prevState, nextState) {
+          return nextState is BuilderState;
+        },
         builder: (BuildContext context, state) {
           if (state is DeckDataState) {
             if (_selectedIndex == 0) {
@@ -78,7 +81,18 @@ class _HomeWidgetState extends State<HomeWidget> {
           }
           throw ArgumentError('Wrong state');
         },
-        listener: (BuildContext context, DeckState state) {},
+        listenWhen: (prevState, nextState) {
+          return nextState is ListenerState;
+        },
+        listener: (BuildContext context, DeckState state) {
+          if (state is RequestCreateDeckState) {
+            if (state.canCreateDeck) {
+              _addDockRequest();
+            } else {
+              _showCreateDeckPremiumError();
+            }
+          }
+        },
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
@@ -115,7 +129,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           ? FloatingActionButton(
               tooltip: 'Add Deck',
               onPressed: () {
-                _addDockRequest();
+                cubit.addDockRequest();
               },
               child: const Icon(Icons.add, color: Colors.white, size: 28),
             )
@@ -158,5 +172,18 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   void _openDeck(DeckItem deck) {
     context.go("/quizCardList", extra: deck);
+  }
+
+  void _showCreateDeckPremiumError() {
+    alert(
+      context,
+      content: const Text(
+        "You can not create more decks, please unlock the full version.",
+      ),
+    ).then(
+      (value) {
+        if (value ?? false) {}
+      },
+    );
   }
 }

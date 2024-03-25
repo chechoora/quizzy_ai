@@ -12,7 +12,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
-import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_display_widget.dart';
+import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
 
 class QuizCardListWidget extends StatefulWidget {
   const QuizCardListWidget({
@@ -60,7 +60,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
       body: BlocConsumer<QuizCardListCubit, QuizCardListState>(
         bloc: cubit,
         buildWhen: (oldState, newState) {
-          return newState is! QuizCardLaunchState;
+          return newState is BuilderState;
         },
         builder: (context, state) {
           if (state is QuizCardListDataState) {
@@ -80,7 +80,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
           throw ArgumentError('Wrong state');
         },
         listenWhen: (oldState, newState) {
-          return newState is QuizCardLaunchState;
+          return newState is ListenerState;
         },
         listener: (context, state) {
           if (state is QuizCardLaunchState) {
@@ -89,6 +89,13 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
               extra: state.quizCarList,
             );
           }
+          if (state is RequestCreateQuizCardState) {
+            if (state.canCreateCard) {
+              _addCardRequest();
+            } else {
+              _showCreateCardPremiumError();
+            }
+          }
         },
       ),
       bottomNavigationBar: _BottomQuizCardBar(
@@ -96,7 +103,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
           context.pop();
         },
         onAddCardRequest: () {
-          _addCardRequest();
+          cubit.addCardRequest();
         },
         onLaunchQuizRequest: () {
           cubit.launchQuizRequest();
@@ -141,6 +148,19 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
         cubit.editQuizCard(card, cardRequest);
       }
     });
+  }
+
+  void _showCreateCardPremiumError() {
+    alert(
+      context,
+      content: const Text(
+        "You can not create more cards, please unlock the full version.",
+      ),
+    ).then(
+      (value) {
+        if (value ?? false) {}
+      },
+    );
   }
 }
 

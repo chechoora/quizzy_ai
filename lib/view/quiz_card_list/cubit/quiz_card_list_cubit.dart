@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
@@ -72,20 +73,56 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       ),
     );
   }
+
+  void addCardRequest() async {
+    final canAddCard = await quizCardPremiumManager.canAddQuizCard(deckItem);
+    emit(
+      RequestCreateQuizCardState(
+        canCreateCard: canAddCard,
+      ),
+    );
+  }
 }
 
-abstract class QuizCardListState {}
+abstract class QuizCardListState extends Equatable {
+  const QuizCardListState();
+}
 
-class QuizCardListLoadingState extends QuizCardListState {}
+abstract class BuilderState extends QuizCardListState {
+  const BuilderState();
+}
 
-class QuizCardListDataState extends QuizCardListState {
-  QuizCardListDataState({required this.quizCarList});
+abstract class ListenerState extends QuizCardListState {
+  const ListenerState();
+
+  @override
+  List<Object?> get props => [double.nan];
+}
+
+class QuizCardListLoadingState extends BuilderState {
+  @override
+  List<Object?> get props => [];
+}
+
+class QuizCardListDataState extends BuilderState {
+  const QuizCardListDataState({required this.quizCarList});
+
+  final List<QuizCardItem> quizCarList;
+
+  @override
+  List<Object?> get props => [quizCarList];
+}
+
+class QuizCardLaunchState extends ListenerState {
+  const QuizCardLaunchState({required this.quizCarList});
 
   final List<QuizCardItem> quizCarList;
 }
 
-class QuizCardLaunchState extends QuizCardListState {
-  QuizCardLaunchState({required this.quizCarList});
+class RequestCreateQuizCardState extends ListenerState {
+  final bool canCreateCard;
 
-  final List<QuizCardItem> quizCarList;
+  const RequestCreateQuizCardState({
+    required this.canCreateCard,
+  });
 }

@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
@@ -35,18 +36,52 @@ class HomeCubit extends Cubit<DeckState> {
     deckRepository.editDeckName(deck, deckName);
     fetchDecks();
   }
+
+  void addDockRequest() async {
+    final canAddDecks = await deckPremiumManager.canAddDeck();
+    emit(
+      RequestCreateDeckState(
+        canCreateDeck: canAddDecks,
+      ),
+    );
+  }
 }
 
-abstract class DeckState {
+abstract class DeckState extends Equatable {
   const DeckState();
 }
 
-class DeckLoadingState extends DeckState {
-  const DeckLoadingState();
+abstract class BuilderState extends DeckState {
+  const BuilderState();
 }
 
-class DeckDataState extends DeckState {
+abstract class ListenerState extends DeckState {
+  const ListenerState();
+
+  @override
+  List<Object?> get props => [double.nan];
+}
+
+class DeckLoadingState extends BuilderState {
+  const DeckLoadingState();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class DeckDataState extends BuilderState {
   final List<DeckItem> deckList;
 
   const DeckDataState(this.deckList);
+
+  @override
+  List<Object?> get props => [deckList];
+}
+
+class RequestCreateDeckState extends ListenerState {
+  final bool canCreateDeck;
+
+  const RequestCreateDeckState({
+    required this.canCreateDeck,
+  });
 }
