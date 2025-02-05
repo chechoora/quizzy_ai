@@ -59,7 +59,7 @@ abstract class ListenerState extends DeckState {
   const ListenerState();
 
   @override
-  List<Object?> get props => [double.nan];
+  List<Object?> get props => [Object()];
 }
 
 class DeckLoadingState extends BuilderState {
