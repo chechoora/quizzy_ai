@@ -16,6 +16,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similiarity_api_mapper.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similarity_service.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
+import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
 import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/util/api/isolate_converter.dart';
@@ -65,6 +66,10 @@ void _setupServices() {
   );
   getIt.registerSingleton<TextSimilarityService>(textSimilarityService);
   getIt.registerSingleton<QuizService>(QuizService(textSimilarityService));
+
+  // on-device AI
+  final onDeviceAIService = OnDeviceAIService();
+  getIt.registerSingleton<OnDeviceAIService>(onDeviceAIService);
 
   // deck
   final deckRepository = DeckRepository(
