@@ -138,6 +138,12 @@ protocol OnDeviceAiApi {
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class OnDeviceAiApiSetup {
   static var codec: FlutterStandardMessageCodec { OnDeviceAiApiPigeonCodec.shared }
+  
+  /// Convenience method to set up the API with the Foundation Models implementation
+  static func setUpWithFoundationModels(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+    let implementation = OnDeviceAiApiImplementation()
+    setUp(binaryMessenger: binaryMessenger, api: implementation, messageChannelSuffix: messageChannelSuffix)
+  }
   /// Sets up an instance of `OnDeviceAiApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: OnDeviceAiApi?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""

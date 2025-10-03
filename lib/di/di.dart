@@ -10,6 +10,7 @@ import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz/text_similarity_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
@@ -37,7 +38,8 @@ Future<void> _setupDataBase() async {
   getIt.registerSingleton<DeckDataBaseRepository>(deckDataBaseRepository);
 
   final quizCardDataBaseRepository = QuizCardDataBaseRepository(database);
-  getIt.registerSingleton<QuizCardDataBaseRepository>(quizCardDataBaseRepository);
+  getIt.registerSingleton<QuizCardDataBaseRepository>(
+      quizCardDataBaseRepository);
 
   final userDataBaseRepository = UserDataBaseRepository(database);
   getIt.registerSingleton<UserDataBaseRepository>(userDataBaseRepository);
@@ -46,7 +48,8 @@ Future<void> _setupDataBase() async {
 Future<void> _setupAPI() async {
   final runner = await IsolateRunner.spawn();
   final textSimilarityApiClient = ChopperClient(
-    baseUrl: Uri.parse('https://twinword-text-similarity-v1.p.rapidapi.com/similarity/'),
+    baseUrl: Uri.parse(
+        'https://twinword-text-similarity-v1.p.rapidapi.com/similarity/'),
     services: [
       TextSimilarityApiService.create(),
     ],
@@ -65,7 +68,12 @@ void _setupServices() {
     apiMapper: TextSimilarityApiMapper(),
   );
   getIt.registerSingleton<TextSimilarityService>(textSimilarityService);
-  getIt.registerSingleton<QuizService>(QuizService(textSimilarityService));
+  final textSimilarityAnswerValidator =
+      TextSimilarityAnswerValidator(textSimilarityService);
+  getIt.registerSingleton<TextSimilarityAnswerValidator>(
+      textSimilarityAnswerValidator);
+  getIt.registerSingleton<QuizService>(
+      QuizService(textSimilarityAnswerValidator));
 
   // on-device AI
   final onDeviceAIService = OnDeviceAIService();

@@ -1,18 +1,17 @@
-import 'package:poc_ai_quiz/domain/text_similiarity/text_similarity_service.dart';
+import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 
 class QuizService {
-  final TextSimilarityService textSimilarityService;
+  final IAnswerValidator answerValidator;
 
-  QuizService(this.textSimilarityService);
+  QuizService(this.answerValidator);
 
   Future<double> isSimilarEnough({
     required String initialText,
     required String inputText,
   }) async {
-    final howSimilar = await textSimilarityService.checkSimilarity(
-      initialText: initialText,
-      inputText: inputText,
+    return await answerValidator.validateAnswer(
+      correctAnswer: initialText,
+      userAnswer: inputText,
     );
-    return howSimilar.similarity;
   }
 }
