@@ -10,6 +10,7 @@ import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/text_similarity_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_database_mapper.dart';
@@ -72,12 +73,12 @@ void _setupServices() {
       TextSimilarityAnswerValidator(textSimilarityService);
   getIt.registerSingleton<TextSimilarityAnswerValidator>(
       textSimilarityAnswerValidator);
-  getIt.registerSingleton<QuizService>(
-      QuizService(textSimilarityAnswerValidator));
 
-  // on-device AI
   final onDeviceAIService = OnDeviceAIService();
   getIt.registerSingleton<OnDeviceAIService>(onDeviceAIService);
+  final onDeviceAIAnswerValidator =
+      OnDeviceAIAnswerValidator(onDeviceAIService);
+  getIt.registerSingleton<QuizService>(QuizService(onDeviceAIAnswerValidator));
 
   // deck
   final deckRepository = DeckRepository(

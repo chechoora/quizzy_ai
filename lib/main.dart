@@ -9,8 +9,10 @@ import 'package:poc_ai_quiz/view/home_widget/home_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
 import 'package:poc_ai_quiz/view/settings/premium_settings/premium_settings_widget.dart';
+import 'package:fimber/fimber.dart';
 
 Future<void> main() async {
+  Fimber.plantTree(DebugTree());
   await setupDi();
   runApp(MyApp());
 }
@@ -22,7 +24,8 @@ class MyApp extends StatelessWidget {
     initialLocation: '/',
     routes: [
       GoRoute(
-        name: 'home', // Optional, add name to your routes. Allows you navigate by name instead of path
+        name: 'home',
+        // Optional, add name to your routes. Allows you navigate by name instead of path
         path: '/',
         builder: (context, state) {
           return const HomeWidget();
