@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
+import 'package:poc_ai_quiz/util/logger.dart';
 
 class QuizEngine {
   QuizEngine({
@@ -9,6 +10,7 @@ class QuizEngine {
     required this.onTestNewCard,
   });
 
+  final _logger = Logger.withTag('QuizEngine');
   final List<QuizCardItem> cards;
   final QuizService quizService;
   final ValueChanged<QuizCardItem> onTestNewCard;
@@ -19,8 +21,10 @@ class QuizEngine {
 
   void nextCard() {
     if (_currentCardIndex >= cards.length) {
+      _logger.e('Attempted to get next card when no cards remain');
       throw Exception('Overflow');
     }
+    _logger.d('Displaying card ${_currentCardIndex + 1}/${cards.length}');
     onTestNewCard.call(cards[_currentCardIndex++]);
   }
 
@@ -28,6 +32,7 @@ class QuizEngine {
     QuizCardItem quizCard,
     String possibleAnswer,
   ) {
+    _logger.d('Validating answer for card ${quizCard.id}');
     return quizService.isSimilarEnough(
       initialText: quizCard.answerText,
       inputText: possibleAnswer,

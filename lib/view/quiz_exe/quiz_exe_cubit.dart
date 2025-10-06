@@ -4,6 +4,7 @@ import 'package:poc_ai_quiz/domain/quiz/quiz_engine.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_match_builder.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
+import 'package:poc_ai_quiz/util/logger.dart';
 
 class QuizExeCubit extends Cubit<QuizExeState> {
   QuizExeCubit({
@@ -12,6 +13,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     required this.quizMatchBuilder,
   }) : super(QuizExeLoadingState());
 
+  final _logger = Logger.withTag('QuizExeCubit');
   final List<QuizCardItem> quizCardItems;
   final QuizService quizService;
   final QuizMatchBuilder quizMatchBuilder;
@@ -29,6 +31,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   );
 
   void launchQuiz() {
+    _logger.d('Launching quiz with ${quizCardItems.length} cards');
     if (quizEngine.hasNext) {
       quizEngine.nextCard();
     }
@@ -38,13 +41,18 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     QuizCardItem quizCardItem,
     String possibleAnswer,
   ) async {
+    _logger.d('Checking answer for card: ${quizCardItem.id}');
     final result = await quizEngine.checkPossibleAnswer(quizCardItem, possibleAnswer);
+    _logger.i('Answer validation result: $result (threshold: 0.6)');
     quizMatchBuilder.saveResult(quizCardItem, possibleAnswer, result);
     emit(QuizCardResultState(isCorrect: result >= 0.6));
     if (quizEngine.hasNext) {
+      _logger.d('Moving to next card');
       quizEngine.nextCard();
     } else {
-      emit(QuizDoneState(quizResults: quizMatchBuilder.getResults()));
+      final results = quizMatchBuilder.getResults();
+      _logger.i('Quiz completed. Results: $results');
+      emit(QuizDoneState(quizResults: results));
     }
   }
 }

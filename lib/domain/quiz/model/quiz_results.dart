@@ -1,9 +1,12 @@
 import 'package:equatable/equatable.dart';
 
-class QuizResults {
+class QuizResults extends Equatable {
   QuizResults({required this.quizMatchList});
 
   final List<QuizAnswerMatch> quizMatchList;
+
+  @override
+  List<Object?> get props => quizMatchList;
 }
 
 class QuizAnswerMatch extends Equatable {

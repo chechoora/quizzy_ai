@@ -92,3 +92,10 @@ lib/
 - Managed through `DeckPremiumManager` and `QuizCardPremiumManager`
 - Uses in-app purchases for feature unlocking
 - Premium state tracked in user repository
+
+## Logging
+- Use the `Logger` class from `lib/util/logger.dart` for all logging
+- Create a logger instance with a tag: `Logger.withTag('YourClassName')`
+- Available log levels: `v()` (verbose), `d()` (debug), `i()` (info), `w()` (warning), `e()` (error)
+- All methods support optional exception and stack trace parameters
+- Uses Fimber for underlying log implementation
