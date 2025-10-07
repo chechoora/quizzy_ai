@@ -1,6 +1,9 @@
 import 'package:chopper/chopper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:isolates/isolate_runner.dart';
+import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_answer_validator.dart';
+import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_api_service.dart';
+import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_api_service.dart';
 import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
@@ -60,6 +63,19 @@ Future<void> _setupAPI() async {
     converter: IsolateConverter(runner),
   );
   getIt.registerSingleton<ChopperClient>(textSimilarityApiClient);
+
+  // Gemini API client
+  final geminiApiClient = ChopperClient(
+    baseUrl: Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'),
+    services: [
+      GeminiApiService.create(),
+    ],
+    interceptors: [
+      GeminiHeaderInterceptor('AIzaSyA101cvgIAiseZSUYNr_i87Y4LqcRAPx_k'),
+    ],
+    converter: const JsonConverter(),
+  );
+  getIt.registerSingleton<ChopperClient>(geminiApiClient, instanceName: 'gemini');
 }
 
 void _setupServices() {
@@ -78,7 +94,15 @@ void _setupServices() {
   getIt.registerSingleton<OnDeviceAIService>(onDeviceAIService);
   final onDeviceAIAnswerValidator =
       OnDeviceAIAnswerValidator(onDeviceAIService);
-  getIt.registerSingleton<QuizService>(QuizService(onDeviceAIAnswerValidator));
+
+  // Gemini answer validator
+  final geminiApiClient = getIt.get<ChopperClient>(instanceName: 'gemini');
+  final geminiAnswerValidator = GeminiAnswerValidator(
+    geminiApiClient.getService<GeminiApiService>(),
+  );
+  getIt.registerSingleton<GeminiAnswerValidator>(geminiAnswerValidator);
+
+  getIt.registerSingleton<QuizService>(QuizService(geminiAnswerValidator));
 
   // deck
   final deckRepository = DeckRepository(
