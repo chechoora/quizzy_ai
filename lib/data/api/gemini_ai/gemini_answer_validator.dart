@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_api_service.dart';
-import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_request_models.dart' as request;
-import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_response_models.dart' as response;
+import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_request_models.dart'
+    as request;
+import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_response_models.dart'
+    as response;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
@@ -54,13 +56,15 @@ Please evaluate how well the user answer matches the expected answer.
         'properties': {
           'score': {
             'type': 'integer',
-            'description': 'Score between 0 and 100 indicating how well the user answer matches the expected answer',
+            'description':
+                'Score between 0 and 100 indicating how well the user answer matches the expected answer',
             'minimum': 0,
             'maximum': 100,
           },
           'explanation': {
             'type': 'string',
-            'description': 'Brief explanation of why this score was given (1-2 sentences)',
+            'description':
+                'Brief explanation of why this score was given (1-2 sentences)',
           },
           'correctPoints': {
             'type': 'array',
@@ -94,7 +98,6 @@ Please evaluate how well the user answer matches the expected answer.
 
       _logger.d('Sending request to Gemini API');
       final apiResponse = await _apiService.generateContent(
-        model: _model,
         body: geminiRequest.toJson(),
       );
 
@@ -103,15 +106,19 @@ Please evaluate how well the user answer matches the expected answer.
         throw Exception('Failed to validate answer: ${apiResponse.error}');
       }
 
-      final geminiResponse = response.GeminiResponse.fromJson(apiResponse.body as Map<String, dynamic>);
+      final geminiResponse = response.GeminiResponse.fromJson(
+          apiResponse.body as Map<String, dynamic>);
 
-      if (geminiResponse.candidates == null || geminiResponse.candidates!.isEmpty) {
+      if (geminiResponse.candidates == null ||
+          geminiResponse.candidates!.isEmpty) {
         _logger.e('No candidates in Gemini response');
         throw Exception('No response candidates from Gemini');
       }
 
       final candidate = geminiResponse.candidates!.first;
-      if (candidate.content == null || candidate.content!.parts == null || candidate.content!.parts!.isEmpty) {
+      if (candidate.content == null ||
+          candidate.content!.parts == null ||
+          candidate.content!.parts!.isEmpty) {
         _logger.e('No content in Gemini candidate');
         throw Exception('No content in Gemini response');
       }
@@ -130,7 +137,8 @@ Please evaluate how well the user answer matches the expected answer.
 
       return quizScore.score / 100.0; // Convert to 0-1 range
     } catch (e, stackTrace) {
-      _logger.e('Error validating answer with Gemini', ex: e, stacktrace: stackTrace);
+      _logger.e('Error validating answer with Gemini',
+          ex: e, stacktrace: stackTrace);
       rethrow;
     }
   }
