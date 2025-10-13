@@ -10,6 +10,7 @@ import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
+import 'package:poc_ai_quiz/data/db/user_settings/user_settings_database_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
@@ -25,6 +26,8 @@ import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
 import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
+import 'package:poc_ai_quiz/domain/user_settings/user_settings_database_mapper.dart';
+import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/util/api/isolate_converter.dart';
 
 final getIt = GetIt.instance;
@@ -48,6 +51,9 @@ Future<void> _setupDataBase() async {
 
   final userDataBaseRepository = UserDataBaseRepository(database);
   getIt.registerSingleton<UserDataBaseRepository>(userDataBaseRepository);
+
+  final userSettingsDataBaseRepository = UserSettingsDataBaseRepository(database);
+  getIt.registerSingleton<UserSettingsDataBaseRepository>(userSettingsDataBaseRepository);
 }
 
 Future<void> _setupAPI() async {
@@ -125,9 +131,17 @@ void _setupServices() {
   );
   getIt.registerSingleton<UserRepository>(userRepository);
 
+  // user settings
+  final userSettingsRepository = UserSettingsRepository(
+    dataBaseRepository: getIt.get<UserSettingsDataBaseRepository>(),
+    userSettingsDataBaseMapper: UserSettingsDataBaseMapper(),
+  );
+  getIt.registerSingleton<UserSettingsRepository>(userSettingsRepository);
+
   // settings
   final settingsService = SettingsService(
     userRepository: userRepository,
+    userSettingsRepository: userSettingsRepository,
     geminiAnswerValidator: geminiAnswerValidator,
     onDeviceAIAnswerValidator: onDeviceAIAnswerValidator,
     textSimilarityAnswerValidator: textSimilarityAnswerValidator,

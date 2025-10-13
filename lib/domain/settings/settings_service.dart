@@ -4,15 +4,18 @@ import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/text_similarity_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
+import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 
 class SettingsService {
   final UserRepository userRepository;
+  final UserSettingsRepository userSettingsRepository;
   final GeminiAnswerValidator geminiAnswerValidator;
   final OnDeviceAIAnswerValidator onDeviceAIAnswerValidator;
   final TextSimilarityAnswerValidator textSimilarityAnswerValidator;
 
   SettingsService({
     required this.userRepository,
+    required this.userSettingsRepository,
     required this.geminiAnswerValidator,
     required this.onDeviceAIAnswerValidator,
     required this.textSimilarityAnswerValidator,
@@ -20,12 +23,13 @@ class SettingsService {
 
   Future<AnswerValidatorType> getCurrentValidatorType() async {
     final user = await userRepository.fetchCurrentUser();
-    return user.answerValidatorType;
+    final userSettings = await userSettingsRepository.fetchUserSettings(user.id);
+    return userSettings.answerValidatorType;
   }
 
   Future<void> updateValidatorType(AnswerValidatorType validatorType) async {
     final user = await userRepository.fetchCurrentUser();
-    await userRepository.updateAnswerValidatorType(user.id, validatorType);
+    await userSettingsRepository.updateAnswerValidatorType(user.id, validatorType);
   }
 
   Future<IAnswerValidator> getAnswerValidator() async {

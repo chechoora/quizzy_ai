@@ -14,7 +14,6 @@ class UserDataBaseRepository {
     final result = await appDatabase.into(appDatabase.userTable).insert(
       UserTableCompanion.insert(
         isPremium: false,
-        answerValidatorType: const Value('gemini'),
       ),
     );
     if (result != -1) {
@@ -22,13 +21,5 @@ class UserDataBaseRepository {
       return user;
     }
     throw Exception('Can not fetch current user');
-  }
-
-  Future<void> updateAnswerValidatorType(int userId, String validatorType) async {
-    await (appDatabase.update(appDatabase.userTable)
-          ..where((tbl) => tbl.id.equals(userId)))
-        .write(UserTableCompanion(
-          answerValidatorType: Value(validatorType),
-        ));
   }
 }
