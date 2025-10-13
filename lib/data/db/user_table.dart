@@ -5,6 +5,8 @@ class UserTable extends Table {
 
   BoolColumn get isPremium => boolean()();
 
+  TextColumn get answerValidatorType => text().withDefault(const Constant('gemini'))();
+
   @override
   Set<Column> get primaryKey => {id};
 }

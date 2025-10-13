@@ -1,15 +1,16 @@
-import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
+import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 
 class QuizService {
-  final IAnswerValidator answerValidator;
+  final SettingsService settingsService;
 
-  QuizService(this.answerValidator);
+  QuizService(this.settingsService);
 
   Future<double> isSimilarEnough({
     required String initialText,
     required String inputText,
   }) async {
-    return await answerValidator.validateAnswer(
+    final validator = await settingsService.getAnswerValidator();
+    return await validator.validateAnswer(
       correctAnswer: initialText,
       userAnswer: inputText,
     );

@@ -16,6 +16,7 @@ import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/text_similarity_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similiarity_api_mapper.dart';
@@ -94,6 +95,7 @@ void _setupServices() {
   getIt.registerSingleton<OnDeviceAIService>(onDeviceAIService);
   final onDeviceAIAnswerValidator =
       OnDeviceAIAnswerValidator(onDeviceAIService);
+  getIt.registerSingleton<OnDeviceAIAnswerValidator>(onDeviceAIAnswerValidator);
 
   // Gemini answer validator
   final geminiApiClient = getIt.get<ChopperClient>(instanceName: 'gemini');
@@ -101,8 +103,6 @@ void _setupServices() {
     geminiApiClient.getService<GeminiApiService>(),
   );
   getIt.registerSingleton<GeminiAnswerValidator>(geminiAnswerValidator);
-
-  getIt.registerSingleton<QuizService>(QuizService(geminiAnswerValidator));
 
   // deck
   final deckRepository = DeckRepository(
@@ -124,6 +124,18 @@ void _setupServices() {
     userDataBaseMapper: UserDataBaseMapper(),
   );
   getIt.registerSingleton<UserRepository>(userRepository);
+
+  // settings
+  final settingsService = SettingsService(
+    userRepository: userRepository,
+    geminiAnswerValidator: geminiAnswerValidator,
+    onDeviceAIAnswerValidator: onDeviceAIAnswerValidator,
+    textSimilarityAnswerValidator: textSimilarityAnswerValidator,
+  );
+  getIt.registerSingleton<SettingsService>(settingsService);
+
+  // quiz service - uses settings to get the correct validator
+  getIt.registerSingleton<QuizService>(QuizService(settingsService));
 
   // premium
   final deckManager = DeckPremiumManager(

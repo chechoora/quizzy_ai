@@ -1,4 +1,5 @@
 import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/user/model/user_item.dart';
 import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
 
@@ -14,5 +15,9 @@ class UserRepository {
   Future<UserItem> fetchCurrentUser() async {
     final dbUser = await dataBaseRepository.fetchCurrentUser();
     return userDataBaseMapper.mapToUserItem(dbUser);
+  }
+
+  Future<void> updateAnswerValidatorType(int userId, AnswerValidatorType validatorType) async {
+    await dataBaseRepository.updateAnswerValidatorType(userId, validatorType.name);
   }
 }
