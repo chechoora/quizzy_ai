@@ -17,7 +17,9 @@ import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/text_similarity_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
+import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/text_similiarity/text_similiarity_api_mapper.dart';
@@ -52,8 +54,10 @@ Future<void> _setupDataBase() async {
   final userDataBaseRepository = UserDataBaseRepository(database);
   getIt.registerSingleton<UserDataBaseRepository>(userDataBaseRepository);
 
-  final userSettingsDataBaseRepository = UserSettingsDataBaseRepository(database);
-  getIt.registerSingleton<UserSettingsDataBaseRepository>(userSettingsDataBaseRepository);
+  final userSettingsDataBaseRepository =
+      UserSettingsDataBaseRepository(database);
+  getIt.registerSingleton<UserSettingsDataBaseRepository>(
+      userSettingsDataBaseRepository);
 }
 
 Future<void> _setupAPI() async {
@@ -73,7 +77,8 @@ Future<void> _setupAPI() async {
 
   // Gemini API client
   final geminiApiClient = ChopperClient(
-    baseUrl: Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'),
+    baseUrl:
+        Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'),
     services: [
       GeminiApiService.create(),
     ],
@@ -82,7 +87,8 @@ Future<void> _setupAPI() async {
     ],
     converter: const JsonConverter(),
   );
-  getIt.registerSingleton<ChopperClient>(geminiApiClient, instanceName: 'gemini');
+  getIt.registerSingleton<ChopperClient>(geminiApiClient,
+      instanceName: 'gemini');
 }
 
 void _setupServices() {
@@ -139,13 +145,20 @@ void _setupServices() {
   getIt.registerSingleton<UserSettingsRepository>(userSettingsRepository);
 
   // settings
-  final settingsService = SettingsService(
+  final validatorsManager = ValidatorsManager(
     userRepository: userRepository,
-    userSettingsRepository: userSettingsRepository,
-    geminiAnswerValidator: geminiAnswerValidator,
-    onDeviceAIAnswerValidator: onDeviceAIAnswerValidator,
-    textSimilarityAnswerValidator: textSimilarityAnswerValidator,
+    onDeviceAIService: onDeviceAIService,
   );
+  getIt.registerSingleton<ValidatorsManager>(validatorsManager);
+
+  final settingsService = SettingsService(
+      userRepository: userRepository,
+      userSettingsRepository: userSettingsRepository,
+      validators: {
+        AnswerValidatorType.textSimilarity: textSimilarityAnswerValidator,
+        AnswerValidatorType.onDeviceAI: onDeviceAIAnswerValidator,
+        AnswerValidatorType.gemini: geminiAnswerValidator,
+      });
   getIt.registerSingleton<SettingsService>(settingsService);
 
   // quiz service - uses settings to get the correct validator
