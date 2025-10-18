@@ -1,7 +1,4 @@
-import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
-import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
-import 'package:poc_ai_quiz/domain/quiz/text_similarity_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';

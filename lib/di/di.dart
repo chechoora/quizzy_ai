@@ -4,8 +4,6 @@ import 'package:isolates/isolate_runner.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_api_service.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_header_interceptor.dart';
-import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_api_service.dart';
-import 'package:poc_ai_quiz/data/api/text_similarity/text_similarity_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
@@ -15,15 +13,12 @@ import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
-import 'package:poc_ai_quiz/domain/quiz/text_similarity_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
-import 'package:poc_ai_quiz/domain/text_similiarity/text_similiarity_api_mapper.dart';
-import 'package:poc_ai_quiz/domain/text_similiarity/text_similarity_service.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
 import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
@@ -62,19 +57,6 @@ Future<void> _setupDataBase() async {
 
 Future<void> _setupAPI() async {
   final runner = await IsolateRunner.spawn();
-  final textSimilarityApiClient = ChopperClient(
-    baseUrl: Uri.parse(
-        'https://twinword-text-similarity-v1.p.rapidapi.com/similarity/'),
-    services: [
-      TextSimilarityApiService.create(),
-    ],
-    interceptors: [
-      TextSimilarityHeaderInterceptor(),
-    ],
-    converter: IsolateConverter(runner),
-  );
-  getIt.registerSingleton<ChopperClient>(textSimilarityApiClient);
-
   // Gemini API client
   final geminiApiClient = ChopperClient(
     baseUrl:
@@ -92,17 +74,6 @@ Future<void> _setupAPI() async {
 }
 
 void _setupServices() {
-  final textSimilarityApiClient = getIt.get<ChopperClient>();
-  final TextSimilarityService textSimilarityService = TextSimilarityService(
-    apiService: textSimilarityApiClient.getService<TextSimilarityApiService>(),
-    apiMapper: TextSimilarityApiMapper(),
-  );
-  getIt.registerSingleton<TextSimilarityService>(textSimilarityService);
-  final textSimilarityAnswerValidator =
-      TextSimilarityAnswerValidator(textSimilarityService);
-  getIt.registerSingleton<TextSimilarityAnswerValidator>(
-      textSimilarityAnswerValidator);
-
   final onDeviceAIService = OnDeviceAIService();
   getIt.registerSingleton<OnDeviceAIService>(onDeviceAIService);
   final onDeviceAIAnswerValidator =
@@ -155,7 +126,6 @@ void _setupServices() {
       userRepository: userRepository,
       userSettingsRepository: userSettingsRepository,
       validators: {
-        AnswerValidatorType.textSimilarity: textSimilarityAnswerValidator,
         AnswerValidatorType.onDeviceAI: onDeviceAIAnswerValidator,
         AnswerValidatorType.gemini: geminiAnswerValidator,
       });

@@ -30,7 +30,7 @@ class ValidatorsManager {
   Future<bool> _isValidatorEnabled(
       AnswerValidatorType type, bool isPremium) async {
     switch (type) {
-      case AnswerValidatorType.textSimilarity:
+      case AnswerValidatorType.custom:
       case AnswerValidatorType.gemini:
         return true;
       case AnswerValidatorType.onDeviceAI:
