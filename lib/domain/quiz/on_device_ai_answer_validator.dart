@@ -2,7 +2,7 @@ import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
-class OnDeviceAIAnswerValidator implements IAnswerValidator {
+class OnDeviceAIAnswerValidator extends IAnswerValidator {
   final _logger = Logger.withTag('OnDeviceAIAnswerValidator');
   final OnDeviceAIService onDeviceAIService;
 
@@ -22,7 +22,8 @@ class OnDeviceAIAnswerValidator implements IAnswerValidator {
       _logger.i('On-device AI validation score: ${result.howCorrect}');
       return result.howCorrect;
     } catch (e, stackTrace) {
-      _logger.e('Failed to validate answer with on-device AI', ex: e, stacktrace: stackTrace);
+      _logger.e('Failed to validate answer with on-device AI',
+          ex: e, stacktrace: stackTrace);
       rethrow;
     }
   }

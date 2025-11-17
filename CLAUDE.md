@@ -43,7 +43,11 @@ lib/
 ### Key Architectural Components
 
 #### Data Layer (`lib/data/`)
-- **API**: Text similarity service using Chopper HTTP client
+- **API**: AI answer validators using Chopper HTTP client
+  - `lib/data/api/gemini_ai/` - Google Gemini AI integration
+  - `lib/data/api/claude/` - Anthropic Claude AI integration
+  - `lib/data/api/openai/` - OpenAI GPT integration
+  - `lib/data/api/on_device_ai/` - On-device AI processing
 - **Database**: Drift database with repositories for deck, quiz_card, and user data
 - **Isolates**: API calls run in separate isolates for performance
 
@@ -66,7 +70,11 @@ lib/
   3. Service registration
 
 ### Key External Services
-- **Text Similarity API**: RapidAPI Twinword service for quiz answer validation
+- **AI Answer Validators**: Multiple AI services for quiz answer validation
+  - **Gemini AI**: Google's Gemini models for answer scoring
+  - **Claude AI**: Anthropic's Claude models for answer evaluation
+  - **OpenAI**: OpenAI's GPT models (gpt-4o-mini default) for answer validation
+  - **On-Device AI**: Local ML model for offline answer validation
 - **In-App Purchases**: Premium feature unlocking
 - **Local Storage**: Drift SQLite database
 
@@ -99,3 +107,31 @@ lib/
 - Available log levels: `v()` (verbose), `d()` (debug), `i()` (info), `w()` (warning), `e()` (error)
 - All methods support optional exception and stack trace parameters
 - Uses Fimber for underlying log implementation
+
+## AI Answer Validators
+
+The app supports multiple AI providers for validating quiz answers:
+
+### OpenAI (`lib/data/api/openai/`)
+- Uses OpenAI's GPT models for answer validation
+- Default model: `gpt-4o-mini` (cost-effective)
+- Supports structured JSON output for detailed scoring
+- Returns score (0-100), explanation, correct points, and missing points
+- Configured in DI with API key in `lib/di/di.dart`
+
+### Gemini AI (`lib/data/api/gemini_ai/`)
+- Uses Google's Gemini models for answer validation
+- Configured with API key in dependency injection
+
+### Claude AI (`lib/data/api/claude/`)
+- Uses Anthropic's Claude models for answer validation
+- Configured with API key in dependency injection
+
+### On-Device AI (`lib/data/api/on_device_ai/`)
+- Local ML model for offline answer validation
+- No API key required
+
+### Validator Selection
+- Users can select their preferred validator in settings
+- Validators are managed through `ValidatorsManager` and `SettingsService`
+- All validators implement the `IAnswerValidator` interface

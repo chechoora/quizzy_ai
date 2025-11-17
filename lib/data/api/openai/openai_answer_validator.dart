@@ -8,7 +8,7 @@ import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
-class OpenAIAnswerValidator implements IAnswerValidator {
+class OpenAIAnswerValidator extends IAnswerValidator {
   static final _logger = Logger.withTag('OpenAIAnswerValidator');
 
   final OpenAIApiService _apiService;
@@ -29,23 +29,13 @@ class OpenAIAnswerValidator implements IAnswerValidator {
       _logger.v('Expected answer: $correctAnswer');
       _logger.v('User answer: $userAnswer');
 
+      final basePrompt = buildValidationPrompt(
+        correctAnswer: correctAnswer,
+        userAnswer: userAnswer,
+      );
+
       final prompt = """
-You are a quiz scoring assistant. Your job is to compare a user's answer with the expected answer and provide a detailed evaluation.
-
-Scoring Guidelines:
-- 90-100: Excellent answer that covers all key points with additional insights
-- 80-89: Good answer that covers most key points accurately
-- 70-79: Adequate answer with some key points but missing important details
-- 60-69: Basic answer with minimal coverage of key points
-- 0-59: Inadequate answer with significant errors or omissions
-
-Be fair but thorough in your evaluation. Consider both factual accuracy and completeness.
-
-Expected Answer:
-$correctAnswer
-
-User Answer:
-$userAnswer
+$basePrompt
 
 Please evaluate how well the user answer matches the expected answer and respond with a JSON object containing:
 - score: integer between 0 and 100
