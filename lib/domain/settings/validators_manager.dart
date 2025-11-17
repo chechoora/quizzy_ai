@@ -32,6 +32,7 @@ class ValidatorsManager {
     switch (type) {
       case AnswerValidatorType.claude:
       case AnswerValidatorType.gemini:
+      case AnswerValidatorType.openAI:
         return true;
       case AnswerValidatorType.onDeviceAI:
         return onDeviceAIService.isOnDeviceAIAvailable();

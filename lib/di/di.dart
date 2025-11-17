@@ -7,6 +7,9 @@ import 'package:poc_ai_quiz/data/api/claude/claude_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_api_service.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_header_interceptor.dart';
+import 'package:poc_ai_quiz/data/api/openai/openai_answer_validator.dart';
+import 'package:poc_ai_quiz/data/api/openai/openai_api_service.dart';
+import 'package:poc_ai_quiz/data/api/openai/openai_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
@@ -89,6 +92,21 @@ Future<void> _setupAPI() async {
   );
   getIt.registerSingleton<ChopperClient>(claudeApiClient,
       instanceName: 'claude');
+
+  // OpenAI API client
+  final openAIApiClient = ChopperClient(
+    baseUrl: Uri.parse('https://api.openai.com/v1'),
+    services: [
+      OpenAIApiService.create(),
+    ],
+    interceptors: [
+      OpenAIHeaderInterceptor(
+          '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'),
+    ],
+    converter: const JsonConverter(),
+  );
+  getIt.registerSingleton<ChopperClient>(openAIApiClient,
+      instanceName: 'openai');
 }
 
 void _setupServices() {
@@ -111,6 +129,13 @@ void _setupServices() {
     claudeApiClient.getService<ClaudeApiService>(),
   );
   getIt.registerSingleton<ClaudeAnswerValidator>(claudeAnswerValidator);
+
+  // OpenAI answer validator
+  final openAIApiClient = getIt.get<ChopperClient>(instanceName: 'openai');
+  final openAIAnswerValidator = OpenAIAnswerValidator(
+    openAIApiClient.getService<OpenAIApiService>(),
+  );
+  getIt.registerSingleton<OpenAIAnswerValidator>(openAIAnswerValidator);
 
   // deck
   final deckRepository = DeckRepository(
@@ -154,6 +179,7 @@ void _setupServices() {
         AnswerValidatorType.onDeviceAI: onDeviceAIAnswerValidator,
         AnswerValidatorType.gemini: geminiAnswerValidator,
         AnswerValidatorType.claude: claudeAnswerValidator,
+        AnswerValidatorType.openAI: openAIAnswerValidator,
       });
   getIt.registerSingleton<SettingsService>(settingsService);
 
