@@ -20,7 +20,7 @@ class _GeminiApiServiceImpl extends GeminiApiService {
     required Map<String, dynamic> body,
   }) {
     // Manually construct the URL to avoid URI parsing issues with the colon
-    final path = 'gemini-2.5-flash:generateContent';
+    const path = 'gemini-2.5-flash:generateContent';
     final url = Uri.parse(client.baseUrl.toString() + path);
 
     final request = Request(
