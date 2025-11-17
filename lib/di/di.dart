@@ -1,6 +1,9 @@
 import 'package:chopper/chopper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:isolates/isolate_runner.dart';
+import 'package:poc_ai_quiz/data/api/claude/claude_answer_validator.dart';
+import 'package:poc_ai_quiz/data/api/claude/claude_api_service.dart';
+import 'package:poc_ai_quiz/data/api/claude/claude_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_api_service.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_header_interceptor.dart';
@@ -71,6 +74,21 @@ Future<void> _setupAPI() async {
   );
   getIt.registerSingleton<ChopperClient>(geminiApiClient,
       instanceName: 'gemini');
+
+  // Claude API client
+  final claudeApiClient = ChopperClient(
+    baseUrl: Uri.parse('https://api.anthropic.com/v1'),
+    services: [
+      ClaudeApiService.create(),
+    ],
+    interceptors: [
+      ClaudeHeaderInterceptor(
+          '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'),
+    ],
+    converter: const JsonConverter(),
+  );
+  getIt.registerSingleton<ChopperClient>(claudeApiClient,
+      instanceName: 'claude');
 }
 
 void _setupServices() {
@@ -86,6 +104,13 @@ void _setupServices() {
     geminiApiClient.getService<GeminiApiService>(),
   );
   getIt.registerSingleton<GeminiAnswerValidator>(geminiAnswerValidator);
+
+  // Claude answer validator
+  final claudeApiClient = getIt.get<ChopperClient>(instanceName: 'claude');
+  final claudeAnswerValidator = ClaudeAnswerValidator(
+    claudeApiClient.getService<ClaudeApiService>(),
+  );
+  getIt.registerSingleton<ClaudeAnswerValidator>(claudeAnswerValidator);
 
   // deck
   final deckRepository = DeckRepository(
@@ -128,6 +153,7 @@ void _setupServices() {
       validators: {
         AnswerValidatorType.onDeviceAI: onDeviceAIAnswerValidator,
         AnswerValidatorType.gemini: geminiAnswerValidator,
+        AnswerValidatorType.claude: claudeAnswerValidator,
       });
   getIt.registerSingleton<SettingsService>(settingsService);
 

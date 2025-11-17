@@ -1,7 +1,7 @@
 enum AnswerValidatorType {
   gemini,
   onDeviceAI,
-  custom;
+  claude;
 
   String toDisplayString() {
     switch (this) {
@@ -9,8 +9,8 @@ enum AnswerValidatorType {
         return 'Gemini AI';
       case AnswerValidatorType.onDeviceAI:
         return 'On-Device AI';
-      case AnswerValidatorType.custom:
-        return 'Custom';
+      case AnswerValidatorType.claude:
+        return 'Claude AI';
     }
   }
 }
