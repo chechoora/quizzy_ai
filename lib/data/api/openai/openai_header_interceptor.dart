@@ -1,17 +1,22 @@
 import 'dart:async';
 import 'package:chopper/chopper.dart';
+import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 
 class OpenAIHeaderInterceptor implements RequestInterceptor {
-  final String apiKey;
+  final ApiKeysProvider apiKeysProvider;
 
-  OpenAIHeaderInterceptor(this.apiKey);
+  OpenAIHeaderInterceptor(this.apiKeysProvider);
 
   @override
   FutureOr<Request> onRequest(Request request) async {
+    final apiKey = apiKeysProvider.openAiApiKey;
+
     // Add headers for OpenAI API
     final headers = Map<String, String>.from(request.headers);
     headers['Content-Type'] = 'application/json';
-    headers['Authorization'] = 'Bearer $apiKey';
+    if (apiKey != null) {
+      headers['Authorization'] = 'Bearer $apiKey';
+    }
 
     return request.copyWith(headers: headers);
   }

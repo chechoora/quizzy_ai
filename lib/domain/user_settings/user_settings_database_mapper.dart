@@ -12,6 +12,9 @@ class UserSettingsDataBaseMapper {
       id: data.id,
       userId: data.userId,
       answerValidatorType: validatorType,
+      geminiApiKey: data.geminiApiKey,
+      claudeApiKey: data.claudeApiKey,
+      openAiApiKey: data.openAiApiKey,
     );
   }
 }

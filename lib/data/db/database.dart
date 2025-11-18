@@ -18,7 +18,24 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (Migrator m) async {
+        await m.createAll();
+      },
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from < 4) {
+          // Migration for adding API key columns to user_settings_table
+          await m.addColumn(userSettingsTable, userSettingsTable.geminiApiKey);
+          await m.addColumn(userSettingsTable, userSettingsTable.claudeApiKey);
+          await m.addColumn(userSettingsTable, userSettingsTable.openAiApiKey);
+        }
+      },
+    );
+  }
 }
 
 LazyDatabase _openConnection() {

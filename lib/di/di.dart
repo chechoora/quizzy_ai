@@ -31,12 +31,14 @@ import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
-import 'package:poc_ai_quiz/util/api/isolate_converter.dart';
+import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setupDi() async {
   await _setupDataBase();
+  await _setupRepositories();
+  await _setupApiKeysProvider();
   await _setupAPI();
   _setupServices();
 }
@@ -61,8 +63,48 @@ Future<void> _setupDataBase() async {
       userSettingsDataBaseRepository);
 }
 
+Future<void> _setupRepositories() async {
+  // user
+  final userRepository = UserRepository(
+    dataBaseRepository: getIt.get<UserDataBaseRepository>(),
+    userDataBaseMapper: UserDataBaseMapper(),
+  );
+  getIt.registerSingleton<UserRepository>(userRepository);
+
+  // user settings
+  final userSettingsRepository = UserSettingsRepository(
+    dataBaseRepository: getIt.get<UserSettingsDataBaseRepository>(),
+    userSettingsDataBaseMapper: UserSettingsDataBaseMapper(),
+  );
+  getIt.registerSingleton<UserSettingsRepository>(userSettingsRepository);
+
+  // deck
+  final deckRepository = DeckRepository(
+    dataBaseRepository: getIt.get<DeckDataBaseRepository>(),
+    deckDatBaseMapper: DeckDatBaseMapper(),
+  );
+  getIt.registerSingleton<DeckRepository>(deckRepository);
+
+  // quizcardlist
+  final quizCardRepository = QuizCardRepository(
+    dataBaseRepository: getIt.get<QuizCardDataBaseRepository>(),
+    dataBaseMapper: QuizCardDataBaseMapper(),
+  );
+  getIt.registerSingleton<QuizCardRepository>(quizCardRepository);
+}
+
+Future<void> _setupApiKeysProvider() async {
+  final apiKeysProvider = ApiKeysProvider(
+    userRepository: getIt.get<UserRepository>(),
+    userSettingsRepository: getIt.get<UserSettingsRepository>(),
+  );
+  await apiKeysProvider.initialize();
+  getIt.registerSingleton<ApiKeysProvider>(apiKeysProvider);
+}
+
 Future<void> _setupAPI() async {
-  final runner = await IsolateRunner.spawn();
+  final apiKeysProvider = getIt.get<ApiKeysProvider>();
+
   // Gemini API client
   final geminiApiClient = ChopperClient(
     baseUrl:
@@ -71,7 +113,7 @@ Future<void> _setupAPI() async {
       GeminiApiService.create(),
     ],
     interceptors: [
-      GeminiHeaderInterceptor('AIzaSyA101cvgIAiseZSUYNr_i87Y4LqcRAPx_k'),
+      GeminiHeaderInterceptor(apiKeysProvider),
     ],
     converter: const JsonConverter(),
   );
@@ -85,8 +127,7 @@ Future<void> _setupAPI() async {
       ClaudeApiService.create(),
     ],
     interceptors: [
-      ClaudeHeaderInterceptor(
-          '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'),
+      ClaudeHeaderInterceptor(apiKeysProvider),
     ],
     converter: const JsonConverter(),
   );
@@ -100,8 +141,7 @@ Future<void> _setupAPI() async {
       OpenAIApiService.create(),
     ],
     interceptors: [
-      OpenAIHeaderInterceptor(
-          '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'),
+      OpenAIHeaderInterceptor(apiKeysProvider),
     ],
     converter: const JsonConverter(),
   );
@@ -137,33 +177,11 @@ void _setupServices() {
   );
   getIt.registerSingleton<OpenAIAnswerValidator>(openAIAnswerValidator);
 
-  // deck
-  final deckRepository = DeckRepository(
-    dataBaseRepository: getIt.get<DeckDataBaseRepository>(),
-    deckDatBaseMapper: DeckDatBaseMapper(),
-  );
-  getIt.registerSingleton<DeckRepository>(deckRepository);
-
-  // quizcardlist
-  final quizCardRepository = QuizCardRepository(
-    dataBaseRepository: getIt.get<QuizCardDataBaseRepository>(),
-    dataBaseMapper: QuizCardDataBaseMapper(),
-  );
-  getIt.registerSingleton<QuizCardRepository>(quizCardRepository);
-
-  // user
-  final userRepository = UserRepository(
-    dataBaseRepository: getIt.get<UserDataBaseRepository>(),
-    userDataBaseMapper: UserDataBaseMapper(),
-  );
-  getIt.registerSingleton<UserRepository>(userRepository);
-
-  // user settings
-  final userSettingsRepository = UserSettingsRepository(
-    dataBaseRepository: getIt.get<UserSettingsDataBaseRepository>(),
-    userSettingsDataBaseMapper: UserSettingsDataBaseMapper(),
-  );
-  getIt.registerSingleton<UserSettingsRepository>(userSettingsRepository);
+  // Get already registered repositories
+  final userRepository = getIt.get<UserRepository>();
+  final userSettingsRepository = getIt.get<UserSettingsRepository>();
+  final deckRepository = getIt.get<DeckRepository>();
+  final quizCardRepository = getIt.get<QuizCardRepository>();
 
   // settings
   final validatorsManager = ValidatorsManager(

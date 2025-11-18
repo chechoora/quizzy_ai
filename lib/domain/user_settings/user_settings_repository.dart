@@ -17,7 +17,40 @@ class UserSettingsRepository {
     return userSettingsDataBaseMapper.mapToUserSettingsItem(dbUserSettings);
   }
 
+  Stream<UserSettingsItem> watchUserSettings(int userId) {
+    return dataBaseRepository.watchUserSettings(userId).map(
+      (dbUserSettings) => userSettingsDataBaseMapper.mapToUserSettingsItem(dbUserSettings),
+    );
+  }
+
   Future<void> updateAnswerValidatorType(int userId, AnswerValidatorType validatorType) async {
     await dataBaseRepository.updateAnswerValidatorType(userId, validatorType.name);
+  }
+
+  Future<String?> getGeminiApiKey(int userId) async {
+    final settings = await fetchUserSettings(userId);
+    return settings.geminiApiKey;
+  }
+
+  Future<void> setGeminiApiKey(int userId, String? apiKey) async {
+    await dataBaseRepository.updateGeminiApiKey(userId, apiKey);
+  }
+
+  Future<String?> getClaudeApiKey(int userId) async {
+    final settings = await fetchUserSettings(userId);
+    return settings.claudeApiKey;
+  }
+
+  Future<void> setClaudeApiKey(int userId, String? apiKey) async {
+    await dataBaseRepository.updateClaudeApiKey(userId, apiKey);
+  }
+
+  Future<String?> getOpenAiApiKey(int userId) async {
+    final settings = await fetchUserSettings(userId);
+    return settings.openAiApiKey;
+  }
+
+  Future<void> setOpenAiApiKey(int userId, String? apiKey) async {
+    await dataBaseRepository.updateOpenAiApiKey(userId, apiKey);
   }
 }

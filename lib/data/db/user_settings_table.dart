@@ -7,4 +7,10 @@ class UserSettingsTable extends Table {
   IntColumn get userId => integer().references(UserTable, #id)();
 
   TextColumn get answerValidatorType => text().withDefault(const Constant('gemini'))();
+
+  TextColumn get geminiApiKey => text().nullable()();
+
+  TextColumn get claudeApiKey => text().nullable()();
+
+  TextColumn get openAiApiKey => text().nullable()();
 }
