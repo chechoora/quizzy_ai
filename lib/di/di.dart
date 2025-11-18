@@ -1,6 +1,5 @@
 import 'package:chopper/chopper.dart';
 import 'package:get_it/get_it.dart';
-import 'package:isolates/isolate_runner.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_api_service.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_header_interceptor.dart';
@@ -186,6 +185,7 @@ void _setupServices() {
   // settings
   final validatorsManager = ValidatorsManager(
     userRepository: userRepository,
+    userSettingsRepository: userSettingsRepository,
     onDeviceAIService: onDeviceAIService,
   );
   getIt.registerSingleton<ValidatorsManager>(validatorsManager);
