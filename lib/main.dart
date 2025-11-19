@@ -12,13 +12,14 @@ import 'package:poc_ai_quiz/view/settings/premium_settings/premium_settings_widg
 import 'package:fimber/fimber.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Fimber.plantTree(DebugTree());
   await setupDi();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  MyApp({super.key});x
 
   final _routerConfig = GoRouter(
     initialLocation: '/',

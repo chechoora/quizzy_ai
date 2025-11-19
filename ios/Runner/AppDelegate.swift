@@ -8,11 +8,12 @@ import Flutter
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
-    
+
     // Set up the OnDeviceAiApi with Foundation Models implementation
     let controller = window?.rootViewController as! FlutterViewController
-    OnDeviceAiApiSetup.setUpWithFoundationModels(binaryMessenger: controller.binaryMessenger)
-    
+    let implementation = OnDeviceAiApiImplementation()
+    OnDeviceAiApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: implementation)
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
