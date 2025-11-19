@@ -41,18 +41,33 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     QuizCardItem quizCardItem,
     String possibleAnswer,
   ) async {
-    _logger.d('Checking answer for card: ${quizCardItem.id}');
-    final result = await quizEngine.checkPossibleAnswer(quizCardItem, possibleAnswer);
-    _logger.i('Answer validation result: $result (threshold: 0.6)');
-    quizMatchBuilder.saveResult(quizCardItem, possibleAnswer, result);
-    emit(QuizCardResultState(isCorrect: result >= 0.6));
-    if (quizEngine.hasNext) {
-      _logger.d('Moving to next card');
-      quizEngine.nextCard();
-    } else {
-      final results = quizMatchBuilder.getResults();
-      _logger.i('Quiz completed. Results: $results');
-      emit(QuizDoneState(quizResults: results));
+    try {
+      _logger.d('Checking answer for card: ${quizCardItem.id}');
+      final result =
+          await quizEngine.checkPossibleAnswer(quizCardItem, possibleAnswer);
+      _logger.i('Answer validation result: $result (threshold: 0.6)');
+      quizMatchBuilder.saveResult(quizCardItem, possibleAnswer, result);
+      emit(QuizCardResultState(isCorrect: result >= 0.6));
+      if (quizEngine.hasNext) {
+        _logger.d('Moving to next card');
+        quizEngine.nextCard();
+      } else {
+        final results = quizMatchBuilder.getResults();
+        _logger.i('Quiz completed. Results: $results');
+        emit(QuizDoneState(quizResults: results));
+      }
+    } catch (e, stackTrace) {
+      _logger.e('Error checking answer for card: ${quizCardItem.id}',
+          ex: e, stacktrace: stackTrace);
+      emit(QuizExeErrorState(
+        message: 'Failed to validate answer: ${e.toString()}',
+        quizCardItem: quizCardItem,
+      ));
+      emit(
+        QuizExeDisplayCardState(
+          quizCardItem: quizCardItem,
+        ),
+      );
     }
   }
 }
@@ -81,4 +96,14 @@ class QuizDoneState extends QuizExeState {
   QuizDoneState({required this.quizResults});
 
   final QuizResults quizResults;
+}
+
+class QuizExeErrorState extends QuizExeState {
+  QuizExeErrorState({
+    required this.message,
+    required this.quizCardItem,
+  });
+
+  final String message;
+  final QuizCardItem quizCardItem;
 }

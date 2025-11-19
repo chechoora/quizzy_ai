@@ -54,6 +54,7 @@ class _QuizExeWidgetState extends State<QuizExeWidget> {
       ),
       body: BlocConsumer<QuizExeCubit, QuizExeState>(
         bloc: cubit,
+        buildWhen: (previous, current) => current is! QuizExeErrorState,
         builder: (BuildContext context, QuizExeState state) {
           if (state is QuizExeDisplayCardState) {
             final quizCard = state.quizCardItem;
@@ -75,7 +76,24 @@ class _QuizExeWidgetState extends State<QuizExeWidget> {
           }
           throw ArgumentError('Wrong state');
         },
-        listener: (BuildContext context, QuizExeState state) {},
+        listener: (BuildContext context, QuizExeState state) {
+          if (state is QuizExeErrorState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Theme.of(context).colorScheme.error,
+                duration: const Duration(seconds: 4),
+                action: SnackBarAction(
+                  label: 'Dismiss',
+                  textColor: Theme.of(context).colorScheme.onError,
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  },
+                ),
+              ),
+            );
+          }
+        },
       ),
     );
   }
