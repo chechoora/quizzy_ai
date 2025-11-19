@@ -5,6 +5,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
+import 'package:poc_ai_quiz/util/unique_emit.dart';
 
 class QuizCardListCubit extends Cubit<QuizCardListState> {
   QuizCardListCubit({
@@ -55,7 +56,8 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     fetchQuizCardListRequest();
   }
 
-  void editQuizCard(QuizCardItem card, QuizCardRequestItem quizCardRequestItem) {
+  void editQuizCard(
+      QuizCardItem card, QuizCardRequestItem quizCardRequestItem) {
     emit(
       QuizCardListLoadingState(),
     );
@@ -92,11 +94,11 @@ abstract class BuilderState extends QuizCardListState {
   const BuilderState();
 }
 
-abstract class ListenerState extends QuizCardListState {
-  const ListenerState();
+abstract class ListenerState extends QuizCardListState with UniqueEmit {
+  ListenerState();
 
   @override
-  List<Object?> get props => [double.nan];
+  List<Object?> get props => [...uniqueProps];
 }
 
 class QuizCardListLoadingState extends BuilderState {
@@ -114,7 +116,7 @@ class QuizCardListDataState extends BuilderState {
 }
 
 class QuizCardLaunchState extends ListenerState {
-  const QuizCardLaunchState({required this.quizCarList});
+  QuizCardLaunchState({required this.quizCarList});
 
   final List<QuizCardItem> quizCarList;
 }
@@ -122,7 +124,7 @@ class QuizCardLaunchState extends ListenerState {
 class RequestCreateQuizCardState extends ListenerState {
   final bool canCreateCard;
 
-  const RequestCreateQuizCardState({
+  RequestCreateQuizCardState({
     required this.canCreateCard,
   });
 }

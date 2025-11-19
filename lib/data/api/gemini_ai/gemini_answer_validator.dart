@@ -12,12 +12,8 @@ class GeminiAnswerValidator extends IAnswerValidator {
   static final _logger = Logger.withTag('GeminiAnswerValidator');
 
   final GeminiApiService _apiService;
-  final String _model;
 
-  GeminiAnswerValidator(
-    this._apiService, {
-    String model = 'gemini-1.5-flash',
-  }) : _model = model;
+  GeminiAnswerValidator(this._apiService);
 
   @override
   Future<double> validateAnswer({
