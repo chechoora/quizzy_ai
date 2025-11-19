@@ -19,7 +19,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});x
+  MyApp({super.key});
 
   final _routerConfig = GoRouter(
     initialLocation: '/',

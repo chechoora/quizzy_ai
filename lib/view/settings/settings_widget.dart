@@ -21,7 +21,7 @@ class SettingsWidget extends HookWidget {
         settingsService: getIt<SettingsService>(),
         validatorsManager: getIt<ValidatorsManager>(),
         userRepository: getIt<UserRepository>(),
-        userSettingsRepository:  getIt<UserSettingsRepository>(),
+        userSettingsRepository: getIt<UserSettingsRepository>(),
       ),
     );
 
@@ -97,7 +97,6 @@ class SettingsWidget extends HookWidget {
       ),
     );
   }
-
 }
 
 class _SettingsContent extends HookWidget {
@@ -115,38 +114,21 @@ class _SettingsContent extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Create controllers for each API key field
-    final controllers = useMemoized(() {
-      final Map<AnswerValidatorType, TextEditingController> map = {};
-      for (var validator in validators) {
-        if (validator.type != AnswerValidatorType.onDeviceAI) {
-          map[validator.type] = TextEditingController(text: validator.apiKey ?? '');
-        }
-      }
-      return map;
-    });
+    // Create a single controller for the selected validator's API key
+    final selectedValidatorItem = validators.firstWhere(
+      (v) => v.type == selectedValidator,
+      orElse: () => validators.first,
+    );
 
-    // Update controllers when validators change
+    final apiKeyController = useTextEditingController(
+      text: selectedValidatorItem.apiKey ?? '',
+    );
+
+    // Update controller when the selected validator changes
     useEffect(() {
-      for (var validator in validators) {
-        if (validator.type != AnswerValidatorType.onDeviceAI) {
-          final controller = controllers[validator.type];
-          if (controller != null && controller.text != (validator.apiKey ?? '')) {
-            controller.text = validator.apiKey ?? '';
-          }
-        }
-      }
+      apiKeyController.text = selectedValidatorItem.apiKey ?? '';
       return null;
-    }, [validators]);
-
-    // Dispose controllers
-    useEffect(() {
-      return () {
-        for (var controller in controllers.values) {
-          controller.dispose();
-        }
-      };
-    }, []);
+    }, [selectedValidator, selectedValidatorItem.apiKey]);
 
     return ListView(
       children: [
@@ -157,7 +139,7 @@ class _SettingsContent extends HookWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: DropdownButtonFormField<AnswerValidatorType>(
-            value: selectedValidator,
+            initialValue: selectedValidator,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               labelText: 'Validator Type',
@@ -192,49 +174,43 @@ class _SettingsContent extends HookWidget {
           ),
         ),
         const SizedBox(height: 24),
-        // API Keys Section
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            'API Keys',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+        // API Key Section - Only show for selected validator if not On-Device AI
+        if (selectedValidator != AnswerValidatorType.onDeviceAI) ...[
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              'API Key',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        ...validators
-            .where((v) => v.type != AnswerValidatorType.onDeviceAI)
-            .map((validator) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: TextField(
-                    controller: controllers[validator.type],
-                    decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
-                      labelText: '${validator.type.toDisplayString()} API Key',
-                      hintText: 'Enter your API key',
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.save),
-                        onPressed: () {
-                          final controller = controllers[validator.type];
-                          if (controller != null) {
-                            final apiKey = controller.text.trim().isEmpty
-                                ? null
-                                : controller.text.trim();
-                            onApiKeyUpdate(validator.type, apiKey);
-                          }
-                        },
-                        tooltip: 'Save API Key',
-                      ),
-                    ),
-                    obscureText: true,
-                    onSubmitted: (value) {
-                      final apiKey = value.trim().isEmpty ? null : value.trim();
-                      onApiKeyUpdate(validator.type, apiKey);
-                    },
-                  ),
-                )),
+          const SizedBox(height: 8),
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: TextField(
+              controller: apiKeyController,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: '${selectedValidator.toDisplayString()} API Key',
+                hintText: 'Enter your API key',
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.save),
+                  onPressed: () {
+                    final apiKey = apiKeyController.text.trim().isEmpty
+                        ? null
+                        : apiKeyController.text.trim();
+                    onApiKeyUpdate(selectedValidator, apiKey);
+                  },
+                  tooltip: 'Save API Key',
+                ),
+              ),
+              obscureText: true,
+            ),
+          ),
+        ],
         const SizedBox(height: 16),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0),

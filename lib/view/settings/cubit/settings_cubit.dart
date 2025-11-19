@@ -37,7 +37,6 @@ class SettingsCubit extends Cubit<SettingsState> {
       _logger.e('Failed to load settings', ex: e, stacktrace: stackTrace);
       emit(SettingsErrorState(
         error: e.toString(),
-        previousValidatorType: null,
       ));
     }
   }
@@ -50,22 +49,23 @@ class SettingsCubit extends Cubit<SettingsState> {
 
     try {
       await settingsService.updateValidatorType(newValidator);
+      emit(SettingsUpdateSuccessState(validatorType: newValidator));
       emit(SettingsDataState(
         validatorType: newValidator,
         validators: currentState.validators,
       ));
-      emit(SettingsUpdateSuccessState(validatorType: newValidator));
       _logger.i('Updated validator to: ${newValidator.toDisplayString()}');
     } catch (e, stackTrace) {
       _logger.e('Failed to update validator', ex: e, stacktrace: stackTrace);
       emit(SettingsErrorState(
         error: e.toString(),
-        previousValidatorType: currentState.validatorType,
       ));
+      emit(currentState);
     }
   }
 
-  Future<void> updateApiKey(AnswerValidatorType validatorType, String? apiKey) async {
+  Future<void> updateApiKey(
+      AnswerValidatorType validatorType, String? apiKey) async {
     final currentState = state;
     if (currentState is! SettingsDataState) return;
 
@@ -100,7 +100,6 @@ class SettingsCubit extends Cubit<SettingsState> {
       _logger.e('Failed to update API key', ex: e, stacktrace: stackTrace);
       emit(SettingsErrorState(
         error: 'Failed to update API key: ${e.toString()}',
-        previousValidatorType: currentState.validatorType,
       ));
     }
   }
@@ -161,13 +160,11 @@ class SettingsApiKeyUpdatedState extends ListenerState {
 
 class SettingsErrorState extends ListenerState {
   final String error;
-  final AnswerValidatorType? previousValidatorType;
 
   const SettingsErrorState({
     required this.error,
-    required this.previousValidatorType,
   });
 
   @override
-  List<Object?> get props => [error, previousValidatorType, super.props];
+  List<Object?> get props => [error, super.props];
 }
