@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_match_builder.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
@@ -9,7 +10,7 @@ import 'package:poc_ai_quiz/view/quiz_exe/display/quiz_display_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/done/quiz_done_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_cubit.dart';
 
-class QuizExeWidget extends StatefulWidget {
+class QuizExeWidget extends HookWidget {
   const QuizExeWidget({
     required this.cards,
     super.key,
@@ -18,24 +19,23 @@ class QuizExeWidget extends StatefulWidget {
   final List<QuizCardItem> cards;
 
   @override
-  State<QuizExeWidget> createState() => _QuizExeWidgetState();
-}
-
-class _QuizExeWidgetState extends State<QuizExeWidget> {
-  late final QuizExeCubit cubit = QuizExeCubit(
-    quizService: getIt<QuizService>(),
-    quizCardItems: widget.cards,
-    quizMatchBuilder: QuizMatchBuilder(),
-  );
-
-  @override
-  void initState() {
-    cubit.launchQuiz();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final cubit = useMemoized(
+      () => QuizExeCubit(
+        quizService: getIt<QuizService>(),
+        quizCardItems: cards,
+        quizMatchBuilder: QuizMatchBuilder(),
+      ),
+    );
+
+    useEffect(
+      () {
+        cubit.launchQuiz();
+        return null;
+      },
+      [cubit],
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: BlocBuilder<QuizExeCubit, QuizExeState>(
@@ -60,6 +60,7 @@ class _QuizExeWidgetState extends State<QuizExeWidget> {
             final quizCard = state.quizCardItem;
             return QuizDisplayWidget(
               quizCardItem: quizCard,
+              isProcessing: state.isProcessing,
               onTextPassed: (possibleAnswer) {
                 cubit.checkTheAnswer(quizCard, possibleAnswer);
               },

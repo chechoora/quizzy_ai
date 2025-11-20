@@ -43,6 +43,10 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   ) async {
     try {
       _logger.d('Checking answer for card: ${quizCardItem.id}');
+      emit(QuizExeDisplayCardState(
+        quizCardItem: quizCardItem,
+        isProcessing: true,
+      ));
       final result =
           await quizEngine.checkPossibleAnswer(quizCardItem, possibleAnswer);
       _logger.i('Answer validation result: $result (threshold: 0.6)');
@@ -61,7 +65,6 @@ class QuizExeCubit extends Cubit<QuizExeState> {
           ex: e, stacktrace: stackTrace);
       emit(QuizExeErrorState(
         message: 'Failed to validate answer: ${e.toString()}',
-        quizCardItem: quizCardItem,
       ));
       emit(
         QuizExeDisplayCardState(
@@ -79,9 +82,11 @@ class QuizExeLoadingState extends QuizExeState {}
 class QuizExeDisplayCardState extends QuizExeState {
   QuizExeDisplayCardState({
     required this.quizCardItem,
+    this.isProcessing = false,
   });
 
   final QuizCardItem quizCardItem;
+  final bool isProcessing;
 }
 
 class QuizCardResultState extends QuizExeState {
@@ -99,11 +104,7 @@ class QuizDoneState extends QuizExeState {
 }
 
 class QuizExeErrorState extends QuizExeState {
-  QuizExeErrorState({
-    required this.message,
-    required this.quizCardItem,
-  });
+  QuizExeErrorState({required this.message});
 
   final String message;
-  final QuizCardItem quizCardItem;
 }

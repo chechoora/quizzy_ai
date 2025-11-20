@@ -59,6 +59,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
 
   go_router: ^13.2.0
+  flutter_hooks: ^0.21.3+1
 
 dev_dependencies:
   flutter_test:
@@ -72,7 +73,6 @@ dev_dependencies:
   mocktail: ^1.0.3
   pigeon: ^22.7.0
   fimber: ^0.7.0
-  flutter_hooks: ^0.21.3+1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -5,12 +5,14 @@ import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 class QuizDisplayWidget extends StatefulWidget {
   const QuizDisplayWidget({
     required this.quizCardItem,
+    this.isProcessing = false,
     this.onTextPassed,
     this.onSkipPassed,
     super.key,
   });
 
   final QuizCardItem quizCardItem;
+  final bool isProcessing;
   final ValueChanged<String>? onTextPassed;
   final VoidCallback? onSkipPassed;
 
@@ -54,9 +56,15 @@ class _QuizDisplayWidgetState extends State<QuizDisplayWidget> {
                   autofocus: true,
                   maxLines: null,
                   controller: editController,
+                  enabled: !widget.isProcessing,
                   decoration: const InputDecoration(hintText: 'Type answer', border: InputBorder.none),
                 ),
               ),
+              if (widget.isProcessing)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(),
+                ),
             ],
           ),
         ),
@@ -64,9 +72,11 @@ class _QuizDisplayWidgetState extends State<QuizDisplayWidget> {
           onCloseRequest: () {
             context.pop();
           },
-          onCheckRequest: () {
-            widget.onTextPassed?.call(editController.text);
-          },
+          onCheckRequest: widget.isProcessing
+              ? null
+              : () {
+                  widget.onTextPassed?.call(editController.text);
+                },
         ),
       ],
     );
