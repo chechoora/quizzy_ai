@@ -229,7 +229,7 @@ class _SettingsContent extends HookWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    '• Gemini AI: Requires a Google Gemini API key. Uses Google AI for intelligent answer validation.',
+                    '• On-Device AI: No API key required. Uses local AI processing for privacy and offline use.',
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -241,7 +241,7 @@ class _SettingsContent extends HookWidget {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    '• On-Device AI: No API key required. Uses local AI processing for privacy and offline use.',
+                    '• Gemini AI: Requires a Google Gemini API key. Uses Google AI for intelligent answer validation.',
                   ),
                 ],
               ),
