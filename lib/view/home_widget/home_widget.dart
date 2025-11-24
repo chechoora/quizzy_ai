@@ -102,7 +102,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               colorFilter: ColorFilter.mode(
                 _selectedIndex == 0
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.inversePrimary,
+                    : Theme.of(context).colorScheme.secondary,
                 BlendMode.srcIn,
               ),
               semanticsLabel: 'Decks',
@@ -114,7 +114,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               Icons.settings,
               color: _selectedIndex == 1
                   ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.inversePrimary,
+                  : Theme.of(context).colorScheme.secondary,
             ),
             label: 'Settings',
           ),
