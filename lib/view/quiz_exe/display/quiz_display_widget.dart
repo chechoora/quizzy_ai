@@ -28,44 +28,80 @@ class _QuizDisplayWidgetState extends State<QuizDisplayWidget> {
     return Column(
       children: [
         Expanded(
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.only(left: 8),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.quizCardItem.questionText,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.black,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              children: [
+                Card(
+                  color: Theme.of(context).colorScheme.secondary,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.quizCardItem.questionText,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).primaryColor),
-                  borderRadius: BorderRadius.circular(10),
+                const SizedBox(height: 8),
+                Card(
+                  color: Theme.of(context).colorScheme.secondary,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    child: SizedBox(
+                      height: 120,
+                      child: TextField(
+                        autofocus: true,
+                        maxLines: null,
+                        controller: editController,
+                        enabled: !widget.isProcessing,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Type answer',
+                          hintStyle: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .inversePrimary
+                                .withValues(alpha: 0.5),
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                margin: const EdgeInsets.all(8),
-                alignment: Alignment.topLeft,
-                height: 120,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 4,
-                ),
-                child: TextField(
-                  autofocus: true,
-                  maxLines: null,
-                  controller: editController,
-                  enabled: !widget.isProcessing,
-                  decoration: const InputDecoration(hintText: 'Type answer', border: InputBorder.none),
-                ),
-              ),
-              if (widget.isProcessing)
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: CircularProgressIndicator(),
-                ),
-            ],
+                if (widget.isProcessing)
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: CircularProgressIndicator(),
+                  ),
+              ],
+            ),
           ),
         ),
         _BottomQuizExeBar(
