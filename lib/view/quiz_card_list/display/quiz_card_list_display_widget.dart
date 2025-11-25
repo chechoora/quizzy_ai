@@ -54,12 +54,11 @@ class QuizCardWidget extends StatefulWidget {
 class _QuizCardWidgetState extends State<QuizCardWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Card(
       margin: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Theme.of(context).primaryColor,
-        ),
+      color: Theme.of(context).colorScheme.secondary,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -67,23 +66,40 @@ class _QuizCardWidgetState extends State<QuizCardWidget> {
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: 4,
+                horizontal: 8,
+                vertical: 8,
               ),
               alignment: Alignment.center,
-              child: Text(widget.quizCardItem.questionText),
+              child: Text(
+                widget.quizCardItem.questionText,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+              ),
             ),
           ),
           Divider(
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.inversePrimary,
             thickness: 1.0,
+            height: 1,
           ),
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: 4,
+                horizontal: 8,
+                vertical: 8,
               ),
               alignment: Alignment.center,
-              child: Text(widget.quizCardItem.answerText),
+              child: Text(
+                widget.quizCardItem.answerText,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+              ),
             ),
           ),
           Row(
@@ -95,7 +111,7 @@ class _QuizCardWidgetState extends State<QuizCardWidget> {
                 icon: Icon(
                   Icons.edit,
                   size: 16,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(context).colorScheme.inversePrimary,
                 ),
                 onPressed: () {
                   widget.onQuizCardEditRequest?.call();
@@ -105,7 +121,7 @@ class _QuizCardWidgetState extends State<QuizCardWidget> {
                 icon: Icon(
                   Icons.delete,
                   size: 16,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(context).colorScheme.inversePrimary,
                 ),
                 onPressed: () {
                   widget.onQuizCardRemoveRequest?.call();
