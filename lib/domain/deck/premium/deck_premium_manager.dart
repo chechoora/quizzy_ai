@@ -26,7 +26,8 @@ class DeckPremiumManager {
   }
 
   Future<bool> canAddDeck() async {
+    final user = await userRepository.fetchCurrentUser();
     final allDecks = await deckRepository.fetchDecks();
-    return allDecks.length < PremiumLimitInfo.deckLimit;
+    return user.isPremium ? true : allDecks.length < PremiumLimitInfo.deckLimit;
   }
 }

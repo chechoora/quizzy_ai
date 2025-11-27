@@ -14,7 +14,8 @@ class QuizCardPremiumManager {
     required this.quizCardRepository,
   });
 
-  Future<List<QuizCardItemWithPremium>> fetchAllowedQuizCard(DeckItem deckItem) async {
+  Future<List<QuizCardItemWithPremium>> fetchAllowedQuizCard(
+      DeckItem deckItem) async {
     final allQuizCards = await quizCardRepository.fetchQuizCardItem(deckItem);
     final user = await userRepository.fetchCurrentUser();
     int count = 0;
@@ -27,7 +28,10 @@ class QuizCardPremiumManager {
   }
 
   Future<bool> canAddQuizCard(DeckItem deckItem) async {
+    final user = await userRepository.fetchCurrentUser();
     final allQuizCards = await quizCardRepository.fetchQuizCardItem(deckItem);
-    return allQuizCards.length < PremiumLimitInfo.quizCardLimit;
+    return user.isPremium
+        ? true
+        : allQuizCards.length < PremiumLimitInfo.quizCardLimit;
   }
 }
