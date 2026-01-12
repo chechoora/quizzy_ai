@@ -90,17 +90,18 @@ class SettingsCubit extends Cubit<SettingsState> {
 
       // Reload validators to reflect the updated API key
       final validators = await validatorsManager.getValidators();
+      emit(SettingsApiKeyUpdatedState(validatorType: validatorType));
       emit(SettingsDataState(
         validatorType: currentState.validatorType,
         validators: validators,
       ));
-      emit(SettingsApiKeyUpdatedState(validatorType: validatorType));
       _logger.i('Updated API key for: ${validatorType.toDisplayString()}');
     } catch (e, stackTrace) {
       _logger.e('Failed to update API key', ex: e, stacktrace: stackTrace);
       emit(SettingsErrorState(
         error: 'Failed to update API key: ${e.toString()}',
       ));
+      emit(currentState);
     }
   }
 }
