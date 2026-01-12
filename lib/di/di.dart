@@ -19,6 +19,7 @@ import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
@@ -216,4 +217,11 @@ void _setupServices() {
     quizCardRepository: quizCardRepository,
   );
   getIt.registerSingleton<QuizCardPremiumManager>(quizManager);
+
+  // quiz card exe validator
+  final quizCardExeValidator = QuizCardExeValidator(
+    userRepository: userRepository,
+    userSettingsRepository: userSettingsRepository,
+  );
+  getIt.registerSingleton<QuizCardExeValidator>(quizCardExeValidator);
 }

@@ -100,7 +100,7 @@ class OnDeviceAiApiImplementation: OnDeviceAiApi {
                 completion(.failure(PigeonError(
                     code: "VALIDATION_ERROR",
                     message: "Failed to validate answer: \(error.localizedDescription)",
-                    details: error
+                    details: nil
                 )))
             }
         }

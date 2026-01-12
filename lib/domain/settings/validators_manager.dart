@@ -4,6 +4,8 @@ import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 
+import '../user_settings/model/user_settings_item.dart' show UserSettingsItem;
+
 class ValidatorsManager {
   final UserRepository userRepository;
   final UserSettingsRepository userSettingsRepository;
@@ -33,7 +35,8 @@ class ValidatorsManager {
     return validators;
   }
 
-  String? _getApiKeyForValidator(AnswerValidatorType type, settings) {
+  String? _getApiKeyForValidator(
+      AnswerValidatorType type, UserSettingsItem settings) {
     switch (type) {
       case AnswerValidatorType.gemini:
         return settings.geminiApiKey;

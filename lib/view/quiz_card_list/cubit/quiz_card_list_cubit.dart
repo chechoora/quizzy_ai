@@ -4,6 +4,7 @@ import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
@@ -12,11 +13,13 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     required this.deckItem,
     required this.quizCardRepository,
     required this.quizCardPremiumManager,
+    required this.quizCardExeValidator,
   }) : super(QuizCardListLoadingState());
 
   final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
   final QuizCardPremiumManager quizCardPremiumManager;
+  final QuizCardExeValidator quizCardExeValidator;
   final items = <QuizCardItem>[];
 
   Future<void> fetchQuizCardListRequest() async {
@@ -68,12 +71,21 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     fetchQuizCardListRequest();
   }
 
-  void launchQuizRequest() {
-    emit(
-      QuizCardLaunchState(
-        quizCarList: items,
-      ),
-    );
+  Future<void> launchQuizRequest() async {
+    final result = await quizCardExeValidator.isExeValid();
+    if (result is QuizCardExeValid) {
+      emit(
+        QuizCardLaunchState(
+          quizCarList: items,
+        ),
+      );
+    } else {
+      emit(
+        QuizCardListErrorState(
+          message: (result as QuizCardExeInvalid).reason,
+        ),
+      );
+    }
   }
 
   void addCardRequest() async {
@@ -127,4 +139,10 @@ class RequestCreateQuizCardState extends ListenerState {
   RequestCreateQuizCardState({
     required this.canCreateCard,
   });
+}
+
+class QuizCardListErrorState extends ListenerState {
+  final String message;
+
+  QuizCardListErrorState({required this.message});
 }

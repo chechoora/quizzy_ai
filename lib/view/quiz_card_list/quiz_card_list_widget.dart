@@ -8,6 +8,7 @@ import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
@@ -31,6 +32,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
     deckItem: widget.deckItem,
     quizCardRepository: getIt<QuizCardRepository>(),
     quizCardPremiumManager: getIt<QuizCardPremiumManager>(),
+    quizCardExeValidator: getIt<QuizCardExeValidator>(),
   );
 
   @override
@@ -95,6 +97,12 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
             } else {
               _showCreateCardPremiumError();
             }
+          }
+          if (state is QuizCardListErrorState) {
+            snackBar(
+              context,
+              message: state.message,
+            );
           }
         },
       ),

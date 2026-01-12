@@ -25,7 +25,8 @@ Future alert(
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: textOK ?? Text(MaterialLocalizations.of(context).okButtonLabel),
+            child:
+                textOK ?? Text(MaterialLocalizations.of(context).okButtonLabel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -34,3 +35,24 @@ Future alert(
         ],
       ),
     );
+
+void snackBar(
+  BuildContext context, {
+  required String message,
+  Duration duration = const Duration(seconds: 4),
+}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: Theme.of(context).colorScheme.error,
+      duration: duration,
+      action: SnackBarAction(
+        label: 'Dismiss',
+        textColor: Theme.of(context).colorScheme.onError,
+        onPressed: () {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        },
+      ),
+    ),
+  );
+}
