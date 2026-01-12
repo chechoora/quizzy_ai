@@ -8,7 +8,8 @@ import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
-import 'package:poc_ai_quiz/util/simple_loading_widget.dart';
+import 'package:poc_ai_quiz/util/view/answer_validator_dropdown.dart';
+import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/cubit/settings_cubit.dart';
 
 class SettingsWidget extends HookWidget {
@@ -136,42 +137,10 @@ class _SettingsContent extends HookWidget {
           title: Text('Answer Validator'),
           subtitle: Text('Choose how quiz answers are validated'),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: DropdownButtonFormField<AnswerValidatorType>(
-            initialValue: selectedValidator,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Validator Type',
-            ),
-            items: validators.map((validatorItem) {
-              return DropdownMenuItem(
-                value: validatorItem.type,
-                enabled: validatorItem.isEnabled,
-                child: Row(
-                  children: [
-                    Text(
-                      validatorItem.type.toDisplayString(),
-                      style: TextStyle(
-                        color: validatorItem.isEnabled
-                            ? null
-                            : Theme.of(context).disabledColor,
-                      ),
-                    ),
-                    if (!validatorItem.isEnabled) ...[
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.lock,
-                        size: 16,
-                        color: Theme.of(context).disabledColor,
-                      ),
-                    ],
-                  ],
-                ),
-              );
-            }).toList(),
-            onChanged: onValidatorChanged,
-          ),
+        AnswerValidatorDropdown(
+          selectedValidator: selectedValidator,
+          validators: validators,
+          onValidatorChanged: onValidatorChanged,
         ),
         const SizedBox(height: 24),
         // API Key Section - Only show for selected validator if not On-Device AI
