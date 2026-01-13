@@ -4,6 +4,10 @@ import 'package:poc_ai_quiz/domain/quiz/quiz_engine.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_match_builder.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
+import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
+import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class QuizExeCubit extends Cubit<QuizExeState> {
@@ -11,22 +15,40 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     required this.quizCardItems,
     required this.quizService,
     required this.quizMatchBuilder,
+    required this.settingsService,
+    required this.validatorsManager,
   }) : super(QuizExeLoadingState());
 
   final _logger = Logger.withTag('QuizExeCubit');
   final List<QuizCardItem> quizCardItems;
   final QuizService quizService;
   final QuizMatchBuilder quizMatchBuilder;
+  final SettingsService settingsService;
+  final ValidatorsManager validatorsManager;
 
   late final quizEngine = QuizEngine(
     cards: quizCardItems,
     quizService: quizService,
-    onTestNewCard: (card) {
-      emit(
-        QuizExeDisplayCardState(
+    onTestNewCard: (card) async {
+      // Get current state to preserve validator data
+      final currentState = state;
+      if (currentState is QuizExeDisplayCardState) {
+        emit(
+          QuizExeDisplayCardState(
+            quizCardItem: card,
+            selectedValidator: currentState.selectedValidator,
+            availableValidators: currentState.availableValidators,
+          ),
+        );
+      } else {
+        final validatorType = await settingsService.getCurrentValidatorType();
+        final availableValidators = await validatorsManager.getValidatorsWithApiKeys();
+        emit(QuizExeDisplayCardState(
           quizCardItem: card,
-        ),
-      );
+          selectedValidator: validatorType,
+          availableValidators: availableValidators,
+        ));
+      }
     },
   );
 
@@ -43,15 +65,24 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   ) async {
     try {
       _logger.d('Checking answer for card: ${quizCardItem.id}');
+
+      // Get current state to preserve validator data
+      final currentState = state;
+      if (currentState is! QuizExeDisplayCardState) return;
+
       emit(QuizExeDisplayCardState(
         quizCardItem: quizCardItem,
+        selectedValidator: currentState.selectedValidator,
+        availableValidators: currentState.availableValidators,
         isProcessing: true,
       ));
+
       final result =
           await quizEngine.checkPossibleAnswer(quizCardItem, possibleAnswer);
       _logger.i('Answer validation result: $result (threshold: 0.6)');
       quizMatchBuilder.saveResult(quizCardItem, possibleAnswer, result);
       emit(QuizCardResultState(isCorrect: result >= 0.6));
+
       if (quizEngine.hasNext) {
         _logger.d('Moving to next card');
         quizEngine.nextCard();
@@ -66,11 +97,36 @@ class QuizExeCubit extends Cubit<QuizExeState> {
       emit(QuizExeErrorState(
         message: 'Failed to validate answer: ${e.toString()}',
       ));
-      emit(
-        QuizExeDisplayCardState(
-          quizCardItem: quizCardItem,
-        ),
-      );
+
+      // Get current state to preserve validator data for error recovery
+      final currentState = state;
+      if (currentState is QuizExeDisplayCardState) {
+        emit(
+          QuizExeDisplayCardState(
+            quizCardItem: quizCardItem,
+            selectedValidator: currentState.selectedValidator,
+            availableValidators: currentState.availableValidators,
+          ),
+        );
+      }
+    }
+  }
+
+  void changeValidator(AnswerValidatorType? newValidator) async {
+    if (newValidator == null) return;
+
+    _logger.d('Changing validator to: ${newValidator.toDisplayString()}');
+    await settingsService.updateValidatorType(newValidator);
+
+    // Re-emit current state with updated validator
+    if (state is QuizExeDisplayCardState) {
+      final currentState = state as QuizExeDisplayCardState;
+      emit(QuizExeDisplayCardState(
+        quizCardItem: currentState.quizCardItem,
+        selectedValidator: newValidator,
+        availableValidators: currentState.availableValidators,
+        isProcessing: currentState.isProcessing,
+      ));
     }
   }
 }
@@ -82,11 +138,15 @@ class QuizExeLoadingState extends QuizExeState {}
 class QuizExeDisplayCardState extends QuizExeState {
   QuizExeDisplayCardState({
     required this.quizCardItem,
+    required this.selectedValidator,
+    required this.availableValidators,
     this.isProcessing = false,
   });
 
   final QuizCardItem quizCardItem;
   final bool isProcessing;
+  final AnswerValidatorType selectedValidator;
+  final List<ValidatorItem> availableValidators;
 }
 
 class QuizCardResultState extends QuizExeState {

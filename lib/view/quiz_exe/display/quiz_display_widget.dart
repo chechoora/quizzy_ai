@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
+import 'package:poc_ai_quiz/util/view/answer_validator_dropdown.dart';
 
 class QuizDisplayWidget extends StatefulWidget {
   const QuizDisplayWidget({
     required this.quizCardItem,
+    required this.selectedValidator,
+    required this.validators,
+    required this.onValidatorChanged,
     this.isProcessing = false,
     this.onTextPassed,
     this.onSkipPassed,
@@ -15,6 +21,9 @@ class QuizDisplayWidget extends StatefulWidget {
   final bool isProcessing;
   final ValueChanged<String>? onTextPassed;
   final VoidCallback? onSkipPassed;
+  final AnswerValidatorType selectedValidator;
+  final List<ValidatorItem> validators;
+  final void Function(AnswerValidatorType?) onValidatorChanged;
 
   @override
   State<QuizDisplayWidget> createState() => _QuizDisplayWidgetState();
@@ -113,6 +122,13 @@ class _QuizDisplayWidgetState extends State<QuizDisplayWidget> {
               : () {
                   widget.onTextPassed?.call(editController.text);
                 },
+          trailing: widget.validators.isEmpty
+              ? Container()
+              : AnswerValidatorDropdown(
+                  selectedValidator: widget.selectedValidator,
+                  validators: widget.validators,
+                  onValidatorChanged: widget.onValidatorChanged,
+                ),
         ),
       ],
     );
@@ -125,12 +141,14 @@ class _BottomQuizExeBar extends StatelessWidget {
     this.onCheckRequest,
     this.onBackRequest,
     this.onForwardRequest,
+    this.trailing,
   });
 
   final VoidCallback? onCloseRequest;
   final VoidCallback? onCheckRequest;
   final VoidCallback? onBackRequest;
   final VoidCallback? onForwardRequest;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -154,6 +172,7 @@ class _BottomQuizExeBar extends StatelessWidget {
             ),
             onPressed: onCheckRequest,
           ),
+          Expanded(child: trailing ?? const SizedBox.shrink()),
           // IconButton(
           //   tooltip: 'Backwards',
           //   icon: Icon(

@@ -1,5 +1,7 @@
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/settings/model/validator_selection_data.dart';
+import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 
@@ -30,5 +32,16 @@ class SettingsService {
   Future<IAnswerValidator> getAnswerValidator() async {
     final validatorType = await getCurrentValidatorType();
     return validators[validatorType]!;
+  }
+
+  Future<ValidatorSelectionData> getValidatorSelectionData(
+    ValidatorsManager validatorsManager,
+  ) async {
+    final currentValidator = await getCurrentValidatorType();
+    final availableValidators = await validatorsManager.getValidatorsWithApiKeys();
+    return ValidatorSelectionData(
+      selectedValidator: currentValidator,
+      availableValidators: availableValidators,
+    );
   }
 }

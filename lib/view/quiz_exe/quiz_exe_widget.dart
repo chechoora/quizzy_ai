@@ -5,6 +5,8 @@ import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_match_builder.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
+import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
+import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/display/quiz_display_widget.dart';
@@ -26,6 +28,8 @@ class QuizExeWidget extends HookWidget {
         quizService: getIt<QuizService>(),
         quizCardItems: cards,
         quizMatchBuilder: QuizMatchBuilder(),
+        settingsService: getIt<SettingsService>(),
+        validatorsManager: getIt<ValidatorsManager>(),
       ),
     );
 
@@ -65,6 +69,9 @@ class QuizExeWidget extends HookWidget {
               onTextPassed: (possibleAnswer) {
                 cubit.checkTheAnswer(quizCard, possibleAnswer);
               },
+              selectedValidator: state.selectedValidator,
+              validators: state.availableValidators,
+              onValidatorChanged: cubit.changeValidator,
               key: ValueKey(quizCard.id),
             );
           }

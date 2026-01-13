@@ -35,6 +35,20 @@ class ValidatorsManager {
     return validators;
   }
 
+  Future<List<ValidatorItem>> getValidatorsWithApiKeys() async {
+    final allValidators = await getValidators();
+    return allValidators.where((validator) {
+      // On-device AI doesn't need API key, just needs to be enabled
+      if (validator.type == AnswerValidatorType.onDeviceAI) {
+        return validator.isEnabled;
+      }
+      // Cloud validators need both enabled status AND API keys
+      return validator.isEnabled &&
+             validator.apiKey != null &&
+             validator.apiKey!.isNotEmpty;
+    }).toList();
+  }
+
   String? _getApiKeyForValidator(
       AnswerValidatorType type, UserSettingsItem settings) {
     switch (type) {
