@@ -172,7 +172,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   void _openDeck(DeckItem deck) {
-    context.go("/quizCardList", extra: deck);
+    context.push(QuizCardListRoute().path, extra: deck);
   }
 
   void _showCreateDeckPremiumError() {

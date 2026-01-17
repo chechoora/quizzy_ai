@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
@@ -10,8 +11,11 @@ import 'package:poc_ai_quiz/view/create_deck/create_deck_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/home_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
-import 'package:poc_ai_quiz/view/settings/premium_settings/premium_settings_widget.dart';
+import 'package:poc_ai_quiz/view/settings/in_app_features/in_app_features_widget.dart';
+import 'package:poc_ai_quiz/view/settings/settings_ai_validator/settings_ai_validator_widget.dart';
 import 'package:fimber/fimber.dart';
+
+import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +49,16 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
+        name: QuizCardListRoute().name,
+        path: QuizCardListRoute().path,
+        builder: (context, state) {
+          final deckItem = state.extra as DeckItem;
+          return QuizCardListWidget(
+            deckItem: deckItem,
+          );
+        },
+      ),
+      GoRoute(
         name: CreateDeckRoute().name,
         path: CreateDeckRoute().path,
         builder: (context, state) {
@@ -63,7 +77,21 @@ class MyApp extends StatelessWidget {
             cardToEdit: card,
           );
         },
-      )
+      ),
+      GoRoute(
+        name: SettingsInAppFeaturesRoute().name,
+        path: SettingsInAppFeaturesRoute().path,
+        builder: (context, state) {
+          return const SettingsInAppFeaturesWidget();
+        },
+      ),
+      GoRoute(
+        name: SettingsAIValidatorRoute().name,
+        path: SettingsAIValidatorRoute().path,
+        builder: (context, state) {
+          return const SettingsAIValidatorWidget();
+        },
+      ),
     ],
   );
 
@@ -74,6 +102,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: _routerConfig,
       theme: AppTheme.lightTheme,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
     );
   }
 }

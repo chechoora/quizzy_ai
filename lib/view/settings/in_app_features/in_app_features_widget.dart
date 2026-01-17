@@ -6,8 +6,8 @@ import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart'
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/cubit/in_app_features_cubit.dart';
 
-class InAppFeaturesWidget extends HookWidget {
-  const InAppFeaturesWidget({super.key});
+class SettingsInAppFeaturesWidget extends HookWidget {
+  const SettingsInAppFeaturesWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

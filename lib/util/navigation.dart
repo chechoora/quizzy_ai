@@ -12,6 +12,10 @@ final class HomeRoute extends NavigationRoute {
   HomeRoute() : super(name: 'home', path: '/');
 }
 
+final class QuizCardListRoute extends NavigationRoute {
+  QuizCardListRoute() : super(name: 'quilCardList', path: '/quilCardList');
+}
+
 final class QuizExeRoute extends NavigationRoute {
   QuizExeRoute() : super(name: 'quizExe', path: '/quizExe');
 }
@@ -22,4 +26,13 @@ final class CreateDeckRoute extends NavigationRoute {
 
 final class CreateCardRoute extends NavigationRoute {
   CreateCardRoute() : super(name: 'createCard', path: '/createCard');
+}
+
+final class SettingsInAppFeaturesRoute extends NavigationRoute {
+  SettingsInAppFeaturesRoute() : super(name: 'inAppFeatures', path: '/inAppFeatures');
+}
+
+final class SettingsAIValidatorRoute extends NavigationRoute {
+  SettingsAIValidatorRoute()
+      : super(name: 'settingsAIValidator', path: '/settingsAIValidator');
 }

@@ -8,8 +8,8 @@ import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
-class SettingsCubit extends Cubit<SettingsState> {
-  SettingsCubit({
+class SettingsAIValidatorCubit extends Cubit<SettingsState> {
+  SettingsAIValidatorCubit({
     required this.settingsService,
     required this.validatorsManager,
     required this.userRepository,
