@@ -1,7 +1,6 @@
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
-import 'package:poc_ai_quiz/domain/in_app_purchase_service/in_app_purchase_service.dart';
-import 'package:poc_ai_quiz/domain/user/user_repository.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 
 import 'package:poc_ai_quiz/data/premium/premium_info.dart';
 

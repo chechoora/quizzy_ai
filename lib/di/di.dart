@@ -14,10 +14,10 @@ import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user_settings/user_settings_database_repository.dart';
+import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
-import 'package:poc_ai_quiz/domain/in_app_purchase_service/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
@@ -34,14 +34,17 @@ import 'package:poc_ai_quiz/domain/user_settings/user_settings_database_mapper.d
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 
+import '../domain/in_app_purchase/in_app_purchase_service.dart';
+
 final getIt = GetIt.instance;
 
 Future<void> setupDi() async {
   await _setupDataBase();
   await _setupRepositories();
   await _setupApiKeysProvider();
+  await _setupInAppPurchase();
   await _setupAPI();
-  _setupServices();
+  await _setupServices();
 }
 
 Future<void> _setupDataBase() async {
@@ -103,6 +106,16 @@ Future<void> _setupApiKeysProvider() async {
   getIt.registerSingleton<ApiKeysProvider>(apiKeysProvider);
 }
 
+Future<void> _setupInAppPurchase() async {
+  final revenueCatPurchaseManager = RevenueCatPurchaseManager();
+  await revenueCatPurchaseManager.initialize();
+  getIt.registerSingleton<RevenueCatPurchaseManager>(revenueCatPurchaseManager);
+  final inAppPurchaseService = InAppPurchaseService(
+    revenueCatPurchaseManager: revenueCatPurchaseManager,
+  );
+  getIt.registerSingleton<InAppPurchaseService>(inAppPurchaseService);
+}
+
 Future<void> _setupAPI() async {
   final apiKeysProvider = getIt.get<ApiKeysProvider>();
 
@@ -150,7 +163,7 @@ Future<void> _setupAPI() async {
       instanceName: 'openai');
 }
 
-void _setupServices() {
+Future<void> _setupServices() async {
   final onDeviceAIService = OnDeviceAIService();
   getIt.registerSingleton<OnDeviceAIService>(onDeviceAIService);
   final onDeviceAIAnswerValidator =
@@ -206,18 +219,15 @@ void _setupServices() {
   // quiz service - uses settings to get the correct validator
   getIt.registerSingleton<QuizService>(QuizService(settingsService));
 
-  final inAppPurchaseService = InAppPurchaseService();
-  getIt.registerSingleton<InAppPurchaseService>(inAppPurchaseService);
-
   // premium
   final deckManager = DeckPremiumManager(
-    inAppPurchaseService: inAppPurchaseService,
+    inAppPurchaseService: getIt<InAppPurchaseService>(),
     deckRepository: deckRepository,
   );
   getIt.registerSingleton<DeckPremiumManager>(deckManager);
 
   final quizManager = QuizCardPremiumManager(
-    inAppPurchaseService: inAppPurchaseService,
+    inAppPurchaseService: getIt<InAppPurchaseService>(),
     quizCardRepository: quizCardRepository,
   );
   getIt.registerSingleton<QuizCardPremiumManager>(quizManager);

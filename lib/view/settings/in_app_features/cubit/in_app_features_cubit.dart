@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poc_ai_quiz/domain/in_app_purchase_service/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
