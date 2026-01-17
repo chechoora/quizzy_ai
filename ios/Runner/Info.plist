@@ -18,16 +18,16 @@
 	<string>poc_ai_quiz</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-    <key>NSAppleEventsUsageDescription</key>
-    <string>This app needs to access Apple Intelligence for answer validation.</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<string>2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>This app needs to access Apple Intelligence for answer validation.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
