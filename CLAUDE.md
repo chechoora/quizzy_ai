@@ -1,137 +1,131 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Development guidance for Claude Code when working with this repository.
 
-## Project Overview
+## Commands
 
-This is a Flutter quiz application that allows users to create decks of quiz cards, take quizzes, and manage their learning progress. The app includes premium features and uses AI text similarity for quiz validation.
+```bash
+# Run the app
+fvm flutter run
 
-## Development Commands
+# Run tests
+fvm flutter test
 
-### Core Development
-- `fvm flutter run` - Run the app in development mode
-- `fvm flutter build` - Build the application
-- `fvm flutter test` - Run all tests
-- `fvm flutter analyze` - Run static analysis/linting
-- `fvm flutter pub get` - Install dependencies
-- `fvm flutter pub upgrade` - Upgrade dependencies
+# Static analysis
+fvm flutter analyze
 
-### Code Generation
-- `fvm flutter packages pub run build_runner build` - Generate code (for Chopper, Drift, JSON serialization)
-- `fvm flutter packages pub run build_runner build --delete-conflicting-outputs` - Force regenerate all generated files
-- `fvm dart run pigeon --input <input_file>` - Generate platform channel code with Pigeon
+# Install dependencies
+fvm flutter pub get
 
-### Database
-- Uses Drift for local database management
-- Database models are in `lib/data/db/`
-- Generated files: `database.g.dart`
+# Code generation (Chopper, Drift, JSON serialization)
+fvm flutter packages pub run build_runner build --delete-conflicting-outputs
+
+# Generate Pigeon platform channel code
+fvm dart run pigeon --input <input_file>
+```
 
 ## Architecture
 
-### Clean Architecture Pattern
-The codebase follows clean architecture with clear separation of concerns:
+Clean architecture with BLoC pattern:
 
 ```
 lib/
-├── data/           # Data layer (API, database)
-├── domain/         # Business logic and models
-├── view/           # UI layer (widgets, cubits)
-├── di/             # Dependency injection
-└── util/           # Shared utilities
+├── data/                    # Data layer
+│   ├── api/                 # API clients (Chopper)
+│   │   ├── gemini_ai/       # Google Gemini integration
+│   │   ├── claude/          # Anthropic Claude integration
+│   │   ├── openai/          # OpenAI GPT integration
+│   │   └── on_device_ai/    # Local ML model
+│   ├── db/                  # Drift database
+│   │   ├── deck/            # Deck repository
+│   │   ├── quiz_card/       # Quiz card repository
+│   │   ├── user/            # User repository
+│   │   └── user_settings/   # Settings repository
+│   └── premium/             # Premium feature data
+├── domain/                  # Business logic
+│   ├── deck/                # Deck model, repository, mapper
+│   ├── quiz_card/           # Quiz card model, repository, premium
+│   ├── quiz/                # Quiz engine, service, validators
+│   ├── settings/            # Validator management, settings service
+│   ├── user/                # User model, repository
+│   └── user_settings/       # User settings, API keys
+├── view/                    # UI layer
+│   ├── home_widget/         # Home screen (deck list)
+│   ├── quiz_card_list/      # Quiz cards for a deck
+│   ├── quiz_exe/            # Quiz execution flow
+│   ├── quiz_widget/         # Quiz display
+│   ├── create_deck/         # Deck creation
+│   ├── create_card/         # Card creation/editing
+│   └── settings/            # Settings screens
+├── di/                      # GetIt dependency injection
+└── util/                    # Utilities (logger, theme, alerts)
 ```
 
-### Key Architectural Components
+## Key Patterns
 
-#### Data Layer (`lib/data/`)
-- **API**: AI answer validators using Chopper HTTP client
-  - `lib/data/api/gemini_ai/` - Google Gemini AI integration
-  - `lib/data/api/claude/` - Anthropic Claude AI integration
-  - `lib/data/api/openai/` - OpenAI GPT integration
-  - `lib/data/api/on_device_ai/` - On-device AI processing
-- **Database**: Drift database with repositories for deck, quiz_card, and user data
-- **Isolates**: API calls run in separate isolates for performance
-
-#### Domain Layer (`lib/domain/`)
-- **Models**: Core business objects (DeckItem, QuizCardItem, etc.)
-- **Services**: Business logic (QuizService, TextSimilarityService)
-- **Repositories**: Abstract data access interfaces
-- **Premium**: Premium feature management
-
-#### View Layer (`lib/view/`)
-- **BLoC Pattern**: Uses flutter_bloc for state management
-- **Routing**: GoRouter for navigation
-- **Widgets**: Screen widgets with separate display components
-
-### Dependency Injection
-- Uses GetIt for service locator pattern
-- Setup in `lib/di/di.dart` with three phases:
-  1. Database setup
-  2. API client configuration
-  3. Service registration
-
-### Key External Services
-- **AI Answer Validators**: Multiple AI services for quiz answer validation
-  - **Gemini AI**: Google's Gemini models for answer scoring
-  - **Claude AI**: Anthropic's Claude models for answer evaluation
-  - **OpenAI**: OpenAI's GPT models (gpt-4o-mini default) for answer validation
-  - **On-Device AI**: Local ML model for offline answer validation
-- **In-App Purchases**: Premium feature unlocking
-- **Local Storage**: Drift SQLite database
-
-### Navigation Structure
-- Home screen with deck list
-- Quiz card list for each deck
-- Quiz execution flow
-- Deck/card creation screens
-- Premium settings
-
-## Testing
-- Unit tests are located in `test/`
-- Uses mocktail for mocking
-- Run specific tests: `flutter test test/specific_test.dart`
-
-## State Management
-- Uses BLoC pattern with flutter_bloc
-- Cubits handle screen-level state
-- Services handle business logic
+### State Management
+- Cubits for screen-level state (`*_cubit.dart`)
+- Services for business logic (`*_service.dart`)
 - Repository pattern for data access
 
-## Premium Features
-- Managed through `DeckPremiumManager` and `QuizCardPremiumManager`
-- Uses in-app purchases for feature unlocking
-- Premium state tracked in user repository
+### Answer Validators
+All validators implement `IAnswerValidator` interface (`lib/domain/quiz/i_answer_validator.dart`):
+- `GeminiAnswerValidator` - Google Gemini API
+- `ClaudeAnswerValidator` - Anthropic Claude API
+- `OpenAIAnswerValidator` - OpenAI GPT API (default: gpt-4o-mini)
+- `OnDeviceAIAnswerValidator` - Local ML model
+
+Validator selection managed by `ValidatorsManager` and `SettingsService`.
+
+### Dependency Injection
+Setup in `lib/di/di.dart`:
+1. Database initialization
+2. Repository registration
+3. API keys provider setup
+4. API client configuration
+5. Service registration
+
+### Navigation
+GoRouter with named routes:
+- `/` - Home (deck list)
+- `/quizCardList` - Cards in a deck
+- `/quizExe` - Quiz execution
+- `/createDeck` - Create/edit deck
+- `/createCard` - Create/edit card
+- `/premiumSettings` - Premium settings
+
+## Database
+
+Drift (SQLite) with tables in `lib/data/db/`:
+- `deck_table.dart` - Deck storage
+- `quiz_card_table.dart` - Quiz card storage (via `database.dart`)
+- `user_table.dart` - User data
+- `user_settings_table.dart` - Settings and API keys
+
+Generated file: `database.g.dart`
 
 ## Logging
-- Use the `Logger` class from `lib/util/logger.dart` for all logging
-- Create a logger instance with a tag: `Logger.withTag('YourClassName')`
-- Available log levels: `v()` (verbose), `d()` (debug), `i()` (info), `w()` (warning), `e()` (error)
-- All methods support optional exception and stack trace parameters
-- Uses Fimber for underlying log implementation
 
-## AI Answer Validators
+```dart
+import 'package:poc_ai_quiz/util/logger.dart';
 
-The app supports multiple AI providers for validating quiz answers:
+final _logger = Logger.withTag('ClassName');
+_logger.d('Debug message');
+_logger.i('Info message');
+_logger.w('Warning message');
+_logger.e('Error message', exception, stackTrace);
+```
 
-### OpenAI (`lib/data/api/openai/`)
-- Uses OpenAI's GPT models for answer validation
-- Default model: `gpt-4o-mini` (cost-effective)
-- Supports structured JSON output for detailed scoring
-- Returns score (0-100), explanation, correct points, and missing points
-- Configured in DI with API key in `lib/di/di.dart`
+## Testing
 
-### Gemini AI (`lib/data/api/gemini_ai/`)
-- Uses Google's Gemini models for answer validation
-- Configured with API key in dependency injection
+- Tests in `test/` directory
+- Mocking with mocktail
+- Run specific test: `fvm flutter test test/specific_test.dart`
 
-### Claude AI (`lib/data/api/claude/`)
-- Uses Anthropic's Claude models for answer validation
-- Configured with API key in dependency injection
+## Premium Features
 
-### On-Device AI (`lib/data/api/on_device_ai/`)
-- Local ML model for offline answer validation
-- No API key required
+Managed by:
+- `DeckPremiumManager` - Deck-related premium features
+- `QuizCardPremiumManager` - Quiz card premium features
 
-### Validator Selection
-- Users can select their preferred validator in settings
-- Validators are managed through `ValidatorsManager` and `SettingsService`
-- All validators implement the `IAnswerValidator` interface
+Premium state tracked in `UserRepository`.
