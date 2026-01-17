@@ -8,6 +8,7 @@ import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/display/quiz_display_widget.dart';
@@ -49,8 +50,9 @@ class QuizExeWidget extends HookWidget {
           bloc: cubit,
           builder: (BuildContext context, state) {
             final isQuizDone = state is QuizDoneState;
+            final l10n = localize(context);
             return Text(
-              isQuizDone ? "Quiz Finished" : "Quiz in Progress",
+              isQuizDone ? l10n.quizExeFinishedTitle : l10n.quizExeInProgressTitle,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
               ),

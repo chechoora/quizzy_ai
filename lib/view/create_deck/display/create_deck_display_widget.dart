@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/view/bottom_save_bar.dart';
 
 class CreateDeckDisplay extends StatefulWidget {
@@ -29,7 +30,7 @@ class _CreateDeckDisplayState extends State<CreateDeckDisplay> {
                 padding: const EdgeInsets.only(left: 8),
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Title of the deck',
+                  localize(context).createDeckTitleLabel,
                   style: TextStyle(
                     fontSize: 24,
                     color: Theme.of(context).colorScheme.primary,

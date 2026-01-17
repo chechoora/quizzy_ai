@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(fvm flutter gen-l10n:*)"
     ],
     "deny": [],
     "ask": []

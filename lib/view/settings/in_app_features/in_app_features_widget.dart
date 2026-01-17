@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/cubit/in_app_features_cubit.dart';
 
@@ -22,9 +23,10 @@ class SettingsInAppFeaturesWidget extends HookWidget {
       return cubit.close;
     }, []);
 
+    final l10n = localize(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('In-App Features'),
+        title: Text(l10n.inAppFeaturesTitle),
       ),
       body: BlocConsumer<InAppFeaturesCubit, InAppFeaturesState>(
         bloc: cubit,
@@ -53,16 +55,16 @@ class SettingsInAppFeaturesWidget extends HookWidget {
         listener: (BuildContext context, InAppFeaturesState state) {
           if (state is InAppFeaturesPurchaseSuccessState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Purchase successful!'),
-                duration: Duration(seconds: 2),
+              SnackBar(
+                content: Text(l10n.inAppFeaturesPurchaseSuccess),
+                duration: const Duration(seconds: 2),
               ),
             );
           } else if (state is InAppFeaturesRestoreSuccessState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Purchases restored successfully!'),
-                duration: Duration(seconds: 2),
+              SnackBar(
+                content: Text(l10n.inAppFeaturesRestoreSuccess),
+                duration: const Duration(seconds: 2),
               ),
             );
           } else if (state is InAppFeaturesErrorState) {
@@ -92,6 +94,7 @@ class _InAppFeaturesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = localize(context);
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
@@ -109,16 +112,16 @@ class _InAppFeaturesContent extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Unlimited Decks & Cards',
-                            style: TextStyle(
+                          Text(
+                            l10n.inAppFeaturesUnlimitedTitle,
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Create unlimited decks and cards without restrictions.',
+                            l10n.inAppFeaturesUnlimitedDescription,
                             style: TextStyle(
                               color: Colors.grey[600],
                             ),
@@ -145,7 +148,7 @@ class _InAppFeaturesContent extends StatelessWidget {
                         Icon(Icons.check_circle, color: Colors.green[700]),
                         const SizedBox(width: 8),
                         Text(
-                          'Purchased',
+                          l10n.inAppFeaturesPurchased,
                           style: TextStyle(
                             color: Colors.green[700],
                             fontWeight: FontWeight.bold,
@@ -159,7 +162,7 @@ class _InAppFeaturesContent extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: onPurchaseUnlimitedDecksCards,
-                      child: const Text('Purchase'),
+                      child: Text(l10n.inAppFeaturesPurchaseButton),
                     ),
                   ),
               ],
@@ -170,7 +173,7 @@ class _InAppFeaturesContent extends StatelessWidget {
         TextButton.icon(
           onPressed: onRestorePurchases,
           icon: const Icon(Icons.restore),
-          label: const Text('Restore Purchases'),
+          label: Text(l10n.inAppFeaturesRestoreButton),
         ),
       ],
     );

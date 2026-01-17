@@ -1,4 +1,66 @@
 {
   "@@locale": "en",
-  "appTitle": "Quizzy AI"
+  "appTitle": "Quizzy AI",
+  "homeQuizDecksTitle": "Quiz Decks",
+  "homeDecksLabel": "Decks",
+  "homeSettingsLabel": "Settings",
+  "homeAddDeckTooltip": "Add Deck",
+  "homeDeleteDeckConfirmation": "Are you sure you want to delete {deckTitle}, all your quiz cards also will be deleted",
+  "@homeDeleteDeckConfirmation": {
+    "placeholders": {
+      "deckTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "homePremiumDeckLimitMessage": "You can not create more decks, please unlock the full version.",
+  "homeUnlockButton": "Unlock",
+  "quizExeFinishedTitle": "Quiz Finished",
+  "quizExeInProgressTitle": "Quiz in Progress",
+  "createDeckTitleLabel": "Title of the deck",
+
+  "inAppFeaturesTitle": "In-App Features",
+  "inAppFeaturesPurchaseSuccess": "Purchase successful!",
+  "inAppFeaturesRestoreSuccess": "Purchases restored successfully!",
+  "inAppFeaturesUnlimitedTitle": "Unlimited Decks & Cards",
+  "inAppFeaturesUnlimitedDescription": "Create unlimited decks and cards without restrictions.",
+  "inAppFeaturesPurchased": "Purchased",
+  "inAppFeaturesPurchaseButton": "Purchase",
+  "inAppFeaturesRestoreButton": "Restore Purchases",
+
+  "settingsAiValidatorTitle": "AI Validator",
+  "settingsAiValidatorLabel": "Answer Validator",
+  "settingsAiValidatorSubtitle": "Choose how quiz answers are validated",
+  "settingsAiValidatorApiKeyTitle": "API Key",
+  "settingsAiValidatorApiKeyLabel": "{validatorName} API Key",
+  "@settingsAiValidatorApiKeyLabel": {
+    "placeholders": {
+      "validatorName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAiValidatorApiKeyHint": "Enter your API key",
+  "settingsAiValidatorApiKeySaveTooltip": "Save API Key",
+  "settingsAiValidatorChangedMessage": "Answer validator changed to {validatorName}",
+  "@settingsAiValidatorChangedMessage": {
+    "placeholders": {
+      "validatorName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAiValidatorApiKeySavedMessage": "API key saved for {validatorName}",
+  "@settingsAiValidatorApiKeySavedMessage": {
+    "placeholders": {
+      "validatorName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAiValidatorOptionsTitle": "Validator Options:",
+  "settingsAiValidatorOnDeviceDescription": "• On-Device AI: No API key required. Uses local AI processing for privacy and offline use.",
+  "settingsAiValidatorClaudeDescription": "• Claude AI: Requires an Anthropic API key. Uses Claude models for answer evaluation.",
+  "settingsAiValidatorOpenAIDescription": "• OpenAI: Requires an OpenAI API key. Uses GPT models for answer validation.",
+  "settingsAiValidatorGeminiDescription": "• Gemini AI: Requires a Google Gemini API key. Uses Google AI for intelligent answer validation."
 }

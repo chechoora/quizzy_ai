@@ -8,6 +8,7 @@ import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/view/answer_validator_dropdown.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
@@ -41,9 +42,10 @@ class SettingsAIValidatorWidget extends HookWidget {
       cubit.updateApiKey(type, apiKey);
     }
 
+    final l10n = localize(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AI Validator'),
+        title: Text(l10n.settingsAiValidatorTitle),
       ),
       body: BlocConsumer<SettingsAIValidatorCubit, SettingsState>(
         bloc: cubit,
@@ -72,7 +74,9 @@ class SettingsAIValidatorWidget extends HookWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Answer validator changed to ${state.validatorType.toDisplayString()}',
+                  l10n.settingsAiValidatorChangedMessage(
+                    state.validatorType.toDisplayString(),
+                  ),
                 ),
                 duration: const Duration(seconds: 2),
               ),
@@ -81,7 +85,9 @@ class SettingsAIValidatorWidget extends HookWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'API key saved for ${state.validatorType.toDisplayString()}',
+                  l10n.settingsAiValidatorApiKeySavedMessage(
+                    state.validatorType.toDisplayString(),
+                  ),
                 ),
                 duration: const Duration(seconds: 2),
               ),
@@ -129,11 +135,12 @@ class _ValidatorContent extends HookWidget {
       return null;
     }, [selectedValidator, selectedValidatorItem.apiKey]);
 
+    final l10n = localize(context);
     return ListView(
       children: [
-        const ListTile(
-          title: Text('Answer Validator'),
-          subtitle: Text('Choose how quiz answers are validated'),
+        ListTile(
+          title: Text(l10n.settingsAiValidatorLabel),
+          subtitle: Text(l10n.settingsAiValidatorSubtitle),
         ),
         AnswerValidatorDropdown(
           selectedValidator: selectedValidator,
@@ -142,11 +149,11 @@ class _ValidatorContent extends HookWidget {
         ),
         const SizedBox(height: 24),
         if (selectedValidator != AnswerValidatorType.onDeviceAI) ...[
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              'API Key',
-              style: TextStyle(
+              l10n.settingsAiValidatorApiKeyTitle,
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -160,8 +167,10 @@ class _ValidatorContent extends HookWidget {
               controller: apiKeyController,
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
-                labelText: '${selectedValidator.toDisplayString()} API Key',
-                hintText: 'Enter your API key',
+                labelText: l10n.settingsAiValidatorApiKeyLabel(
+                  selectedValidator.toDisplayString(),
+                ),
+                hintText: l10n.settingsAiValidatorApiKeyHint,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.save),
                   onPressed: () {
@@ -170,7 +179,7 @@ class _ValidatorContent extends HookWidget {
                         : apiKeyController.text.trim();
                     onApiKeyUpdate(selectedValidator, apiKey);
                   },
-                  tooltip: 'Save API Key',
+                  tooltip: l10n.settingsAiValidatorApiKeySaveTooltip,
                 ),
               ),
               obscureText: true,
@@ -178,37 +187,29 @@ class _ValidatorContent extends HookWidget {
           ),
         ],
         const SizedBox(height: 16),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Card(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Validator Options:',
-                    style: TextStyle(
+                    l10n.settingsAiValidatorOptionsTitle,
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    '• On-Device AI: No API key required. Uses local AI processing for privacy and offline use.',
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    '• Claude AI: Requires an Anthropic API key. Uses Claude models for answer evaluation.',
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    '• OpenAI: Requires an OpenAI API key. Uses GPT models for answer validation.',
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    '• Gemini AI: Requires a Google Gemini API key. Uses Google AI for intelligent answer validation.',
-                  ),
+                  const SizedBox(height: 8),
+                  Text(l10n.settingsAiValidatorOnDeviceDescription),
+                  const SizedBox(height: 4),
+                  Text(l10n.settingsAiValidatorClaudeDescription),
+                  const SizedBox(height: 4),
+                  Text(l10n.settingsAiValidatorOpenAIDescription),
+                  const SizedBox(height: 4),
+                  Text(l10n.settingsAiValidatorGeminiDescription),
                 ],
               ),
             ),

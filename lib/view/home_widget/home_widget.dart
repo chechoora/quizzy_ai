@@ -6,6 +6,7 @@ import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
@@ -46,7 +47,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Quiz Decks",
+          localize(context).homeQuizDecksTitle,
           style: TextStyle(
             color: Theme.of(context).colorScheme.primary,
           ),
@@ -106,9 +107,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                     : Theme.of(context).colorScheme.secondary,
                 BlendMode.srcIn,
               ),
-              semanticsLabel: 'Decks',
+              semanticsLabel: localize(context).homeDecksLabel,
             ),
-            label: 'Decks',
+            label: localize(context).homeDecksLabel,
           ),
           BottomNavigationBarItem(
             icon: Icon(
@@ -117,7 +118,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                   ? Theme.of(context).colorScheme.primary
                   : Theme.of(context).colorScheme.secondary,
             ),
-            label: 'Settings',
+            label: localize(context).homeSettingsLabel,
           ),
         ],
         onTap: (index) {
@@ -128,7 +129,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       ),
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
-              tooltip: 'Add Deck',
+              tooltip: localize(context).homeAddDeckTooltip,
               onPressed: () {
                 cubit.addDockRequest();
               },
@@ -150,7 +151,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     alert(
       context,
       content: Text(
-        "Are you sure you want to delete ${deck.title}, all your quiz cards also will be deleted",
+        localize(context).homeDeleteDeckConfirmation(deck.title),
       ),
     ).then(
       (value) {
@@ -178,10 +179,10 @@ class _HomeWidgetState extends State<HomeWidget> {
   void _showCreateDeckPremiumError() {
     alert(
       context,
-      content: const Text(
-        "You can not create more decks, please unlock the full version.",
+      content: Text(
+        localize(context).homePremiumDeckLimitMessage,
       ),
-      textOK: const Text("Unlock"),
+      textOK: Text(localize(context).homeUnlockButton),
     ).then(
       (value) {
         if (value ?? false) {
