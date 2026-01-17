@@ -28,7 +28,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.chechoora.quizzy"
+        applicationId = "com.chechoora.poc_ai_quiz"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = 3
