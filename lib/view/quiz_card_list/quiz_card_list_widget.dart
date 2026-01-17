@@ -164,9 +164,12 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
       content: const Text(
         "You can not create more cards, please unlock the full version.",
       ),
+      textOK: const Text("Unlock"),
     ).then(
       (value) {
-        if (value ?? false) {}
+        if (value ?? false) {
+          // TODO Navigate to purchase screen
+        }
       },
     );
   }

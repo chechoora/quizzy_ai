@@ -1,33 +1,38 @@
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase_service/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 
 import 'package:poc_ai_quiz/data/premium/premium_info.dart';
 
 class DeckPremiumManager {
-  final UserRepository userRepository;
   final DeckRepository deckRepository;
+  final InAppPurchaseService inAppPurchaseService;
 
   DeckPremiumManager({
-    required this.userRepository,
     required this.deckRepository,
+    required this.inAppPurchaseService,
   });
 
   Future<List<DeckItemWithPremium>> fetchAllowedDecks() async {
     final allDecks = await deckRepository.fetchDecks();
-    final user = await userRepository.fetchCurrentUser();
     int count = 0;
+    final isFeaturePurchased = await inAppPurchaseService
+        .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
     return allDecks.map((deck) {
       return DeckItemWithPremium.fromDeck(
         deckItem: deck,
-        isLocked: !user.isPremium && ++count < PremiumLimitInfo.deckLimit,
+        isLocked: !isFeaturePurchased && ++count < PremiumLimitInfo.deckLimit,
       );
     }).toList();
   }
 
   Future<bool> canAddDeck() async {
-    final user = await userRepository.fetchCurrentUser();
     final allDecks = await deckRepository.fetchDecks();
-    return user.isPremium ? true : allDecks.length < PremiumLimitInfo.deckLimit;
+    final isFeaturePurchased = await inAppPurchaseService
+        .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
+    return isFeaturePurchased
+        ? true
+        : allDecks.length < PremiumLimitInfo.deckLimit;
   }
 }

@@ -180,9 +180,12 @@ class _HomeWidgetState extends State<HomeWidget> {
       content: const Text(
         "You can not create more decks, please unlock the full version.",
       ),
+      textOK: const Text("Unlock"),
     ).then(
       (value) {
-        if (value ?? false) {}
+        if (value ?? false) {
+          // TODO Navigate to purchase screen
+        }
       },
     );
   }

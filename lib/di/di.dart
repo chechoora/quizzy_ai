@@ -17,6 +17,7 @@ import 'package:poc_ai_quiz/data/db/user_settings/user_settings_database_reposit
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase_service/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
@@ -205,15 +206,18 @@ void _setupServices() {
   // quiz service - uses settings to get the correct validator
   getIt.registerSingleton<QuizService>(QuizService(settingsService));
 
+  final inAppPurchaseService = InAppPurchaseService();
+  getIt.registerSingleton<InAppPurchaseService>(inAppPurchaseService);
+
   // premium
   final deckManager = DeckPremiumManager(
-    userRepository: userRepository,
+    inAppPurchaseService: inAppPurchaseService,
     deckRepository: deckRepository,
   );
   getIt.registerSingleton<DeckPremiumManager>(deckManager);
 
   final quizManager = QuizCardPremiumManager(
-    userRepository: userRepository,
+    inAppPurchaseService: inAppPurchaseService,
     quizCardRepository: quizCardRepository,
   );
   getIt.registerSingleton<QuizCardPremiumManager>(quizManager);

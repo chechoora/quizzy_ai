@@ -1,4 +1,5 @@
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase_service/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
@@ -6,31 +7,34 @@ import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/data/premium/premium_info.dart';
 
 class QuizCardPremiumManager {
-  final UserRepository userRepository;
   final QuizCardRepository quizCardRepository;
+  final InAppPurchaseService inAppPurchaseService;
 
   QuizCardPremiumManager({
-    required this.userRepository,
     required this.quizCardRepository,
+    required this.inAppPurchaseService,
   });
 
   Future<List<QuizCardItemWithPremium>> fetchAllowedQuizCard(
       DeckItem deckItem) async {
     final allQuizCards = await quizCardRepository.fetchQuizCardItem(deckItem);
-    final user = await userRepository.fetchCurrentUser();
     int count = 0;
+    final isFeaturePurchased = await inAppPurchaseService
+        .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
     return allQuizCards.map((quizCard) {
       return QuizCardItemWithPremium.fromQuizCard(
         quizCardItem: quizCard,
-        isLocked: !user.isPremium && ++count < PremiumLimitInfo.quizCardLimit,
+        isLocked:
+            !isFeaturePurchased && ++count < PremiumLimitInfo.quizCardLimit,
       );
     }).toList();
   }
 
   Future<bool> canAddQuizCard(DeckItem deckItem) async {
-    final user = await userRepository.fetchCurrentUser();
     final allQuizCards = await quizCardRepository.fetchQuizCardItem(deckItem);
-    return user.isPremium
+    final isFeaturePurchased = await inAppPurchaseService
+        .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
+    return isFeaturePurchased
         ? true
         : allQuizCards.length < PremiumLimitInfo.quizCardLimit;
   }
