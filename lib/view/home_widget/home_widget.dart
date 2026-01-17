@@ -7,6 +7,7 @@ import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/cubit/deck_cubit.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.dart';
@@ -138,7 +139,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   void _addDockRequest() {
-    context.push('/createDeck').then((deckName) {
+    context.push(CreateDeckRoute().path).then((deckName) {
       if (deckName is String) {
         cubit.createDeck(deckName);
       }
@@ -161,7 +162,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   void _launchEditDeckTitleRequest(DeckItem deck) {
-    context.push('/createDeck', extra: deck.title).then(
+    context.push(CreateDeckRoute().path, extra: deck.title).then(
       (deckName) {
         if (deckName is String) {
           cubit.editDeck(deck, deckName);

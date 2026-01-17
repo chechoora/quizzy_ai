@@ -4,6 +4,7 @@ import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/util/app_theme.dart';
+import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/view/create_card/create_card_widget.dart';
 import 'package:poc_ai_quiz/view/create_deck/create_deck_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/home_widget.dart';
@@ -26,26 +27,16 @@ class MyApp extends StatelessWidget {
     initialLocation: '/',
     routes: [
       GoRoute(
-        name: 'home',
+        name: HomeRoute().name,
         // Optional, add name to your routes. Allows you navigate by name instead of path
-        path: '/',
+        path: HomeRoute().path,
         builder: (context, state) {
           return const HomeWidget();
         },
-        routes: [
-          GoRoute(
-            name: 'quizCardList',
-            path: 'quizCardList',
-            builder: (context, state) {
-              final deckItem = state.extra as DeckItem;
-              return QuizCardListWidget(deckItem: deckItem);
-            },
-          ),
-        ],
       ),
       GoRoute(
-        name: 'quizExe',
-        path: '/quizExe',
+        name: QuizExeRoute().name,
+        path: QuizExeRoute().path,
         builder: (context, state) {
           final quizCards = state.extra as List<QuizCardItem>;
           return QuizExeWidget(
@@ -54,15 +45,8 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
-        name: 'premiumSettings',
-        path: '/premiumSettings',
-        builder: (context, state) {
-          return const PremiumSettingsWidget();
-        },
-      ),
-      GoRoute(
-        name: 'createDeck',
-        path: '/createDeck',
+        name: CreateDeckRoute().name,
+        path: CreateDeckRoute().path,
         builder: (context, state) {
           final deckName = state.extra as String?;
           return CreateDeckWidget(
@@ -71,8 +55,8 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
-        name: 'createCard',
-        path: '/createCard',
+        name: CreateCardRoute().name,
+        path: CreateCardRoute().path,
         builder: (context, state) {
           final card = state.extra as QuizCardItem?;
           return CreateCardWidget(
@@ -87,7 +71,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       routerConfig: _routerConfig,
       theme: AppTheme.lightTheme,

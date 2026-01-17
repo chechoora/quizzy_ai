@@ -11,6 +11,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.d
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
@@ -87,7 +88,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
         listener: (context, state) {
           if (state is QuizCardLaunchState) {
             context.push(
-              '/quizExe',
+              QuizExeRoute().path,
               extra: state.quizCarList,
             );
           }
@@ -121,7 +122,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
   }
 
   void _addCardRequest() {
-    context.push('/createCard').then((cardRequest) {
+    context.push(CreateCardRoute().path).then((cardRequest) {
       if (cardRequest is QuizCardRequestItem) {
         cubit.createQuizCardItem(cardRequest);
       }
@@ -151,7 +152,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
   }
 
   void _launchEditCardRequest(QuizCardItem card) {
-    context.push('/createCard', extra: card).then((cardRequest) {
+    context.push(CreateCardRoute().path, extra: card).then((cardRequest) {
       if (cardRequest is QuizCardRequestItem) {
         cubit.editQuizCard(card, cardRequest);
       }
