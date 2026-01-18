@@ -182,7 +182,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       content: Text(
         localize(context).homePremiumDeckLimitMessage,
       ),
-      textOK: Text(localize(context).homeUnlockButton),
+      //textOK: Text(localize(context).homeUnlockButton),
     ).then(
       (value) {
         if (value ?? false) {

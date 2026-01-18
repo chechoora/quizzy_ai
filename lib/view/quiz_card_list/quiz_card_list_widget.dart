@@ -10,6 +10,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
@@ -162,10 +163,10 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
   void _showCreateCardPremiumError() {
     alert(
       context,
-      content: const Text(
-        "You can not create more cards, please unlock the full version.",
+      content: Text(
+        localize(context).quizCardListPremiumCardLimitMessage,
       ),
-      textOK: const Text("Unlock"),
+      //textOK: Text(localize(context).homeUnlockButton),
     ).then(
       (value) {
         if (value ?? false) {
