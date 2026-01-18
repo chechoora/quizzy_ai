@@ -57,7 +57,7 @@ class SettingsInAppFeaturesWidget extends HookWidget {
           if (state is InAppFeaturesPurchaseSuccessState) {
             snackBar(context, message: l10n.inAppFeaturesPurchaseSuccess);
           } else if (state is InAppFeaturesRestoreSuccessState) {
-            snackBar(context, message: l10n.inAppFeaturesPurchaseSuccess);
+            snackBar(context, message: l10n.inAppFeaturesRestoreSuccess);
           } else if (state is InAppFeaturesErrorState) {
             snackBar(context,
                 message: state.error, duration: const Duration(seconds: 4));

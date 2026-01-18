@@ -130,7 +130,6 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
     });
   }
 
-  // TODO add alert
   bool validateQuizCard(QuizCardRequestItem? quizCardRequestItem) {
     return quizCardRequestItem != null &&
         quizCardRequestItem.question.isNotEmpty &&

@@ -14,7 +14,9 @@ import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user_settings/user_settings_database_repository.dart';
+import 'package:poc_ai_quiz/data/in_app_purchase/mock_revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
+import 'package:poc_ai_quiz/util/env.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
@@ -108,9 +110,17 @@ Future<void> _setupApiKeysProvider() async {
 }
 
 Future<void> _setupInAppPurchase() async {
-  final revenueCatPurchaseManager = RevenueCatPurchaseManager(
-    Logger.withTag('RevenueCatPurchaseManager'),
-  );
+  final RevenueCatPurchaseManager revenueCatPurchaseManager;
+  switch (AppEnv.purchaseType) {
+    case AppEnv.purchaseTypeMockPref:
+      revenueCatPurchaseManager = MockPrefRevenueCatPurchaseManager();
+    case AppEnv.purchaseTypeMockCache:
+      revenueCatPurchaseManager = MockCacheRevenueCatPurchaseManager();
+    default:
+      revenueCatPurchaseManager = RevenueCatPurchaseManager(
+        Logger.withTag('RevenueCatPurchaseManager'),
+      );
+  }
   await revenueCatPurchaseManager.initialize();
   getIt.registerSingleton<RevenueCatPurchaseManager>(revenueCatPurchaseManager);
   final inAppPurchaseService = InAppPurchaseService(
