@@ -14,7 +14,7 @@ if (playStorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.chechoora.poc_ai_quiz"
+    namespace = "com.chechoora.quizzy"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -28,7 +28,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.chechoora.poc_ai_quiz"
+        applicationId = "com.chechoora.quizzy"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = 3
