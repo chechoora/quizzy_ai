@@ -140,8 +140,8 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
   void _launchConfirmDeleteRequest(QuizCardItem card) {
     alert(
       context,
-      content: const Text(
-        "Are you sure you want to delete current card?",
+      content: Text(
+        localize(context).quizCardListDeleteCardConfirmation,
       ),
     ).then(
       (value) {
@@ -167,6 +167,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
         localize(context).quizCardListPremiumCardLimitMessage,
       ),
       //textOK: Text(localize(context).homeUnlockButton),
+      textCancel: const SizedBox.shrink(),
     ).then(
       (value) {
         if (value ?? false) {

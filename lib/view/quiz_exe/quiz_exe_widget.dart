@@ -63,7 +63,7 @@ class QuizExeWidget extends HookWidget {
       ),
       body: BlocConsumer<QuizExeCubit, QuizExeState>(
         bloc: cubit,
-        buildWhen: (previous, current) => current is! QuizExeErrorState,
+        buildWhen: (previous, current) => current is! QuizExeErrorState && current is! QuizCardResultState,
         builder: (BuildContext context, QuizExeState state) {
           if (state is QuizExeDisplayCardState) {
             final quizCard = state.quizCardItem;

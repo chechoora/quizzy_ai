@@ -64,5 +64,6 @@
   "settingsAiValidatorOpenAIDescription": "• OpenAI: Requires an OpenAI API key. Uses GPT models for answer validation.",
   "settingsAiValidatorGeminiDescription": "• Gemini AI: Requires a Google Gemini API key. Uses Google AI for intelligent answer validation.",
 
-  "quizCardListPremiumCardLimitMessage": "You can not create more cards, please unlock the full version."
+  "quizCardListPremiumCardLimitMessage": "You can not create more cards, please unlock the full version.",
+  "quizCardListDeleteCardConfirmation": "Are you sure you want to delete current card?"
 }

@@ -1,5 +1,5 @@
 class PremiumLimitInfo {
-  static const deckLimit = 5;
+  static const deckLimit = 3;
 
-  static const quizCardLimit = 12;
+  static const quizCardLimit = 8;
 }

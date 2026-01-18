@@ -14,7 +14,6 @@ import 'package:poc_ai_quiz/view/home_widget/cubit/deck_cubit.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
 
-// TODO Add error messages
 class HomeWidget extends StatefulWidget {
   const HomeWidget({super.key});
 
@@ -182,6 +181,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       content: Text(
         localize(context).homePremiumDeckLimitMessage,
       ),
+      textCancel: const SizedBox.shrink(),
       //textOK: Text(localize(context).homeUnlockButton),
     ).then(
       (value) {
