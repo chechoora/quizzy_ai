@@ -4,7 +4,7 @@ import 'package:poc_ai_quiz/domain/user/model/user_item.dart';
 class UserDataBaseMapper {
 
   UserItem mapToUserItem(UserTableData data) {
-    return UserItem(data.id, data.isPremium);
+    return UserItem(data.id);
   }
 
 }

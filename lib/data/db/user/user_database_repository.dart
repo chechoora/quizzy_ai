@@ -12,12 +12,11 @@ class UserDataBaseRepository {
       return users.first;
     }
     final result = await appDatabase.into(appDatabase.userTable).insert(
-      UserTableCompanion.insert(
-        isPremium: false,
-      ),
-    );
+          UserTableCompanion.insert(),
+        );
     if (result != -1) {
-      final user = (await appDatabase.select(appDatabase.userTable).get()).first;
+      final user =
+          (await appDatabase.select(appDatabase.userTable).get()).first;
       return user;
     }
     throw Exception('Can not fetch current user');

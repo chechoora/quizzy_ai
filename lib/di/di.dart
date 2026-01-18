@@ -33,6 +33,7 @@ import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
+import 'package:poc_ai_quiz/util/logger.dart';
 
 import '../domain/in_app_purchase/in_app_purchase_service.dart';
 
@@ -107,7 +108,9 @@ Future<void> _setupApiKeysProvider() async {
 }
 
 Future<void> _setupInAppPurchase() async {
-  final revenueCatPurchaseManager = RevenueCatPurchaseManager();
+  final revenueCatPurchaseManager = RevenueCatPurchaseManager(
+    Logger.withTag('RevenueCatPurchaseManager'),
+  );
   await revenueCatPurchaseManager.initialize();
   getIt.registerSingleton<RevenueCatPurchaseManager>(revenueCatPurchaseManager);
   final inAppPurchaseService = InAppPurchaseService(

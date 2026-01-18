@@ -1,6 +1,5 @@
 class UserItem {
-  UserItem(this.id, this.isPremium);
+  UserItem(this.id);
 
   final int id;
-  final bool isPremium;
 }

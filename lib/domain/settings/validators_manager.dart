@@ -19,12 +19,11 @@ class ValidatorsManager {
 
   Future<List<ValidatorItem>> getValidators() async {
     final user = await userRepository.fetchCurrentUser();
-    final isPremium = user.isPremium;
     final settings = await userSettingsRepository.fetchUserSettings(user.id);
 
     final validators = <ValidatorItem>[];
     for (var type in AnswerValidatorType.values) {
-      final isEnabled = await _isValidatorEnabled(type, isPremium);
+      final isEnabled = await _isValidatorEnabled(type);
       final apiKey = _getApiKeyForValidator(type, settings);
       validators.add(ValidatorItem(
         type: type,
@@ -44,8 +43,8 @@ class ValidatorsManager {
       }
       // Cloud validators need both enabled status AND API keys
       return validator.isEnabled &&
-             validator.apiKey != null &&
-             validator.apiKey!.isNotEmpty;
+          validator.apiKey != null &&
+          validator.apiKey!.isNotEmpty;
     }).toList();
   }
 
@@ -63,8 +62,7 @@ class ValidatorsManager {
     }
   }
 
-  Future<bool> _isValidatorEnabled(
-      AnswerValidatorType type, bool isPremium) async {
+  Future<bool> _isValidatorEnabled(AnswerValidatorType type) async {
     switch (type) {
       case AnswerValidatorType.claude:
       case AnswerValidatorType.gemini:
