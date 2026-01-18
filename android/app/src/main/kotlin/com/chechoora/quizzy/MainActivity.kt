@@ -1,4 +1,4 @@
-package com.chechoora.poc_ai_quiz
+package com.chechoora.quizzy
 
 import io.flutter.embedding.android.FlutterActivity
 
