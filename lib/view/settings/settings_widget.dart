@@ -22,15 +22,15 @@ class SettingsWidget extends StatelessWidget {
               context.pushNamed(SettingsAIValidatorRoute().name);
             },
           ),
-          // ListTile(
-          //   leading: const Icon(Icons.shopping_bag),
-          //   title: const Text('In-App Features'),
-          //   subtitle: const Text('Manage premium features'),
-          //   trailing: const Icon(Icons.chevron_right),
-          //   onTap: () {
-          //     context.pushNamed(SettingsInAppFeaturesRoute().name);
-          //   },
-          // ),
+          ListTile(
+            leading: const Icon(Icons.shopping_bag),
+            title: const Text('In-App Features'),
+            subtitle: const Text('Manage premium features'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              context.pushNamed(SettingsInAppFeaturesRoute().name);
+            },
+          ),
         ],
       ),
     );

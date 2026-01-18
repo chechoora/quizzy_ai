@@ -35,9 +35,12 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
 
     emit(const InAppFeaturesPurchasingState());
     try {
-      await inAppPurchaseService.purchaseFeature(
+      final result = await inAppPurchaseService.purchaseFeature(
         InAppPurchaseFeature.unlimitedDecksCards,
       );
+      if (!result) {
+        throw Exception('Purchase was not completed successfully');
+      }
       emit(const InAppFeaturesPurchaseSuccessState());
       _logger.i('Purchased unlimited decks/cards feature');
       await loadFeatures();
