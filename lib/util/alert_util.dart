@@ -23,15 +23,17 @@ Future alert(
         title: title,
         content: SingleChildScrollView(child: content),
         actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child:
-                textOK ?? Text(MaterialLocalizations.of(context).okButtonLabel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-          ),
+          if (textOK is! SizedBox)
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: textOK ??
+                  Text(MaterialLocalizations.of(context).okButtonLabel),
+            ),
+          if (textCancel is! SizedBox)
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+            ),
         ],
       ),
     );
