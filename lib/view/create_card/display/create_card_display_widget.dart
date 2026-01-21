@@ -47,6 +47,7 @@ class _CreateCardDisplayWidgetState extends State<CreateCardDisplayWidget> {
                 height: 120,
                 margin: const EdgeInsets.all(8),
                 child: TextFormField(
+                  textCapitalization: TextCapitalization.sentences,
                   textAlign: TextAlign.left,
                   textAlignVertical: TextAlignVertical.top,
                   maxLines: null,
@@ -75,6 +76,7 @@ class _CreateCardDisplayWidgetState extends State<CreateCardDisplayWidget> {
                 height: 120,
                 margin: const EdgeInsets.all(8),
                 child: TextFormField(
+                  textCapitalization: TextCapitalization.sentences,
                   textAlign: TextAlign.left,
                   textAlignVertical: TextAlignVertical.top,
                   maxLines: null,

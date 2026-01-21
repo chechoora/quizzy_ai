@@ -40,6 +40,7 @@ class _CreateDeckDisplayState extends State<CreateDeckDisplay> {
               Container(
                 margin: const EdgeInsets.all(8),
                 child: TextFormField(
+                  textCapitalization: TextCapitalization.sentences,
                   controller: controller,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(

@@ -77,6 +77,7 @@ class _QuizDisplayWidgetState extends State<QuizDisplayWidget> {
                     child: SizedBox(
                       height: 120,
                       child: TextField(
+                        textCapitalization: TextCapitalization.sentences,
                         autofocus: true,
                         maxLines: null,
                         controller: editController,
