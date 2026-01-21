@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
@@ -23,6 +24,8 @@ class ValidatorsManager {
 
     final validators = <ValidatorItem>[];
     for (var type in AnswerValidatorType.values) {
+      final isAvailable = await _isValidatorsAvailable(type);
+      if (!isAvailable) continue;
       final isEnabled = await _isValidatorEnabled(type);
       final apiKey = _getApiKeyForValidator(type, settings);
       validators.add(ValidatorItem(
@@ -38,7 +41,8 @@ class ValidatorsManager {
     final allValidators = await getValidators();
     return allValidators.where((validator) {
       // On-device AI doesn't need API key, just needs to be enabled
-      if (validator.type == AnswerValidatorType.onDeviceAI) {
+      if (validator.type == AnswerValidatorType.onDeviceAI ||
+          validator.type == AnswerValidatorType.ml) {
         return validator.isEnabled;
       }
       // Cloud validators need both enabled status AND API keys
@@ -72,6 +76,18 @@ class ValidatorsManager {
         return true;
       case AnswerValidatorType.onDeviceAI:
         return onDeviceAIService.isOnDeviceAIAvailable();
+    }
+  }
+
+  Future _isValidatorsAvailable(AnswerValidatorType type) async {
+    switch (type) {
+      case AnswerValidatorType.claude:
+      case AnswerValidatorType.gemini:
+      case AnswerValidatorType.openAI:
+      case AnswerValidatorType.ml:
+        return true;
+      case AnswerValidatorType.onDeviceAI:
+        return defaultTargetPlatform == TargetPlatform.iOS;
     }
   }
 }
