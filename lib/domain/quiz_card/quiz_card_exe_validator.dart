@@ -34,6 +34,7 @@ class QuizCardExeValidator {
         apiKey = settings.openAiApiKey;
         break;
       case AnswerValidatorType.onDeviceAI:
+      case AnswerValidatorType.ml:
         // Already handled above
         return const QuizCardExeValid();
     }

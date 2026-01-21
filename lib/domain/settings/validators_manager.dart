@@ -58,6 +58,7 @@ class ValidatorsManager {
       case AnswerValidatorType.openAI:
         return settings.openAiApiKey;
       case AnswerValidatorType.onDeviceAI:
+      case AnswerValidatorType.ml:
         return null; // On-device AI doesn't need an API key
     }
   }
@@ -67,6 +68,7 @@ class ValidatorsManager {
       case AnswerValidatorType.claude:
       case AnswerValidatorType.gemini:
       case AnswerValidatorType.openAI:
+      case AnswerValidatorType.ml:
         return true;
       case AnswerValidatorType.onDeviceAI:
         return onDeviceAIService.isOnDeviceAIAvailable();

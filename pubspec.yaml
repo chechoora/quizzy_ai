@@ -32,6 +32,7 @@ dependencies:
   purchases_flutter: ^9.10.6
   intl: ^0.20.2
   shared_preferences: ^2.2.2
+  onnxruntime: ^1.4.1
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +55,9 @@ flutter:
   generate: true
   assets:
     - assets/icons/
+    - assets/model/all_minilm_l6_v2.onnx
+    - assets/model/vocab.txt
+    - assets/model/tokenizer.json
 
 flutter_gen:
   enabled: true

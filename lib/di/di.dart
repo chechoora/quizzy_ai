@@ -16,6 +16,7 @@ import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user_settings/user_settings_database_repository.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/mock_revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz/ml_answer_validator.dart';
 import 'package:poc_ai_quiz/util/env.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
@@ -183,6 +184,10 @@ Future<void> _setupServices() async {
       OnDeviceAIAnswerValidator(onDeviceAIService);
   getIt.registerSingleton<OnDeviceAIAnswerValidator>(onDeviceAIAnswerValidator);
 
+  final mlAnswerValidator = MlAnswerValidator();
+  await mlAnswerValidator.initialize();
+  getIt.registerSingleton<MlAnswerValidator>(mlAnswerValidator);
+
   // Gemini answer validator
   final geminiApiClient = getIt.get<ChopperClient>(instanceName: 'gemini');
   final geminiAnswerValidator = GeminiAnswerValidator(
@@ -226,6 +231,7 @@ Future<void> _setupServices() async {
         AnswerValidatorType.gemini: geminiAnswerValidator,
         AnswerValidatorType.claude: claudeAnswerValidator,
         AnswerValidatorType.openAI: openAIAnswerValidator,
+        AnswerValidatorType.ml: mlAnswerValidator,
       });
   getIt.registerSingleton<SettingsService>(settingsService);
 

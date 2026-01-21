@@ -148,7 +148,9 @@ class _ValidatorContent extends HookWidget {
           onValidatorChanged: onValidatorChanged,
         ),
         const SizedBox(height: 24),
-        if (selectedValidator != AnswerValidatorType.onDeviceAI) ...[
+        // TODO: Suuucks, change this
+        if (selectedValidator != AnswerValidatorType.onDeviceAI &&
+            selectedValidator != AnswerValidatorType.ml) ...[
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(

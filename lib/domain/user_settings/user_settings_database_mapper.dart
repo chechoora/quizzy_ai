@@ -6,7 +6,7 @@ class UserSettingsDataBaseMapper {
   UserSettingsItem mapToUserSettingsItem(UserSettingsTableData data) {
     final validatorType = AnswerValidatorType.values.firstWhere(
       (e) => e.name == data.answerValidatorType,
-      orElse: () => AnswerValidatorType.gemini,
+      orElse: () => AnswerValidatorType.ml,
     );
     return UserSettingsItem(
       id: data.id,

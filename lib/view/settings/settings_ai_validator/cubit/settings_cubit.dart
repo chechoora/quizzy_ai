@@ -84,7 +84,8 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
           await userSettingsRepository.setOpenAiApiKey(user.id, apiKey);
           break;
         case AnswerValidatorType.onDeviceAI:
-          // On-device AI doesn't need an API key
+        case AnswerValidatorType.ml:
+        // On-device AI doesn't need an API key
           return;
       }
 

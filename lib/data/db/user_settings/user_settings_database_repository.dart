@@ -19,7 +19,7 @@ class UserSettingsDataBaseRepository {
     final result = await appDatabase.into(appDatabase.userSettingsTable).insert(
           UserSettingsTableCompanion.insert(
             userId: userId,
-            answerValidatorType: const Value('gemini'),
+            answerValidatorType: const Value('ml'),
           ),
         );
 

@@ -1,4 +1,11 @@
 abstract class IAnswerValidator {
+  Future<void> initialize() async {}
+
+  Future<double> validateAnswer({
+    required String correctAnswer,
+    required String userAnswer,
+  });
+
   String buildValidationPrompt({
     required String correctAnswer,
     required String userAnswer,
@@ -21,9 +28,4 @@ $correctAnswer
 User Answer:
 $userAnswer""";
   }
-
-  Future<double> validateAnswer({
-    required String correctAnswer,
-    required String userAnswer,
-  });
 }
