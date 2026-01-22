@@ -18,10 +18,66 @@ import 'package:fimber/fimber.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  Fimber.plantTree(DebugTree());
-  await setupDi();
-  runApp(MyApp());
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    Fimber.plantTree(DebugTree());
+    await setupDi();
+    runApp(MyApp());
+  } catch (e, stackTrace) {
+    runApp(ErrorApp(error: e.toString(), stackTrace: stackTrace.toString()));
+  }
+}
+
+class ErrorApp extends StatelessWidget {
+  final String error;
+  final String stackTrace;
+
+  const ErrorApp({super.key, required this.error, required this.stackTrace});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.red[900],
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'STARTUP CRASH',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Error:',
+                  style: TextStyle(color: Colors.yellow, fontSize: 16),
+                ),
+                SelectableText(
+                  error,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Stack Trace:',
+                  style: TextStyle(color: Colors.yellow, fontSize: 16),
+                ),
+                SelectableText(
+                  stackTrace,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
