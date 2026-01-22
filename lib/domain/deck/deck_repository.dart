@@ -17,7 +17,7 @@ class DeckRepository {
   }
 
   Future<bool> saveDeck(String deckName) {
-    return dataBaseRepository.saveDeck(deckName);
+    return dataBaseRepository.saveDeck(deckName.trim());
   }
 
   Future<bool> deleteDeck(DeckItem deck) {
@@ -25,6 +25,6 @@ class DeckRepository {
   }
 
   Future<bool> editDeckName(DeckItem deck, String deckName) {
-    return dataBaseRepository.editDeckName(deck, deckName);
+    return dataBaseRepository.editDeckName(deck, deckName.trim());
   }
 }

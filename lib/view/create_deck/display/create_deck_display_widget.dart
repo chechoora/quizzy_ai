@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/view/bottom_save_bar.dart';
+import 'package:poc_ai_quiz/view/create_card/display/create_card_display_widget.dart';
 
 class CreateDeckDisplay extends StatefulWidget {
   const CreateDeckDisplay({
@@ -40,6 +41,7 @@ class _CreateDeckDisplayState extends State<CreateDeckDisplay> {
               Container(
                 margin: const EdgeInsets.all(8),
                 child: TextFormField(
+                  maxLength: deckNameLimit,
                   textCapitalization: TextCapitalization.sentences,
                   controller: controller,
                   decoration: InputDecoration(

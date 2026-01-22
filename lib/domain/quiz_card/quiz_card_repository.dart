@@ -24,8 +24,8 @@ class QuizCardRepository {
     required int deckId,
   }) {
     return dataBaseRepository.saveQuizCard(
-      question: question,
-      answer: answer,
+      question: question.trim(),
+      answer: answer.trim(),
       deckId: deckId,
     );
   }

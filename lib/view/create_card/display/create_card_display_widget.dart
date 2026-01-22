@@ -13,7 +13,8 @@ class CreateCardDisplayWidget extends StatefulWidget {
   final QuizCardItem? cardToEdit;
 
   @override
-  State<CreateCardDisplayWidget> createState() => _CreateCardDisplayWidgetState();
+  State<CreateCardDisplayWidget> createState() =>
+      _CreateCardDisplayWidgetState();
 }
 
 class _CreateCardDisplayWidgetState extends State<CreateCardDisplayWidget> {
@@ -47,6 +48,7 @@ class _CreateCardDisplayWidgetState extends State<CreateCardDisplayWidget> {
                 height: 120,
                 margin: const EdgeInsets.all(8),
                 child: TextFormField(
+                  maxLength: questionLimit,
                   textCapitalization: TextCapitalization.sentences,
                   textAlign: TextAlign.left,
                   textAlignVertical: TextAlignVertical.top,
@@ -76,6 +78,7 @@ class _CreateCardDisplayWidgetState extends State<CreateCardDisplayWidget> {
                 height: 120,
                 margin: const EdgeInsets.all(8),
                 child: TextFormField(
+                  maxLength: answerLimit,
                   textCapitalization: TextCapitalization.sentences,
                   textAlign: TextAlign.left,
                   textAlignVertical: TextAlignVertical.top,
@@ -110,3 +113,7 @@ class _CreateCardDisplayWidgetState extends State<CreateCardDisplayWidget> {
     );
   }
 }
+
+const deckNameLimit = 30;
+const questionLimit = 500;
+const answerLimit = 50;

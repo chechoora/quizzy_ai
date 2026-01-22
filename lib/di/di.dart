@@ -77,6 +77,7 @@ Future<void> _setupRepositories() async {
     dataBaseRepository: getIt.get<UserDataBaseRepository>(),
     userDataBaseMapper: UserDataBaseMapper(),
   );
+  await userRepository.fetchCurrentUser();
   getIt.registerSingleton<UserRepository>(userRepository);
 
   // user settings

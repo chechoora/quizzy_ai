@@ -4,6 +4,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
 import 'package:poc_ai_quiz/util/view/answer_validator_dropdown.dart';
+import 'package:poc_ai_quiz/view/create_card/display/create_card_display_widget.dart';
 
 class QuizDisplayWidget extends StatefulWidget {
   const QuizDisplayWidget({
@@ -77,6 +78,7 @@ class _QuizDisplayWidgetState extends State<QuizDisplayWidget> {
                     child: SizedBox(
                       height: 120,
                       child: TextField(
+                        maxLength: answerLimit,
                         textCapitalization: TextCapitalization.sentences,
                         autofocus: true,
                         maxLines: null,
