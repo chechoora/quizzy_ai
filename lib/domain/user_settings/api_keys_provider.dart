@@ -22,13 +22,12 @@ class ApiKeysProvider {
     if (_initialized) return;
 
     final currentUser = await userRepository.fetchCurrentUser();
-    final settingsStream = userSettingsRepository.watchUserSettings(currentUser.id);
+    final settings =
+        await userSettingsRepository.fetchUserSettings(currentUser.id);
 
-    _settingsSubscription = settingsStream.listen((settings) {
-      _cachedGeminiApiKey = settings.geminiApiKey;
-      _cachedClaudeApiKey = settings.claudeApiKey;
-      _cachedOpenAiApiKey = settings.openAiApiKey;
-    });
+    _cachedGeminiApiKey = settings.geminiApiKey;
+    _cachedClaudeApiKey = settings.claudeApiKey;
+    _cachedOpenAiApiKey = settings.openAiApiKey;
 
     _initialized = true;
   }
