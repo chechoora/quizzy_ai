@@ -10,7 +10,7 @@ enum AnswerValidatorType {
       case AnswerValidatorType.gemini:
         return 'Gemini AI';
       case AnswerValidatorType.onDeviceAI:
-        return 'On-Device AI';
+        return 'On-Device AI (experimental)';
       case AnswerValidatorType.claude:
         return 'Claude AI';
       case AnswerValidatorType.openAI:
