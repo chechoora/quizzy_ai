@@ -46,7 +46,8 @@ Please use the record_quiz_score tool to provide your evaluation.
       final tools = [
         request.Tool(
           name: 'record_quiz_score',
-          description: 'Record the quiz score evaluation with detailed breakdown',
+          description:
+              'Record the quiz score evaluation with detailed breakdown',
           inputSchema: {
             'type': 'object',
             'properties': {
@@ -58,7 +59,8 @@ Please use the record_quiz_score tool to provide your evaluation.
               },
               'explanation': {
                 'type': 'string',
-                'description': 'Brief explanation (1-2 sentences)',
+                'description':
+                    'Brief explanation (1-2 sentences) in the language of the question',
               },
               'correctPoints': {
                 'type': 'array',
@@ -71,7 +73,12 @@ Please use the record_quiz_score tool to provide your evaluation.
                 'items': {'type': 'string'},
               },
             },
-            'required': ['score', 'explanation', 'correctPoints', 'missingPoints'],
+            'required': [
+              'score',
+              'explanation',
+              'correctPoints',
+              'missingPoints'
+            ],
           },
         ),
       ];

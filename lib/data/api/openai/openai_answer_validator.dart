@@ -41,7 +41,7 @@ $basePrompt
 
 Please evaluate how well the user answer matches the expected answer and respond with a JSON object containing:
 - score: integer between 0 and 100
-- explanation: brief explanation (1-2 sentences)
+- explanation: brief explanation (1-2 sentences) in the language of the question
 - correctPoints: array of key points that were correctly addressed
 - missingPoints: array of key points that were missing or incorrect
 """;
@@ -75,7 +75,7 @@ Please evaluate how well the user answer matches the expected answer and respond
                 'explanation': {
                   'type': 'string',
                   'description':
-                      'Brief explanation of why this score was given (1-2 sentences)',
+                      'Brief explanation of why this score was given (1-2 sentences) in the language of the question',
                 },
                 'correctPoints': {
                   'type': 'array',

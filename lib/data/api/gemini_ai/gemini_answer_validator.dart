@@ -53,7 +53,7 @@ Please evaluate how well the user answer matches the expected answer.
           'explanation': {
             'type': 'string',
             'description':
-                'Brief explanation of why this score was given (1-2 sentences)',
+                'Brief explanation of why this score was given (1-2 sentences) in the language of the question',
           },
           'correctPoints': {
             'type': 'array',
