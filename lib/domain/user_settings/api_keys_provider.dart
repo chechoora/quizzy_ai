@@ -29,6 +29,14 @@ class ApiKeysProvider {
     _cachedClaudeApiKey = settings.claudeApiKey;
     _cachedOpenAiApiKey = settings.openAiApiKey;
 
+    _settingsSubscription = userSettingsRepository
+        .watchUserSettings(currentUser.id)
+        .listen((updatedSettings) {
+      _cachedGeminiApiKey = updatedSettings.geminiApiKey;
+      _cachedClaudeApiKey = updatedSettings.claudeApiKey;
+      _cachedOpenAiApiKey = updatedSettings.openAiApiKey;
+    });
+
     _initialized = true;
   }
 
