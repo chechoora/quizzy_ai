@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "897552655477",
+    "project_id": "quizzy-ai-85865",
+    "storage_bucket": "quizzy-ai-85865.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:897552655477:android:39ac6517281f560443043c",
+        "android_client_info": {
+          "package_name": "com.chechoora.quizzy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI5VFgJDZ8jDQve17iJkc1zAebKb2psXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
