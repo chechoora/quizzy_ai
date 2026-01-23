@@ -64,6 +64,7 @@ class _QuizWidgetState extends State<QuizWidget> {
                 child: const Text('Test'),
                 onPressed: () {
                   cubit.checkText(
+                    question: 'What are text fields?',
                     initialText: textToCompare,
                     inputText: editController.text,
                   );

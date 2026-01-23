@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
 
 class QuizResults extends Equatable {
-  QuizResults({required this.quizMatchList});
+  const QuizResults({
+    required this.quizMatchList,
+  });
 
   final List<QuizAnswerMatch> quizMatchList;
 
@@ -16,6 +18,7 @@ class QuizAnswerMatch extends Equatable {
     required this.correctAnswer,
     required this.yourAnswer,
     required this.ratio,
+    this.explanation,
   });
 
   final int cardId;
@@ -23,6 +26,7 @@ class QuizAnswerMatch extends Equatable {
   final String correctAnswer;
   final String yourAnswer;
   final double ratio;
+  final String? explanation;
 
   @override
   List<Object?> get props => [

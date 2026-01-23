@@ -94,8 +94,13 @@ class QuizExeCubit extends Cubit<QuizExeState> {
       final result =
           await quizEngine.checkPossibleAnswer(quizCardItem, possibleAnswer);
       _logger.i('Answer validation result: $result (threshold: 0.6)');
-      quizMatchBuilder.saveResult(quizCardItem, possibleAnswer, result);
-      emit(QuizCardResultState(isCorrect: result >= 0.6));
+      quizMatchBuilder.saveResult(
+        quizCardItem,
+        possibleAnswer,
+        result.score,
+        result.explanation,
+      );
+      emit(QuizCardResultState(isCorrect: result.score >= 0.6));
 
       if (quizEngine.hasNext) {
         _logger.d('Moving to next card');

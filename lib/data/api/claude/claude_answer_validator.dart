@@ -19,16 +19,19 @@ class ClaudeAnswerValidator extends IAnswerValidator {
   }) : _model = model;
 
   @override
-  Future<double> validateAnswer({
+  Future<AnswerResult> validateAnswer({
+    required String question,
     required String correctAnswer,
     required String userAnswer,
   }) async {
     try {
       _logger.d('Validating answer with Claude');
+      _logger.v('Question: $question');
       _logger.v('Expected answer: $correctAnswer');
       _logger.v('User answer: $userAnswer');
 
       final basePrompt = buildValidationPrompt(
+        question: question,
         correctAnswer: correctAnswer,
         userAnswer: userAnswer,
       );
@@ -127,7 +130,10 @@ Please use the record_quiz_score tool to provide your evaluation.
       _logger.v('Correct points: ${quizScore.correctPoints}');
       _logger.v('Missing points: ${quizScore.missingPoints}');
 
-      return quizScore.score / 100.0; // Convert to 0-1 range
+      return AnswerResult(
+        score: quizScore.score / 100.0,
+        explanation: quizScore.explanation,
+      );
     } catch (e, stackTrace) {
       _logger.e('Error validating answer with Claude',
           ex: e, stacktrace: stackTrace);

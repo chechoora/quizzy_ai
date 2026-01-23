@@ -9,18 +9,21 @@ class OnDeviceAIAnswerValidator extends IAnswerValidator {
   OnDeviceAIAnswerValidator(this.onDeviceAIService);
 
   @override
-  Future<double> validateAnswer({
+  Future<AnswerResult> validateAnswer({
+    required String question,
     required String correctAnswer,
     required String userAnswer,
   }) async {
     _logger.d('Validating answer with on-device AI');
+    _logger.v('Question: $question');
     try {
+      // TODO Add question to the validation
       final result = await onDeviceAIService.validateAnswer(
         userAnswer: userAnswer,
         correctAnswer: correctAnswer,
       );
       _logger.i('On-device AI validation score: ${result.howCorrect}');
-      return result.howCorrect;
+      return AnswerResult(score: result.howCorrect);
     } catch (e, stackTrace) {
       _logger.e('Failed to validate answer with on-device AI',
           ex: e, stacktrace: stackTrace);

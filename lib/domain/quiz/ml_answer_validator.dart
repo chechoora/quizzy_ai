@@ -34,7 +34,8 @@ class MlAnswerValidator extends IAnswerValidator {
   }
 
   @override
-  Future<double> validateAnswer({
+  Future<AnswerResult> validateAnswer({
+    required String question,
     required String correctAnswer,
     required String userAnswer,
   }) async {
@@ -43,7 +44,8 @@ class MlAnswerValidator extends IAnswerValidator {
     _cache[correctAnswer] = correctEmbed;
 
     final userEmbed = await _getEmbedding(userAnswer);
-    return _cosineSimilarity(correctEmbed, userEmbed);
+    final score = _cosineSimilarity(correctEmbed, userEmbed);
+    return AnswerResult(score: score);
   }
 
   Future<List<double>> _getEmbedding(String text) async {

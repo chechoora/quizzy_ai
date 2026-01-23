@@ -1,12 +1,14 @@
 abstract class IAnswerValidator {
   Future<void> initialize() async {}
 
-  Future<double> validateAnswer({
+  Future<AnswerResult> validateAnswer({
+    required String question,
     required String correctAnswer,
     required String userAnswer,
   });
 
   String buildValidationPrompt({
+    required String question,
     required String correctAnswer,
     required String userAnswer,
   }) {
@@ -22,10 +24,24 @@ Scoring Guidelines:
 
 Be fair but thorough in your evaluation. Consider both factual accuracy and completeness.
 
+Question:
+$question
+
 Expected Answer:
 $correctAnswer
 
 User Answer:
 $userAnswer""";
   }
+}
+
+class AnswerResult {
+  // From 0.0 to 1.0
+  final double score;
+  final String? explanation;
+
+  AnswerResult({
+    required this.score,
+    this.explanation,
+  });
 }

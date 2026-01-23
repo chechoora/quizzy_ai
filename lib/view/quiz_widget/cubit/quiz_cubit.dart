@@ -7,13 +7,16 @@ class QuizCubit extends Cubit<QuizState> {
   final QuizService quizService;
 
   Future<void> checkText({
+    required String question,
     required String initialText,
     required String inputText,
   }) async {
-    final bool isSimilarEnough = await quizService.isSimilarEnough(
+    final bool isSimilarEnough = (await quizService.isSimilarEnough(
+          question: question,
           initialText: initialText,
           inputText: inputText,
-        ) >=
+        ))
+            .score >=
         0.7;
     emit(QuizResultState(isSimilarEnough));
   }

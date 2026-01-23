@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
@@ -28,12 +29,13 @@ class QuizEngine {
     onTestNewCard.call(cards[_currentCardIndex++]);
   }
 
-  Future<double> checkPossibleAnswer(
+  Future<AnswerResult> checkPossibleAnswer(
     QuizCardItem quizCard,
     String possibleAnswer,
   ) {
     _logger.d('Validating answer for card ${quizCard.id}');
     return quizService.isSimilarEnough(
+      question: quizCard.questionText,
       initialText: quizCard.answerText,
       inputText: possibleAnswer,
     );

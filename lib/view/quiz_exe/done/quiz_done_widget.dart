@@ -71,6 +71,10 @@ class QuizMatchWidget extends StatelessWidget {
           Text(
             "Match: ${(quizAnswerMatch.ratio * 100).toInt()}",
           ),
+          if (quizAnswerMatch.explanation != null)
+            Text(
+              "Explanation: ${quizAnswerMatch.explanation}",
+            ),
         ],
       ),
     );
