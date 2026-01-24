@@ -34,6 +34,8 @@ class GeminiAnswerValidator extends IAnswerValidator {
       );
 
       final prompt = """
+CRITICAL INSTRUCTION: All text responses (explanation, correctPoints, missingPoints) MUST be written in the same language as the question below. Do NOT respond in English unless the question is in English.
+
 $basePrompt
 
 Please evaluate how well the user answer matches the expected answer.
@@ -53,16 +55,18 @@ Please evaluate how well the user answer matches the expected answer.
           'explanation': {
             'type': 'string',
             'description':
-                'Brief explanation of why this score was given (1-2 sentences) in the language of the question',
+                'Brief explanation (1-2 sentences) in the SAME LANGUAGE as the question',
           },
           'correctPoints': {
             'type': 'array',
-            'description': 'Key points that were correctly addressed',
+            'description':
+                'Key points correctly addressed (in the SAME LANGUAGE as the question)',
             'items': {'type': 'string'},
           },
           'missingPoints': {
             'type': 'array',
-            'description': 'Key points that were missing or incorrect',
+            'description':
+                'Key points missing or incorrect (in the SAME LANGUAGE as the question)',
             'items': {'type': 'string'},
           },
         },
@@ -77,7 +81,7 @@ Please evaluate how well the user answer matches the expected answer.
         ],
         generationConfig: request.GenerationConfig(
           temperature: 0.3,
-          maxOutputTokens: 500,
+          maxOutputTokens: 1024,
           topP: 0.95,
           topK: 40,
           responseMimeType: 'application/json',

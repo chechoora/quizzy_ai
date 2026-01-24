@@ -17,31 +17,31 @@ class QuizCardExeValidator {
     final selectedValidator = settings.answerValidatorType;
 
     // On-device AI doesn't need an API key
-    if (selectedValidator == AnswerValidatorType.onDeviceAI) {
+    if (selectedValidator == AnswerValidatorType.onDeviceAI ||
+        selectedValidator == AnswerValidatorType.ml) {
       return const QuizCardExeValid();
     }
 
     // Check if the selected validator has an API key configured
-    String? apiKey;
+    ValidatorConfig? config;
     switch (selectedValidator) {
       case AnswerValidatorType.gemini:
-        apiKey = settings.geminiApiKey;
+        config = settings.geminiConfig;
         break;
       case AnswerValidatorType.claude:
-        apiKey = settings.claudeApiKey;
+        config = settings.claudeConfig;
         break;
       case AnswerValidatorType.openAI:
-        apiKey = settings.openAiApiKey;
+        config = settings.openConfig;
         break;
       case AnswerValidatorType.onDeviceAI:
       case AnswerValidatorType.ml:
-        // Already handled above
         return const QuizCardExeValid();
     }
 
-    if (apiKey == null || apiKey.isEmpty) {
+    if (config == null) {
       return QuizCardExeInvalid(
-        reason: '${selectedValidator.toDisplayString()} requires an API key',
+        reason: '${selectedValidator.toDisplayString()} is not configured.',
       );
     }
 

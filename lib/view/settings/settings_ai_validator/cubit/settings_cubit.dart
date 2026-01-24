@@ -85,7 +85,7 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
           break;
         case AnswerValidatorType.onDeviceAI:
         case AnswerValidatorType.ml:
-        // On-device AI doesn't need an API key
+          // On-device AI doesn't need an API key
           return;
       }
 
@@ -104,6 +104,13 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
       ));
       emit(currentState);
     }
+  }
+
+  void updateOpenSourceConfig(
+    AnswerValidatorType type,
+    OpenSourceModelConfig? config,
+  ) {
+
   }
 }
 

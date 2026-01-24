@@ -1,19 +1,20 @@
 import 'dart:async';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 
-class ApiKeysProvider {
+class ValidatorConfigProvider {
   final UserRepository userRepository;
   final UserSettingsRepository userSettingsRepository;
 
-  ApiKeysProvider({
+  ValidatorConfigProvider({
     required this.userRepository,
     required this.userSettingsRepository,
   });
 
-  String? _cachedGeminiApiKey;
-  String? _cachedClaudeApiKey;
-  String? _cachedOpenAiApiKey;
+  ValidatorConfig? _cachedGeminiConfig;
+  ValidatorConfig? _cachedClaudeConfig;
+  ValidatorConfig? _cachedOpenAiConfig;
   StreamSubscription? _settingsSubscription;
   bool _initialized = false;
 
@@ -25,29 +26,29 @@ class ApiKeysProvider {
     final settings =
         await userSettingsRepository.fetchUserSettings(currentUser.id);
 
-    _cachedGeminiApiKey = settings.geminiApiKey;
-    _cachedClaudeApiKey = settings.claudeApiKey;
-    _cachedOpenAiApiKey = settings.openAiApiKey;
+    _cachedGeminiConfig = settings.geminiConfig;
+    _cachedClaudeConfig = settings.claudeConfig;
+    _cachedOpenAiConfig = settings.openConfig;
 
     _settingsSubscription = userSettingsRepository
         .watchUserSettings(currentUser.id)
         .listen((updatedSettings) {
-      _cachedGeminiApiKey = updatedSettings.geminiApiKey;
-      _cachedClaudeApiKey = updatedSettings.claudeApiKey;
-      _cachedOpenAiApiKey = updatedSettings.openAiApiKey;
+      _cachedGeminiConfig = updatedSettings.geminiConfig;
+      _cachedClaudeConfig = updatedSettings.claudeConfig;
+      _cachedOpenAiConfig = updatedSettings.openConfig;
     });
 
     _initialized = true;
   }
 
   /// Gets the cached Gemini API key
-  String? get geminiApiKey => _cachedGeminiApiKey;
+  ValidatorConfig? get geminiConfig => _cachedGeminiConfig;
 
   /// Gets the cached Claude API key
-  String? get claudeApiKey => _cachedClaudeApiKey;
+  ValidatorConfig? get claudeConfig => _cachedClaudeConfig;
 
   /// Gets the cached OpenAI API key
-  String? get openAiApiKey => _cachedOpenAiApiKey;
+  ValidatorConfig? get openAiConfig => _cachedOpenAiConfig;
 
   /// Disposes the provider and cancels subscriptions
   void dispose() {

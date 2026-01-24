@@ -31,7 +31,7 @@ class ValidatorsManager {
       validators.add(ValidatorItem(
         type: type,
         isEnabled: isEnabled,
-        apiKey: apiKey,
+        validatorConfig: apiKey,
       ));
     }
     return validators;
@@ -46,21 +46,19 @@ class ValidatorsManager {
         return validator.isEnabled;
       }
       // Cloud validators need both enabled status AND API keys
-      return validator.isEnabled &&
-          validator.apiKey != null &&
-          validator.apiKey!.isNotEmpty;
+      return validator.isEnabled && validator.validatorConfig != null;
     }).toList();
   }
 
-  String? _getApiKeyForValidator(
+  ValidatorConfig? _getApiKeyForValidator(
       AnswerValidatorType type, UserSettingsItem settings) {
     switch (type) {
       case AnswerValidatorType.gemini:
-        return settings.geminiApiKey;
+        return settings.geminiConfig;
       case AnswerValidatorType.claude:
-        return settings.claudeApiKey;
+        return settings.claudeConfig;
       case AnswerValidatorType.openAI:
-        return settings.openAiApiKey;
+        return settings.openConfig;
       case AnswerValidatorType.onDeviceAI:
       case AnswerValidatorType.ml:
         return null; // On-device AI doesn't need an API key

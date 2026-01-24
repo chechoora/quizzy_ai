@@ -5,15 +5,15 @@ class UserSettingsItem {
     required this.id,
     required this.userId,
     required this.answerValidatorType,
-    required this.geminiApiKey,
-    required this.claudeApiKey,
-    required this.openAiApiKey,
+    required this.geminiConfig,
+    required this.claudeConfig,
+    required this.openConfig,
   });
 
   final int id;
   final int userId;
   final AnswerValidatorType answerValidatorType;
-  final String? geminiApiKey;
-  final String? claudeApiKey;
-  final String? openAiApiKey;
+  final ApiKeyConfig? geminiConfig;
+  final ApiKeyConfig? claudeConfig;
+  final ApiKeyConfig? openConfig;
 }

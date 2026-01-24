@@ -103,12 +103,12 @@ Future<void> _setupRepositories() async {
 }
 
 Future<void> _setupApiKeysProvider() async {
-  final apiKeysProvider = ApiKeysProvider(
+  final apiKeysProvider = ValidatorConfigProvider(
     userRepository: getIt.get<UserRepository>(),
     userSettingsRepository: getIt.get<UserSettingsRepository>(),
   );
   await apiKeysProvider.initialize();
-  getIt.registerSingleton<ApiKeysProvider>(apiKeysProvider);
+  getIt.registerSingleton<ValidatorConfigProvider>(apiKeysProvider);
 }
 
 Future<void> _setupInAppPurchase() async {
@@ -132,7 +132,7 @@ Future<void> _setupInAppPurchase() async {
 }
 
 Future<void> _setupAPI() async {
-  final apiKeysProvider = getIt.get<ApiKeysProvider>();
+  final apiKeysProvider = getIt.get<ValidatorConfigProvider>();
 
   // Gemini API client
   final geminiApiClient = ChopperClient(

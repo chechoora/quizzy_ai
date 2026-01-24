@@ -10,6 +10,8 @@ import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
+import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/util/ext.dart';
 import 'package:poc_ai_quiz/util/view/answer_validator_dropdown.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
@@ -43,6 +45,13 @@ class SettingsAIValidatorWidget extends HookWidget {
       cubit.updateApiKey(type, apiKey);
     }
 
+    void handleOpenSourceConfigUpdate(
+      AnswerValidatorType type,
+      OpenSourceModelConfig? config,
+    ) {
+      cubit.updateOpenSourceConfig(type, config);
+    }
+
     final l10n = localize(context);
     return Scaffold(
       appBar: AppBar(
@@ -55,11 +64,12 @@ class SettingsAIValidatorWidget extends HookWidget {
         },
         builder: (BuildContext context, state) {
           if (state is SettingsDataState) {
-            return _ValidatorContent(
+            return _ValidatorApiKeyContent(
               selectedValidator: state.validatorType,
               validators: state.validators,
               onValidatorChanged: handleValidatorChange,
               onApiKeyUpdate: handleApiKeyUpdate,
+              onOpenSourceConfigUpdate: handleOpenSourceConfigUpdate,
             );
           }
           if (state is SettingsLoadingState) {
@@ -107,18 +117,20 @@ class SettingsAIValidatorWidget extends HookWidget {
   }
 }
 
-class _ValidatorContent extends HookWidget {
-  const _ValidatorContent({
+class _ValidatorApiKeyContent extends HookWidget {
+  const _ValidatorApiKeyContent({
     required this.selectedValidator,
     required this.validators,
     required this.onValidatorChanged,
     required this.onApiKeyUpdate,
+    required this.onOpenSourceConfigUpdate,
   });
 
   final AnswerValidatorType selectedValidator;
   final List<ValidatorItem> validators;
   final void Function(AnswerValidatorType?) onValidatorChanged;
   final void Function(AnswerValidatorType, String?) onApiKeyUpdate;
+  final void Function(AnswerValidatorType, OpenSourceModelConfig?) onOpenSourceConfigUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -126,16 +138,6 @@ class _ValidatorContent extends HookWidget {
       (v) => v.type == selectedValidator,
       orElse: () => validators.first,
     );
-
-    final apiKeyController = useTextEditingController(
-      text: selectedValidatorItem.apiKey ?? '',
-    );
-
-    useEffect(() {
-      apiKeyController.text = selectedValidatorItem.apiKey ?? '';
-      return null;
-    }, [selectedValidator, selectedValidatorItem.apiKey]);
-
     final l10n = localize(context);
     return ListView(
       children: [
@@ -149,46 +151,21 @@ class _ValidatorContent extends HookWidget {
           onValidatorChanged: onValidatorChanged,
         ),
         const SizedBox(height: 24),
-        // TODO: Suuucks, change this
-        if (selectedValidator != AnswerValidatorType.onDeviceAI &&
-            selectedValidator != AnswerValidatorType.ml) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              l10n.settingsAiValidatorApiKeyTitle,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+        switch (selectedValidatorItem.validatorConfig) {
+          ApiKeyConfig() => _ApiKeyTextField(
+              initialApiKey: selectedValidatorItem.validatorConfig?.let(
+                (config) => (config as ApiKeyConfig).apiKey,
               ),
+              selectedValidator: selectedValidator,
+              onApiKeyUpdate: onApiKeyUpdate,
             ),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              controller: apiKeyController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: l10n.settingsAiValidatorApiKeyLabel(
-                  selectedValidator.toDisplayString(),
-                ),
-                hintText: l10n.settingsAiValidatorApiKeyHint,
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.save),
-                  onPressed: () {
-                    final apiKey = apiKeyController.text.trim().isEmpty
-                        ? null
-                        : apiKeyController.text.trim();
-                    onApiKeyUpdate(selectedValidator, apiKey);
-                  },
-                  tooltip: l10n.settingsAiValidatorApiKeySaveTooltip,
-                ),
-              ),
-              obscureText: true,
+          OpenSourceModelConfig config => _OpenSourceModelConfigField(
+              initialConfig: config,
+              selectedValidator: selectedValidator,
+              onConfigUpdate: onOpenSourceConfigUpdate,
             ),
-          ),
-        ],
+          null => const SizedBox.shrink(),
+        },
         const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -220,6 +197,158 @@ class _ValidatorContent extends HookWidget {
                 ],
               ),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ApiKeyTextField extends HookWidget {
+  const _ApiKeyTextField({
+    required this.initialApiKey,
+    required this.selectedValidator,
+    required this.onApiKeyUpdate,
+  });
+
+  final String? initialApiKey;
+  final AnswerValidatorType selectedValidator;
+  final void Function(AnswerValidatorType, String?) onApiKeyUpdate;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = useTextEditingController(text: initialApiKey ?? '');
+
+    useEffect(() {
+      controller.text = initialApiKey ?? '';
+      return null;
+    }, [selectedValidator, initialApiKey]);
+
+    final l10n = localize(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            l10n.settingsAiValidatorApiKeyTitle,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: l10n.settingsAiValidatorApiKeyLabel(
+                selectedValidator.toDisplayString(),
+              ),
+              hintText: l10n.settingsAiValidatorApiKeyHint,
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.save),
+                onPressed: () {
+                  final apiKey = controller.text.trim().isEmpty
+                      ? null
+                      : controller.text.trim();
+                  onApiKeyUpdate(selectedValidator, apiKey);
+                },
+                tooltip: l10n.settingsAiValidatorApiKeySaveTooltip,
+              ),
+            ),
+            obscureText: true,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _OpenSourceModelConfigField extends HookWidget {
+  const _OpenSourceModelConfigField({
+    required this.initialConfig,
+    required this.selectedValidator,
+    required this.onConfigUpdate,
+  });
+
+  final OpenSourceModelConfig? initialConfig;
+  final AnswerValidatorType selectedValidator;
+  final void Function(AnswerValidatorType, OpenSourceModelConfig?) onConfigUpdate;
+
+  @override
+  Widget build(BuildContext context) {
+    final urlController = useTextEditingController(text: initialConfig?.url ?? '');
+    final modelController = useTextEditingController(text: initialConfig?.model ?? '');
+
+    useEffect(() {
+      urlController.text = initialConfig?.url ?? '';
+      modelController.text = initialConfig?.model ?? '';
+      return null;
+    }, [selectedValidator, initialConfig]);
+
+    final l10n = localize(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            l10n.settingsAiValidatorApiKeyTitle,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: TextField(
+            controller: urlController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Server URL',
+              hintText: 'http://localhost:11434/api',
+            ),
+            keyboardType: TextInputType.url,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: TextField(
+            controller: modelController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Model Name',
+              hintText: 'llama3.2',
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: FilledButton.icon(
+            onPressed: () {
+              final url = urlController.text.trim();
+              final model = modelController.text.trim();
+              if (url.isEmpty && model.isEmpty) {
+                onConfigUpdate(selectedValidator, null);
+              } else if (url.isEmpty || model.isEmpty) {
+                context.showSnackBar('Please fill in both URL and model name');
+              } else {
+                onConfigUpdate(
+                  selectedValidator,
+                  OpenSourceModelConfig(url: url, model: model),
+                );
+              }
+            },
+            icon: const Icon(Icons.save),
+            label: Text(l10n.settingsAiValidatorApiKeySaveTooltip),
           ),
         ),
       ],

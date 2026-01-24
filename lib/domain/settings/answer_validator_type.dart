@@ -20,3 +20,31 @@ enum AnswerValidatorType {
     }
   }
 }
+
+sealed class ValidatorConfig {
+  const ValidatorConfig();
+
+  bool get isValid;
+}
+
+class ApiKeyConfig extends ValidatorConfig {
+  final String apiKey;
+
+  const ApiKeyConfig({required this.apiKey});
+
+  @override
+  bool get isValid => apiKey.isNotEmpty;
+}
+
+class OpenSourceModelConfig extends ValidatorConfig {
+  final String url;
+  final String model;
+
+  const OpenSourceModelConfig({
+    required this.url,
+    required this.model,
+  });
+
+  @override
+  bool get isValid => url.isNotEmpty && model.isNotEmpty;
+}

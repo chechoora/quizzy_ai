@@ -27,27 +27,27 @@ class UserSettingsRepository {
     await dataBaseRepository.updateAnswerValidatorType(userId, validatorType.name);
   }
 
-  Future<String?> getGeminiApiKey(int userId) async {
+  Future<ApiKeyConfig?> getGeminiApiKey(int userId) async {
     final settings = await fetchUserSettings(userId);
-    return settings.geminiApiKey;
+    return settings.geminiConfig;
   }
 
   Future<void> setGeminiApiKey(int userId, String? apiKey) async {
     await dataBaseRepository.updateGeminiApiKey(userId, apiKey);
   }
 
-  Future<String?> getClaudeApiKey(int userId) async {
+  Future<ApiKeyConfig?> getClaudeApiKey(int userId) async {
     final settings = await fetchUserSettings(userId);
-    return settings.claudeApiKey;
+    return settings.claudeConfig;
   }
 
   Future<void> setClaudeApiKey(int userId, String? apiKey) async {
     await dataBaseRepository.updateClaudeApiKey(userId, apiKey);
   }
 
-  Future<String?> getOpenAiApiKey(int userId) async {
+  Future<ApiKeyConfig?> getOpenAiApiKey(int userId) async {
     final settings = await fetchUserSettings(userId);
-    return settings.openAiApiKey;
+    return settings.openConfig;
   }
 
   Future<void> setOpenAiApiKey(int userId, String? apiKey) async {
