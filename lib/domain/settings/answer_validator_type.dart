@@ -24,6 +24,28 @@ enum AnswerValidatorType {
   }
 }
 
+enum ValidatorCategory {
+  cloud,
+  onDevice,
+  openSource,
+}
+
+extension AnswerValidatorTypeExtension on AnswerValidatorType {
+  ValidatorCategory get category {
+    switch (this) {
+      case AnswerValidatorType.gemini:
+      case AnswerValidatorType.claude:
+      case AnswerValidatorType.openAI:
+        return ValidatorCategory.cloud;
+      case AnswerValidatorType.onDeviceAI:
+      case AnswerValidatorType.ml:
+        return ValidatorCategory.onDevice;
+      case AnswerValidatorType.ollama:
+        return ValidatorCategory.openSource;
+    }
+  }
+}
+
 sealed class ValidatorConfig {
   const ValidatorConfig();
 

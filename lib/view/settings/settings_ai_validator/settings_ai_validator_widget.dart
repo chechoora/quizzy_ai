@@ -130,7 +130,8 @@ class _ValidatorApiKeyContent extends HookWidget {
   final List<ValidatorItem> validators;
   final void Function(AnswerValidatorType?) onValidatorChanged;
   final void Function(AnswerValidatorType, String?) onApiKeyUpdate;
-  final void Function(AnswerValidatorType, OpenSourceConfig?) onOpenSourceConfigUpdate;
+  final void Function(AnswerValidatorType, OpenSourceConfig?)
+      onOpenSourceConfigUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +139,8 @@ class _ValidatorApiKeyContent extends HookWidget {
       (v) => v.type == selectedValidator,
       orElse: () => validators.first,
     );
+
+    final validatorCategory = selectedValidator.category;
     final l10n = localize(context);
     return ListView(
       children: [
@@ -151,20 +154,21 @@ class _ValidatorApiKeyContent extends HookWidget {
           onValidatorChanged: onValidatorChanged,
         ),
         const SizedBox(height: 24),
-        switch (selectedValidatorItem.validatorConfig) {
-          ApiKeyConfig() => _ApiKeyTextField(
+        switch (validatorCategory) {
+          ValidatorCategory.cloud => _ApiKeyTextField(
               initialApiKey: selectedValidatorItem.validatorConfig?.let(
                 (config) => (config as ApiKeyConfig).apiKey,
               ),
               selectedValidator: selectedValidator,
               onApiKeyUpdate: onApiKeyUpdate,
             ),
-          OpenSourceConfig config => _OpenSourceModelConfigField(
-              initialConfig: config,
+          ValidatorCategory.openSource => _OpenSourceModelConfigField(
+              initialConfig:
+                  selectedValidatorItem.validatorConfig as OpenSourceConfig?,
               selectedValidator: selectedValidator,
               onConfigUpdate: onOpenSourceConfigUpdate,
             ),
-          null => const SizedBox.shrink(),
+          ValidatorCategory.onDevice => const SizedBox.shrink(),
         },
         const SizedBox(height: 16),
         Padding(
@@ -281,8 +285,10 @@ class _OpenSourceModelConfigField extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final urlController = useTextEditingController(text: initialConfig?.url ?? '');
-    final modelController = useTextEditingController(text: initialConfig?.model ?? '');
+    final urlController =
+        useTextEditingController(text: initialConfig?.url ?? '');
+    final modelController =
+        useTextEditingController(text: initialConfig?.model ?? '');
 
     useEffect(() {
       urlController.text = initialConfig?.url ?? '';
