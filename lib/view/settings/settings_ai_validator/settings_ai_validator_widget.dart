@@ -198,6 +198,8 @@ class _ValidatorApiKeyContent extends HookWidget {
                   Text(l10n.settingsAiValidatorGeminiDescription),
                   const SizedBox(height: 4),
                   Text(l10n.settingsAiValidatorMlDescription),
+                  const SizedBox(height: 4),
+                  Text(l10n.settingsAiValidatorOllamaDescription),
                 ],
               ),
             ),
@@ -303,7 +305,7 @@ class _OpenSourceModelConfigField extends HookWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
-            l10n.settingsAiValidatorApiKeyTitle,
+            l10n.settingsAiValidatorApiConfigTitle,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
@@ -315,10 +317,10 @@ class _OpenSourceModelConfigField extends HookWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: TextField(
             controller: urlController,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Server URL',
-              hintText: 'http://localhost:11434/api',
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: l10n.settingsAiValidatorServerUrlLabel,
+              hintText: l10n.settingsAiValidatorServerUrlHint,
             ),
             keyboardType: TextInputType.url,
           ),
@@ -328,10 +330,10 @@ class _OpenSourceModelConfigField extends HookWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: TextField(
             controller: modelController,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Model Name',
-              hintText: 'llama3.2',
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: l10n.settingsAiValidatorModelNameLabel,
+              hintText: l10n.settingsAiValidatorModelNameHint,
             ),
           ),
         ),
@@ -345,7 +347,7 @@ class _OpenSourceModelConfigField extends HookWidget {
               if (url.isEmpty && model.isEmpty) {
                 onConfigUpdate(selectedValidator, null);
               } else if (url.isEmpty || model.isEmpty) {
-                context.showSnackBar('Please fill in both URL and model name');
+                context.showSnackBar(l10n.settingsAiValidatorFillBothFieldsError);
               } else {
                 onConfigUpdate(
                   selectedValidator,
@@ -354,7 +356,7 @@ class _OpenSourceModelConfigField extends HookWidget {
               }
             },
             icon: const Icon(Icons.save),
-            label: Text(l10n.settingsAiValidatorApiKeySaveTooltip),
+            label: Text(l10n.settingsAiValidatorSaveConfigButton),
           ),
         ),
       ],

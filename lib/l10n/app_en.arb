@@ -64,6 +64,14 @@
   "settingsAiValidatorOpenAIDescription": "• OpenAI: Requires an OpenAI API key. Uses GPT models for answer validation.",
   "settingsAiValidatorGeminiDescription": "• Gemini AI: Requires a Google Gemini API key. Uses Google AI for intelligent answer validation.",
   "settingsAiValidatorMlDescription": "• ML Model: No API key required. Uses built-in machine learning models for answer checking.",
+  "settingsAiValidatorOllamaDescription": "• Ollama (Local): Requires Ollama server running locally. Configure server URL and model name.",
+  "settingsAiValidatorApiConfigTitle": "Api Configuration",
+  "settingsAiValidatorServerUrlLabel": "Server URL",
+  "settingsAiValidatorServerUrlHint": "http://localhost:11434/api",
+  "settingsAiValidatorModelNameLabel": "Model Name",
+  "settingsAiValidatorModelNameHint": "llama3.2",
+  "settingsAiValidatorFillBothFieldsError": "Please fill in both URL and model name",
+  "settingsAiValidatorSaveConfigButton": "Save Configuration",
 
   "quizCardListPremiumCardLimitMessage": "You can not create more cards, please unlock the full version.",
   "quizCardListDeleteCardConfirmation": "Are you sure you want to delete current card?"
