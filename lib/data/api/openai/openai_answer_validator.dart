@@ -6,6 +6,7 @@ import 'package:poc_ai_quiz/data/api/openai/openai_response_models.dart'
     as response;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
+import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class OpenAIAnswerValidator extends IAnswerValidator {
@@ -36,15 +37,11 @@ class OpenAIAnswerValidator extends IAnswerValidator {
         userAnswer: userAnswer,
       );
 
-      final prompt = """
+      final prompt = '''
 $basePrompt
 
-Please evaluate how well the user answer matches the expected answer and respond with a JSON object containing:
-- score: integer between 0 and 100
-- explanation: brief explanation (1-2 sentences) in the language of the question
-- correctPoints: array of key points that were correctly addressed
-- missingPoints: array of key points that were missing or incorrect
-""";
+${ValidatorPrompts.jsonResponseInstruction}
+''';
 
       final openAIRequest = request.OpenAIRequest(
         model: _model,
@@ -63,37 +60,7 @@ Please evaluate how well the user answer matches the expected answer and respond
             'name': 'quiz_score',
             'strict': true,
             'schema': {
-              'type': 'object',
-              'properties': {
-                'score': {
-                  'type': 'integer',
-                  'description':
-                      'Score between 0 and 100 indicating how well the user answer matches the expected answer',
-                  'minimum': 0,
-                  'maximum': 100,
-                },
-                'explanation': {
-                  'type': 'string',
-                  'description':
-                      'Brief explanation of why this score was given (1-2 sentences) in the language of the question',
-                },
-                'correctPoints': {
-                  'type': 'array',
-                  'description': 'Key points that were correctly addressed',
-                  'items': {'type': 'string'},
-                },
-                'missingPoints': {
-                  'type': 'array',
-                  'description': 'Key points that were missing or incorrect',
-                  'items': {'type': 'string'},
-                },
-              },
-              'required': [
-                'score',
-                'explanation',
-                'correctPoints',
-                'missingPoints'
-              ],
+              ...ValidatorPrompts.quizScoreSchema,
               'additionalProperties': false,
             },
           },

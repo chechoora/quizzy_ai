@@ -6,6 +6,7 @@ import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_response_models.dart'
     as response;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
+import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class GeminiAnswerValidator extends IAnswerValidator {
@@ -33,45 +34,16 @@ class GeminiAnswerValidator extends IAnswerValidator {
         userAnswer: userAnswer,
       );
 
-      final prompt = """
-CRITICAL INSTRUCTION: All text responses (explanation, correctPoints, missingPoints) MUST be written in the same language as the question below. Do NOT respond in English unless the question is in English.
+      final prompt = '''
+${ValidatorPrompts.geminiLanguageInstruction}
 
 $basePrompt
 
-Please evaluate how well the user answer matches the expected answer.
-""";
+${ValidatorPrompts.geminiEvaluateInstruction}
+''';
 
-      // Define JSON schema for structured output
-      final responseSchema = {
-        'type': 'object',
-        'properties': {
-          'score': {
-            'type': 'integer',
-            'description':
-                'Score between 0 and 100 indicating how well the user answer matches the expected answer',
-            'minimum': 0,
-            'maximum': 100,
-          },
-          'explanation': {
-            'type': 'string',
-            'description':
-                'Brief explanation (1-2 sentences) in the SAME LANGUAGE as the question',
-          },
-          'correctPoints': {
-            'type': 'array',
-            'description':
-                'Key points correctly addressed (in the SAME LANGUAGE as the question)',
-            'items': {'type': 'string'},
-          },
-          'missingPoints': {
-            'type': 'array',
-            'description':
-                'Key points missing or incorrect (in the SAME LANGUAGE as the question)',
-            'items': {'type': 'string'},
-          },
-        },
-        'required': ['score', 'explanation', 'correctPoints', 'missingPoints'],
-      };
+      // Use shared JSON schema for structured output
+      const responseSchema = ValidatorPrompts.quizScoreSchema;
 
       final geminiRequest = request.GeminiRequest(
         contents: [

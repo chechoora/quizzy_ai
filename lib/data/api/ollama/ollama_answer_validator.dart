@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
+import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
@@ -39,16 +40,12 @@ class OllamaAnswerValidator extends IAnswerValidator {
         userAnswer: userAnswer,
       );
 
-      final prompt = """
+      final prompt = '''
 $basePrompt
 
-Please evaluate how well the user answer matches the expected answer and respond with a JSON object containing:
-- score: integer between 0 and 100
-- explanation: brief explanation (1-2 sentences) in the language of the question
-- correctPoints: array of key points that were correctly addressed
-- missingPoints: array of key points that were missing or incorrect
+${ValidatorPrompts.jsonResponseInstruction}
 
-Respond ONLY with the JSON object, no additional text.""";
+${ValidatorPrompts.jsonOnlyInstruction}''';
 
       // Build request for Ollama's OpenAI-compatible endpoint
       final requestBody = {

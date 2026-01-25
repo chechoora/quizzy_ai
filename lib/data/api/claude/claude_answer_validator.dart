@@ -5,6 +5,7 @@ import 'package:poc_ai_quiz/data/api/claude/claude_response_models.dart'
     as response;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
+import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class ClaudeAnswerValidator extends IAnswerValidator {
@@ -36,50 +37,19 @@ class ClaudeAnswerValidator extends IAnswerValidator {
         userAnswer: userAnswer,
       );
 
-      final prompt = """
+      final prompt = '''
 $basePrompt
 
-Please use the record_quiz_score tool to provide your evaluation.
-""";
+${ValidatorPrompts.claudeToolUseInstruction}
+''';
 
-      // Define the tool schema for structured output
+      // Define the tool schema for structured output using shared schema
       final tools = [
         request.Tool(
           name: 'record_quiz_score',
           description:
               'Record the quiz score evaluation with detailed breakdown',
-          inputSchema: {
-            'type': 'object',
-            'properties': {
-              'score': {
-                'type': 'integer',
-                'description': 'Score between 0 and 100',
-                'minimum': 0,
-                'maximum': 100,
-              },
-              'explanation': {
-                'type': 'string',
-                'description':
-                    'Brief explanation (1-2 sentences) in the language of the question',
-              },
-              'correctPoints': {
-                'type': 'array',
-                'description': 'Key points that were correctly addressed',
-                'items': {'type': 'string'},
-              },
-              'missingPoints': {
-                'type': 'array',
-                'description': 'Key points that were missing or incorrect',
-                'items': {'type': 'string'},
-              },
-            },
-            'required': [
-              'score',
-              'explanation',
-              'correctPoints',
-              'missingPoints'
-            ],
-          },
+          inputSchema: ValidatorPrompts.quizScoreSchema,
         ),
       ];
 
