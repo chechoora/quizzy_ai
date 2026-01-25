@@ -34,6 +34,9 @@ class QuizCardExeValidator {
       case AnswerValidatorType.openAI:
         config = settings.openConfig;
         break;
+      case AnswerValidatorType.ollama:
+        config = settings.ollamaConfig;
+        break;
       case AnswerValidatorType.onDeviceAI:
       case AnswerValidatorType.ml:
         return const QuizCardExeValid();

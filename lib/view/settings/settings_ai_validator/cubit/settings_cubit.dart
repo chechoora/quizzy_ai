@@ -87,6 +87,8 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
         case AnswerValidatorType.ml:
           // On-device AI doesn't need an API key
           return;
+        case AnswerValidatorType.ollama:
+          throw ArgumentError('Ollama does not use API keys');
       }
 
       // Reload validators to reflect the updated API key
@@ -108,10 +110,8 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
 
   void updateOpenSourceConfig(
     AnswerValidatorType type,
-    OpenSourceModelConfig? config,
-  ) {
-
-  }
+    OpenSourceConfig? config,
+  ) {}
 }
 
 abstract class SettingsState extends Equatable {

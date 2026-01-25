@@ -3,6 +3,7 @@ enum AnswerValidatorType {
   claude,
   openAI,
   gemini,
+  ollama,
   ml;
 
   String toDisplayString() {
@@ -15,6 +16,8 @@ enum AnswerValidatorType {
         return 'Claude AI';
       case AnswerValidatorType.openAI:
         return 'OpenAI';
+      case AnswerValidatorType.ollama:
+        return 'Ollama (Local)';
       case AnswerValidatorType.ml:
         return 'ML Model';
     }
@@ -36,11 +39,11 @@ class ApiKeyConfig extends ValidatorConfig {
   bool get isValid => apiKey.isNotEmpty;
 }
 
-class OpenSourceModelConfig extends ValidatorConfig {
+class OpenSourceConfig extends ValidatorConfig {
   final String url;
   final String model;
 
-  const OpenSourceModelConfig({
+  const OpenSourceConfig({
     required this.url,
     required this.model,
   });

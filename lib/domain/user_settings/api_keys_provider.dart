@@ -15,6 +15,7 @@ class ValidatorConfigProvider {
   ValidatorConfig? _cachedGeminiConfig;
   ValidatorConfig? _cachedClaudeConfig;
   ValidatorConfig? _cachedOpenAiConfig;
+  ValidatorConfig? _cachedOllamaConfig;
   StreamSubscription? _settingsSubscription;
   bool _initialized = false;
 
@@ -29,6 +30,7 @@ class ValidatorConfigProvider {
     _cachedGeminiConfig = settings.geminiConfig;
     _cachedClaudeConfig = settings.claudeConfig;
     _cachedOpenAiConfig = settings.openConfig;
+    _cachedOllamaConfig = settings.ollamaConfig;
 
     _settingsSubscription = userSettingsRepository
         .watchUserSettings(currentUser.id)
@@ -36,6 +38,7 @@ class ValidatorConfigProvider {
       _cachedGeminiConfig = updatedSettings.geminiConfig;
       _cachedClaudeConfig = updatedSettings.claudeConfig;
       _cachedOpenAiConfig = updatedSettings.openConfig;
+      _cachedOllamaConfig = updatedSettings.ollamaConfig;
     });
 
     _initialized = true;
@@ -49,6 +52,9 @@ class ValidatorConfigProvider {
 
   /// Gets the cached OpenAI API key
   ValidatorConfig? get openAiConfig => _cachedOpenAiConfig;
+
+  /// Gets the cached Ollama Config
+  ValidatorConfig? get ollamaConfig => _cachedOllamaConfig;
 
   /// Disposes the provider and cancels subscriptions
   void dispose() {

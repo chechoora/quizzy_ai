@@ -9,6 +9,7 @@ import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/api/openai/openai_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/openai/openai_api_service.dart';
 import 'package:poc_ai_quiz/data/api/openai/openai_header_interceptor.dart';
+import 'package:poc_ai_quiz/data/api/ollama/ollama_answer_validator.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
@@ -210,6 +211,12 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<OpenAIAnswerValidator>(openAIAnswerValidator);
 
+  // Ollama answer validator
+  final ollamaAnswerValidator = OllamaAnswerValidator(
+    getIt.get<ValidatorConfigProvider>(),
+  );
+  getIt.registerSingleton<OllamaAnswerValidator>(ollamaAnswerValidator);
+
   // Get already registered repositories
   final userRepository = getIt.get<UserRepository>();
   final userSettingsRepository = getIt.get<UserSettingsRepository>();
@@ -232,6 +239,7 @@ Future<void> _setupServices() async {
         AnswerValidatorType.gemini: geminiAnswerValidator,
         AnswerValidatorType.claude: claudeAnswerValidator,
         AnswerValidatorType.openAI: openAIAnswerValidator,
+        AnswerValidatorType.ollama: ollamaAnswerValidator,
         AnswerValidatorType.ml: mlAnswerValidator,
       });
   getIt.registerSingleton<SettingsService>(settingsService);

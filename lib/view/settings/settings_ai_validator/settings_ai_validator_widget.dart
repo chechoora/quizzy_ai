@@ -47,7 +47,7 @@ class SettingsAIValidatorWidget extends HookWidget {
 
     void handleOpenSourceConfigUpdate(
       AnswerValidatorType type,
-      OpenSourceModelConfig? config,
+      OpenSourceConfig? config,
     ) {
       cubit.updateOpenSourceConfig(type, config);
     }
@@ -130,7 +130,7 @@ class _ValidatorApiKeyContent extends HookWidget {
   final List<ValidatorItem> validators;
   final void Function(AnswerValidatorType?) onValidatorChanged;
   final void Function(AnswerValidatorType, String?) onApiKeyUpdate;
-  final void Function(AnswerValidatorType, OpenSourceModelConfig?) onOpenSourceConfigUpdate;
+  final void Function(AnswerValidatorType, OpenSourceConfig?) onOpenSourceConfigUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +159,7 @@ class _ValidatorApiKeyContent extends HookWidget {
               selectedValidator: selectedValidator,
               onApiKeyUpdate: onApiKeyUpdate,
             ),
-          OpenSourceModelConfig config => _OpenSourceModelConfigField(
+          OpenSourceConfig config => _OpenSourceModelConfigField(
               initialConfig: config,
               selectedValidator: selectedValidator,
               onConfigUpdate: onOpenSourceConfigUpdate,
@@ -275,9 +275,9 @@ class _OpenSourceModelConfigField extends HookWidget {
     required this.onConfigUpdate,
   });
 
-  final OpenSourceModelConfig? initialConfig;
+  final OpenSourceConfig? initialConfig;
   final AnswerValidatorType selectedValidator;
-  final void Function(AnswerValidatorType, OpenSourceModelConfig?) onConfigUpdate;
+  final void Function(AnswerValidatorType, OpenSourceConfig?) onConfigUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -343,7 +343,7 @@ class _OpenSourceModelConfigField extends HookWidget {
               } else {
                 onConfigUpdate(
                   selectedValidator,
-                  OpenSourceModelConfig(url: url, model: model),
+                  OpenSourceConfig(url: url, model: model),
                 );
               }
             },

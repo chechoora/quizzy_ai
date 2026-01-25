@@ -16,6 +16,13 @@ class UserSettingsDataBaseMapper {
       geminiConfig: data.geminiApiKey?.let((key) => ApiKeyConfig(apiKey: key)),
       claudeConfig: data.claudeApiKey?.let((key) => ApiKeyConfig(apiKey: key)),
       openConfig: data.openAiApiKey?.let((key) => ApiKeyConfig(apiKey: key)),
+      ollamaConfig:
+          (data.ollamaModelUrl != null && data.ollamaModelName != null)
+              ? OpenSourceConfig(
+                  url: data.ollamaModelUrl!,
+                  model: data.ollamaModelName!,
+                )
+              : null,
     );
   }
 }

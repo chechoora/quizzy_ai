@@ -27,7 +27,7 @@ class ValidatorsManager {
       final isAvailable = await _isValidatorsAvailable(type);
       if (!isAvailable) continue;
       final isEnabled = await _isValidatorEnabled(type);
-      final apiKey = _getApiKeyForValidator(type, settings);
+      final apiKey = _getConfigValidator(type, settings);
       validators.add(ValidatorItem(
         type: type,
         isEnabled: isEnabled,
@@ -50,7 +50,7 @@ class ValidatorsManager {
     }).toList();
   }
 
-  ValidatorConfig? _getApiKeyForValidator(
+  ValidatorConfig? _getConfigValidator(
       AnswerValidatorType type, UserSettingsItem settings) {
     switch (type) {
       case AnswerValidatorType.gemini:
@@ -59,6 +59,8 @@ class ValidatorsManager {
         return settings.claudeConfig;
       case AnswerValidatorType.openAI:
         return settings.openConfig;
+      case AnswerValidatorType.ollama:
+        return settings.ollamaConfig;
       case AnswerValidatorType.onDeviceAI:
       case AnswerValidatorType.ml:
         return null; // On-device AI doesn't need an API key
@@ -71,6 +73,7 @@ class ValidatorsManager {
       case AnswerValidatorType.gemini:
       case AnswerValidatorType.openAI:
       case AnswerValidatorType.ml:
+      case AnswerValidatorType.ollama:
         return true;
       case AnswerValidatorType.onDeviceAI:
         return onDeviceAIService.isOnDeviceAIAvailable();
@@ -83,6 +86,7 @@ class ValidatorsManager {
       case AnswerValidatorType.gemini:
       case AnswerValidatorType.openAI:
       case AnswerValidatorType.ml:
+      case AnswerValidatorType.ollama:
         return true;
       case AnswerValidatorType.onDeviceAI:
         return defaultTargetPlatform == TargetPlatform.iOS;

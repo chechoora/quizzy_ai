@@ -8,6 +8,7 @@ class UserSettingsItem {
     required this.geminiConfig,
     required this.claudeConfig,
     required this.openConfig,
+    required this.ollamaConfig,
   });
 
   final int id;
@@ -16,4 +17,5 @@ class UserSettingsItem {
   final ApiKeyConfig? geminiConfig;
   final ApiKeyConfig? claudeConfig;
   final ApiKeyConfig? openConfig;
+  final OpenSourceConfig? ollamaConfig;
 }

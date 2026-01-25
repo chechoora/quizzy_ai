@@ -13,4 +13,8 @@ class UserSettingsTable extends Table {
   TextColumn get claudeApiKey => text().nullable()();
 
   TextColumn get openAiApiKey => text().nullable()();
+
+  TextColumn get ollamaModelUrl => text().nullable()();
+
+  TextColumn get ollamaModelName => text().nullable()();
 }
