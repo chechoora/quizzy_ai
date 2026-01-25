@@ -72,4 +72,17 @@ class UserSettingsDataBaseRepository {
       openAiApiKey: Value(apiKey),
     ));
   }
+
+  Future<void> updateOllamaConfig(
+    int userId,
+    String? url,
+    String? model,
+  ) async {
+    await (appDatabase.update(appDatabase.userSettingsTable)
+          ..where((tbl) => tbl.userId.equals(userId)))
+        .write(UserSettingsTableCompanion(
+      ollamaModelUrl: Value(url),
+      ollamaModelName: Value(model),
+    ));
+  }
 }

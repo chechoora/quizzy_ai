@@ -50,7 +50,7 @@
       }
     }
   },
-  "settingsAiValidatorApiKeySavedMessage": "API key saved for {validatorName}",
+  "settingsAiValidatorApiKeySavedMessage": "Config saved for {validatorName}",
   "@settingsAiValidatorApiKeySavedMessage": {
     "placeholders": {
       "validatorName": {

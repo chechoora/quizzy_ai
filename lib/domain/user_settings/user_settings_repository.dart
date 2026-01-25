@@ -53,4 +53,8 @@ class UserSettingsRepository {
   Future<void> setOpenAiApiKey(int userId, String? apiKey) async {
     await dataBaseRepository.updateOpenAiApiKey(userId, apiKey);
   }
+
+  Future<void> setOllamaConfig(int userId, OpenSourceConfig? config) async {
+    await dataBaseRepository.updateOllamaConfig(userId, config?.url, config?.model);
+  }
 }

@@ -108,10 +108,39 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
     }
   }
 
-  void updateOpenSourceConfig(
+  Future<void> updateOpenSourceConfig(
     AnswerValidatorType type,
     OpenSourceConfig? config,
-  ) {}
+  ) async {
+    final currentState = state;
+    if (currentState is! SettingsDataState) return;
+
+    try {
+      final user = await userRepository.fetchCurrentUser();
+
+      switch (type) {
+        case AnswerValidatorType.ollama:
+          await userSettingsRepository.setOllamaConfig(user.id, config);
+          break;
+        default:
+          throw ArgumentError('$type does not support OpenSourceConfig');
+      }
+
+      final validators = await validatorsManager.getValidators();
+      emit(SettingsApiKeyUpdatedState(validatorType: type));
+      emit(SettingsDataState(
+        validatorType: currentState.validatorType,
+        validators: validators,
+      ));
+      _logger.i('Updated config for: ${type.toDisplayString()}');
+    } catch (e, stackTrace) {
+      _logger.e('Failed to update config', ex: e, stacktrace: stackTrace);
+      emit(SettingsErrorState(
+        error: 'Failed to update config: ${e.toString()}',
+      ));
+      emit(currentState);
+    }
+  }
 }
 
 abstract class SettingsState extends Equatable {

@@ -17,7 +17,7 @@ enum AnswerValidatorType {
       case AnswerValidatorType.openAI:
         return 'OpenAI';
       case AnswerValidatorType.ollama:
-        return 'Ollama (Local)';
+        return 'Ollama (Local, experimental)';
       case AnswerValidatorType.ml:
         return 'ML Model';
     }

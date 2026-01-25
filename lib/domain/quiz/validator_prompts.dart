@@ -51,7 +51,7 @@ abstract class ValidatorPrompts {
   static const String jsonResponseInstruction = '''
 Please evaluate how well the user answer matches the expected answer and respond with a JSON object containing:
 - score: integer between 0 and 100
-- explanation: brief explanation (1-2 sentences) in the language of the question
+- explanation: brief explanation (1-2 sentences)
 - correctPoints: array of key points that were correctly addressed
 - missingPoints: array of key points that were missing or incorrect''';
 
@@ -70,8 +70,4 @@ Please evaluate how well the user answer matches the expected answer and respond
   /// Simple evaluation instruction for Gemini.
   static const String geminiEvaluateInstruction =
       'Please evaluate how well the user answer matches the expected answer.';
-
-  /// Instruction to respond in the same language as the question.
-  static const String answerInQuestionLanguage =
-      'Answer values must be provided in the SAME LANGUAGE as the question.';
 }

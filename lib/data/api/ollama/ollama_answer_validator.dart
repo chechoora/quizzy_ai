@@ -65,7 +65,7 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
       _logger.d('Sending request to Ollama API at $url');
 
       final response = await http.post(
-        Uri.parse(url),
+        Uri.parse('$url/api/chat'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -73,7 +73,8 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
       );
 
       if (response.statusCode != 200) {
-        _logger.e('Ollama API request failed with status ${response.statusCode}');
+        _logger
+            .e('Ollama API request failed with status ${response.statusCode}');
         throw Exception(
             'Failed to validate answer: ${response.statusCode} - ${response.body}');
       }
@@ -121,13 +122,20 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
   }
 
   String _buildUrl(String baseUrl) {
-    // Remove trailing slash if present
-    final normalizedUrl = baseUrl.endsWith('/')
-        ? baseUrl.substring(0, baseUrl.length - 1)
-        : baseUrl;
+    var normalizedUrl = baseUrl.trim();
 
-    // Use Ollama's native chat endpoint
-    return '$normalizedUrl/api/chat';
+    // Add http:// scheme if missing
+    if (!normalizedUrl.startsWith('http://') &&
+        !normalizedUrl.startsWith('https://')) {
+      normalizedUrl = 'http://$normalizedUrl';
+    }
+
+    // Remove trailing slash if present
+    if (normalizedUrl.endsWith('/')) {
+      normalizedUrl = normalizedUrl.substring(0, normalizedUrl.length - 1);
+    }
+
+    return normalizedUrl;
   }
 
   AnswerResult _parseContent(String content) {
