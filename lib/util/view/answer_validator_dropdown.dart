@@ -19,6 +19,7 @@ class AnswerValidatorDropdown extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: DropdownButtonFormField<AnswerValidatorType>(
+        isExpanded: true,
         initialValue: selectedValidator,
         decoration: const InputDecoration(
           border: OutlineInputBorder(),
@@ -29,13 +30,17 @@ class AnswerValidatorDropdown extends StatelessWidget {
             value: validatorItem.type,
             enabled: validatorItem.isEnabled,
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  validatorItem.type.toDisplayString(),
-                  style: TextStyle(
-                    color: validatorItem.isEnabled
-                        ? null
-                        : Theme.of(context).disabledColor,
+                Flexible(
+                  child: Text(
+                    overflow: TextOverflow.ellipsis,
+                    validatorItem.type.toDisplayString(),
+                    style: TextStyle(
+                      color: validatorItem.isEnabled
+                          ? null
+                          : Theme.of(context).disabledColor,
+                    ),
                   ),
                 ),
                 if (!validatorItem.isEnabled) ...[
