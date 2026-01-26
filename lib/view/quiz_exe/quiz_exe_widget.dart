@@ -107,11 +107,12 @@ class QuizExeWidget extends HookWidget {
             final l10n = localize(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                dismissDirection: DismissDirection.none,
                 content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(l10n.quizExeScoreLabel(result.score)),
+                    Text(l10n.quizExeScoreLabel((result.score * 100).toInt())),
                     const SizedBox(height: 4),
                     result.explanation != null
                         ? Text(l10n.quizExeDetailsLabel(result.explanation!))
