@@ -33,7 +33,7 @@ android {
         applicationId = "com.chechoora.quizzy"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = 12
+        versionCode = 13
         versionName = flutter.versionName
     }
 
