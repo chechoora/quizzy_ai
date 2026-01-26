@@ -74,5 +74,27 @@
   "settingsAiValidatorSaveConfigButton": "Save Configuration",
 
   "quizCardListPremiumCardLimitMessage": "You can not create more cards, please unlock the full version.",
-  "quizCardListDeleteCardConfirmation": "Are you sure you want to delete current card?"
+  "quizCardListDeleteCardConfirmation": "Are you sure you want to delete current card?",
+  "quizCardListBackTooltip": "Back",
+  "quizCardListAddCardTooltip": "Add Card",
+  "quizCardListPlayDeckButton": "Play the Deck",
+  "quizCardListQuickPlayButton": "Quick Play",
+
+  "quizExeScoreLabel": "Score: {score}",
+  "@quizExeScoreLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "quizExeDetailsLabel": "Details: {explanation}",
+  "@quizExeDetailsLabel": {
+    "placeholders": {
+      "explanation": {
+        "type": "String"
+      }
+    }
+  },
+  "quizExeNextCardButton": "Next Card"
 }

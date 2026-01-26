@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/initial_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/model/quiz_results.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_engine.dart';
@@ -19,6 +20,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     required this.settingsService,
     required this.validatorsManager,
     required this.initialAnswerValidator,
+    this.isQuickPlay = false,
   }) : super(QuizExeLoadingState());
 
   final InitialAnswerValidator initialAnswerValidator;
@@ -27,6 +29,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   final QuizMatchBuilder quizMatchBuilder;
   final SettingsService settingsService;
   final ValidatorsManager validatorsManager;
+  final bool isQuickPlay;
 
   final _logger = Logger.withTag('QuizExeCubit');
 
@@ -100,16 +103,12 @@ class QuizExeCubit extends Cubit<QuizExeState> {
         result.score,
         result.explanation,
       );
-      emit(QuizCardResultState(isCorrect: result.score >= 0.6));
-
-      if (quizEngine.hasNext) {
-        _logger.d('Moving to next card');
-        quizEngine.nextCard();
-      } else {
-        final results = quizMatchBuilder.getResults();
-        _logger.i('Quiz completed. Results: $results');
-        emit(QuizDoneState(quizResults: results));
+      if (isQuickPlay) {
+        _logger.d('Quick play mode, show result briefly');
+        emit(QuizCardResultState(answerResult: result));
+        return;
       }
+      nextCard();
     } catch (e, stackTrace) {
       _logger.e('Error checking answer for card: ${quizCardItem.id}',
           ex: e, stacktrace: stackTrace);
@@ -118,6 +117,17 @@ class QuizExeCubit extends Cubit<QuizExeState> {
       ));
 
       emit(lastDisplayState);
+    }
+  }
+
+  void nextCard() {
+    if (quizEngine.hasNext) {
+      _logger.d('Moving to next card');
+      quizEngine.nextCard();
+    } else {
+      final results = quizMatchBuilder.getResults();
+      _logger.i('Quiz completed. Results: $results');
+      emit(QuizDoneState(quizResults: results));
     }
   }
 
@@ -174,10 +184,10 @@ class QuizExeDisplayCardState extends QuizExeState {
 
 class QuizCardResultState extends QuizExeState {
   QuizCardResultState({
-    required this.isCorrect,
+    required this.answerResult,
   });
 
-  final bool isCorrect;
+  final AnswerResult answerResult;
 }
 
 class QuizDoneState extends QuizExeState {

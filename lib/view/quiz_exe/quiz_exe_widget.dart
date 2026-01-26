@@ -18,10 +18,12 @@ import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_cubit.dart';
 class QuizExeWidget extends HookWidget {
   const QuizExeWidget({
     required this.cards,
+    this.isQuickPlay = false,
     super.key,
   });
 
   final List<QuizCardItem> cards;
+  final bool isQuickPlay;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class QuizExeWidget extends HookWidget {
         settingsService: getIt<SettingsService>(),
         validatorsManager: getIt<ValidatorsManager>(),
         initialAnswerValidator: InitialAnswerValidator(),
+        isQuickPlay: isQuickPlay,
       ),
     );
 
@@ -52,7 +55,9 @@ class QuizExeWidget extends HookWidget {
             final isQuizDone = state is QuizDoneState;
             final l10n = localize(context);
             return Text(
-              isQuizDone ? l10n.quizExeFinishedTitle : l10n.quizExeInProgressTitle,
+              isQuizDone
+                  ? l10n.quizExeFinishedTitle
+                  : l10n.quizExeInProgressTitle,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -63,7 +68,8 @@ class QuizExeWidget extends HookWidget {
       ),
       body: BlocConsumer<QuizExeCubit, QuizExeState>(
         bloc: cubit,
-        buildWhen: (previous, current) => current is! QuizExeErrorState && current is! QuizCardResultState,
+        buildWhen: (previous, current) =>
+            current is! QuizExeErrorState && current is! QuizCardResultState,
         builder: (BuildContext context, QuizExeState state) {
           if (state is QuizExeDisplayCardState) {
             final quizCard = state.quizCardItem;
@@ -94,6 +100,35 @@ class QuizExeWidget extends HookWidget {
             snackBar(
               context,
               message: state.message,
+            );
+          }
+          if (state is QuizCardResultState) {
+            final result = state.answerResult;
+            final l10n = localize(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(l10n.quizExeScoreLabel(result.score)),
+                    const SizedBox(height: 4),
+                    result.explanation != null
+                        ? Text(l10n.quizExeDetailsLabel(result.explanation!))
+                        : const SizedBox.shrink(),
+                  ],
+                ),
+                backgroundColor: Theme.of(context).colorScheme.error,
+                duration: const Duration(days: 365),
+                action: SnackBarAction(
+                  label: l10n.quizExeNextCardButton,
+                  textColor: Theme.of(context).colorScheme.onError,
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    cubit.nextCard();
+                  },
+                ),
+              ),
             );
           }
         },

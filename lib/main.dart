@@ -125,10 +125,11 @@ class MyApp extends StatelessWidget {
         name: QuizExeRoute().name,
         path: QuizExeRoute().path,
         builder: (context, state) {
-          final quizCards = state.extra as List<QuizCardItem>;
-          return QuizExeWidget(
-            cards: quizCards,
-          );
+          final extras = state.extra as Map<String, dynamic>;
+          final quizCards =
+              extras[QuizExeRoute.quizCardsKey] as List<QuizCardItem>;
+          final isQuickPlay = extras[QuizExeRoute.isQuickPlayKey] as bool;
+          return QuizExeWidget(cards: quizCards, isQuickPlay: isQuickPlay);
         },
       ),
       GoRoute(

@@ -90,7 +90,10 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
           if (state is QuizCardLaunchState) {
             context.push(
               QuizExeRoute().path,
-              extra: state.quizCarList,
+              extra: {
+                QuizExeRoute.quizCardsKey: state.quizCarList,
+                QuizExeRoute.isQuickPlayKey: state.isQuickPlay,
+              },
             );
           }
           if (state is RequestCreateQuizCardState) {
@@ -117,6 +120,9 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
         },
         onLaunchQuizRequest: () {
           cubit.launchQuizRequest();
+        },
+        onLaunchQuickPlayRequest: () {
+          cubit.launchQuizRequest(isQuickPlay: true);
         },
       ),
     );
@@ -182,20 +188,23 @@ class _BottomQuizCardBar extends StatelessWidget {
     this.onBackRequest,
     this.onAddCardRequest,
     this.onLaunchQuizRequest,
+    this.onLaunchQuickPlayRequest,
   });
 
   final VoidCallback? onBackRequest;
   final VoidCallback? onAddCardRequest;
   final VoidCallback? onLaunchQuizRequest;
+  final VoidCallback? onLaunchQuickPlayRequest;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = localize(context);
     return BottomAppBar(
       color: Colors.white,
       child: Row(
         children: <Widget>[
           IconButton(
-            tooltip: 'Back',
+            tooltip: l10n.quizCardListBackTooltip,
             icon: Icon(
               Icons.arrow_back_rounded,
               color: Theme.of(context).colorScheme.primary,
@@ -203,20 +212,30 @@ class _BottomQuizCardBar extends StatelessWidget {
             onPressed: onBackRequest,
           ),
           IconButton(
-            tooltip: 'Add Card',
+            tooltip: l10n.quizCardListAddCardTooltip,
             icon: Icon(
               Icons.add,
               color: Theme.of(context).colorScheme.primary,
             ),
             onPressed: onAddCardRequest,
           ),
-          IconButton(
-            tooltip: 'Launch Deck',
-            icon: Icon(
-              Icons.play_arrow,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+          TextButton(
             onPressed: onLaunchQuizRequest,
+            child: Text(
+              l10n.quizCardListPlayDeckButton,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onLaunchQuickPlayRequest,
+            child: Text(
+              l10n.quizCardListQuickPlayButton,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
           ),
         ],
       ),
