@@ -27,6 +27,9 @@
   "inAppFeaturesPurchased": "Purchased",
   "inAppFeaturesPurchaseButton": "Purchase",
   "inAppFeaturesRestoreButton": "Restore Purchases",
+  "inAppFeaturesQuizzyAiTitle": "Quizzy Validator",
+  "inAppFeaturesQuizzyAiDescription": "Use our AI-powered validator to check your quiz answers with high accuracy.",
+  "inAppFeaturesSubscribeButton": "Subscribe",
 
   "settingsAiValidatorTitle": "AI Validator",
   "settingsAiValidatorLabel": "Answer Validator",

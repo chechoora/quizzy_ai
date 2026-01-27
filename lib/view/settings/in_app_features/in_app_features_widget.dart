@@ -39,7 +39,9 @@ class SettingsInAppFeaturesWidget extends HookWidget {
             return _InAppFeaturesContent(
               isUnlimitedDecksCardsPurchased:
                   state.isUnlimitedDecksCardsPurchased,
+              isQuizzyAiSubscribed: state.isQuizzyAiSubscribed,
               onPurchaseUnlimitedDecksCards: cubit.purchaseUnlimitedDecksCards,
+              onSubscribeQuizzyAi: cubit.subscribeQuizzyAi,
               onRestorePurchases: cubit.restorePurchases,
             );
           }
@@ -71,12 +73,16 @@ class SettingsInAppFeaturesWidget extends HookWidget {
 class _InAppFeaturesContent extends StatelessWidget {
   const _InAppFeaturesContent({
     required this.isUnlimitedDecksCardsPurchased,
+    required this.isQuizzyAiSubscribed,
     required this.onPurchaseUnlimitedDecksCards,
+    required this.onSubscribeQuizzyAi,
     required this.onRestorePurchases,
   });
 
   final bool isUnlimitedDecksCardsPurchased;
+  final bool isQuizzyAiSubscribed;
   final VoidCallback onPurchaseUnlimitedDecksCards;
+  final VoidCallback onSubscribeQuizzyAi;
   final VoidCallback onRestorePurchases;
 
   @override
@@ -85,76 +91,22 @@ class _InAppFeaturesContent extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.all_inclusive, size: 32),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.inAppFeaturesUnlimitedTitle,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            l10n.inAppFeaturesUnlimitedDescription,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                if (isUnlimitedDecksCardsPurchased)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green[100],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.check_circle, color: Colors.green[700]),
-                        const SizedBox(width: 8),
-                        Text(
-                          l10n.inAppFeaturesPurchased,
-                          style: TextStyle(
-                            color: Colors.green[700],
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                else
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: onPurchaseUnlimitedDecksCards,
-                      child: Text(l10n.inAppFeaturesPurchaseButton),
-                    ),
-                  ),
-              ],
-            ),
-          ),
+        _FeatureCard(
+          icon: Icons.all_inclusive,
+          title: l10n.inAppFeaturesUnlimitedTitle,
+          description: l10n.inAppFeaturesUnlimitedDescription,
+          actionTitle: l10n.inAppFeaturesPurchaseButton,
+          isPurchased: isUnlimitedDecksCardsPurchased,
+          onPurchase: onPurchaseUnlimitedDecksCards,
+        ),
+        const SizedBox(height: 16),
+        _FeatureCard(
+          icon: Icons.auto_awesome,
+          title: l10n.inAppFeaturesQuizzyAiTitle,
+          description: l10n.inAppFeaturesQuizzyAiDescription,
+          actionTitle: l10n.inAppFeaturesSubscribeButton,
+          isPurchased: isQuizzyAiSubscribed,
+          onPurchase: onSubscribeQuizzyAi,
         ),
         const SizedBox(height: 24),
         TextButton.icon(
@@ -163,6 +115,100 @@ class _InAppFeaturesContent extends StatelessWidget {
           label: Text(l10n.inAppFeaturesRestoreButton),
         ),
       ],
+    );
+  }
+}
+
+class _FeatureCard extends StatelessWidget {
+  const _FeatureCard({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.actionTitle,
+    required this.isPurchased,
+    required this.onPurchase,
+  });
+
+  final IconData icon;
+  final String title;
+  final String description;
+  final String actionTitle;
+  final bool isPurchased;
+  final VoidCallback onPurchase;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = localize(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 32),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (isPurchased)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.green[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.green[700]),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.inAppFeaturesPurchased,
+                      style: TextStyle(
+                        color: Colors.green[700],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: onPurchase,
+                  child: Text(actionTitle),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

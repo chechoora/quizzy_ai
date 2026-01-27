@@ -6,6 +6,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 class RevenueCatPurchaseManager {
   static const cardsAndDecksOffering = 'unlimited_cards_decks';
+  static const quizzyAiOffering = 'quizzy_ai';
 
   final Logger _logger;
 
@@ -33,7 +34,8 @@ class RevenueCatPurchaseManager {
   Future<bool> isFeaturePurchased(String identifier) async {
     _logger.d('Checking if feature purchased: $identifier');
     final customerInfo = await Purchases.getCustomerInfo();
-    final isActive = customerInfo.entitlements.all[identifier]?.isActive ?? false;
+    final isActive =
+        customerInfo.entitlements.all[identifier]?.isActive ?? false;
     _logger.d('Feature $identifier is active: $isActive');
     return isActive;
   }
@@ -41,22 +43,21 @@ class RevenueCatPurchaseManager {
   Future<bool> purchaseOffering(String identifier) async {
     _logger.d('Purchasing offering: $identifier');
     final offerings = await Purchases.getOfferings();
-    final offering = offerings.current;
+    final offering = offerings.all[identifier];
     if (offering == null) {
       _logger.e('No current offering available');
       throw Exception('No current offering available');
     }
 
-    final package = offering.availablePackages.firstWhere(
-      (pkg) => pkg.identifier == identifier,
-      orElse: () {
-        _logger.e('Feature $identifier not found in offerings');
-        throw Exception('Feature $identifier not found in offerings');
-      },
-    );
+    final package = offering.availablePackages.firstOrNull;
+    if (package == null) {
+      _logger.e('No available packages for offering $identifier');
+      throw Exception('No available packages for offering $identifier');
+    }
     final purchaseParams = PurchaseParams.package(package);
     final result = await Purchases.purchase(purchaseParams);
-    final isActive = result.customerInfo.entitlements.all[identifier]?.isActive ?? false;
+    final isActive =
+        result.customerInfo.entitlements.all[identifier]?.isActive ?? false;
     _logger.i('Purchase completed for $identifier, active: $isActive');
     return isActive;
   }

@@ -20,8 +20,13 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
           await inAppPurchaseService.isFeaturePurchased(
         InAppPurchaseFeature.unlimitedDecksCards,
       );
+      final isQuizzyAiSubscribed =
+          await inAppPurchaseService.isFeaturePurchased(
+        InAppPurchaseFeature.quizzyAi,
+      );
       emit(InAppFeaturesDataState(
         isUnlimitedDecksCardsPurchased: isUnlimitedDecksCardsPurchased,
+        isQuizzyAiSubscribed: isQuizzyAiSubscribed,
       ));
     } catch (e, stackTrace) {
       _logger.e('Failed to load features', ex: e, stacktrace: stackTrace);
@@ -46,6 +51,28 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
       await loadFeatures();
     } catch (e, stackTrace) {
       _logger.e('Failed to purchase feature', ex: e, stacktrace: stackTrace);
+      emit(InAppFeaturesErrorState(error: e.toString()));
+      emit(currentState);
+    }
+  }
+
+  Future<void> subscribeQuizzyAi() async {
+    final currentState = state;
+    if (currentState is! InAppFeaturesDataState) return;
+
+    emit(const InAppFeaturesPurchasingState());
+    try {
+      final result = await inAppPurchaseService.purchaseFeature(
+        InAppPurchaseFeature.quizzyAi,
+      );
+      if (!result) {
+        throw Exception('Subscription was not completed successfully');
+      }
+      emit(const InAppFeaturesPurchaseSuccessState());
+      _logger.i('Subscribed to Quizzy AI');
+      await loadFeatures();
+    } catch (e, stackTrace) {
+      _logger.e('Failed to subscribe', ex: e, stacktrace: stackTrace);
       emit(InAppFeaturesErrorState(error: e.toString()));
       emit(currentState);
     }
@@ -107,13 +134,15 @@ class InAppFeaturesRestoringState extends BuilderState {
 
 class InAppFeaturesDataState extends BuilderState {
   final bool isUnlimitedDecksCardsPurchased;
+  final bool isQuizzyAiSubscribed;
 
   const InAppFeaturesDataState({
     required this.isUnlimitedDecksCardsPurchased,
+    required this.isQuizzyAiSubscribed,
   });
 
   @override
-  List<Object?> get props => [isUnlimitedDecksCardsPurchased];
+  List<Object?> get props => [isUnlimitedDecksCardsPurchased, isQuizzyAiSubscribed];
 }
 
 class InAppFeaturesPurchaseSuccessState extends ListenerState {

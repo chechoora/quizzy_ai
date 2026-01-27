@@ -25,6 +25,7 @@ class InAppPurchaseService {
 
 enum InAppPurchaseFeature {
   unlimitedDecksCards,
+  quizzyAi;
 }
 
 extension on InAppPurchaseFeature {
@@ -32,6 +33,8 @@ extension on InAppPurchaseFeature {
     switch (this) {
       case InAppPurchaseFeature.unlimitedDecksCards:
         return RevenueCatPurchaseManager.cardsAndDecksOffering;
+      case InAppPurchaseFeature.quizzyAi:
+        return RevenueCatPurchaseManager.quizzyAiOffering;
     }
   }
 }
