@@ -38,7 +38,7 @@ class SettingsService {
     ValidatorsManager validatorsManager,
   ) async {
     final currentValidator = await getCurrentValidatorType();
-    final availableValidators = await validatorsManager.getValidatorsWithApiKeys();
+    final availableValidators = await validatorsManager.getEnabledValidators();
     return ValidatorSelectionData(
       selectedValidator: currentValidator,
       availableValidators: availableValidators,

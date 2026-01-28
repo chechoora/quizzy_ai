@@ -264,6 +264,7 @@ Future<void> _setupServices() async {
   final quizCardExeValidator = QuizCardExeValidator(
     userRepository: userRepository,
     userSettingsRepository: userSettingsRepository,
+    inAppPurchaseService: getIt<InAppPurchaseService>(),
   );
   getIt.registerSingleton<QuizCardExeValidator>(quizCardExeValidator);
 }

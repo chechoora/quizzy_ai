@@ -28,29 +28,13 @@ class AnswerValidatorDropdown extends StatelessWidget {
         items: validators.map((validatorItem) {
           return DropdownMenuItem(
             value: validatorItem.type,
-            enabled: validatorItem.isEnabled,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Flexible(
-                  child: Text(
-                    overflow: TextOverflow.ellipsis,
-                    validatorItem.type.toDisplayString(),
-                    style: TextStyle(
-                      color: validatorItem.isEnabled
-                          ? null
-                          : Theme.of(context).disabledColor,
-                    ),
-                  ),
+                Text(
+                  overflow: TextOverflow.ellipsis,
+                  validatorItem.type.toDisplayString(),
                 ),
-                if (!validatorItem.isEnabled) ...[
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.lock,
-                    size: 16,
-                    color: Theme.of(context).disabledColor,
-                  ),
-                ],
               ],
             ),
           );

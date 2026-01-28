@@ -1,3 +1,4 @@
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
@@ -6,10 +7,12 @@ class QuizCardExeValidator {
   const QuizCardExeValidator({
     required this.userRepository,
     required this.userSettingsRepository,
+    required this.inAppPurchaseService,
   });
 
   final UserRepository userRepository;
   final UserSettingsRepository userSettingsRepository;
+  final InAppPurchaseService inAppPurchaseService;
 
   Future<QuizCardExeValidationResult> isExeValid() async {
     final user = await userRepository.fetchCurrentUser();
@@ -40,6 +43,14 @@ class QuizCardExeValidator {
       case AnswerValidatorType.onDeviceAI:
       case AnswerValidatorType.ml:
         return const QuizCardExeValid();
+      case AnswerValidatorType.quizzyAI:
+        return await inAppPurchaseService
+                .isFeaturePurchased(InAppPurchaseFeature.quizzyAi)
+            ? const QuizCardExeValid()
+            : const QuizCardExeInvalid(
+                reason:
+                    'Quizzy AI feature is not purchased. Please subscribe to use this validator.',
+              );
     }
 
     if (config == null) {

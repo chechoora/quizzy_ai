@@ -85,10 +85,9 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
           break;
         case AnswerValidatorType.onDeviceAI:
         case AnswerValidatorType.ml:
-          // On-device AI doesn't need an API key
-          return;
         case AnswerValidatorType.ollama:
-          throw ArgumentError('Ollama does not use API keys');
+        case AnswerValidatorType.quizzyAI:
+          throw ArgumentError('$validatorType does not use API keys');
       }
 
       // Reload validators to reflect the updated API key

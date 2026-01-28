@@ -1,4 +1,5 @@
 enum AnswerValidatorType {
+  quizzyAI,
   onDeviceAI,
   claude,
   openAI,
@@ -20,6 +21,8 @@ enum AnswerValidatorType {
         return 'Ollama (Local, experimental)';
       case AnswerValidatorType.ml:
         return 'ML Model';
+      case AnswerValidatorType.quizzyAI:
+        return 'Quizzy AI';
     }
   }
 }
@@ -36,6 +39,7 @@ extension AnswerValidatorTypeExtension on AnswerValidatorType {
       case AnswerValidatorType.gemini:
       case AnswerValidatorType.claude:
       case AnswerValidatorType.openAI:
+      case AnswerValidatorType.quizzyAI:
         return ValidatorCategory.cloud;
       case AnswerValidatorType.onDeviceAI:
       case AnswerValidatorType.ml:

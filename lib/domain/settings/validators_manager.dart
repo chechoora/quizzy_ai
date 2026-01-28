@@ -26,27 +26,25 @@ class ValidatorsManager {
     for (var type in AnswerValidatorType.values) {
       final isAvailable = await _isValidatorsAvailable(type);
       if (!isAvailable) continue;
-      final isEnabled = await _isValidatorEnabled(type);
       final apiKey = _getConfigValidator(type, settings);
       validators.add(ValidatorItem(
         type: type,
-        isEnabled: isEnabled,
         validatorConfig: apiKey,
       ));
     }
     return validators;
   }
 
-  Future<List<ValidatorItem>> getValidatorsWithApiKeys() async {
+  Future<List<ValidatorItem>> getEnabledValidators() async {
     final allValidators = await getValidators();
     return allValidators.where((validator) {
       // On-device AI doesn't need API key, just needs to be enabled
       if (validator.type == AnswerValidatorType.onDeviceAI ||
           validator.type == AnswerValidatorType.ml) {
-        return validator.isEnabled;
+        return true;
       }
       // Cloud validators need both enabled status AND API keys
-      return validator.isEnabled && validator.validatorConfig != null;
+      return validator.validatorConfig != null;
     }).toList();
   }
 
@@ -63,20 +61,8 @@ class ValidatorsManager {
         return settings.ollamaConfig;
       case AnswerValidatorType.onDeviceAI:
       case AnswerValidatorType.ml:
+      case AnswerValidatorType.quizzyAI:
         return null; // On-device AI doesn't need an API key
-    }
-  }
-
-  Future<bool> _isValidatorEnabled(AnswerValidatorType type) async {
-    switch (type) {
-      case AnswerValidatorType.claude:
-      case AnswerValidatorType.gemini:
-      case AnswerValidatorType.openAI:
-      case AnswerValidatorType.ml:
-      case AnswerValidatorType.ollama:
-        return true;
-      case AnswerValidatorType.onDeviceAI:
-        return onDeviceAIService.isOnDeviceAIAvailable();
     }
   }
 
@@ -87,9 +73,11 @@ class ValidatorsManager {
       case AnswerValidatorType.openAI:
       case AnswerValidatorType.ml:
       case AnswerValidatorType.ollama:
+      case AnswerValidatorType.quizzyAI:
         return true;
       case AnswerValidatorType.onDeviceAI:
-        return defaultTargetPlatform == TargetPlatform.iOS;
+        return defaultTargetPlatform == TargetPlatform.iOS &&
+            await onDeviceAIService.isOnDeviceAIAvailable();
     }
   }
 }

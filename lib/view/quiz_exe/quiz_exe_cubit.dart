@@ -50,7 +50,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
       } else {
         final validatorType = await settingsService.getCurrentValidatorType();
         final availableValidators =
-            await validatorsManager.getValidatorsWithApiKeys();
+            await validatorsManager.getEnabledValidators();
         emit(QuizExeDisplayCardState(
           quizCardItem: card,
           selectedValidator: validatorType,
