@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-extension ContextUiExtensions on BuildContext {
-  void showSnackBar(String message) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  }
+void showSnackBar(BuildContext context, String message,
+    {Duration duration = const Duration(seconds: 4)}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      duration: duration,
+    ),
+  );
 }
 
 Future alert(

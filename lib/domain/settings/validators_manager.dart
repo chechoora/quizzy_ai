@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
@@ -11,11 +12,13 @@ class ValidatorsManager {
   final UserRepository userRepository;
   final UserSettingsRepository userSettingsRepository;
   final OnDeviceAIService onDeviceAIService;
+  final InAppPurchaseService inAppPurchaseService;
 
   ValidatorsManager({
     required this.userRepository,
     required this.userSettingsRepository,
     required this.onDeviceAIService,
+    required this.inAppPurchaseService,
   });
 
   Future<List<ValidatorItem>> getValidators() async {
@@ -26,10 +29,10 @@ class ValidatorsManager {
     for (var type in AnswerValidatorType.values) {
       final isAvailable = await _isValidatorsAvailable(type);
       if (!isAvailable) continue;
-      final apiKey = _getConfigValidator(type, settings);
+      final config = await _getConfigValidator(type, settings);
       validators.add(ValidatorItem(
         type: type,
-        validatorConfig: apiKey,
+        validatorConfig: config,
       ));
     }
     return validators;
@@ -48,8 +51,8 @@ class ValidatorsManager {
     }).toList();
   }
 
-  ValidatorConfig? _getConfigValidator(
-      AnswerValidatorType type, UserSettingsItem settings) {
+  Future<ValidatorConfig?> _getConfigValidator(
+      AnswerValidatorType type, UserSettingsItem settings) async {
     switch (type) {
       case AnswerValidatorType.gemini:
         return settings.geminiConfig;
@@ -61,8 +64,11 @@ class ValidatorsManager {
         return settings.ollamaConfig;
       case AnswerValidatorType.onDeviceAI:
       case AnswerValidatorType.ml:
-      case AnswerValidatorType.quizzyAI:
         return null; // On-device AI doesn't need an API key
+      case AnswerValidatorType.quizzyAI:
+        return PurchaseConfig(
+            isPurchased: await inAppPurchaseService
+                .isFeaturePurchased(InAppPurchaseFeature.quizzyAi));
     }
   }
 

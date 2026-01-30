@@ -141,6 +141,7 @@ class _ValidatorApiKeyContent extends HookWidget {
     );
 
     final validatorCategory = selectedValidator.category;
+    final validatorConfig = selectedValidatorItem.validatorConfig;
     final l10n = localize(context);
     return ListView(
       children: [
@@ -154,21 +155,20 @@ class _ValidatorApiKeyContent extends HookWidget {
           onValidatorChanged: onValidatorChanged,
         ),
         const SizedBox(height: 24),
-        switch (validatorCategory) {
-          ValidatorCategory.cloud => _ApiKeyTextField(
-              initialApiKey: selectedValidatorItem.validatorConfig?.let(
-                (config) => (config as ApiKeyConfig).apiKey,
-              ),
+        switch (validatorConfig) {
+          ApiKeyConfig() => _ApiKeyTextField(
+              initialApiKey: validatorConfig.apiKey,
               selectedValidator: selectedValidator,
               onApiKeyUpdate: onApiKeyUpdate,
             ),
-          ValidatorCategory.openSource => _OpenSourceModelConfigField(
+          OpenSourceConfig() => _OpenSourceModelConfigField(
               initialConfig:
                   selectedValidatorItem.validatorConfig as OpenSourceConfig?,
               selectedValidator: selectedValidator,
               onConfigUpdate: onOpenSourceConfigUpdate,
             ),
-          ValidatorCategory.onDevice => const SizedBox.shrink(),
+          PurchaseConfig() => const SizedBox.shrink(),
+          null => const SizedBox.shrink(),
         },
         const SizedBox(height: 16),
         Padding(
@@ -347,7 +347,7 @@ class _OpenSourceModelConfigField extends HookWidget {
               if (url.isEmpty && model.isEmpty) {
                 onConfigUpdate(selectedValidator, null);
               } else if (url.isEmpty || model.isEmpty) {
-                context.showSnackBar(l10n.settingsAiValidatorFillBothFieldsError);
+                showSnackBar(context, l10n.settingsAiValidatorFillBothFieldsError);
               } else {
                 onConfigUpdate(
                   selectedValidator,

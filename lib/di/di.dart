@@ -228,6 +228,7 @@ Future<void> _setupServices() async {
     userRepository: userRepository,
     userSettingsRepository: userSettingsRepository,
     onDeviceAIService: onDeviceAIService,
+    inAppPurchaseService: getIt<InAppPurchaseService>(),
   );
   getIt.registerSingleton<ValidatorsManager>(validatorsManager);
 

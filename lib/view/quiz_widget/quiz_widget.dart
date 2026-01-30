@@ -57,7 +57,9 @@ class _QuizWidgetState extends State<QuizWidget> {
                 child: TextField(
                   maxLines: null,
                   controller: editController,
-                  decoration: const InputDecoration(hintText: 'Type similar answer', border: InputBorder.none),
+                  decoration: const InputDecoration(
+                      hintText: 'Type similar answer',
+                      border: InputBorder.none),
                 ),
               ),
               ElevatedButton(
@@ -78,7 +80,7 @@ class _QuizWidgetState extends State<QuizWidget> {
         },
         listener: (BuildContext context, QuizState state) {
           if (state is QuizResultState) {
-            context.showSnackBar(state.isSimilarEnough ? "yay" : "nay");
+            showSnackBar(context, state.isSimilarEnough ? "yay" : "nay");
           }
         },
       ), // This trailing comma makes auto-formatting nicer for build methods.

@@ -77,3 +77,12 @@ class OpenSourceConfig extends ValidatorConfig {
   @override
   bool get isValid => url.isNotEmpty && model.isNotEmpty;
 }
+
+class PurchaseConfig extends ValidatorConfig {
+  const PurchaseConfig({required this.isPurchased});
+
+  final bool isPurchased;
+
+  @override
+  bool get isValid => true;
+}
