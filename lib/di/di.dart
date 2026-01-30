@@ -10,6 +10,7 @@ import 'package:poc_ai_quiz/data/api/openai/openai_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/openai/openai_api_service.dart';
 import 'package:poc_ai_quiz/data/api/openai/openai_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/api/ollama/ollama_answer_validator.dart';
+import 'package:poc_ai_quiz/data/api/quizzy/quizzy_ai_interceptor.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
@@ -39,6 +40,8 @@ import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
+import '../data/api/quizzy/quizzy_answer_validator.dart';
+import '../data/api/quizzy/quizzy_api_service.dart';
 import '../domain/in_app_purchase/in_app_purchase_service.dart';
 
 final getIt = GetIt.instance;
@@ -177,6 +180,18 @@ Future<void> _setupAPI() async {
   );
   getIt.registerSingleton<ChopperClient>(openAIApiClient,
       instanceName: 'openai');
+
+  // Quizzy API client
+  final quizzyApiClient = ChopperClient(
+    baseUrl: Uri.parse('https://api.quizzy.ai'),
+    services: [
+      QuizzyApiService.create(),
+    ],
+    interceptors: [
+      QuizzyAIInterceptor(),
+    ],
+    converter: const JsonConverter(),
+  );
 }
 
 Future<void> _setupServices() async {
@@ -210,6 +225,13 @@ Future<void> _setupServices() async {
     openAIApiClient.getService<OpenAIApiService>(),
   );
   getIt.registerSingleton<OpenAIAnswerValidator>(openAIAnswerValidator);
+
+  // Quizzy answer validator
+  final quizzyClient = getIt.get<ChopperClient>(instanceName: 'quizzy');
+  final quizzyAnswerValidator = QuizzyAnswerValidator(
+    quizzyClient.getService<QuizzyApiService>(),
+  );
+  getIt.registerSingleton<QuizzyAnswerValidator>(quizzyAnswerValidator);
 
   // Ollama answer validator
   final ollamaAnswerValidator = OllamaAnswerValidator(
