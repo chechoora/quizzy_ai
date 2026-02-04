@@ -18,6 +18,7 @@ import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.da
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
 import 'package:poc_ai_quiz/view/widgets/app_add_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
+import 'package:poc_ai_quiz/view/widgets/app_text_field.dart';
 
 class HomeWidget extends StatefulWidget {
   const HomeWidget({super.key});
@@ -314,25 +315,26 @@ class _CreateDeckBottomSheet extends HookWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 12, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'New deck',
-                  style: AppTypography.h3.copyWith(
-                    color: AppColors.grayscale600,
-                  ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'New deck',
+                style: AppTypography.h3.copyWith(
+                  color: AppColors.grayscale600,
                 ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
+              ),
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close),
+              ),
+            ],
           ),
-          const Divider(),
+          const Divider(
+            height: 0.5,
+            thickness: 0.5,
+            color: AppColors.grayscale300,
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
             child: Column(
@@ -345,26 +347,10 @@ class _CreateDeckBottomSheet extends HookWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                AppTextField(
                   controller: controller,
                   autofocus: true,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    hintText: 'e.g. World capitals',
-                    hintStyle: AppTypography.mainText.copyWith(
-                      color: AppColors.grayscale400,
-                    ),
-                    filled: true,
-                    fillColor: AppColors.grayscale100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
-                  ),
+                  hint: 'e.g. World capitals',
                 ),
                 const SizedBox(height: 20),
                 AppButton.primary(

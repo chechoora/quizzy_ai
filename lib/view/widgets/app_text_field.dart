@@ -82,6 +82,8 @@ class AppTextField extends HookWidget {
           ),
           contentPadding: const EdgeInsets.all(16),
           border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
           suffixIcon: trailingActionText != null
               ? _TrailingAction(
                   text: trailingActionText!,

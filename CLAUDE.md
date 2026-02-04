@@ -71,6 +71,11 @@ lib/
 ### Widgets
 - Use `flutter_hooks` for stateful widgets - extend `HookWidget` instead of `StatefulWidget`
 - Use hooks like `useState`, `useFocusNode`, `useTextEditingController`, etc.
+- Look up reusable widgets in `lib/view/widgets/` before creating new ones
+
+### Theme & Styling
+- Colors: `lib/util/theme/app_colors.dart` - use `AppColors.*`
+- Typography: `lib/util/theme/app_typography.dart` - use `AppTypography.*`
 
 ### Answer Validators
 All validators implement `IAnswerValidator` interface (`lib/domain/quiz/i_answer_validator.dart`):
