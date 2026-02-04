@@ -192,6 +192,8 @@ Future<void> _setupAPI() async {
     ],
     converter: const JsonConverter(),
   );
+  getIt.registerSingleton<ChopperClient>(quizzyApiClient,
+      instanceName: 'quizzy');
 }
 
 Future<void> _setupServices() async {

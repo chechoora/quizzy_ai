@@ -9,10 +9,12 @@ import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
+import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/cubit/deck_cubit.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
+import 'package:poc_ai_quiz/view/widgets/app_add_button.dart';
 
 class HomeWidget extends StatefulWidget {
   const HomeWidget({super.key});
@@ -44,14 +46,6 @@ class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          localize(context).homeQuizDecksTitle,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-      ),
       body: BlocConsumer<HomeCubit, DeckState>(
         bloc: cubit,
         buildWhen: (prevState, nextState) {
@@ -95,46 +89,57 @@ class _HomeWidgetState extends State<HomeWidget> {
           }
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/icons/deck_icon.svg',
-              colorFilter: ColorFilter.mode(
-                _selectedIndex == 0
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.secondary,
-                BlendMode.srcIn,
+      bottomNavigationBar: Container(
+        height: 84,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _NavItem(
+              icon: SvgPicture.asset(
+                'assets/icons/decks.svg',
+                colorFilter: ColorFilter.mode(
+                  _selectedIndex == 0
+                      ? AppColors.primary500
+                      : AppColors.grayscale500,
+                  BlendMode.srcIn,
+                ),
+                semanticsLabel: localize(context).homeDecksLabel,
               ),
-              semanticsLabel: localize(context).homeDecksLabel,
+              label: localize(context).homeDecksLabel,
+              isSelected: _selectedIndex == 0,
+              onTap: () => setState(() => _selectedIndex = 0),
             ),
-            label: localize(context).homeDecksLabel,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.settings,
-              color: _selectedIndex == 1
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.secondary,
+            AppAddButton(
+              onPressed: () => cubit.addDockRequest(),
             ),
-            label: localize(context).homeSettingsLabel,
-          ),
-        ],
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+            _NavItem(
+              icon: SvgPicture.asset(
+                'assets/icons/settings.svg',
+                colorFilter: ColorFilter.mode(
+                  _selectedIndex == 1
+                      ? AppColors.primary500
+                      : AppColors.grayscale500,
+                  BlendMode.srcIn,
+                ),
+                semanticsLabel: localize(context).homeDecksLabel,
+              ),
+              label: localize(context).homeSettingsLabel,
+              isSelected: _selectedIndex == 1,
+              onTap: () => setState(() => _selectedIndex = 1),
+            ),
+          ],
+        ),
       ),
-      floatingActionButton: _selectedIndex == 0
-          ? FloatingActionButton(
-              tooltip: localize(context).homeAddDeckTooltip,
-              onPressed: () {
-                cubit.addDockRequest();
-              },
-              child: const Icon(Icons.add, color: Colors.white, size: 28),
-            )
-          : null,
     );
   }
 
@@ -189,6 +194,46 @@ class _HomeWidgetState extends State<HomeWidget> {
           // TODO Navigate to purchase screen
         }
       },
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final Widget icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 80,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color:
+                    isSelected ? AppColors.primary500 : AppColors.grayscale500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
