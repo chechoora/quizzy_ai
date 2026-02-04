@@ -306,16 +306,19 @@ class _CreateDeckBottomSheet extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useTextEditingController();
-
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+    useListenable(controller);
+    final text = controller.text.trim();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24.0,
+            vertical: 8.0,
+          ),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -330,43 +333,48 @@ class _CreateDeckBottomSheet extends HookWidget {
               ),
             ],
           ),
-          const Divider(
-            height: 0.5,
-            thickness: 0.5,
-            color: AppColors.grayscale300,
+        ),
+        const Divider(
+          height: 0.5,
+          thickness: 0.5,
+          color: AppColors.grayscale300,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24.0,
+            vertical: 8.0,
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Enter a name for your new study collection.',
-                  style: AppTypography.mainText.copyWith(
-                    color: AppColors.grayscale500,
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Enter a name for your new study collection.',
+                style: AppTypography.mainText.copyWith(
+                  color: AppColors.grayscale500,
                 ),
-                const SizedBox(height: 16),
-                AppTextField(
-                  controller: controller,
-                  autofocus: true,
-                  hint: 'e.g. World capitals',
-                ),
-                const SizedBox(height: 20),
-                AppButton.primary(
-                  text: 'Create New Deck',
-                  onPressed: () {
-                    final text = controller.text.trim();
-                    if (text.isNotEmpty) {
-                      Navigator.pop(context, text);
-                    }
-                  },
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: controller,
+                autofocus: true,
+                hint: 'e.g. World capitals',
+              ),
+              const SizedBox(height: 20),
+              AppButton.primary(
+                text: 'Create New Deck',
+                onPressed: text.isNotEmpty
+                    ? () {
+                        Navigator.pop(context, text);
+                      }
+                    : null,
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).viewInsets.bottom + 16,
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
