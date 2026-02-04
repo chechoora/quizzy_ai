@@ -58,6 +58,7 @@ flutter:
   generate: true
   assets:
     - assets/icons/
+    - assets/images/
     - assets/model/all_minilm_l6_v2.onnx
     - assets/model/vocab.txt
     - assets/model/tokenizer.json

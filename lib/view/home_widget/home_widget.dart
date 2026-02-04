@@ -10,6 +10,7 @@ import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/cubit/deck_cubit.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.dart';
@@ -46,6 +47,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: BlocConsumer<HomeCubit, DeckState>(
         bloc: cubit,
         buildWhen: (prevState, nextState) {
@@ -54,6 +56,10 @@ class _HomeWidgetState extends State<HomeWidget> {
         builder: (BuildContext context, state) {
           if (state is DeckDataState) {
             if (_selectedIndex == 0) {
+              final deckList = state.deckList;
+              if (deckList.isEmpty) {
+                return const _EmptyListWidget();
+              }
               return DeckListDisplayWidget(
                 deckList: state.deckList,
                 onDeckRemoveRequest: (deck) {
@@ -91,6 +97,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       ),
       bottomNavigationBar: Container(
         height: 84,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           boxShadow: [
@@ -194,6 +201,46 @@ class _HomeWidgetState extends State<HomeWidget> {
           // TODO Navigate to purchase screen
         }
       },
+    );
+  }
+}
+
+class _EmptyListWidget extends StatelessWidget {
+  const _EmptyListWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      margin: const EdgeInsets.symmetric(
+        horizontal: 52,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/images/decks_empty_state.png',
+            height: 148,
+            fit: BoxFit.fitHeight,
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No decks yet',
+            style: AppTypography.h3.copyWith(
+              color: AppColors.grayscale600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Create your first deck and start learning!',
+            textAlign: TextAlign.center,
+            style: AppTypography.h4.copyWith(
+              color: AppColors.grayscale500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
