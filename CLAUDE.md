@@ -68,6 +68,10 @@ lib/
 - Services for business logic (`*_service.dart`)
 - Repository pattern for data access
 
+### Widgets
+- Use `flutter_hooks` for stateful widgets - extend `HookWidget` instead of `StatefulWidget`
+- Use hooks like `useState`, `useFocusNode`, `useTextEditingController`, etc.
+
 ### Answer Validators
 All validators implement `IAnswerValidator` interface (`lib/domain/quiz/i_answer_validator.dart`):
 - `GeminiAnswerValidator` - Google Gemini API
