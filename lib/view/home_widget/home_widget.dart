@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
@@ -16,6 +17,7 @@ import 'package:poc_ai_quiz/view/home_widget/cubit/deck_cubit.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
 import 'package:poc_ai_quiz/view/widgets/app_add_button.dart';
+import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 
 class HomeWidget extends StatefulWidget {
   const HomeWidget({super.key});
@@ -151,11 +153,23 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   void _addDockRequest() {
-    context.push(CreateDeckRoute().path).then((deckName) {
-      if (deckName is String) {
+    _showCreateDeckBottomSheet().then((deckName) {
+      if (deckName is String && deckName.isNotEmpty) {
         cubit.createDeck(deckName);
       }
     });
+  }
+
+  Future<String?> _showCreateDeckBottomSheet() {
+    return showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => const _CreateDeckBottomSheet(),
+    );
   }
 
   void _launchConfirmDeleteRequest(DeckItem deck) {
@@ -280,6 +294,92 @@ class _NavItem extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CreateDeckBottomSheet extends HookWidget {
+  const _CreateDeckBottomSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = useTextEditingController();
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 12, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'New deck',
+                  style: AppTypography.h3.copyWith(
+                    color: AppColors.grayscale600,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Enter a name for your new study collection.',
+                  style: AppTypography.mainText.copyWith(
+                    color: AppColors.grayscale500,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. World capitals',
+                    hintStyle: AppTypography.mainText.copyWith(
+                      color: AppColors.grayscale400,
+                    ),
+                    filled: true,
+                    fillColor: AppColors.grayscale100,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                AppButton.primary(
+                  text: 'Create New Deck',
+                  onPressed: () {
+                    final text = controller.text.trim();
+                    if (text.isNotEmpty) {
+                      Navigator.pop(context, text);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

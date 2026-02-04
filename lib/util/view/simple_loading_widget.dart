@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 
 class SimpleLoadingWidget extends StatelessWidget {
   const SimpleLoadingWidget({super.key});
@@ -8,9 +9,9 @@ class SimpleLoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
-      child: SpinKitHourGlass(
+      child: const SpinKitHourGlass(
         size: 32,
-        color: Theme.of(context).primaryColor,
+        color: AppColors.primary500,
       ),
     );
   }
