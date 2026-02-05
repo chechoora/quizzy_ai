@@ -162,7 +162,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     });
   }
 
-  Future<String?> _showCreateDeckBottomSheet() {
+  Future<String?> _showCreateDeckBottomSheet({String? deckName}) {
     return showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
@@ -170,7 +170,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => const _CreateDeckBottomSheet(),
+      builder: (context) => _CreateDeckBottomSheet(deckName: deckName),
     );
   }
 
@@ -201,9 +201,9 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   void _launchEditDeckTitleRequest(DeckItem deck) {
-    context.push(CreateDeckRoute().path, extra: deck.title).then(
+    _showCreateDeckBottomSheet(deckName: deck.title).then(
       (deckName) {
-        if (deckName is String) {
+        if (deckName is String && deckName.isNotEmpty) {
           cubit.editDeck(deck, deckName);
         }
       },
@@ -313,13 +313,17 @@ class _NavItem extends StatelessWidget {
 }
 
 class _CreateDeckBottomSheet extends HookWidget {
-  const _CreateDeckBottomSheet();
+  const _CreateDeckBottomSheet({this.deckName});
+
+  final String? deckName;
 
   @override
   Widget build(BuildContext context) {
-    final controller = useTextEditingController();
+    final controller = useTextEditingController(text: deckName);
     useListenable(controller);
     final text = controller.text.trim();
+    final isEditing = deckName != null;
+    final l10n = localize(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -334,7 +338,7 @@ class _CreateDeckBottomSheet extends HookWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                localize(context).homeNewDeckTitle,
+                isEditing ? l10n.homeEditDeckTitle : l10n.homeNewDeckTitle,
                 style: AppTypography.h3.copyWith(
                   color: AppColors.grayscale600,
                 ),
@@ -360,7 +364,9 @@ class _CreateDeckBottomSheet extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                localize(context).homeNewDeckDescription,
+                isEditing
+                    ? l10n.homeEditDeckDescription
+                    : l10n.homeNewDeckDescription,
                 style: AppTypography.mainText.copyWith(
                   color: AppColors.grayscale500,
                 ),
@@ -369,11 +375,11 @@ class _CreateDeckBottomSheet extends HookWidget {
               AppTextField(
                 controller: controller,
                 autofocus: true,
-                hint: localize(context).homeNewDeckHint,
+                hint: l10n.homeNewDeckHint,
               ),
               const SizedBox(height: 20),
               AppButton.primary(
-                text: localize(context).homeCreateDeckButton,
+                text: isEditing ? l10n.homeSaveDeckButton : l10n.homeCreateDeckButton,
                 onPressed: text.isNotEmpty
                     ? () {
                         Navigator.pop(context, text);

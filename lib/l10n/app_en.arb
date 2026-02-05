@@ -82,6 +82,8 @@
   "quizCardListAddCardTooltip": "Add Card",
   "quizCardListPlayDeckButton": "Play the Deck",
   "quizCardListQuickPlayButton": "Quick Play",
+  "quizCardListEditCardAction": "Edit card",
+  "quizCardListDeleteCardAction": "Delete card",
 
   "quizExeScoreLabel": "Score: {score}",
   "@quizExeScoreLabel": {
@@ -106,7 +108,12 @@
   "homeNewDeckTitle": "New deck",
   "homeNewDeckDescription": "Enter a name for your new study collection.",
   "homeNewDeckHint": "e.g. World capitals",
+  "homeEditDeckTitle": "Edit deck",
+  "homeEditDeckDescription": "Update the name of your deck.",
   "homeCreateDeckButton": "Create New Deck",
+  "homeSaveDeckButton": "Save",
   "homeCancelButton": "Cancel",
-  "homeDeleteButton": "Delete"
+  "homeDeleteButton": "Delete",
+  "homeEditDeckAction": "Edit deck",
+  "homeDeleteDeckAction": "Delete deck"
 }

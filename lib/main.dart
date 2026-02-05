@@ -12,7 +12,6 @@ import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/util/app_theme.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/view/create_card/create_card_widget.dart';
-import 'package:poc_ai_quiz/view/create_deck/create_deck_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/home_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
@@ -139,16 +138,6 @@ class MyApp extends StatelessWidget {
           final deckItem = state.extra as DeckItem;
           return QuizCardListWidget(
             deckItem: deckItem,
-          );
-        },
-      ),
-      GoRoute(
-        name: CreateDeckRoute().name,
-        path: CreateDeckRoute().path,
-        builder: (context, state) {
-          final deckName = state.extra as String?;
-          return CreateDeckWidget(
-            deckName: deckName,
           );
         },
       ),

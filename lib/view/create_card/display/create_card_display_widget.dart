@@ -115,5 +115,5 @@ class _CreateCardDisplayWidgetState extends State<CreateCardDisplayWidget> {
 }
 
 const deckNameLimit = 30;
-const questionLimit = 500;
+const questionLimit = 200;
 const answerLimit = 50;

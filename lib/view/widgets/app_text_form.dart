@@ -76,12 +76,14 @@ class AppTextForm extends HookWidget {
         ),
         cursorColor: AppColors.primary500,
         decoration: InputDecoration(
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
           hintText: hint,
           hintStyle: AppTypography.mainText.copyWith(
             color: AppColors.grayscale300,
           ),
           contentPadding: const EdgeInsets.all(16),
-          border: InputBorder.none,
         ),
       ),
     );

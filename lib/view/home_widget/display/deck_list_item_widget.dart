@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:poc_ai_quiz/view/widgets/app_more_button.dart';
 
 class DeckListItemWidget extends StatelessWidget {
   const DeckListItemWidget({
@@ -20,6 +22,7 @@ class DeckListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = localize(context);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       elevation: 0,
@@ -49,104 +52,24 @@ class DeckListItemWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              _MoreButton(
-                onEditPressed: () => onDeckEditRequest?.call(deck),
-                onDeletePressed: () => onDeckRemoveRequest?.call(deck),
+              AppMoreButton(
+                actions: [
+                  AppMoreButtonAction(
+                    label: l10n.homeEditDeckAction,
+                    icon: 'assets/icons/edit.svg',
+                    onPressed: () => onDeckEditRequest?.call(deck),
+                  ),
+                  AppMoreButtonAction(
+                    label: l10n.homeDeleteDeckAction,
+                    icon: 'assets/icons/delete.svg',
+                    textColor: AppColors.error500,
+                    onPressed: () => onDeckRemoveRequest?.call(deck),
+                  ),
+                ],
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-enum _MenuAction { edit, delete }
-
-class _MoreButton extends StatelessWidget {
-  const _MoreButton({
-    this.onEditPressed,
-    this.onDeletePressed,
-  });
-
-  final VoidCallback? onEditPressed;
-  final VoidCallback? onDeletePressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<_MenuAction>(
-      onSelected: (action) {
-        switch (action) {
-          case _MenuAction.edit:
-            onEditPressed?.call();
-          case _MenuAction.delete:
-            onDeletePressed?.call();
-        }
-      },
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      color: AppColors.grayscaleWhite,
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: _MenuAction.edit,
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/edit.svg',
-                width: 20,
-                height: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Edit deck',
-                style: AppTypography.mainText.copyWith(
-                  color: AppColors.grayscale600,
-                ),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: _MenuAction.delete,
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/delete.svg',
-                width: 20,
-                height: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Delete deck',
-                style: AppTypography.mainText.copyWith(
-                  color: AppColors.error500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildDot(),
-          const SizedBox(height: 3),
-          _buildDot(),
-          const SizedBox(height: 3),
-          _buildDot(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDot() {
-    return Container(
-      width: 4,
-      height: 4,
-      decoration: const BoxDecoration(
-        color: AppColors.grayscale500,
-        shape: BoxShape.circle,
       ),
     );
   }
