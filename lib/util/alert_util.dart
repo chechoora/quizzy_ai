@@ -7,30 +7,42 @@ Future alert(
   Widget? content,
   Widget? primary,
   Widget? secondary,
-}) =>
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: title,
-        content: SingleChildScrollView(child: content),
-        actions: <Widget>[
-          if (primary is! SizedBox)
-            AppDialogButton.primary(
-              text: MaterialLocalizations.of(context).okButtonLabel,
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-          if (secondary is! SizedBox)
-            AppDialogButton.primary(
-              text: MaterialLocalizations.of(context).calendarModeButtonLabel,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-        ],
-      ),
+}) {
+  final Widget primaryWidget;
+  if (primary != null) {
+    primaryWidget = primary;
+  } else {
+    primaryWidget = AppDialogButton.primary(
+      text: MaterialLocalizations.of(context).okButtonLabel,
+      onPressed: () {
+        Navigator.of(context).pop(true);
+      },
     );
+  }
+  final Widget secondaryWidget;
+  if (secondary != null) {
+    secondaryWidget = secondary;
+  } else {
+    secondaryWidget = AppDialogButton.primary(
+      text: MaterialLocalizations.of(context).cancelButtonLabel,
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
+  return showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      actionsAlignment: MainAxisAlignment.spaceBetween,
+      title: title,
+      content: SingleChildScrollView(child: content),
+      actions: <Widget>[
+        primaryWidget,
+        secondaryWidget,
+      ],
+    ),
+  );
+}
 
 void snackBar(
   BuildContext context, {

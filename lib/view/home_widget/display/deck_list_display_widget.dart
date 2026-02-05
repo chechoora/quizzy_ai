@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_item_widget.dart';
 
 class DeckListDisplayWidget extends StatelessWidget {
@@ -18,20 +20,55 @@ class DeckListDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (context, index) {
-        final deck = deckList[index];
-        return DeckListItemWidget(
-          deck: deck,
-          onDeckRemoveRequest: onDeckRemoveRequest,
-          onDeckEditRequest: onDeckEditRequest,
-          onDeckClicked: onDeckClicked,
-        );
-      },
-      separatorBuilder: (context, index) => const SizedBox(
-        width: 2,
+    return SafeArea(
+      child: Column(
+        children: [
+          Text(
+            'Quizzy AI',
+            style: AppTypography.h1.copyWith(
+              color: AppColors.grayscale600,
+            ),
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          Text(
+            'Welcome back (Or hello, hello!)',
+            style: AppTypography.h4.copyWith(
+              color: AppColors.grayscale600,
+            ),
+          ),
+          const SizedBox(
+            height: 6,
+          ),
+          Text(
+            'Choose a deck and let’s play.️',
+            style: AppTypography.h4.copyWith(
+              color: AppColors.grayscale400,
+            ),
+          ),
+          const SizedBox(
+            height: 24,
+          ),
+          Expanded(
+            child: ListView.separated(
+              itemBuilder: (context, index) {
+                final deck = deckList[index];
+                return DeckListItemWidget(
+                  deck: deck,
+                  onDeckRemoveRequest: onDeckRemoveRequest,
+                  onDeckEditRequest: onDeckEditRequest,
+                  onDeckClicked: onDeckClicked,
+                );
+              },
+              separatorBuilder: (context, index) => const SizedBox(
+                width: 2,
+              ),
+              itemCount: deckList.length,
+            ),
+          ),
+        ],
       ),
-      itemCount: deckList.length,
     );
   }
 }
