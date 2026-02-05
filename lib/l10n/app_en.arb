@@ -31,6 +31,9 @@
   "inAppFeaturesQuizzyAiDescription": "Use our AI-powered validator to check your quiz answers with high accuracy.",
   "inAppFeaturesSubscribeButton": "Subscribe",
 
+  "settingsTitle": "Settings",
+  "settingsAiValidatorSubtitleTile": "Configure answer validation settings",
+  "settingsInAppFeaturesSubtitle": "Manage premium features",
   "settingsAiValidatorTitle": "AI Validator",
   "settingsAiValidatorLabel": "Answer Validator",
   "settingsAiValidatorSubtitle": "Choose how quiz answers are validated",

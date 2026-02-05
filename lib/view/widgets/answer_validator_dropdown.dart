@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
-import 'package:poc_ai_quiz/l10n/app_localizations.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
@@ -47,7 +47,7 @@ class AnswerValidatorDropdown extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(color: AppColors.primary500, width: 2),
           ),
-          labelText: AppLocalizations.of(context)?.answerValidatorDropdownLabel,
+          labelText: localize(context).answerValidatorDropdownLabel,
           labelStyle: AppTypography.secondaryText.copyWith(
             color: AppColors.grayscale500,
           ),
@@ -61,11 +61,9 @@ class AnswerValidatorDropdown extends StatelessWidget {
                   ? () {
                       snackBar(
                         context,
-                        message: AppLocalizations.of(context)
-                                ?.answerValidatorNotAvailableMessage(
-                              validatorItem.type.toDisplayString(),
-                            ) ??
-                            '',
+                        message: localize(context).answerValidatorNotAvailableMessage(
+                          validatorItem.type.toDisplayString(),
+                        ),
                       );
                     }
                   : null,

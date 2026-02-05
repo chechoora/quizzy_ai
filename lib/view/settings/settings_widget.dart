@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
@@ -11,30 +12,38 @@ class SettingsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        title: Text(
-          'Settings',
-          style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 32),
+            Text(
+              localize(context).settingsTitle,
+              style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                children: [
+                  _SettingsTile(
+                    icon: Icons.smart_toy,
+                    title: localize(context).settingsAiValidatorTitle,
+                    subtitle: localize(context).settingsAiValidatorSubtitleTile,
+                    onTap: () =>
+                        context.pushNamed(SettingsAIValidatorRoute().name),
+                  ),
+                  const SizedBox(height: 12),
+                  _SettingsTile(
+                    icon: Icons.shopping_bag,
+                    title: localize(context).inAppFeaturesTitle,
+                    subtitle: localize(context).settingsInAppFeaturesSubtitle,
+                    onTap: () =>
+                        context.pushNamed(SettingsInAppFeaturesRoute().name),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        children: [
-          _SettingsTile(
-            icon: Icons.smart_toy,
-            title: 'AI Validator',
-            subtitle: 'Configure answer validation settings',
-            onTap: () => context.pushNamed(SettingsAIValidatorRoute().name),
-          ),
-          const SizedBox(height: 12),
-          _SettingsTile(
-            icon: Icons.shopping_bag,
-            title: 'In-App Features',
-            subtitle: 'Manage premium features',
-            onTap: () => context.pushNamed(SettingsInAppFeaturesRoute().name),
-          ),
-        ],
       ),
     );
   }
