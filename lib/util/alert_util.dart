@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
-
-void showSnackBar(BuildContext context, String message,
-    {Duration duration = const Duration(seconds: 4)}) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(message),
-      duration: duration,
-    ),
-  );
-}
+import 'package:poc_ai_quiz/view/widgets/app_dialog_button.dart';
 
 Future alert(
   BuildContext context, {
   Widget? title,
   Widget? content,
-  Widget? textOK,
-  Widget? textCancel,
+  Widget? primary,
+  Widget? secondary,
 }) =>
     showDialog(
       context: context,
@@ -23,16 +14,19 @@ Future alert(
         title: title,
         content: SingleChildScrollView(child: content),
         actions: <Widget>[
-          if (textOK is! SizedBox)
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: textOK ??
-                  Text(MaterialLocalizations.of(context).okButtonLabel),
+          if (primary is! SizedBox)
+            AppDialogButton.primary(
+              text: MaterialLocalizations.of(context).okButtonLabel,
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
             ),
-          if (textCancel is! SizedBox)
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          if (secondary is! SizedBox)
+            AppDialogButton.primary(
+              text: MaterialLocalizations.of(context).calendarModeButtonLabel,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
         ],
       ),

@@ -33,9 +33,10 @@ class AnswerValidatorDropdown extends StatelessWidget {
             child: GestureDetector(
               onTap: !_isEnabled(validatorItem)
                   ? () {
-                      showSnackBar(
+                      snackBar(
                         context,
-                        'The ${validatorItem.type.toDisplayString()} validator is not available. Please check your configuration or purchase status.',
+                        message:
+                            'The ${validatorItem.type.toDisplayString()} validator is not available. Please check your configuration or purchase status.',
                       );
                     }
                   : null,

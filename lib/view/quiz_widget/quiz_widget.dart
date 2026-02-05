@@ -80,7 +80,7 @@ class _QuizWidgetState extends State<QuizWidget> {
         },
         listener: (BuildContext context, QuizState state) {
           if (state is QuizResultState) {
-            showSnackBar(context, state.isSimilarEnough ? "yay" : "nay");
+            snackBar(context, message: state.isSimilarEnough ? "yay" : "nay");
           }
         },
       ), // This trailing comma makes auto-formatting nicer for build methods.

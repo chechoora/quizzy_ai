@@ -172,7 +172,7 @@ class _QuizCardListWidgetState extends State<QuizCardListWidget> {
         localize(context).quizCardListPremiumCardLimitMessage,
       ),
       //textOK: Text(localize(context).homeUnlockButton),
-      textCancel: const SizedBox.shrink(),
+      secondary: const SizedBox.shrink(),
     ).then(
       (value) {
         if (value ?? false) {

@@ -18,6 +18,7 @@ import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.da
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
 import 'package:poc_ai_quiz/view/widgets/app_add_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
+import 'package:poc_ai_quiz/view/widgets/app_dialog_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_text_field.dart';
 
 class HomeWidget extends StatefulWidget {
@@ -178,6 +179,17 @@ class _HomeWidgetState extends State<HomeWidget> {
       context,
       content: Text(
         localize(context).homeDeleteDeckConfirmation(deck.title),
+        style: AppTypography.h4.copyWith(
+          color: AppColors.grayscale600,
+        ),
+      ),
+      primary: AppDialogButton.primary(
+        text: localize(context).homeCancelButton,
+        onPressed: () => Navigator.of(context).pop(false),
+      ),
+      secondary: AppDialogButton.destructive(
+        text: localize(context).homeDeleteButton,
+        onPressed: () => Navigator.of(context).pop(true),
       ),
     ).then(
       (value) {
@@ -208,7 +220,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       content: Text(
         localize(context).homePremiumDeckLimitMessage,
       ),
-      textCancel: const SizedBox.shrink(),
+      secondary: const SizedBox.shrink(),
       //textOK: Text(localize(context).homeUnlockButton),
     ).then(
       (value) {
@@ -241,14 +253,14 @@ class _EmptyListWidget extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'No decks yet',
+            localize(context).homeEmptyStateTitle,
             style: AppTypography.h3.copyWith(
               color: AppColors.grayscale600,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Create your first deck and start learning!',
+            localize(context).homeEmptyStateDescription,
             textAlign: TextAlign.center,
             style: AppTypography.h4.copyWith(
               color: AppColors.grayscale500,
@@ -322,7 +334,7 @@ class _CreateDeckBottomSheet extends HookWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'New deck',
+                localize(context).homeNewDeckTitle,
                 style: AppTypography.h3.copyWith(
                   color: AppColors.grayscale600,
                 ),
@@ -348,7 +360,7 @@ class _CreateDeckBottomSheet extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Enter a name for your new study collection.',
+                localize(context).homeNewDeckDescription,
                 style: AppTypography.mainText.copyWith(
                   color: AppColors.grayscale500,
                 ),
@@ -357,11 +369,11 @@ class _CreateDeckBottomSheet extends HookWidget {
               AppTextField(
                 controller: controller,
                 autofocus: true,
-                hint: 'e.g. World capitals',
+                hint: localize(context).homeNewDeckHint,
               ),
               const SizedBox(height: 20),
               AppButton.primary(
-                text: 'Create New Deck',
+                text: localize(context).homeCreateDeckButton,
                 onPressed: text.isNotEmpty
                     ? () {
                         Navigator.pop(context, text);

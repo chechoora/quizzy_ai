@@ -347,7 +347,8 @@ class _OpenSourceModelConfigField extends HookWidget {
               if (url.isEmpty && model.isEmpty) {
                 onConfigUpdate(selectedValidator, null);
               } else if (url.isEmpty || model.isEmpty) {
-                showSnackBar(context, l10n.settingsAiValidatorFillBothFieldsError);
+                snackBar(context,
+                    message: l10n.settingsAiValidatorFillBothFieldsError);
               } else {
                 onConfigUpdate(
                   selectedValidator,

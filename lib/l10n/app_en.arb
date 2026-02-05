@@ -99,5 +99,14 @@
       }
     }
   },
-  "quizExeNextCardButton": "Next Card"
+  "quizExeNextCardButton": "Next Card",
+
+  "homeEmptyStateTitle": "No decks yet",
+  "homeEmptyStateDescription": "Create your first deck and start learning!",
+  "homeNewDeckTitle": "New deck",
+  "homeNewDeckDescription": "Enter a name for your new study collection.",
+  "homeNewDeckHint": "e.g. World capitals",
+  "homeCreateDeckButton": "Create New Deck",
+  "homeCancelButton": "Cancel",
+  "homeDeleteButton": "Delete"
 }
