@@ -23,6 +23,9 @@ class DeckListDisplayWidget extends StatelessWidget {
     return SafeArea(
       child: Column(
         children: [
+          const SizedBox(
+            height: 32,
+          ),
           Text(
             'Quizzy AI',
             style: AppTypography.h1.copyWith(
@@ -30,25 +33,7 @@ class DeckListDisplayWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            height: 16,
-          ),
-          Text(
-            'Welcome back (Or hello, hello!)',
-            style: AppTypography.h4.copyWith(
-              color: AppColors.grayscale600,
-            ),
-          ),
-          const SizedBox(
-            height: 6,
-          ),
-          Text(
-            'Choose a deck and let’s play.️',
-            style: AppTypography.h4.copyWith(
-              color: AppColors.grayscale400,
-            ),
-          ),
-          const SizedBox(
-            height: 24,
+            height: 12,
           ),
           Expanded(
             child: ListView.separated(

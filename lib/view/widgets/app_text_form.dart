@@ -46,7 +46,7 @@ class AppTextForm extends HookWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.grayscaleWhite,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(17),
         border: isFocused.value
             ? Border.all(color: AppColors.primary500, width: 2)
             : null,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
@@ -22,15 +21,10 @@ class QuizCardListDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
+    return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-        childAspectRatio: 172 / 148,
-      ),
       itemCount: quizCarList.length + 1,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         if (index == quizCarList.length) {
           return _AddCardTile(onPressed: onAddCardRequest);
@@ -66,33 +60,9 @@ class _QuizCardTile extends StatelessWidget {
         color: AppColors.grayscaleWhite,
         borderRadius: BorderRadius.circular(15),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SvgPicture.asset(
-                'assets/icons/file.svg',
-              ),
-              AppMoreButton(
-                actions: [
-                  AppMoreButtonAction(
-                    label: l10n.quizCardListEditCardAction,
-                    icon: 'assets/icons/edit.svg',
-                    onPressed: () => onEditPressed?.call(),
-                  ),
-                  AppMoreButtonAction(
-                    label: l10n.quizCardListDeleteCardAction,
-                    icon: 'assets/icons/delete.svg',
-                    textColor: AppColors.error500,
-                    onPressed: () => onDeletePressed?.call(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,6 +87,21 @@ class _QuizCardTile extends StatelessWidget {
               ],
             ),
           ),
+          AppMoreButton(
+            actions: [
+              AppMoreButtonAction(
+                label: l10n.quizCardListEditCardAction,
+                icon: 'assets/icons/edit.svg',
+                onPressed: () => onEditPressed?.call(),
+              ),
+              AppMoreButtonAction(
+                label: l10n.quizCardListDeleteCardAction,
+                icon: 'assets/icons/delete.svg',
+                textColor: AppColors.error500,
+                onPressed: () => onDeletePressed?.call(),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -131,31 +116,36 @@ class _AddCardTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
-    return GestureDetector(
-      onTap: onPressed,
-      child: CustomPaint(
-        painter: _DashedBorderPainter(
-          color: AppColors.grayscale500,
-          strokeWidth: 1.5,
-          radius: 15,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.add,
-              size: 24,
-              color: AppColors.grayscale500,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: GestureDetector(
+        onTap: onPressed,
+        child: CustomPaint(
+          painter: _DashedBorderPainter(
+            color: AppColors.grayscale500,
+            strokeWidth: 1.5,
+            radius: 15,
+          ),
+          child: SizedBox(
+            height: 64,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.add,
+                  size: 24,
+                  color: AppColors.grayscale500,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.quizCardListAddCardTooltip,
+                  style: AppTypography.secondaryText.copyWith(
+                    color: AppColors.grayscale500,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              l10n.quizCardListAddCardTooltip,
-              style: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+          ),
         ),
       ),
     );
