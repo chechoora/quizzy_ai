@@ -87,6 +87,7 @@ class QuizExeWidget extends HookWidget {
               snackBar(
                 context,
                 message: state.message,
+                isError: true,
               );
             }
             if (state is QuizCardResultState) {

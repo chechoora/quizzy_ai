@@ -5,6 +5,8 @@ import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/cubit/in_app_features_cubit.dart';
 
@@ -26,8 +28,13 @@ class SettingsInAppFeaturesWidget extends HookWidget {
 
     final l10n = localize(context);
     return Scaffold(
+      backgroundColor: AppColors.backgroundSecondary,
       appBar: AppBar(
-        title: Text(l10n.inAppFeaturesTitle),
+        backgroundColor: AppColors.background,
+        title: Text(
+          l10n.inAppFeaturesTitle,
+          style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
+        ),
       ),
       body: BlocConsumer<InAppFeaturesCubit, InAppFeaturesState>(
         bloc: cubit,
@@ -61,8 +68,12 @@ class SettingsInAppFeaturesWidget extends HookWidget {
           } else if (state is InAppFeaturesRestoreSuccessState) {
             snackBar(context, message: l10n.inAppFeaturesRestoreSuccess);
           } else if (state is InAppFeaturesErrorState) {
-            snackBar(context,
-                message: state.error, duration: const Duration(seconds: 4));
+            snackBar(
+              context,
+              message: state.error,
+              duration: const Duration(seconds: 4),
+              isError: true,
+            );
           }
         },
       ),
@@ -111,8 +122,13 @@ class _InAppFeaturesContent extends StatelessWidget {
         const SizedBox(height: 24),
         TextButton.icon(
           onPressed: onRestorePurchases,
-          icon: const Icon(Icons.restore),
-          label: Text(l10n.inAppFeaturesRestoreButton),
+          icon: const Icon(Icons.restore, color: AppColors.primary500),
+          label: Text(
+            l10n.inAppFeaturesRestoreButton,
+            style: AppTypography.buttonSmall.copyWith(
+              color: AppColors.primary500,
+            ),
+          ),
         ),
       ],
     );
@@ -139,75 +155,88 @@ class _FeatureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, size: 32),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        description,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (isPurchased)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.green[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.grayscaleWhite,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 32, color: AppColors.primary500),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green[700]),
-                    const SizedBox(width: 8),
                     Text(
-                      l10n.inAppFeaturesPurchased,
-                      style: TextStyle(
-                        color: Colors.green[700],
-                        fontWeight: FontWeight.bold,
+                      title,
+                      style: AppTypography.h3.copyWith(
+                        color: AppColors.grayscale600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: AppTypography.secondaryText.copyWith(
+                        color: AppColors.grayscale500,
                       ),
                     ),
                   ],
                 ),
-              )
-            else
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: onPurchase,
-                  child: Text(actionTitle),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (isPurchased)
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.success100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.check_circle, color: AppColors.success600),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.inAppFeaturesPurchased,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.success600,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: onPurchase,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary500,
+                  foregroundColor: AppColors.grayscaleWhite,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  actionTitle,
+                  style: AppTypography.buttonMain.copyWith(
+                    color: AppColors.grayscaleWhite,
+                  ),
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

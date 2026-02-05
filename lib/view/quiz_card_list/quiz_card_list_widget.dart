@@ -159,6 +159,7 @@ class QuizCardListWidget extends HookWidget {
                     snackBar(
                       context,
                       message: state.message,
+                      isError: true,
                     );
                   }
                 },

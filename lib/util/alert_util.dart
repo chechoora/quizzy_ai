@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/widgets/app_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/widgets/app_dialog_button.dart';
 
@@ -51,15 +52,21 @@ void snackBar(
   BuildContext context, {
   required String message,
   Duration duration = const Duration(seconds: 4),
+  bool isError = false,
 }) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(message),
-      backgroundColor: AppColors.error100,
+      content: Text(
+        message,
+        style: AppTypography.secondaryText.copyWith(
+          color: isError ? AppColors.error100 : AppColors.grayscale100,
+        ),
+      ),
+      backgroundColor: isError ? AppColors.error500 : AppColors.grayscale500,
       duration: duration,
       action: SnackBarAction(
         label: localize(context).dismiss,
-        textColor: AppColors.error500,
+        textColor: isError ? AppColors.error100 : AppColors.grayscale100,
         onPressed: () {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
         },
