@@ -120,5 +120,7 @@
   "quizDisplayTypeAnswerLabel": "Type your answer below",
   "quizDisplayTypeAnswerHint": "Type your answer",
   "quizDisplayAnswerButton": "Answer",
-  "quizDisplayDontKnowButton": "Don't know"
+  "quizDisplayDontKnowButton": "Don't know",
+
+  "dismiss": "Dismiss"
 }

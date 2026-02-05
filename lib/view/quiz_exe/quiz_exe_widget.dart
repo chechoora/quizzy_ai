@@ -11,6 +11,9 @@ import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:poc_ai_quiz/view/widgets/app_bottom_sheet.dart';
+import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/display/quiz_display_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/done/quiz_done_widget.dart';
@@ -89,31 +92,31 @@ class QuizExeWidget extends HookWidget {
             if (state is QuizCardResultState) {
               final result = state.answerResult;
               final l10n = localize(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  dismissDirection: DismissDirection.none,
-                  content: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                          l10n.quizExeScoreLabel((result.score * 100).toInt())),
-                      const SizedBox(height: 4),
-                      result.explanation != null
-                          ? Text(l10n.quizExeDetailsLabel(result.explanation!))
-                          : const SizedBox.shrink(),
-                    ],
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  duration: const Duration(days: 365),
-                  action: SnackBarAction(
-                    label: l10n.quizExeNextCardButton,
-                    textColor: Theme.of(context).colorScheme.onError,
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      cubit.nextCard();
-                    },
-                  ),
+              final isCorrect = result.score >= 0.7;
+              showAppBottomSheet(
+                context,
+                title: Text(
+                  l10n.quizExeScoreLabel((result.score * 100).toInt()),
+                  style: AppTypography.h3,
+                ),
+                content: result.explanation != null
+                    ? Text(
+                        l10n.quizExeDetailsLabel(result.explanation!),
+                        style: AppTypography.secondaryText,
+                      )
+                    : null,
+                variant: isCorrect
+                    ? AppBottomSheetVariant.positive
+                    : AppBottomSheetVariant.destructive,
+                button: AppButton(
+                  text: l10n.quizExeNextCardButton,
+                  variant: isCorrect
+                      ? AppButtonVariant.positive
+                      : AppButtonVariant.destructive,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    cubit.nextCard();
+                  },
                 ),
               );
             }
