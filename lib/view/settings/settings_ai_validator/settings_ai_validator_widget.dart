@@ -57,62 +57,70 @@ class SettingsAIValidatorWidget extends HookWidget {
     final l10n = localize(context);
     return Scaffold(
       backgroundColor: AppColors.backgroundSecondary,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        title: Text(
-          l10n.settingsAiValidatorTitle,
-          style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 32,
+            ),
+            Text(
+              l10n.settingsAiValidatorTitle,
+              style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
+            ),
+            Expanded(
+              child: BlocConsumer<SettingsAIValidatorCubit, SettingsState>(
+                bloc: cubit,
+                buildWhen: (prevState, nextState) {
+                  return nextState is BuilderState;
+                },
+                builder: (BuildContext context, state) {
+                  if (state is SettingsDataState) {
+                    return _ValidatorApiKeyContent(
+                      selectedValidator: state.validatorType,
+                      validators: state.validators,
+                      onValidatorChanged: handleValidatorChange,
+                      onApiKeyUpdate: handleApiKeyUpdate,
+                      onOpenSourceConfigUpdate: handleOpenSourceConfigUpdate,
+                    );
+                  }
+                  if (state is SettingsLoadingState) {
+                    return const SimpleLoadingWidget();
+                  }
+                  throw ArgumentError('Wrong state: $state');
+                },
+                listenWhen: (prevState, nextState) {
+                  return nextState is ListenerState;
+                },
+                listener: (BuildContext context, SettingsState state) {
+                  if (state is SettingsUpdateSuccessState) {
+                    snackBar(
+                      context,
+                      message: l10n.settingsAiValidatorChangedMessage(
+                        state.validatorType.toDisplayString(),
+                      ),
+                      duration: const Duration(seconds: 2),
+                    );
+                  } else if (state is SettingsApiKeyUpdatedState) {
+                    snackBar(
+                      context,
+                      message: l10n.settingsAiValidatorApiKeySavedMessage(
+                        state.validatorType.toDisplayString(),
+                      ),
+                      duration: const Duration(seconds: 2),
+                    );
+                  } else if (state is SettingsErrorState) {
+                    snackBar(
+                      context,
+                      message: state.error,
+                      isError: true,
+                      duration: const Duration(seconds: 2),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
         ),
-      ),
-      body: BlocConsumer<SettingsAIValidatorCubit, SettingsState>(
-        bloc: cubit,
-        buildWhen: (prevState, nextState) {
-          return nextState is BuilderState;
-        },
-        builder: (BuildContext context, state) {
-          if (state is SettingsDataState) {
-            return _ValidatorApiKeyContent(
-              selectedValidator: state.validatorType,
-              validators: state.validators,
-              onValidatorChanged: handleValidatorChange,
-              onApiKeyUpdate: handleApiKeyUpdate,
-              onOpenSourceConfigUpdate: handleOpenSourceConfigUpdate,
-            );
-          }
-          if (state is SettingsLoadingState) {
-            return const SimpleLoadingWidget();
-          }
-          throw ArgumentError('Wrong state: $state');
-        },
-        listenWhen: (prevState, nextState) {
-          return nextState is ListenerState;
-        },
-        listener: (BuildContext context, SettingsState state) {
-          if (state is SettingsUpdateSuccessState) {
-            snackBar(
-              context,
-              message: l10n.settingsAiValidatorChangedMessage(
-                state.validatorType.toDisplayString(),
-              ),
-              duration: const Duration(seconds: 2),
-            );
-          } else if (state is SettingsApiKeyUpdatedState) {
-            snackBar(
-              context,
-              message: l10n.settingsAiValidatorApiKeySavedMessage(
-                state.validatorType.toDisplayString(),
-              ),
-              duration: const Duration(seconds: 2),
-            );
-          } else if (state is SettingsErrorState) {
-            snackBar(
-              context,
-              message: state.error,
-              isError: true,
-              duration: const Duration(seconds: 2),
-            );
-          }
-        },
       ),
     );
   }

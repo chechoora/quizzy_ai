@@ -66,15 +66,18 @@ class AppMoreButton extends StatelessWidget {
             ),
           ),
       ],
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildDot(),
-          const SizedBox(height: 3),
-          _buildDot(),
-          const SizedBox(height: 3),
-          _buildDot(),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildDot(),
+            const SizedBox(height: 3),
+            _buildDot(),
+            const SizedBox(height: 3),
+            _buildDot(),
+          ],
+        ),
       ),
     );
   }

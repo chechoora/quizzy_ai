@@ -29,53 +29,64 @@ class SettingsInAppFeaturesWidget extends HookWidget {
     final l10n = localize(context);
     return Scaffold(
       backgroundColor: AppColors.backgroundSecondary,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        title: Text(
-          l10n.inAppFeaturesTitle,
-          style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 32,
+            ),
+            Text(
+              l10n.inAppFeaturesTitle,
+              style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
+            ),
+            Expanded(
+              child: BlocConsumer<InAppFeaturesCubit, InAppFeaturesState>(
+                bloc: cubit,
+                buildWhen: (prevState, nextState) {
+                  return nextState is BuilderState;
+                },
+                builder: (BuildContext context, state) {
+                  if (state is InAppFeaturesDataState) {
+                    return _InAppFeaturesContent(
+                      isUnlimitedDecksCardsPurchased:
+                          state.isUnlimitedDecksCardsPurchased,
+                      isQuizzyAiSubscribed: state.isQuizzyAiSubscribed,
+                      onPurchaseUnlimitedDecksCards:
+                          cubit.purchaseUnlimitedDecksCards,
+                      onSubscribeQuizzyAi: cubit.subscribeQuizzyAi,
+                      onRestorePurchases: cubit.restorePurchases,
+                    );
+                  }
+                  if (state is InAppFeaturesLoadingState ||
+                      state is InAppFeaturesPurchasingState ||
+                      state is InAppFeaturesRestoringState) {
+                    return const SimpleLoadingWidget();
+                  }
+                  throw ArgumentError('Wrong state: $state');
+                },
+                listenWhen: (prevState, nextState) {
+                  return nextState is ListenerState;
+                },
+                listener: (BuildContext context, InAppFeaturesState state) {
+                  if (state is InAppFeaturesPurchaseSuccessState) {
+                    snackBar(context,
+                        message: l10n.inAppFeaturesPurchaseSuccess);
+                  } else if (state is InAppFeaturesRestoreSuccessState) {
+                    snackBar(context,
+                        message: l10n.inAppFeaturesRestoreSuccess);
+                  } else if (state is InAppFeaturesErrorState) {
+                    snackBar(
+                      context,
+                      message: state.error,
+                      duration: const Duration(seconds: 4),
+                      isError: true,
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
         ),
-      ),
-      body: BlocConsumer<InAppFeaturesCubit, InAppFeaturesState>(
-        bloc: cubit,
-        buildWhen: (prevState, nextState) {
-          return nextState is BuilderState;
-        },
-        builder: (BuildContext context, state) {
-          if (state is InAppFeaturesDataState) {
-            return _InAppFeaturesContent(
-              isUnlimitedDecksCardsPurchased:
-                  state.isUnlimitedDecksCardsPurchased,
-              isQuizzyAiSubscribed: state.isQuizzyAiSubscribed,
-              onPurchaseUnlimitedDecksCards: cubit.purchaseUnlimitedDecksCards,
-              onSubscribeQuizzyAi: cubit.subscribeQuizzyAi,
-              onRestorePurchases: cubit.restorePurchases,
-            );
-          }
-          if (state is InAppFeaturesLoadingState ||
-              state is InAppFeaturesPurchasingState ||
-              state is InAppFeaturesRestoringState) {
-            return const SimpleLoadingWidget();
-          }
-          throw ArgumentError('Wrong state: $state');
-        },
-        listenWhen: (prevState, nextState) {
-          return nextState is ListenerState;
-        },
-        listener: (BuildContext context, InAppFeaturesState state) {
-          if (state is InAppFeaturesPurchaseSuccessState) {
-            snackBar(context, message: l10n.inAppFeaturesPurchaseSuccess);
-          } else if (state is InAppFeaturesRestoreSuccessState) {
-            snackBar(context, message: l10n.inAppFeaturesRestoreSuccess);
-          } else if (state is InAppFeaturesErrorState) {
-            snackBar(
-              context,
-              message: state.error,
-              duration: const Duration(seconds: 4),
-              isError: true,
-            );
-          }
-        },
       ),
     );
   }
