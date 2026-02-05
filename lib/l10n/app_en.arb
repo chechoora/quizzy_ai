@@ -115,5 +115,10 @@
   "homeCancelButton": "Cancel",
   "homeDeleteButton": "Delete",
   "homeEditDeckAction": "Edit deck",
-  "homeDeleteDeckAction": "Delete deck"
+  "homeDeleteDeckAction": "Delete deck",
+
+  "quizDisplayTypeAnswerLabel": "Type your answer below",
+  "quizDisplayTypeAnswerHint": "Type your answer",
+  "quizDisplayAnswerButton": "Answer",
+  "quizDisplayDontKnowButton": "Don't know"
 }
