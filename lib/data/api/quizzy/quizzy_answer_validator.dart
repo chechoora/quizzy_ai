@@ -15,11 +15,11 @@ class QuizzyAnswerValidator extends IAnswerValidator {
   }) async {
     return _answerFromResponse(
       await _apiService.validateAnswer(
-        body: {
-          'question': question,
-          'correct_answer': correctAnswer,
-          'user_answer': userAnswer,
-        },
+        body: CheckAnswerRequest(
+          question: question,
+          correctAnswer: correctAnswer,
+          userAnswer: userAnswer,
+        ),
       ),
     );
   }
@@ -27,9 +27,13 @@ class QuizzyAnswerValidator extends IAnswerValidator {
   Future<AnswerResult> _answerFromResponse(Response<dynamic> response) async {
     if (response.statusCode == 200) {
       final data = response.body as Map<String, dynamic>;
-      final score = (data['score'] as num).toDouble();
-      final explanation = data['explanation'] as String?;
-      return AnswerResult(score: score, explanation: explanation);
+      final isCorrect = data['isCorrect'] as bool;
+      final feedback = data['feedback'] as String?;
+      final confidence = (data['confidence'] as num).toDouble();
+      return AnswerResult(
+        score: isCorrect ? confidence : 0.0,
+        explanation: feedback,
+      );
     } else {
       throw Exception('Failed to validate answer: ${response.statusCode}');
     }

@@ -9,7 +9,7 @@ class QuizzyAIInterceptor implements RequestInterceptor {
     // Add any necessary headers for Quizzy AI API
     final headers = Map<String, String>.from(request.headers);
     headers['Content-Type'] = 'application/json';
-    headers['Api-Key'] = QuizzyAI.apiKey;
+   // headers['Api-Key'] = QuizzyAI.apiKey;
 
     return request.copyWith(headers: headers);
   }
