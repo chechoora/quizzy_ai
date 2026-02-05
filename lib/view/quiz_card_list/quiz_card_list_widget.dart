@@ -111,11 +111,23 @@ class QuizCardListWidget extends HookWidget {
                 },
                 builder: (context, state) {
                   if (state is QuizCardListDataState) {
-                    return QuizCardListDisplayWidget(
-                      quizCarList: state.quizCarList,
-                      onQuizCardEditRequest: launchEditCardRequest,
-                      onQuizCardRemoveRequest: launchConfirmDeleteRequest,
-                      onAddCardRequest: () => cubit.addCardRequest(),
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: QuizCardListDisplayWidget(
+                            quizCarList: state.quizCarList,
+                            onQuizCardEditRequest: launchEditCardRequest,
+                            onQuizCardRemoveRequest: launchConfirmDeleteRequest,
+                            onAddCardRequest: () => cubit.addCardRequest(),
+                          ),
+                        ),
+                        if (state.quizCarList.isNotEmpty)
+                          _BottomButtons(
+                            onQuickPlayPressed: () =>
+                                cubit.launchQuizRequest(isQuickPlay: true),
+                            onPlayDeckPressed: () => cubit.launchQuizRequest(),
+                          ),
+                      ],
                     );
                   }
                   if (state is QuizCardListLoadingState) {
@@ -151,11 +163,6 @@ class QuizCardListWidget extends HookWidget {
                   }
                 },
               ),
-            ),
-            _BottomButtons(
-              onQuickPlayPressed: () =>
-                  cubit.launchQuizRequest(isQuickPlay: true),
-              onPlayDeckPressed: () => cubit.launchQuizRequest(),
             ),
           ],
         ),

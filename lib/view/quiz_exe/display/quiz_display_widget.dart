@@ -5,6 +5,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:poc_ai_quiz/view/widgets/app_close_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_text_form.dart';
 
 class QuizDisplayWidget extends HookWidget {
@@ -87,7 +88,7 @@ class _Header extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          _CloseButton(onPressed: onClose ?? () => context.pop()),
+          AppCloseButton(onPressed: onClose ?? () => context.pop()),
           const SizedBox(width: 8),
           Expanded(
             child: _ProgressBar(progress: progress),
@@ -181,40 +182,6 @@ class _QuizCard extends HookWidget {
   }
 }
 
-class _CloseButton extends StatelessWidget {
-  const _CloseButton({this.onPressed});
-
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 40,
-      height: 40,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          shape: const CircleBorder(),
-          padding: EdgeInsets.zero,
-          elevation: 2,
-          shadowColor: const Color(0xFFE7E7E7).withValues(alpha: 0.25),
-        ).copyWith(
-          backgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.pressed)) {
-              return AppColors.grayscale100;
-            }
-            return AppColors.grayscaleWhite;
-          }),
-        ),
-        child: const Icon(
-          Icons.close,
-          color: AppColors.grayscale600,
-          size: 20,
-        ),
-      ),
-    );
-  }
-}
 
 class _ProgressBar extends StatelessWidget {
   const _ProgressBar({required this.progress});
