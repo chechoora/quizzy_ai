@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 
-enum AppButtonVariant { primary, secondary, tertiary }
+enum AppButtonVariant { primary, secondary, tertiary, positive, destructive }
 
 class AppButton extends StatelessWidget {
   const AppButton({
@@ -40,6 +40,20 @@ class AppButton extends StatelessWidget {
     this.leadingIcon,
   }) : variant = AppButtonVariant.tertiary;
 
+  const AppButton.positive({
+    super.key,
+    required this.text,
+    this.onPressed,
+    this.leadingIcon,
+  }) : variant = AppButtonVariant.positive;
+
+  const AppButton.destructive({
+    super.key,
+    required this.text,
+    this.onPressed,
+    this.leadingIcon,
+  }) : variant = AppButtonVariant.destructive;
+
   @override
   Widget build(BuildContext context) {
     return switch (variant) {
@@ -54,6 +68,16 @@ class AppButton extends StatelessWidget {
           leadingIcon: leadingIcon,
         ),
       AppButtonVariant.tertiary => _TertiaryButton(
+          text: text,
+          onPressed: onPressed,
+          leadingIcon: leadingIcon,
+        ),
+      AppButtonVariant.positive => _PositiveButton(
+          text: text,
+          onPressed: onPressed,
+          leadingIcon: leadingIcon,
+        ),
+      AppButtonVariant.destructive => _DestructiveButton(
           text: text,
           onPressed: onPressed,
           leadingIcon: leadingIcon,
@@ -212,6 +236,108 @@ class _TertiaryButton extends StatelessWidget {
         leadingIcon: leadingIcon,
         textStyle: AppTypography.buttonMain.copyWith(
           color: _isEnabled ? AppColors.primary500 : AppColors.grayscale400,
+        ),
+      ),
+    );
+  }
+}
+
+class _PositiveButton extends StatelessWidget {
+  const _PositiveButton({
+    required this.text,
+    this.onPressed,
+    this.leadingIcon,
+  });
+
+  final String text;
+  final VoidCallback? onPressed;
+  final IconData? leadingIcon;
+
+  bool get _isEnabled => onPressed != null;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor:
+            _isEnabled ? AppColors.success500 : AppColors.grayscale200,
+        foregroundColor:
+            _isEnabled ? AppColors.grayscaleWhite : AppColors.grayscale400,
+        disabledBackgroundColor: AppColors.grayscale200,
+        disabledForegroundColor: AppColors.grayscale400,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ).copyWith(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return AppColors.grayscale200;
+          }
+          if (states.contains(WidgetState.pressed)) {
+            return AppColors.success600;
+          }
+          return AppColors.success500;
+        }),
+      ),
+      child: _ButtonContent(
+        text: text,
+        leadingIcon: leadingIcon,
+        textStyle: AppTypography.buttonMain.copyWith(
+          color: _isEnabled ? AppColors.grayscaleWhite : AppColors.grayscale400,
+        ),
+      ),
+    );
+  }
+}
+
+class _DestructiveButton extends StatelessWidget {
+  const _DestructiveButton({
+    required this.text,
+    this.onPressed,
+    this.leadingIcon,
+  });
+
+  final String text;
+  final VoidCallback? onPressed;
+  final IconData? leadingIcon;
+
+  bool get _isEnabled => onPressed != null;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor:
+            _isEnabled ? AppColors.error500 : AppColors.grayscale200,
+        foregroundColor:
+            _isEnabled ? AppColors.grayscaleWhite : AppColors.grayscale400,
+        disabledBackgroundColor: AppColors.grayscale200,
+        disabledForegroundColor: AppColors.grayscale400,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ).copyWith(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return AppColors.grayscale200;
+          }
+          if (states.contains(WidgetState.pressed)) {
+            return AppColors.error600;
+          }
+          return AppColors.error500;
+        }),
+      ),
+      child: _ButtonContent(
+        text: text,
+        leadingIcon: leadingIcon,
+        textStyle: AppTypography.buttonMain.copyWith(
+          color: _isEnabled ? AppColors.grayscaleWhite : AppColors.grayscale400,
         ),
       ),
     );

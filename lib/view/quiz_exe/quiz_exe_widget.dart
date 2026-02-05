@@ -11,7 +11,7 @@ import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
+import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/display/quiz_display_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/done/quiz_done_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_cubit.dart';

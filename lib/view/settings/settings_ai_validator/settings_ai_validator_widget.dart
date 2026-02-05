@@ -12,8 +12,8 @@ import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/ext.dart';
-import 'package:poc_ai_quiz/util/view/answer_validator_dropdown.dart';
-import 'package:poc_ai_quiz/util/view/simple_loading_widget.dart';
+import 'package:poc_ai_quiz/view/widgets/answer_validator_dropdown.dart';
+import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
 
 class SettingsAIValidatorWidget extends HookWidget {

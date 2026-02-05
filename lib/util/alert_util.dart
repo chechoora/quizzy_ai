@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poc_ai_quiz/view/widgets/app_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/widgets/app_dialog_button.dart';
 
 Future alert(
@@ -61,6 +62,25 @@ void snackBar(
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
         },
       ),
+    ),
+  );
+}
+
+Future<T?> showAppBottomSheet<T>(
+  BuildContext context, {
+  required Widget title,
+  required Widget button,
+  AppBottomSheetVariant variant = AppBottomSheetVariant.positive,
+  Widget? content,
+}) {
+  return showModalBottomSheet<T>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (_) => AppBottomSheet(
+      title: title,
+      button: button,
+      variant: variant,
+      content: content,
     ),
   );
 }

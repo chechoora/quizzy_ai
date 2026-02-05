@@ -143,14 +143,7 @@ class _QuizCard extends HookWidget {
               color: AppColors.grayscale600,
             ),
           ),
-          const SizedBox(height: 32),
-          Text(
-            localize(context).quizDisplayTypeAnswerLabel,
-            style: AppTypography.h4.copyWith(
-              color: AppColors.grayscale600,
-            ),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 24),
           AppTextForm(
             controller: controller,
             hint: localize(context).quizDisplayTypeAnswerHint,
