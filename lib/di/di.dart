@@ -266,6 +266,7 @@ Future<void> _setupServices() async {
         AnswerValidatorType.openAI: openAIAnswerValidator,
         AnswerValidatorType.ollama: ollamaAnswerValidator,
         AnswerValidatorType.ml: mlAnswerValidator,
+        AnswerValidatorType.quizzyAI: quizzyAnswerValidator,
       });
   getIt.registerSingleton<SettingsService>(settingsService);
 

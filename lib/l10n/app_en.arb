@@ -68,6 +68,15 @@
   "settingsAiValidatorGeminiDescription": "• Gemini AI: Requires a Google Gemini API key. Uses Google AI for intelligent answer validation.",
   "settingsAiValidatorMlDescription": "• ML Model: No API key required. Uses built-in machine learning models for answer checking.",
   "settingsAiValidatorOllamaDescription": "• Ollama (Local): Requires Ollama server running locally. Configure server URL and model name.",
+  "answerValidatorDropdownLabel": "Validator Type",
+  "answerValidatorNotAvailableMessage": "The {validatorName} validator is not available. Please check your configuration or purchase status.",
+  "@answerValidatorNotAvailableMessage": {
+    "placeholders": {
+      "validatorName": {
+        "type": "String"
+      }
+    }
+  },
   "settingsAiValidatorApiConfigTitle": "Api Configuration",
   "settingsAiValidatorServerUrlLabel": "Server URL",
   "settingsAiValidatorServerUrlHint": "http://localhost:11434/api",

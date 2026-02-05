@@ -101,6 +101,8 @@ class _HomeWidgetState extends State<HomeWidget> {
       ),
       bottomNavigationBar: Container(
         height: 84,
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
@@ -379,7 +381,9 @@ class _CreateDeckBottomSheet extends HookWidget {
               ),
               const SizedBox(height: 20),
               AppButton.primary(
-                text: isEditing ? l10n.homeSaveDeckButton : l10n.homeCreateDeckButton,
+                text: isEditing
+                    ? l10n.homeSaveDeckButton
+                    : l10n.homeCreateDeckButton,
                 onPressed: text.isNotEmpty
                     ? () {
                         Navigator.pop(context, text);

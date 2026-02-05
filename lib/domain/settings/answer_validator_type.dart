@@ -74,6 +74,9 @@ class OpenSourceConfig extends ValidatorConfig {
     required this.model,
   });
 
+  factory OpenSourceConfig.empty() =>
+      const OpenSourceConfig(url: '', model: '');
+
   @override
   bool get isValid => url.isNotEmpty && model.isNotEmpty;
 }

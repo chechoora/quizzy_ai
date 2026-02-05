@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
+import 'package:poc_ai_quiz/l10n/app_localizations.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 
 class AnswerValidatorDropdown extends StatelessWidget {
   const AnswerValidatorDropdown({
@@ -17,14 +20,37 @@ class AnswerValidatorDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.grayscaleWhite,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 16.0
+      ),
       child: DropdownButtonFormField<AnswerValidatorType>(
         isExpanded: true,
         initialValue: selectedValidator,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          labelText: 'Validator Type',
+        dropdownColor: AppColors.grayscaleWhite,
+        style: AppTypography.mainText.copyWith(color: AppColors.textPrimary),
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: AppColors.grayscale300),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: AppColors.grayscale300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: AppColors.primary500, width: 2),
+          ),
+          labelText: AppLocalizations.of(context)?.answerValidatorDropdownLabel,
+          labelStyle: AppTypography.secondaryText.copyWith(
+            color: AppColors.grayscale500,
+          ),
         ),
         items: validators.map((validatorItem) {
           return DropdownMenuItem(
@@ -35,8 +61,11 @@ class AnswerValidatorDropdown extends StatelessWidget {
                   ? () {
                       snackBar(
                         context,
-                        message:
-                            'The ${validatorItem.type.toDisplayString()} validator is not available. Please check your configuration or purchase status.',
+                        message: AppLocalizations.of(context)
+                                ?.answerValidatorNotAvailableMessage(
+                              validatorItem.type.toDisplayString(),
+                            ) ??
+                            '',
                       );
                     }
                   : null,
@@ -44,8 +73,13 @@ class AnswerValidatorDropdown extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    overflow: TextOverflow.ellipsis,
                     validatorItem.type.toDisplayString(),
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.mainText.copyWith(
+                      color: _isEnabled(validatorItem)
+                          ? AppColors.textPrimary
+                          : AppColors.grayscale400,
+                    ),
                   ),
                 ],
               ),

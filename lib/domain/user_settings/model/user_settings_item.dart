@@ -14,8 +14,8 @@ class UserSettingsItem {
   final int id;
   final int userId;
   final AnswerValidatorType answerValidatorType;
-  final ApiKeyConfig? geminiConfig;
-  final ApiKeyConfig? claudeConfig;
-  final ApiKeyConfig? openConfig;
-  final OpenSourceConfig? ollamaConfig;
+  final ApiKeyConfig geminiConfig;
+  final ApiKeyConfig claudeConfig;
+  final ApiKeyConfig openConfig;
+  final OpenSourceConfig ollamaConfig;
 }
