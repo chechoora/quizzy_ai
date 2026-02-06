@@ -53,7 +53,7 @@ class QuizCardExeValidator {
               );
     }
 
-    if (config == null) {
+    if (!config.isValid) {
       return QuizCardExeInvalid(
         reason: '${selectedValidator.toDisplayString()} is not configured.',
       );
