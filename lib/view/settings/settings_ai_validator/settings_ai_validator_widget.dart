@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
@@ -152,15 +154,25 @@ class _ValidatorApiKeyContent extends HookWidget {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: [
-        Text(
-          l10n.settingsAiValidatorLabel,
-          style: AppTypography.h4.copyWith(color: AppColors.grayscale600),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+          ),
+          child: Text(
+            l10n.settingsAiValidatorLabel,
+            style: AppTypography.h4.copyWith(color: AppColors.grayscale600),
+          ),
         ),
         const SizedBox(height: 4),
-        Text(
-          l10n.settingsAiValidatorSubtitle,
-          style: AppTypography.secondaryText.copyWith(
-            color: AppColors.grayscale500,
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+          ),
+          child: Text(
+            l10n.settingsAiValidatorSubtitle,
+            style: AppTypography.secondaryText.copyWith(
+              color: AppColors.grayscale500,
+            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -211,25 +223,19 @@ class _ValidatorApiKeyContent extends HookWidget {
                 ),
                 const SizedBox(height: 4),
               ],
-              Text(
-                l10n.settingsAiValidatorClaudeDescription,
-                style: AppTypography.secondaryText.copyWith(
-                  color: AppColors.grayscale500,
-                ),
+              _ValidatorDescriptionWithLink(
+                description: l10n.settingsAiValidatorClaudeDescription,
+                linkUrl: l10n.settingsAiValidatorClaudeLink,
               ),
               const SizedBox(height: 4),
-              Text(
-                l10n.settingsAiValidatorOpenAIDescription,
-                style: AppTypography.secondaryText.copyWith(
-                  color: AppColors.grayscale500,
-                ),
+              _ValidatorDescriptionWithLink(
+                description: l10n.settingsAiValidatorOpenAIDescription,
+                linkUrl: l10n.settingsAiValidatorOpenAILink,
               ),
               const SizedBox(height: 4),
-              Text(
-                l10n.settingsAiValidatorGeminiDescription,
-                style: AppTypography.secondaryText.copyWith(
-                  color: AppColors.grayscale500,
-                ),
+              _ValidatorDescriptionWithLink(
+                description: l10n.settingsAiValidatorGeminiDescription,
+                linkUrl: l10n.settingsAiValidatorGeminiLink,
               ),
               const SizedBox(height: 4),
               Text(
@@ -241,6 +247,13 @@ class _ValidatorApiKeyContent extends HookWidget {
               const SizedBox(height: 4),
               Text(
                 l10n.settingsAiValidatorOllamaDescription,
+                style: AppTypography.secondaryText.copyWith(
+                  color: AppColors.grayscale500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                l10n.settingsAiValidatorQuizzyAIDescription,
                 style: AppTypography.secondaryText.copyWith(
                   color: AppColors.grayscale500,
                 ),
@@ -465,6 +478,39 @@ class _OpenSourceModelConfigField extends HookWidget {
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ValidatorDescriptionWithLink extends StatelessWidget {
+  const _ValidatorDescriptionWithLink({
+    required this.description,
+    required this.linkUrl,
+  });
+
+  final String description;
+  final String linkUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        style: AppTypography.secondaryText.copyWith(
+          color: AppColors.grayscale500,
+        ),
+        children: [
+          TextSpan(text: '$description '),
+          TextSpan(
+            text: 'Get API Key',
+            style: AppTypography.secondaryText.copyWith(
+              color: AppColors.primary500,
+              decoration: TextDecoration.underline,
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () => launchUrl(Uri.parse(linkUrl)),
           ),
         ],
       ),
