@@ -100,10 +100,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         },
       ),
       bottomNavigationBar: Container(
-        height: 84,
-        padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 16),
-        alignment: Alignment.center,
+        height: 84 + MediaQuery.of(context).padding.bottom,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           boxShadow: [
@@ -114,42 +111,51 @@ class _HomeWidgetState extends State<HomeWidget> {
             ),
           ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Column(
           children: [
-            _NavItem(
-              icon: SvgPicture.asset(
-                'assets/icons/decks.svg',
-                colorFilter: ColorFilter.mode(
-                  _selectedIndex == 0
-                      ? AppColors.primary500
-                      : AppColors.grayscale500,
-                  BlendMode.srcIn,
-                ),
-                semanticsLabel: localize(context).homeDecksLabel,
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavItem(
+                    icon: SvgPicture.asset(
+                      'assets/icons/decks.svg',
+                      colorFilter: ColorFilter.mode(
+                        _selectedIndex == 0
+                            ? AppColors.primary500
+                            : AppColors.grayscale500,
+                        BlendMode.srcIn,
+                      ),
+                      semanticsLabel: localize(context).homeDecksLabel,
+                    ),
+                    label: localize(context).homeDecksLabel,
+                    isSelected: _selectedIndex == 0,
+                    onTap: () => setState(() => _selectedIndex = 0),
+                  ),
+                  AppAddButton(
+                    onPressed: () => cubit.addDockRequest(),
+                  ),
+                  _NavItem(
+                    icon: SvgPicture.asset(
+                      'assets/icons/settings.svg',
+                      colorFilter: ColorFilter.mode(
+                        _selectedIndex == 1
+                            ? AppColors.primary500
+                            : AppColors.grayscale500,
+                        BlendMode.srcIn,
+                      ),
+                      semanticsLabel: localize(context).homeDecksLabel,
+                    ),
+                    label: localize(context).homeSettingsLabel,
+                    isSelected: _selectedIndex == 1,
+                    onTap: () => setState(() => _selectedIndex = 1),
+                  ),
+                ],
               ),
-              label: localize(context).homeDecksLabel,
-              isSelected: _selectedIndex == 0,
-              onTap: () => setState(() => _selectedIndex = 0),
             ),
-            AppAddButton(
-              onPressed: () => cubit.addDockRequest(),
-            ),
-            _NavItem(
-              icon: SvgPicture.asset(
-                'assets/icons/settings.svg',
-                colorFilter: ColorFilter.mode(
-                  _selectedIndex == 1
-                      ? AppColors.primary500
-                      : AppColors.grayscale500,
-                  BlendMode.srcIn,
-                ),
-                semanticsLabel: localize(context).homeDecksLabel,
-              ),
-              label: localize(context).homeSettingsLabel,
-              isSelected: _selectedIndex == 1,
-              onTap: () => setState(() => _selectedIndex = 1),
-            ),
+            SizedBox(
+              height: MediaQuery.of(context).padding.bottom,
+            )
           ],
         ),
       ),

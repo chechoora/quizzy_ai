@@ -46,9 +46,7 @@ class DeckListDisplayWidget extends StatelessWidget {
                   onDeckClicked: onDeckClicked,
                 );
               },
-              separatorBuilder: (context, index) => const SizedBox(
-                width: 2,
-              ),
+              separatorBuilder: (context, index) => const SizedBox(height: 16),
               itemCount: deckList.length,
             ),
           ),

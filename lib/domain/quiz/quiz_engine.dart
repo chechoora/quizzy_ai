@@ -14,7 +14,7 @@ class QuizEngine {
   final _logger = Logger.withTag('QuizEngine');
   final List<QuizCardItem> cards;
   final QuizService quizService;
-  final ValueChanged<QuizCardItem> onTestNewCard;
+  final Function(QuizCardItem, int, int) onTestNewCard;
 
   int _currentCardIndex = 0;
 
@@ -26,7 +26,11 @@ class QuizEngine {
       throw Exception('Overflow');
     }
     _logger.d('Displaying card ${_currentCardIndex + 1}/${cards.length}');
-    onTestNewCard.call(cards[_currentCardIndex++]);
+    onTestNewCard.call(
+      cards[_currentCardIndex++],
+      _currentCardIndex,
+      cards.length,
+    );
   }
 
   Future<AnswerResult> checkPossibleAnswer(

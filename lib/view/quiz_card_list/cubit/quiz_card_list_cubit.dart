@@ -71,12 +71,19 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     fetchQuizCardListRequest();
   }
 
-  Future<void> launchQuizRequest({bool isQuickPlay = false}) async {
+  Future<void> launchQuizRequest({
+    bool isQuickPlay = false,
+    bool isShuffle = false,
+  }) async {
     final result = await quizCardExeValidator.isExeValid();
+    final cars = List<QuizCardItem>.from(items);
+    if (isShuffle) {
+      cars.shuffle();
+    }
     if (result is QuizCardExeValid) {
       emit(
         QuizCardLaunchState(
-          quizCarList: items,
+          quizCarList: cars,
           isQuickPlay: isQuickPlay,
         ),
       );

@@ -34,9 +34,11 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   late final quizEngine = QuizEngine(
     cards: quizCardItems,
     quizService: quizService,
-    onTestNewCard: (card) async {
+    onTestNewCard: (card, index, total) async {
       emit(QuizExeDisplayCardState(
         quizCardItem: card,
+        currentIndex: index,
+        totalCards: total,
       ));
     },
   );

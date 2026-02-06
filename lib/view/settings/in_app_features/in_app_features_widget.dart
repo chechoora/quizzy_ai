@@ -7,6 +7,7 @@ import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/cubit/in_app_features_cubit.dart';
 
@@ -32,12 +33,9 @@ class SettingsInAppFeaturesWidget extends HookWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(
-              height: 32,
-            ),
-            Text(
-              l10n.inAppFeaturesTitle,
-              style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
+            AppSimpleHeader(
+              title: l10n.inAppFeaturesTitle,
+              onBackPressed: () => Navigator.of(context).pop(),
             ),
             Expanded(
               child: BlocConsumer<InAppFeaturesCubit, InAppFeaturesState>(

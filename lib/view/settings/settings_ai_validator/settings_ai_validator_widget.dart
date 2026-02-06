@@ -15,6 +15,7 @@ import 'package:poc_ai_quiz/util/ext.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/widgets/answer_validator_dropdown.dart';
+import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
 
@@ -60,12 +61,9 @@ class SettingsAIValidatorWidget extends HookWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(
-              height: 32,
-            ),
-            Text(
-              l10n.settingsAiValidatorTitle,
-              style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
+            AppSimpleHeader(
+              title: l10n.settingsAiValidatorTitle,
+              onBackPressed: () => Navigator.of(context).pop(),
             ),
             Expanded(
               child: BlocConsumer<SettingsAIValidatorCubit, SettingsState>(

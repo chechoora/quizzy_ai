@@ -17,7 +17,7 @@ import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
-import 'package:poc_ai_quiz/view/widgets/app_back_button.dart';
+import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 
 class QuizCardListWidget extends HookWidget {
@@ -46,6 +46,8 @@ class QuizCardListWidget extends HookWidget {
       },
       [cubit],
     );
+
+    final shuffleValue = useState(false);
 
     void addCardRequest() {
       context.push(CreateCardRoute().path).then((cardRequest) {
@@ -99,7 +101,7 @@ class QuizCardListWidget extends HookWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _Header(
+            AppSimpleHeader(
               title: deckItem.title,
               onBackPressed: () => context.pop(),
             ),
@@ -123,9 +125,16 @@ class QuizCardListWidget extends HookWidget {
                         ),
                         if (state.quizCarList.isNotEmpty)
                           _BottomButtons(
-                            onQuickPlayPressed: () =>
-                                cubit.launchQuizRequest(isQuickPlay: true),
-                            onPlayDeckPressed: () => cubit.launchQuizRequest(),
+                            onQuickPlayPressed: () => cubit.launchQuizRequest(
+                              isQuickPlay: true,
+                              isShuffle: shuffleValue.value,
+                            ),
+                            onPlayDeckPressed: () => cubit.launchQuizRequest(
+                              isShuffle: shuffleValue.value,
+                            ),
+                            onShufflePressed: (isShuffle) =>
+                                shuffleValue.value = isShuffle,
+                            shuffleEnabled: shuffleValue.value,
                           ),
                       ],
                     );
@@ -172,48 +181,18 @@ class QuizCardListWidget extends HookWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({
-    required this.title,
-    this.onBackPressed,
-  });
-
-  final String title;
-  final VoidCallback? onBackPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 32, bottom: 16),
-      child: Row(
-        children: [
-          AppBackButton(onPressed: onBackPressed),
-          Expanded(
-            child: Text(
-              title,
-              style: AppTypography.h2.copyWith(
-                color: AppColors.grayscale600,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(width: 40),
-        ],
-      ),
-    );
-  }
-}
-
 class _BottomButtons extends StatelessWidget {
   const _BottomButtons({
     this.onQuickPlayPressed,
     this.onPlayDeckPressed,
+    this.onShufflePressed,
+    this.shuffleEnabled = false,
   });
 
   final VoidCallback? onQuickPlayPressed;
   final VoidCallback? onPlayDeckPressed;
+  final ValueChanged<bool>? onShufflePressed;
+  final bool shuffleEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -224,6 +203,26 @@ class _BottomButtons extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {
+                onShufflePressed?.call(!shuffleEnabled);
+              },
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                shuffleEnabled ? 'Shuffle Cards' : 'Cards in Order',
+                style: AppTypography.buttonSmall.copyWith(
+                  color: AppColors.primary500,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
           AppButton.primary(
             text: l10n.quizCardListQuickPlayButton,
             leadingIcon: Icons.bolt,
