@@ -20,9 +20,10 @@ class SettingsWidget extends StatelessWidget {
               localize(context).settingsTitle,
               style: AppTypography.h2.copyWith(color: AppColors.grayscale600),
             ),
+            const SizedBox(height: 16),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   _SettingsTile(
                     icon: Icons.smart_toy,

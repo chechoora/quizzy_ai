@@ -33,7 +33,7 @@ class DeckListDisplayWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            height: 12,
+            height: 16,
           ),
           Expanded(
             child: ListView.separated(
