@@ -55,15 +55,15 @@ class ImportExportScreen extends HookWidget {
                   if (state is ImportExportImportSuccessState) {
                     snackBar(
                       context,
-                      message:
-                          'Successfully imported ${state.deckCount} deck(s)',
+                      message: localize(context)
+                          .importExportImportDecksSuccess(state.deckCount),
                     );
                   }
                   if (state is ImportExportImportCardsSuccessState) {
                     snackBar(
                       context,
-                      message:
-                          'Successfully imported ${state.cardCount} card(s)',
+                      message: localize(context)
+                          .importExportImportCardsSuccess(state.cardCount),
                     );
                   }
                   if (state is ImportExportSelectDeckState) {
@@ -107,7 +107,7 @@ void _showDeckPickerSheet(
     backgroundColor: Colors.transparent,
     builder: (sheetContext) => AppBottomSheet.neutral(
       title: Text(
-        'Select deck for import',
+        localize(context).importExportSelectDeckTitle,
         style: AppTypography.h3.copyWith(color: AppColors.grayscale600),
       ),
       content: Column(
@@ -143,7 +143,7 @@ void _showDeckPickerSheet(
         }).toList(),
       ),
       button: AppButton.secondary(
-        text: 'Cancel',
+        text: localize(context).importExportCancelButton,
         onPressed: () => Navigator.of(sheetContext).pop(),
       ),
     ),
@@ -166,24 +166,24 @@ class _DataContent extends StatelessWidget {
       children: [
         // -- Import Section --
         const SizedBox(height: 8),
-        const _SectionHeader(
+        _SectionHeader(
           icon: Icons.file_download,
-          title: 'Import',
+          title: localize(context).importExportImportTitle,
         ),
         const SizedBox(height: 12),
         Text(
-          'Import from a JSON file or clipboard. Use the matching format:',
+          localize(context).importExportImportDescription,
           style: AppTypography.secondaryText.copyWith(
             color: AppColors.grayscale500,
           ),
         ),
         const SizedBox(height: 8),
-        const Row(
+        Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: _JsonExampleCard(
-                title: 'Decks',
+                title: localize(context).importExportDecksButton,
                 json: '{\n'
                     '  "decks": [\n'
                     '    {\n'
@@ -199,10 +199,10 @@ class _DataContent extends StatelessWidget {
                     '}',
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: _JsonExampleCard(
-                title: 'Cards',
+                title: localize(context).importExportCardsButton,
                 json: '{\n'
                     '  "cards": [\n'
                     '    {\n'
@@ -217,7 +217,7 @@ class _DataContent extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          'From file',
+          localize(context).importExportFromFile,
           style: AppTypography.secondaryText.copyWith(
             color: AppColors.grayscale400,
           ),
@@ -227,7 +227,7 @@ class _DataContent extends StatelessWidget {
           children: [
             Expanded(
               child: AppButton.secondary(
-                text: 'Decks',
+                text: localize(context).importExportDecksButton,
                 leadingIcon: Icons.file_open,
                 onPressed: () => cubit.importDecksFromFile(),
               ),
@@ -235,7 +235,7 @@ class _DataContent extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: AppButton.secondary(
-                text: 'Cards',
+                text: localize(context).importExportCardsButton,
                 leadingIcon: Icons.file_open,
                 onPressed: () => cubit.importCardsFromFile(),
               ),
@@ -244,7 +244,7 @@ class _DataContent extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'From clipboard',
+          localize(context).importExportFromClipboard,
           style: AppTypography.secondaryText.copyWith(
             color: AppColors.grayscale400,
           ),
@@ -254,7 +254,7 @@ class _DataContent extends StatelessWidget {
           children: [
             Expanded(
               child: AppButton.secondary(
-                text: 'Decks',
+                text: localize(context).importExportDecksButton,
                 leadingIcon: Icons.paste,
                 onPressed: () => cubit.importDecksFromClipboard(),
               ),
@@ -262,7 +262,7 @@ class _DataContent extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: AppButton.secondary(
-                text: 'Cards',
+                text: localize(context).importExportCardsButton,
                 leadingIcon: Icons.paste,
                 onPressed: () => cubit.importCardsFromClipboard(),
               ),
@@ -271,15 +271,15 @@ class _DataContent extends StatelessWidget {
         ),
         const SizedBox(height: 32),
         // -- Export Section --
-        const _SectionHeader(
+        _SectionHeader(
           icon: Icons.file_upload,
-          title: 'Export',
+          title: localize(context).importExportExportTitle,
         ),
         const SizedBox(height: 12),
         Row(
           children: [
             Text(
-              'Select decks to export',
+              localize(context).importExportSelectDecksToExport,
               style: AppTypography.secondaryText.copyWith(
                 color: AppColors.grayscale500,
               ),
@@ -294,7 +294,9 @@ class _DataContent extends StatelessWidget {
                 }
               },
               child: Text(
-                state.allSelected ? 'Deselect all' : 'Select all',
+                state.allSelected
+                    ? localize(context).importExportDeselectAll
+                    : localize(context).importExportSelectAll,
                 style: AppTypography.secondaryText.copyWith(
                   color: AppColors.primary500,
                 ),
@@ -308,7 +310,7 @@ class _DataContent extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: Center(
               child: Text(
-                'No decks available',
+                localize(context).importExportNoDecksAvailable,
                 style: AppTypography.secondaryText.copyWith(
                   color: AppColors.grayscale400,
                 ),
@@ -331,7 +333,8 @@ class _DataContent extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: AppButton.primary(
-            text: 'Export Selected (${state.selectedDeckIds.length})',
+            text: localize(context).importExportExportSelectedButton(
+                state.selectedDeckIds.length),
             leadingIcon: Icons.file_upload,
             onPressed:
                 state.hasSelection ? () => cubit.exportSelectedDecks() : null,
@@ -404,7 +407,8 @@ class _JsonExampleCard extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: json));
-                  snackBar(context, message: 'Copied to clipboard');
+                  snackBar(context,
+                      message: localize(context).importExportCopiedToClipboard);
                 },
                 child: const Icon(
                   Icons.copy,

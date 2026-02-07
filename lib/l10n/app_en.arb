@@ -140,5 +140,44 @@
   "quizDisplayAnswerButton": "Answer",
   "quizDisplayDontKnowButton": "Don't know",
 
-  "dismiss": "Dismiss"
+  "dismiss": "Dismiss",
+
+  "importExportImportTitle": "Import",
+  "importExportImportDescription": "Import from a JSON file or clipboard. Use the matching format:",
+  "importExportFromFile": "From file",
+  "importExportFromClipboard": "From clipboard",
+  "importExportDecksButton": "Decks",
+  "importExportCardsButton": "Cards",
+  "importExportSelectDeckTitle": "Select deck for import",
+  "importExportCancelButton": "Cancel",
+  "importExportImportDecksSuccess": "Successfully imported {deckCount} deck(s)",
+  "@importExportImportDecksSuccess": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      }
+    }
+  },
+  "importExportImportCardsSuccess": "Successfully imported {cardCount} card(s)",
+  "@importExportImportCardsSuccess": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "importExportExportTitle": "Export",
+  "importExportSelectDecksToExport": "Select decks to export",
+  "importExportSelectAll": "Select all",
+  "importExportDeselectAll": "Deselect all",
+  "importExportNoDecksAvailable": "No decks available",
+  "importExportExportSelectedButton": "Export Selected ({count})",
+  "@importExportExportSelectedButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importExportCopiedToClipboard": "Copied to clipboard"
 }
