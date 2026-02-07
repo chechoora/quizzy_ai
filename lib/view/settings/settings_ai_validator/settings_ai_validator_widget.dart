@@ -1,9 +1,6 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
@@ -13,13 +10,12 @@ import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
-import 'package:poc_ai_quiz/util/ext.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/widgets/answer_validator_dropdown.dart';
 import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
+import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_bottom_sheet.dart';
 
 class SettingsAIValidatorWidget extends HookWidget {
   const SettingsAIValidatorWidget({super.key});
@@ -154,29 +150,26 @@ class _ValidatorApiKeyContent extends HookWidget {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
-          ),
-          child: Text(
-            l10n.settingsAiValidatorLabel,
-            style: AppTypography.h4.copyWith(color: AppColors.grayscale600),
-          ),
+        Text(
+          l10n.settingsAiValidatorLabel,
+          style: AppTypography.h3.copyWith(color: AppColors.grayscale600),
+          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 4),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
+        const SizedBox(height: 8),
+        Text(
+          l10n.settingsAiValidatorSubtitle,
+          style: AppTypography.mainText.copyWith(
+            color: AppColors.grayscale500,
           ),
-          child: Text(
-            l10n.settingsAiValidatorSubtitle,
-            style: AppTypography.secondaryText.copyWith(
-              color: AppColors.grayscale500,
-            ),
-          ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
-        AnswerValidatorDropdown(
+        Text(
+          l10n.answerValidatorDropdownLabel,
+          style: AppTypography.h4.copyWith(color: AppColors.grayscale600),
+        ),
+        const SizedBox(height: 12),
+        _ValidatorDropdownTrigger(
           selectedValidator: selectedValidator,
           validators: validators,
           onValidatorChanged: onValidatorChanged,
@@ -197,70 +190,6 @@ class _ValidatorApiKeyContent extends HookWidget {
           PurchaseConfig() => const SizedBox.shrink(),
           null => const SizedBox.shrink(),
         },
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.grayscaleWhite,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.settingsAiValidatorOptionsTitle,
-                style: AppTypography.h4.copyWith(
-                  color: AppColors.grayscale600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              if (defaultTargetPlatform == TargetPlatform.iOS) ...[
-                Text(
-                  l10n.settingsAiValidatorOnDeviceDescription,
-                  style: AppTypography.secondaryText.copyWith(
-                    color: AppColors.grayscale500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-              ],
-              _ValidatorDescriptionWithLink(
-                description: l10n.settingsAiValidatorClaudeDescription,
-                linkUrl: l10n.settingsAiValidatorClaudeLink,
-              ),
-              const SizedBox(height: 4),
-              _ValidatorDescriptionWithLink(
-                description: l10n.settingsAiValidatorOpenAIDescription,
-                linkUrl: l10n.settingsAiValidatorOpenAILink,
-              ),
-              const SizedBox(height: 4),
-              _ValidatorDescriptionWithLink(
-                description: l10n.settingsAiValidatorGeminiDescription,
-                linkUrl: l10n.settingsAiValidatorGeminiLink,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                l10n.settingsAiValidatorMlDescription,
-                style: AppTypography.secondaryText.copyWith(
-                  color: AppColors.grayscale500,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                l10n.settingsAiValidatorOllamaDescription,
-                style: AppTypography.secondaryText.copyWith(
-                  color: AppColors.grayscale500,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                l10n.settingsAiValidatorQuizzyAIDescription,
-                style: AppTypography.secondaryText.copyWith(
-                  color: AppColors.grayscale500,
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -485,34 +414,53 @@ class _OpenSourceModelConfigField extends HookWidget {
   }
 }
 
-class _ValidatorDescriptionWithLink extends StatelessWidget {
-  const _ValidatorDescriptionWithLink({
-    required this.description,
-    required this.linkUrl,
+class _ValidatorDropdownTrigger extends StatelessWidget {
+  const _ValidatorDropdownTrigger({
+    required this.selectedValidator,
+    required this.validators,
+    required this.onValidatorChanged,
   });
 
-  final String description;
-  final String linkUrl;
+  final AnswerValidatorType selectedValidator;
+  final List<ValidatorItem> validators;
+  final void Function(AnswerValidatorType?) onValidatorChanged;
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        style: AppTypography.secondaryText.copyWith(
-          color: AppColors.grayscale500,
+    return GestureDetector(
+      onTap: () async {
+        final result = await showValidatorTypeBottomSheet(
+          context,
+          selectedValidator: selectedValidator,
+          validators: validators,
+        );
+        if (result != null) {
+          onValidatorChanged(result);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.grayscaleWhite,
+          borderRadius: BorderRadius.circular(15),
         ),
-        children: [
-          TextSpan(text: '$description '),
-          TextSpan(
-            text: 'Get API Key',
-            style: AppTypography.secondaryText.copyWith(
-              color: AppColors.primary500,
-              decoration: TextDecoration.underline,
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                selectedValidator.toDisplayString(),
+                style: AppTypography.mainText.copyWith(
+                  color: AppColors.grayscale600,
+                ),
+              ),
             ),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () => launchUrl(Uri.parse(linkUrl)),
-          ),
-        ],
+            const Icon(
+              Icons.keyboard_arrow_down,
+              size: 24,
+              color: AppColors.grayscale600,
+            ),
+          ],
+        ),
       ),
     );
   }

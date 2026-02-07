@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(mkdir:*)",
-      "Bash(fvm flutter gen-l10n:*)"
+      "Bash(fvm flutter gen-l10n:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []
