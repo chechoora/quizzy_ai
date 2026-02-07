@@ -12,6 +12,12 @@ class UserQuotaRepository {
   });
 
   Stream<QuotaItem> fetchQuota(String appUserId) async* {
+    // yield mock data
+
+    yield QuotaItem(weeklyPercentUsage: 14.3, questionsLeft: 100);
+
+    return;
+
     // Emit cached data first if available
     if (prefDataSource.hasValidCache()) {
       final weeklyPercentUsage = prefDataSource.getWeeklyPercentUsage();

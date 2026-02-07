@@ -11,51 +11,35 @@ class ValidatorTypeUIData {
   });
 }
 
-/// Strips "• Name: " prefix from existing l10n description strings.
-String _cleanDescription(String raw) {
-  final colonIndex = raw.indexOf(': ');
-  if (raw.startsWith('•') && colonIndex != -1) {
-    return raw.substring(colonIndex + 2);
-  }
-  return raw;
-}
-
 ValidatorTypeUIData getValidatorUIData(AnswerValidatorType type) {
   return switch (type) {
     AnswerValidatorType.quizzyAI => ValidatorTypeUIData(
         iconAsset: 'assets/icons/quizzy_ai.svg',
-        getDescription: (l10n) =>
-            _cleanDescription(l10n.settingsAiValidatorQuizzyAIDescription),
+        getDescription: (l10n) => l10n.settingsAiValidatorQuizzyAIDescription,
       ),
     AnswerValidatorType.onDeviceAI => ValidatorTypeUIData(
         iconAsset: 'assets/icons/on_device_ai.svg',
-        getDescription: (l10n) =>
-            _cleanDescription(l10n.settingsAiValidatorOnDeviceDescription),
+        getDescription: (l10n) => l10n.settingsAiValidatorOnDeviceDescription,
       ),
     AnswerValidatorType.claude => ValidatorTypeUIData(
         iconAsset: 'assets/icons/calude_ai.svg',
-        getDescription: (l10n) =>
-            _cleanDescription(l10n.settingsAiValidatorClaudeDescription),
+        getDescription: (l10n) => l10n.settingsAiValidatorClaudeDescription,
       ),
     AnswerValidatorType.openAI => ValidatorTypeUIData(
         iconAsset: 'assets/icons/open_ai.svg',
-        getDescription: (l10n) =>
-            _cleanDescription(l10n.settingsAiValidatorOpenAIDescription),
+        getDescription: (l10n) => l10n.settingsAiValidatorOpenAIDescription,
       ),
     AnswerValidatorType.gemini => ValidatorTypeUIData(
         iconAsset: 'assets/icons/gemini_ai.svg',
-        getDescription: (l10n) =>
-            _cleanDescription(l10n.settingsAiValidatorGeminiDescription),
+        getDescription: (l10n) => l10n.settingsAiValidatorGeminiDescription,
       ),
     AnswerValidatorType.ml => ValidatorTypeUIData(
         iconAsset: 'assets/icons/ml.svg',
-        getDescription: (l10n) =>
-            _cleanDescription(l10n.settingsAiValidatorMlDescription),
+        getDescription: (l10n) => l10n.settingsAiValidatorMlDescription,
       ),
     AnswerValidatorType.ollama => ValidatorTypeUIData(
         iconAsset: 'assets/icons/ollama.svg',
-        getDescription: (l10n) =>
-            _cleanDescription(l10n.settingsAiValidatorOllamaDescription),
+        getDescription: (l10n) => l10n.settingsAiValidatorOllamaDescription,
       ),
   };
 }

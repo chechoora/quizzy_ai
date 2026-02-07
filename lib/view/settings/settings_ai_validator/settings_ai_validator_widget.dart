@@ -19,6 +19,7 @@ import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/quota/quota_display_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_bottom_sheet.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsAIValidatorWidget extends HookWidget {
   const SettingsAIValidatorWidget({super.key});
@@ -209,11 +210,40 @@ class _ApiKeyTextField extends HookWidget {
   final AnswerValidatorType selectedValidator;
   final void Function(AnswerValidatorType, String?) onApiKeyUpdate;
 
+  String? _getApiKeyUrl(BuildContext context) {
+    final l10n = localize(context);
+    return switch (selectedValidator) {
+      AnswerValidatorType.claude => l10n.settingsAiValidatorClaudeLink,
+      AnswerValidatorType.openAI => l10n.settingsAiValidatorOpenAILink,
+      AnswerValidatorType.gemini => l10n.settingsAiValidatorGeminiLink,
+      _ => null,
+    };
+  }
+
+  Future<void> _launchApiKeyUrl(BuildContext context) async {
+    final url = _getApiKeyUrl(context);
+    if (url != null) {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (context.mounted) {
+          snackBar(
+            context,
+            message: 'Could not open URL: $url',
+            isError: true,
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = useTextEditingController(text: initialApiKey ?? '');
     final isEmpty = useState(controller.text.trim().isEmpty);
-    final isUnchanged = useState(controller.text.trim() == (initialApiKey ?? ''));
+    final isUnchanged =
+        useState(controller.text.trim() == (initialApiKey ?? ''));
 
     useEffect(() {
       controller.text = initialApiKey ?? '';
@@ -235,46 +265,75 @@ class _ApiKeyTextField extends HookWidget {
     final l10n = localize(context);
     final hasInitialKey = initialApiKey != null && initialApiKey!.isNotEmpty;
     final showDeleteButton = hasInitialKey && isUnchanged.value;
+    final apiKeyUrl = _getApiKeyUrl(context);
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+    return Column(
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.settingsAiValidatorApiKeyTitle,
-                style: AppTypography.h4.copyWith(
-                  color: AppColors.grayscale600,
-                ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.settingsAiValidatorApiKeyTitle,
+                    style: AppTypography.h4.copyWith(
+                      color: AppColors.grayscale600,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppTextField(
+                    controller: controller,
+                    hint: l10n.settingsAiValidatorApiKeyHint,
+                    obscureText: true,
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              AppTextField(
-                controller: controller,
-                hint: l10n.settingsAiValidatorApiKeyHint,
-                obscureText: true,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            showDeleteButton
+                ? AppButton.destructive(
+                    text: 'Delete',
+                    onPressed: () {
+                      onApiKeyUpdate(selectedValidator, null);
+                    },
+                  )
+                : AppButton.primary(
+                    text: 'Apply',
+                    onPressed: isEmpty.value
+                        ? null
+                        : () {
+                            final apiKey = controller.text.trim();
+                            onApiKeyUpdate(selectedValidator, apiKey);
+                          },
+                  ),
+          ],
         ),
-        const SizedBox(width: 8),
-        showDeleteButton
-            ? AppButton.destructive(
-                text: 'Delete',
-                onPressed: () {
-                  onApiKeyUpdate(selectedValidator, null);
-                },
-              )
-            : AppButton.primary(
-                text: 'Apply',
-                onPressed: isEmpty.value
-                    ? null
-                    : () {
-                        final apiKey = controller.text.trim();
-                        onApiKeyUpdate(selectedValidator, apiKey);
-                      },
-              ),
+        if (apiKeyUrl != null) ...[
+          const SizedBox(height: 4),
+          GestureDetector(
+            onTap: () => _launchApiKeyUrl(context),
+            child: Row(
+              children: [
+                const SizedBox(width: 4),
+                Text(
+                  'Get API Key',
+                  style: AppTypography.smallText.copyWith(
+                    color: AppColors.primary500,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.open_in_new,
+                  size: 14,
+                  color: AppColors.primary500,
+                ),
+              ],
+            ),
+          ),
+        ]
       ],
     );
   }
@@ -319,10 +378,12 @@ class _OpenSourceModelConfigField extends HookWidget {
         AppTextField(
           controller: urlController,
           keyboardType: TextInputType.url,
+          hint: l10n.settingsAiValidatorServerUrlHint,
         ),
         const SizedBox(height: 12),
         AppTextField(
           controller: modelController,
+          hint: l10n.settingsAiValidatorModelNameHint,
         ),
         const SizedBox(height: 16),
         SizedBox(
