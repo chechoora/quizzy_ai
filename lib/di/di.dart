@@ -1,5 +1,6 @@
 import 'package:chopper/chopper.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_api_service.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_header_interceptor.dart';
@@ -35,6 +36,8 @@ import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
 import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
+import 'package:poc_ai_quiz/domain/user/user_quota_repository.dart';
+import 'package:poc_ai_quiz/data/user_quota/user_quota_pref_data_source.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
@@ -49,12 +52,18 @@ import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart'
 final getIt = GetIt.instance;
 
 Future<void> setupDi() async {
+  await _setupSharedPreferences();
   await _setupDataBase();
   await _setupRepositories();
   await _setupApiKeysProvider();
   await _setupInAppPurchase();
   await _setupAPI();
   await _setupServices();
+}
+
+Future<void> _setupSharedPreferences() async {
+  final prefs = await SharedPreferences.getInstance();
+  getIt.registerSingleton<SharedPreferences>(prefs);
 }
 
 Future<void> _setupDataBase() async {
@@ -236,6 +245,18 @@ Future<void> _setupServices() async {
     quizzyClient.getService<QuizzyApiService>(),
   );
   getIt.registerSingleton<QuizzyAnswerValidator>(quizzyAnswerValidator);
+
+  // User quota repository
+  final userQuotaPrefDataSource = UserQuotaPrefDataSource(
+    prefs: getIt.get<SharedPreferences>(),
+  );
+  getIt.registerSingleton<UserQuotaPrefDataSource>(userQuotaPrefDataSource);
+
+  final userQuotaRepository = UserQuotaRepository(
+    apiService: quizzyClient.getService<QuizzyApiService>(),
+    prefDataSource: userQuotaPrefDataSource,
+  );
+  getIt.registerSingleton<UserQuotaRepository>(userQuotaRepository);
 
   // Ollama answer validator
   final ollamaAnswerValidator = OllamaAnswerValidator(

@@ -2,7 +2,7 @@ import 'package:chopper/chopper.dart';
 
 part 'quizzy_api_service.chopper.dart';
 
-@ChopperApi(baseUrl: '/api/ai-tutor/check-answer')
+@ChopperApi(baseUrl: '/api')
 abstract class QuizzyApiService extends ChopperService {
   static QuizzyApiService create([ChopperClient? client]) {
     final service = _$QuizzyApiService();
@@ -12,9 +12,14 @@ abstract class QuizzyApiService extends ChopperService {
     return service;
   }
 
-  @Post()
+  @Post(path: '/ai-tutor/check-answer')
   Future<Response> validateAnswer({
     @Body() required CheckAnswerRequest body,
+  });
+
+  @Get(path: '/ai-tutor/quota')
+  Future<Response<QuotaResponse>> getQuota({
+    @Query('uniquePurchaseId') required String uniquePurchaseId,
   });
 }
 
@@ -36,5 +41,25 @@ class CheckAnswerRequest {
         'userAnswer': userAnswer,
         'correctAnswer': correctAnswer,
         if (context != null) 'context': context,
+      };
+}
+
+class QuotaResponse {
+  final double weeklyPercentUsage;
+  final int questionsLeft;
+
+  QuotaResponse({
+    required this.weeklyPercentUsage,
+    required this.questionsLeft,
+  });
+
+  factory QuotaResponse.fromJson(Map<String, dynamic> json) => QuotaResponse(
+        weeklyPercentUsage: (json['weekly_percent_usage'] as num).toDouble(),
+        questionsLeft: json['questions_left'] as int,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'weekly_percent_usage': weeklyPercentUsage,
+        'questions_left': questionsLeft,
       };
 }
