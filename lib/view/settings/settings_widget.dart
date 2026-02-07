@@ -34,6 +34,14 @@ class SettingsWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _SettingsTile(
+                    icon: Icons.import_export,
+                    title: localize(context).settingsImportExportTitle,
+                    subtitle: localize(context).settingsImportExportSubtitle,
+                    onTap: () =>
+                        context.pushNamed(SettingsImportExportRoute().name),
+                  ),
+                  const SizedBox(height: 12),
+                  _SettingsTile(
                     icon: Icons.shopping_bag,
                     title: localize(context).inAppFeaturesTitle,
                     subtitle: localize(context).settingsInAppFeaturesSubtitle,

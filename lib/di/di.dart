@@ -39,10 +39,12 @@ import 'package:poc_ai_quiz/domain/user_settings/user_settings_database_mapper.d
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
-
-import '../data/api/quizzy/quizzy_answer_validator.dart';
-import '../data/api/quizzy/quizzy_api_service.dart';
-import '../domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/data/api/quizzy/quizzy_answer_validator.dart';
+import 'package:poc_ai_quiz/data/api/quizzy/quizzy_api_service.dart';
+import 'package:poc_ai_quiz/data/import_export/export_service.dart';
+import 'package:poc_ai_quiz/data/import_export/import_service.dart';
+import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 
 final getIt = GetIt.instance;
 
@@ -293,4 +295,21 @@ Future<void> _setupServices() async {
     inAppPurchaseService: getIt<InAppPurchaseService>(),
   );
   getIt.registerSingleton<QuizCardExeValidator>(quizCardExeValidator);
+
+  // import / export
+  final importService = ImportService();
+  getIt.registerSingleton<ImportService>(importService);
+
+  final exportService = ExportService(
+    quizCardRepository: quizCardRepository,
+  );
+  getIt.registerSingleton<ExportService>(exportService);
+
+  final importExportService = ImportExportService(
+    importService: importService,
+    exportService: exportService,
+    deckRepository: deckRepository,
+    quizCardRepository: quizCardRepository,
+  );
+  getIt.registerSingleton<ImportExportService>(importExportService);
 }

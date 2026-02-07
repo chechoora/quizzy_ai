@@ -34,6 +34,8 @@
   "settingsTitle": "Settings",
   "settingsAiValidatorSubtitleTile": "Configure answer validation settings",
   "settingsInAppFeaturesSubtitle": "Manage premium features",
+  "settingsImportExportTitle": "Import / Export",
+  "settingsImportExportSubtitle": "Import or export your decks and cards",
   "settingsAiValidatorTitle": "AI Validator",
   "settingsAiValidatorLabel": "Answer Validator",
   "settingsAiValidatorSubtitle": "Choose how quiz answers are validated",

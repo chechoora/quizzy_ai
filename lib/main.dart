@@ -13,6 +13,7 @@ import 'package:poc_ai_quiz/util/app_theme.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/view/create_card/create_card_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/home_widget.dart';
+import 'package:poc_ai_quiz/view/import_export/screen.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/in_app_features_widget.dart';
@@ -163,6 +164,13 @@ class MyApp extends StatelessWidget {
         path: SettingsAIValidatorRoute().path,
         builder: (context, state) {
           return const SettingsAIValidatorWidget();
+        },
+      ),
+      GoRoute(
+        name: SettingsImportExportRoute().name,
+        path: SettingsImportExportRoute().path,
+        builder: (context, state) {
+          return const ImportExportScreen();
         },
       ),
     ],

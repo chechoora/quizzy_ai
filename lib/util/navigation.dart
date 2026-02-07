@@ -35,6 +35,11 @@ final class SettingsInAppFeaturesRoute extends NavigationRoute {
   SettingsInAppFeaturesRoute() : super(name: 'inAppFeatures', path: '/inAppFeatures');
 }
 
+final class SettingsImportExportRoute extends NavigationRoute {
+  SettingsImportExportRoute()
+      : super(name: 'importExport', path: '/importExport');
+}
+
 final class SettingsAIValidatorRoute extends NavigationRoute {
   SettingsAIValidatorRoute()
       : super(name: 'settingsAIValidator', path: '/settingsAIValidator');
