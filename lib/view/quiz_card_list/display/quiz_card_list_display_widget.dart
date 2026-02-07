@@ -117,7 +117,7 @@ class _AddCardTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = localize(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.only(left: 4, right: 4, bottom: 2),
       child: GestureDetector(
         onTap: onPressed,
         child: CustomPaint(
