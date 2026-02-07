@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
+import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_state.dart';
@@ -15,14 +16,17 @@ class ImportExportCubit extends Cubit<ImportExportState> {
   final DeckRepository deckRepository;
   final ImportExportService importExportService;
 
+  final List<DeckItem> _decks = [];
   final Set<int> _selectedDeckIds = {};
 
   Future<void> loadDecks() async {
     emit(const ImportExportLoadingState());
     try {
-      final decks = await deckRepository.fetchDecks();
+      _decks
+        ..clear()
+        ..addAll(await deckRepository.fetchDecks());
       _selectedDeckIds.clear();
-      emit(ImportExportDataState(decks: decks, selectedDeckIds: const {}));
+      emit(ImportExportDataState(decks: _decks, selectedDeckIds: const {}));
     } catch (e, stackTrace) {
       _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
       emit(ImportExportErrorState(message: 'Failed to load decks: $e'));
@@ -35,44 +39,40 @@ class ImportExportCubit extends Cubit<ImportExportState> {
     } else {
       _selectedDeckIds.add(deckId);
     }
-    final currentState = state;
-    if (currentState is ImportExportDataState) {
-      emit(currentState.copyWith(selectedDeckIds: Set.from(_selectedDeckIds)));
-    }
+    emit(ImportExportDataState(
+      decks: _decks,
+      selectedDeckIds: _selectedDeckIds,
+    ));
   }
 
   void selectAllDecks() {
-    final currentState = state;
-    if (currentState is ImportExportDataState) {
-      _selectedDeckIds
-        ..clear()
-        ..addAll(currentState.decks.map((d) => d.id));
-      emit(currentState.copyWith(selectedDeckIds: Set.from(_selectedDeckIds)));
-    }
+    _selectedDeckIds
+      ..clear()
+      ..addAll(_decks.map((d) => d.id));
+    emit(ImportExportDataState(
+      decks: _decks,
+      selectedDeckIds: _selectedDeckIds,
+    ));
   }
 
   void deselectAllDecks() {
     _selectedDeckIds.clear();
-    final currentState = state;
-    if (currentState is ImportExportDataState) {
-      emit(currentState.copyWith(selectedDeckIds: const {}));
-    }
+    emit(ImportExportDataState(
+      decks: _decks,
+      selectedDeckIds: _selectedDeckIds,
+    ));
   }
 
   Future<void> exportSelectedDecks() async {
-    final currentState = state;
-    if (currentState is! ImportExportDataState) return;
     if (_selectedDeckIds.isEmpty) return;
-
     emit(const ImportExportLoadingState());
     try {
-      final selectedDecks = currentState.decks
-          .where((d) => _selectedDeckIds.contains(d.id))
-          .toList();
+      final selectedDecks =
+          _decks.where((d) => _selectedDeckIds.contains(d.id)).toList();
 
       await importExportService.exportDecks(selectedDecks);
       emit(ImportExportDataState(
-        decks: currentState.decks,
+        decks: _decks,
         selectedDeckIds: Set.from(_selectedDeckIds),
       ));
     } catch (e, stackTrace) {
@@ -82,20 +82,99 @@ class ImportExportCubit extends Cubit<ImportExportState> {
     }
   }
 
-  Future<void> importFromFile() async {
+  Future<void> importDecksFromFile() async {
     emit(const ImportExportLoadingState());
     try {
       final importedCount = await importExportService.importDecksFromFile();
       if (importedCount == null) {
-        // User cancelled file picker
         await loadDecks();
         return;
       }
       emit(ImportExportImportSuccessState(deckCount: importedCount));
       await loadDecks();
     } catch (e, stackTrace) {
-      _logger.e('Failed to import', ex: e, stacktrace: stackTrace);
-      emit(ImportExportErrorState(message: 'Failed to import: $e'));
+      _logger.e('Failed to import decks', ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(message: 'Failed to import decks: $e'));
+      loadDecks();
+    }
+  }
+
+  Future<void> importCardsFromFile() async {
+    if (_decks.isEmpty) {
+      emit(const ImportExportErrorState(
+        message: 'Create a deck first before importing cards',
+      ));
+      return;
+    }
+    emit(ImportExportSelectDeckState(decks: _decks));
+  }
+
+  Future<void> confirmImportCards(int deckId) async {
+    emit(const ImportExportLoadingState());
+    try {
+      final importedCount =
+          await importExportService.importCardsFromFile(deckId: deckId);
+      if (importedCount == null) {
+        await loadDecks();
+        return;
+      }
+      emit(ImportExportImportCardsSuccessState(cardCount: importedCount));
+      await loadDecks();
+    } catch (e, stackTrace) {
+      _logger.e('Failed to import cards', ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(message: 'Failed to import cards: $e'));
+      loadDecks();
+    }
+  }
+
+  Future<void> importDecksFromClipboard() async {
+    emit(const ImportExportLoadingState());
+    try {
+      final importedCount =
+          await importExportService.importDecksFromClipboard();
+      if (importedCount == null) {
+        emit(const ImportExportErrorState(message: 'Clipboard is empty'));
+        await loadDecks();
+        return;
+      }
+      emit(ImportExportImportSuccessState(deckCount: importedCount));
+      await loadDecks();
+    } catch (e, stackTrace) {
+      _logger.e('Failed to import decks from clipboard',
+          ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(
+          message: 'Failed to import decks from clipboard: $e'));
+      loadDecks();
+    }
+  }
+
+  Future<void> importCardsFromClipboard() async {
+    if (_decks.isEmpty) {
+      emit(const ImportExportErrorState(
+        message: 'Create a deck first before importing cards',
+      ));
+      return;
+    }
+    emit(ImportExportSelectDeckState(decks: _decks, fromClipboard: true));
+  }
+
+  Future<void> confirmImportCardsFromClipboard(int deckId) async {
+    emit(const ImportExportLoadingState());
+    try {
+      final importedCount =
+          await importExportService.importCardsFromClipboard(deckId: deckId);
+      if (importedCount == null) {
+        emit(const ImportExportErrorState(message: 'Clipboard is empty'));
+        await loadDecks();
+        return;
+      }
+      emit(ImportExportImportCardsSuccessState(cardCount: importedCount));
+      await loadDecks();
+    } catch (e, stackTrace) {
+      _logger.e('Failed to import cards from clipboard',
+          ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(
+          message: 'Failed to import cards from clipboard: $e'));
       loadDecks();
     }
   }

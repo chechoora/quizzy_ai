@@ -57,6 +57,16 @@ class ImportExportDataState extends BuilderState {
 
 // Listener States
 
+class ImportExportSelectDeckState extends ListenerState {
+  const ImportExportSelectDeckState({
+    required this.decks,
+    this.fromClipboard = false,
+  });
+
+  final List<DeckItem> decks;
+  final bool fromClipboard;
+}
+
 class ImportExportErrorState extends ListenerState {
   const ImportExportErrorState({required this.message});
 
@@ -67,4 +77,10 @@ class ImportExportImportSuccessState extends ListenerState {
   const ImportExportImportSuccessState({required this.deckCount});
 
   final int deckCount;
+}
+
+class ImportExportImportCardsSuccessState extends ListenerState {
+  const ImportExportImportCardsSuccessState({required this.cardCount});
+
+  final int cardCount;
 }

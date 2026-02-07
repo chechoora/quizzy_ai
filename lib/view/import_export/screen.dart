@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
+import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
@@ -10,6 +12,7 @@ import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_cubit.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_state.dart';
+import 'package:poc_ai_quiz/view/widgets/app_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
@@ -56,6 +59,21 @@ class ImportExportScreen extends HookWidget {
                           'Successfully imported ${state.deckCount} deck(s)',
                     );
                   }
+                  if (state is ImportExportImportCardsSuccessState) {
+                    snackBar(
+                      context,
+                      message:
+                          'Successfully imported ${state.cardCount} card(s)',
+                    );
+                  }
+                  if (state is ImportExportSelectDeckState) {
+                    _showDeckPickerSheet(
+                      context,
+                      cubit,
+                      state.decks,
+                      fromClipboard: state.fromClipboard,
+                    );
+                  }
                 },
                 builder: (context, state) {
                   if (state is ImportExportLoadingState) {
@@ -78,6 +96,60 @@ class ImportExportScreen extends HookWidget {
   }
 }
 
+void _showDeckPickerSheet(
+  BuildContext context,
+  ImportExportCubit cubit,
+  List<DeckItem> decks, {
+  bool fromClipboard = false,
+}) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (sheetContext) => AppBottomSheet.neutral(
+      title: Text(
+        'Select deck for import',
+        style: AppTypography.h3.copyWith(color: AppColors.grayscale600),
+      ),
+      content: Column(
+        children: decks.map((deck) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                if (fromClipboard) {
+                  cubit.confirmImportCardsFromClipboard(deck.id);
+                } else {
+                  cubit.confirmImportCards(deck.id);
+                }
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.grayscaleWhite,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.grayscale200),
+                ),
+                child: Text(
+                  deck.title,
+                  style: AppTypography.h4.copyWith(
+                    color: AppColors.grayscale600,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+      button: AppButton.secondary(
+        text: 'Cancel',
+        onPressed: () => Navigator.of(sheetContext).pop(),
+      ),
+    ),
+  );
+}
+
 class _DataContent extends StatelessWidget {
   const _DataContent({
     required this.state,
@@ -89,96 +161,273 @@ class _DataContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       children: [
-        // Import section
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: SizedBox(
-            width: double.infinity,
-            child: AppButton.secondary(
-              text: 'Import from File',
-              leadingIcon: Icons.file_download,
-              onPressed: () => cubit.importFromFile(),
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        // Export section header
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Text(
-                'Select decks to export',
-                style: AppTypography.h4.copyWith(
-                  color: AppColors.grayscale600,
-                ),
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: () {
-                  if (state.allSelected) {
-                    cubit.deselectAllDecks();
-                  } else {
-                    cubit.selectAllDecks();
-                  }
-                },
-                child: Text(
-                  state.allSelected ? 'Deselect all' : 'Select all',
-                  style: AppTypography.secondaryText.copyWith(
-                    color: AppColors.primary500,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        // -- Import Section --
+        const SizedBox(height: 8),
+        const _SectionHeader(
+          icon: Icons.file_download,
+          title: 'Import',
         ),
         const SizedBox(height: 12),
-        // Deck list
-        Expanded(
-          child: state.decks.isEmpty
-              ? Center(
-                  child: Text(
-                    'No decks available',
-                    style: AppTypography.secondaryText.copyWith(
-                      color: AppColors.grayscale400,
-                    ),
-                  ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: state.decks.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final deck = state.decks[index];
-                    final isSelected =
-                        state.selectedDeckIds.contains(deck.id);
-                    return _DeckSelectionTile(
-                      title: deck.title,
-                      isSelected: isSelected,
-                      onTap: () => cubit.toggleDeckSelection(deck.id),
-                    );
-                  },
-                ),
+        Text(
+          'Import from a JSON file or clipboard. Use the matching format:',
+          style: AppTypography.secondaryText.copyWith(
+            color: AppColors.grayscale500,
+          ),
         ),
-        // Export button
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: SizedBox(
-            width: double.infinity,
-            child: AppButton.primary(
-              text: 'Export Selected (${state.selectedDeckIds.length})',
-              leadingIcon: Icons.file_upload,
-              onPressed:
-                  state.hasSelection ? () => cubit.exportSelectedDecks() : null,
+        const SizedBox(height: 8),
+        const Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _JsonExampleCard(
+                title: 'Decks',
+                json: '{\n'
+                    '  "decks": [\n'
+                    '    {\n'
+                    '      "title": "My Deck",\n'
+                    '      "cards": [\n'
+                    '        {\n'
+                    '          "question": "...",\n'
+                    '          "answer": "..."\n'
+                    '        }\n'
+                    '      ]\n'
+                    '    }\n'
+                    '  ]\n'
+                    '}',
+              ),
             ),
+            SizedBox(width: 8),
+            Expanded(
+              child: _JsonExampleCard(
+                title: 'Cards',
+                json: '{\n'
+                    '  "cards": [\n'
+                    '    {\n'
+                    '      "question": "...",\n'
+                    '      "answer": "..."\n'
+                    '    }\n'
+                    '  ]\n'
+                    '}',
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'From file',
+          style: AppTypography.secondaryText.copyWith(
+            color: AppColors.grayscale400,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: AppButton.secondary(
+                text: 'Decks',
+                leadingIcon: Icons.file_open,
+                onPressed: () => cubit.importDecksFromFile(),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: AppButton.secondary(
+                text: 'Cards',
+                leadingIcon: Icons.file_open,
+                onPressed: () => cubit.importCardsFromFile(),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'From clipboard',
+          style: AppTypography.secondaryText.copyWith(
+            color: AppColors.grayscale400,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: AppButton.secondary(
+                text: 'Decks',
+                leadingIcon: Icons.paste,
+                onPressed: () => cubit.importDecksFromClipboard(),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: AppButton.secondary(
+                text: 'Cards',
+                leadingIcon: Icons.paste,
+                onPressed: () => cubit.importCardsFromClipboard(),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        // -- Export Section --
+        const _SectionHeader(
+          icon: Icons.file_upload,
+          title: 'Export',
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Text(
+              'Select decks to export',
+              style: AppTypography.secondaryText.copyWith(
+                color: AppColors.grayscale500,
+              ),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: () {
+                if (state.allSelected) {
+                  cubit.deselectAllDecks();
+                } else {
+                  cubit.selectAllDecks();
+                }
+              },
+              child: Text(
+                state.allSelected ? 'Deselect all' : 'Select all',
+                style: AppTypography.secondaryText.copyWith(
+                  color: AppColors.primary500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (state.decks.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Center(
+              child: Text(
+                'No decks available',
+                style: AppTypography.secondaryText.copyWith(
+                  color: AppColors.grayscale400,
+                ),
+              ),
+            ),
+          )
+        else
+          ...state.decks.map((deck) {
+            final isSelected = state.selectedDeckIds.contains(deck.id);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _DeckSelectionTile(
+                title: deck.title,
+                isSelected: isSelected,
+                onTap: () => cubit.toggleDeckSelection(deck.id),
+              ),
+            );
+          }),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: AppButton.primary(
+            text: 'Export Selected (${state.selectedDeckIds.length})',
+            leadingIcon: Icons.file_upload,
+            onPressed:
+                state.hasSelection ? () => cubit.exportSelectedDecks() : null,
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.icon,
+    required this.title,
+  });
+
+  final IconData icon;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.primary500, size: 22),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: AppTypography.h4.copyWith(
+            color: AppColors.grayscale600,
           ),
         ),
       ],
     );
   }
+}
 
+class _JsonExampleCard extends StatelessWidget {
+  const _JsonExampleCard({
+    required this.title,
+    required this.json,
+  });
+
+  final String title;
+  final String json;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.grayscale100,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.grayscale200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                title,
+                style: AppTypography.secondaryText.copyWith(
+                  color: AppColors.primary500,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: json));
+                  snackBar(context, message: 'Copied to clipboard');
+                },
+                child: const Icon(
+                  Icons.copy,
+                  size: 16,
+                  color: AppColors.grayscale400,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            json,
+            style: AppTypography.secondaryText.copyWith(
+              color: AppColors.grayscale600,
+              fontFamily: 'monospace',
+              fontSize: 11,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _DeckSelectionTile extends StatelessWidget {
@@ -211,12 +460,8 @@ class _DeckSelectionTile extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              isSelected
-                  ? Icons.check_circle
-                  : Icons.radio_button_unchecked,
-              color: isSelected
-                  ? AppColors.primary500
-                  : AppColors.grayscale400,
+              isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: isSelected ? AppColors.primary500 : AppColors.grayscale400,
             ),
             const SizedBox(width: 12),
             Expanded(

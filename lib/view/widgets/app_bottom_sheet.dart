@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 
-enum AppBottomSheetVariant { positive, destructive, warning }
+enum AppBottomSheetVariant { positive, destructive, warning, neutral }
 
 class AppBottomSheet extends StatelessWidget {
   const AppBottomSheet({
@@ -37,6 +37,13 @@ class AppBottomSheet extends StatelessWidget {
     required this.button,
     this.content,
   }) : variant = AppBottomSheetVariant.warning;
+
+  const AppBottomSheet.neutral({
+    super.key,
+    required this.title,
+    required this.button,
+    this.content,
+  }) : variant = AppBottomSheetVariant.neutral;
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +145,11 @@ class _BottomSheetColors {
           backgroundColor: AppColors.yellow100,
           icon: Icons.warning_rounded,
           iconColor: AppColors.yellow500,
+        ),
+      AppBottomSheetVariant.neutral => const _BottomSheetColors(
+          backgroundColor: AppColors.grayscale100,
+          icon: Icons.info_outline,
+          iconColor: AppColors.grayscale500,
         ),
     };
   }

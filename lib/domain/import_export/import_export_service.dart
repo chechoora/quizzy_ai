@@ -35,9 +35,30 @@ class ImportExportService {
   Future<int?> importDecksFromFile() async {
     final decks = await importService.importDecksFromFile();
     if (decks == null) return null;
+    return _saveImportedDecks(decks);
+  }
 
+  /// Returns the number of imported cards, or null if the user cancelled.
+  Future<int?> importCardsFromFile({required int deckId}) async {
+    final cards = await importService.importCardsFromFile();
+    if (cards == null) return null;
+    return _saveImportedCards(cards, deckId: deckId);
+  }
+
+  Future<int?> importDecksFromClipboard() async {
+    final decks = await importService.importDecksFromClipboard();
+    if (decks == null) return null;
+    return _saveImportedDecks(decks);
+  }
+
+  Future<int?> importCardsFromClipboard({required int deckId}) async {
+    final cards = await importService.importCardsFromClipboard();
+    if (cards == null) return null;
+    return _saveImportedCards(cards, deckId: deckId);
+  }
+
+  Future<int> _saveImportedDecks(List<DeckImportModel> decks) async {
     var importedCount = 0;
-
     for (final deck in decks) {
       final saved = await deckRepository.saveDeck(deck.title);
       if (!saved) continue;
@@ -54,7 +75,22 @@ class ImportExportService {
       }
       importedCount++;
     }
+    return importedCount;
+  }
 
+  Future<int> _saveImportedCards(
+    List<CardImportModel> cards, {
+    required int deckId,
+  }) async {
+    var importedCount = 0;
+    for (final card in cards) {
+      await quizCardRepository.saveQuizCard(
+        question: card.question,
+        answer: card.answer,
+        deckId: deckId,
+      );
+      importedCount++;
+    }
     return importedCount;
   }
 }
