@@ -69,6 +69,10 @@ class QuizExeWidget extends HookWidget {
                 onTextPassed: (possibleAnswer) {
                   cubit.checkTheAnswer(quizCard, possibleAnswer);
                 },
+                onSkipPassed: () {
+                  cubit.checkTheAnswer(
+                      quizCard, localize(context).quizDisplayDontKnowButton);
+                },
                 key: ValueKey(quizCard.id),
               );
             }
