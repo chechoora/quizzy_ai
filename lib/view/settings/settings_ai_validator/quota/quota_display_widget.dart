@@ -123,7 +123,7 @@ class QuotaDisplayWidget extends HookWidget {
                       ),
                       const SizedBox(height: 12),
                       AppButton.primary(
-                        text: 'Retry',
+                        text: l10n.settingsAiValidatorQuotaRetryButton,
                         onPressed: () => cubit.loadQuota(),
                       ),
                     ],

@@ -228,9 +228,10 @@ class _ApiKeyTextField extends HookWidget {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
         if (context.mounted) {
+          final l10n = localize(context);
           snackBar(
             context,
-            message: 'Could not open URL: $url',
+            message: l10n.settingsAiValidatorCouldNotOpenUrlError(url),
             isError: true,
           );
         }
@@ -294,13 +295,13 @@ class _ApiKeyTextField extends HookWidget {
             const SizedBox(width: 8),
             showDeleteButton
                 ? AppButton.destructive(
-                    text: 'Delete',
+                    text: l10n.settingsAiValidatorDeleteButton,
                     onPressed: () {
                       onApiKeyUpdate(selectedValidator, null);
                     },
                   )
                 : AppButton.primary(
-                    text: 'Apply',
+                    text: l10n.settingsAiValidatorApplyButton,
                     onPressed: isEmpty.value
                         ? null
                         : () {
@@ -318,7 +319,7 @@ class _ApiKeyTextField extends HookWidget {
               children: [
                 const SizedBox(width: 4),
                 Text(
-                  'Get API Key',
+                  l10n.settingsAiValidatorGetApiKeyLink,
                   style: AppTypography.smallText.copyWith(
                     color: AppColors.primary500,
                     decoration: TextDecoration.underline,

@@ -96,6 +96,18 @@
   "settingsAiValidatorQuotaTitle": "Usage Quota",
   "settingsAiValidatorWeeklyUsageLabel": "Weekly Usage",
   "settingsAiValidatorQuestionsLeftLabel": "Questions Left",
+  "settingsAiValidatorQuotaRetryButton": "Retry",
+  "settingsAiValidatorGetApiKeyLink": "Get API Key",
+  "settingsAiValidatorCouldNotOpenUrlError": "Could not open URL: {url}",
+  "@settingsAiValidatorCouldNotOpenUrlError": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAiValidatorDeleteButton": "Delete",
+  "settingsAiValidatorApplyButton": "Apply",
 
   "quizCardListPremiumCardLimitMessage": "You can not create more cards, please unlock the full version.",
   "quizCardListDeleteCardConfirmation": "Are you sure you want to delete current card?",
