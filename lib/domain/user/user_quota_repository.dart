@@ -11,7 +11,7 @@ class UserQuotaRepository {
     required this.prefDataSource,
   });
 
-  Stream<QuotaItem> fetchQuota(String uniquePurchaseId) async* {
+  Stream<QuotaItem> fetchQuota(String appUserId) async* {
     // Emit cached data first if available
     if (prefDataSource.hasValidCache()) {
       final weeklyPercentUsage = prefDataSource.getWeeklyPercentUsage();
@@ -27,7 +27,7 @@ class UserQuotaRepository {
 
     // Fetch fresh data from API
     final response = await apiService.getQuota(
-      uniquePurchaseId: uniquePurchaseId,
+      appUserId: appUserId,
     );
 
     if (response.isSuccessful && response.body != null) {

@@ -1,8 +1,8 @@
 import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
+import 'package:purchases_flutter/models/customer_info_wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MockCacheRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
-
   bool _isUnlocked = false;
 
   @override
@@ -29,6 +29,11 @@ class MockCacheRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   Future<void> restorePurchases() async {
     _isUnlocked = true;
   }
+
+  @override
+  Future<String> getAppUserId() {
+    return Future.value('mock_user_id');
+  }
 }
 
 class MockPrefRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
@@ -53,6 +58,13 @@ class MockPrefRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   @override
   Future<void> restorePurchases() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('$_prefKeyPrefix${RevenueCatPurchaseManager.cardsAndDecksOffering}', true);
+    await prefs.setBool(
+        '$_prefKeyPrefix${RevenueCatPurchaseManager.cardsAndDecksOffering}',
+        true);
+  }
+
+  @override
+  Future<String> getAppUserId() {
+    return Future.value('mock_user_id');
   }
 }

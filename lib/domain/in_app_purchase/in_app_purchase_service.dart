@@ -21,6 +21,10 @@ class InAppPurchaseService {
   Future<void> restorePurchasedFeatures() async {
     return revenueCatPurchaseManager.restorePurchases();
   }
+
+  Future<String> getAppUserId(InAppPurchaseFeature feature) async {
+    return revenueCatPurchaseManager.getAppUserId();
+  }
 }
 
 enum InAppPurchaseFeature {

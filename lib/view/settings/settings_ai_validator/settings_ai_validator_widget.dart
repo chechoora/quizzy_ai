@@ -17,6 +17,7 @@ import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/app_text_field.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
+import 'package:poc_ai_quiz/view/settings/settings_ai_validator/quota/quota_display_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_bottom_sheet.dart';
 
 class SettingsAIValidatorWidget extends HookWidget {
@@ -189,7 +190,7 @@ class _ValidatorApiKeyContent extends HookWidget {
               selectedValidator: selectedValidator,
               onConfigUpdate: onOpenSourceConfigUpdate,
             ),
-          PurchaseConfig() => const SizedBox.shrink(),
+          PurchaseConfig() => const QuotaDisplayWidget(),
           null => const SizedBox.shrink(),
         },
       ],

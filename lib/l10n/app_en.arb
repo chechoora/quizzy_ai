@@ -93,6 +93,9 @@
   "settingsAiValidatorModelNameHint": "llama3.2",
   "settingsAiValidatorFillBothFieldsError": "Please fill in both URL and model name",
   "settingsAiValidatorSaveConfigButton": "Save Configuration",
+  "settingsAiValidatorQuotaTitle": "Usage Quota",
+  "settingsAiValidatorWeeklyUsageLabel": "Weekly Usage",
+  "settingsAiValidatorQuestionsLeftLabel": "Questions Left",
 
   "quizCardListPremiumCardLimitMessage": "You can not create more cards, please unlock the full version.",
   "quizCardListDeleteCardConfirmation": "Are you sure you want to delete current card?",

@@ -19,7 +19,7 @@ abstract class QuizzyApiService extends ChopperService {
 
   @Get(path: '/ai-tutor/quota')
   Future<Response<QuotaResponse>> getQuota({
-    @Query('uniquePurchaseId') required String uniquePurchaseId,
+    @Query('appUserId') required String appUserId,
   });
 }
 
