@@ -150,6 +150,55 @@ void _showDeckPickerSheet(
   );
 }
 
+void _showImportSourceSheet(
+  BuildContext context, {
+  required VoidCallback onFile,
+  required VoidCallback onClipboard,
+}) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (sheetContext) => AppBottomSheet.neutral(
+      title: Text(
+        localize(context).importExportImportSourceTitle,
+        style: AppTypography.h3.copyWith(color: AppColors.grayscale600),
+      ),
+      content: Column(
+        children: [
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: AppButton.primary(
+              text: localize(context).importExportFromFile,
+              leadingIcon: Icons.file_open,
+              onPressed: () {
+                Navigator.of(sheetContext).pop();
+                onFile();
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: AppButton.primary(
+              text: localize(context).importExportFromClipboard,
+              leadingIcon: Icons.paste,
+              onPressed: () {
+                Navigator.of(sheetContext).pop();
+                onClipboard();
+              },
+            ),
+          ),
+        ],
+      ),
+      button: AppButton.secondary(
+        text: localize(context).importExportCancelButton,
+        onPressed: () => Navigator.of(sheetContext).pop(),
+      ),
+    ),
+  );
+}
+
 class _DataContent extends StatelessWidget {
   const _DataContent({
     required this.state,
@@ -216,55 +265,29 @@ class _DataContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        Text(
-          localize(context).importExportFromFile,
-          style: AppTypography.secondaryText.copyWith(
-            color: AppColors.grayscale400,
-          ),
-        ),
-        const SizedBox(height: 8),
         Row(
           children: [
             Expanded(
               child: AppButton.secondary(
                 text: localize(context).importExportDecksButton,
-                leadingIcon: Icons.file_open,
-                onPressed: () => cubit.importDecksFromFile(),
+                leadingIcon: Icons.file_download,
+                onPressed: () => _showImportSourceSheet(
+                  context,
+                  onFile: () => cubit.importDecksFromFile(),
+                  onClipboard: () => cubit.importDecksFromClipboard(),
+                ),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: AppButton.secondary(
                 text: localize(context).importExportCardsButton,
-                leadingIcon: Icons.file_open,
-                onPressed: () => cubit.importCardsFromFile(),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          localize(context).importExportFromClipboard,
-          style: AppTypography.secondaryText.copyWith(
-            color: AppColors.grayscale400,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: AppButton.secondary(
-                text: localize(context).importExportDecksButton,
-                leadingIcon: Icons.paste,
-                onPressed: () => cubit.importDecksFromClipboard(),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: AppButton.secondary(
-                text: localize(context).importExportCardsButton,
-                leadingIcon: Icons.paste,
-                onPressed: () => cubit.importCardsFromClipboard(),
+                leadingIcon: Icons.file_download,
+                onPressed: () => _showImportSourceSheet(
+                  context,
+                  onFile: () => cubit.importCardsFromFile(),
+                  onClipboard: () => cubit.importCardsFromClipboard(),
+                ),
               ),
             ),
           ],

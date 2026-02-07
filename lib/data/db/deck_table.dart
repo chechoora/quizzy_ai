@@ -16,9 +16,9 @@ class QuizCardTable extends Table {
 
   IntColumn get deckId => integer().references(DeckTable, #id)();
 
-  TextColumn get questionText => text().withLength(min: 3)();
+  TextColumn get questionText => text().withLength(min: 1)();
 
-  TextColumn get answerText => text().withLength(min: 3)();
+  TextColumn get answerText => text().withLength(min: 1)();
 
   BoolColumn get isArchive => boolean()();
 

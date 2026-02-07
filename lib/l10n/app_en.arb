@@ -144,6 +144,7 @@
 
   "importExportImportTitle": "Import",
   "importExportImportDescription": "Import from a JSON file or clipboard. Use the matching format:",
+  "importExportImportSourceTitle": "Import source",
   "importExportFromFile": "From file",
   "importExportFromClipboard": "From clipboard",
   "importExportDecksButton": "Decks",
