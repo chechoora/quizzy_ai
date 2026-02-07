@@ -81,7 +81,7 @@ class _QuizCardTile extends StatelessWidget {
                   style: AppTypography.secondaryText.copyWith(
                     color: AppColors.grayscale500,
                   ),
-                  maxLines: 1,
+                  maxLines: 10,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
