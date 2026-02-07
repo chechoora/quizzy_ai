@@ -12,7 +12,9 @@ import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
+import 'package:poc_ai_quiz/view/widgets/app_text_field.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_bottom_sheet.dart';
@@ -209,75 +211,70 @@ class _ApiKeyTextField extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final controller = useTextEditingController(text: initialApiKey ?? '');
+    final isEmpty = useState(controller.text.trim().isEmpty);
+    final isUnchanged = useState(controller.text.trim() == (initialApiKey ?? ''));
 
     useEffect(() {
       controller.text = initialApiKey ?? '';
+      isEmpty.value = controller.text.trim().isEmpty;
+      isUnchanged.value = controller.text.trim() == (initialApiKey ?? '');
       return null;
     }, [selectedValidator, initialApiKey]);
 
+    useEffect(() {
+      void listener() {
+        isEmpty.value = controller.text.trim().isEmpty;
+        isUnchanged.value = controller.text.trim() == (initialApiKey ?? '');
+      }
+
+      controller.addListener(listener);
+      return () => controller.removeListener(listener);
+    }, [controller]);
+
     final l10n = localize(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 12,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.grayscaleWhite,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.settingsAiValidatorApiKeyTitle,
-            style: AppTypography.h4.copyWith(
-              color: AppColors.grayscale600,
-            ),
+    final hasInitialKey = initialApiKey != null && initialApiKey!.isNotEmpty;
+    final showDeleteButton = hasInitialKey && isUnchanged.value;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.settingsAiValidatorApiKeyTitle,
+                style: AppTypography.h4.copyWith(
+                  color: AppColors.grayscale600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              AppTextField(
+                controller: controller,
+                hint: l10n.settingsAiValidatorApiKeyHint,
+                obscureText: true,
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.grayscale300),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.grayscale300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.primary500),
-              ),
-              labelText: l10n.settingsAiValidatorApiKeyLabel(
-                selectedValidator.toDisplayString(),
-              ),
-              labelStyle: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale500,
-              ),
-              hintText: l10n.settingsAiValidatorApiKeyHint,
-              hintStyle: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale400,
-              ),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.save, color: AppColors.primary500),
+        ),
+        const SizedBox(width: 8),
+        showDeleteButton
+            ? AppButton.destructive(
+                text: 'Delete',
                 onPressed: () {
-                  final apiKey = controller.text.trim().isEmpty
-                      ? null
-                      : controller.text.trim();
-                  onApiKeyUpdate(selectedValidator, apiKey);
+                  onApiKeyUpdate(selectedValidator, null);
                 },
-                tooltip: l10n.settingsAiValidatorApiKeySaveTooltip,
+              )
+            : AppButton.primary(
+                text: 'Apply',
+                onPressed: isEmpty.value
+                    ? null
+                    : () {
+                        final apiKey = controller.text.trim();
+                        onApiKeyUpdate(selectedValidator, apiKey);
+                      },
               ),
-            ),
-            style: AppTypography.mainText.copyWith(
-              color: AppColors.grayscale600,
-            ),
-            obscureText: true,
-          ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -307,109 +304,48 @@ class _OpenSourceModelConfigField extends HookWidget {
     }, [selectedValidator, initialConfig]);
 
     final l10n = localize(context);
-    final inputDecoration = InputDecoration(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.grayscale300),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.grayscale300),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.primary500),
-      ),
-    );
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.grayscaleWhite,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.settingsAiValidatorApiConfigTitle,
-            style: AppTypography.h4.copyWith(
-              color: AppColors.grayscale600,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.settingsAiValidatorApiConfigTitle,
+          style: AppTypography.h4.copyWith(
+            color: AppColors.grayscale600,
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: urlController,
-            decoration: inputDecoration.copyWith(
-              labelText: l10n.settingsAiValidatorServerUrlLabel,
-              labelStyle: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale500,
-              ),
-              hintText: l10n.settingsAiValidatorServerUrlHint,
-              hintStyle: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale400,
-              ),
-            ),
-            style: AppTypography.mainText.copyWith(
-              color: AppColors.grayscale600,
-            ),
-            keyboardType: TextInputType.url,
+        ),
+        const SizedBox(height: 12),
+        AppTextField(
+          controller: urlController,
+          keyboardType: TextInputType.url,
+        ),
+        const SizedBox(height: 12),
+        AppTextField(
+          controller: modelController,
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: AppButton.primary(
+            text: l10n.settingsAiValidatorSaveConfigButton,
+            onPressed: () {
+              final url = urlController.text.trim();
+              final model = modelController.text.trim();
+              if (url.isEmpty && model.isEmpty) {
+                onConfigUpdate(selectedValidator, null);
+              } else if (url.isEmpty || model.isEmpty) {
+                snackBar(context,
+                    message: l10n.settingsAiValidatorFillBothFieldsError);
+              } else {
+                onConfigUpdate(
+                  selectedValidator,
+                  OpenSourceConfig(url: url, model: model),
+                );
+              }
+            },
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: modelController,
-            decoration: inputDecoration.copyWith(
-              labelText: l10n.settingsAiValidatorModelNameLabel,
-              labelStyle: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale500,
-              ),
-              hintText: l10n.settingsAiValidatorModelNameHint,
-              hintStyle: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale400,
-              ),
-            ),
-            style: AppTypography.mainText.copyWith(
-              color: AppColors.grayscale600,
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                final url = urlController.text.trim();
-                final model = modelController.text.trim();
-                if (url.isEmpty && model.isEmpty) {
-                  onConfigUpdate(selectedValidator, null);
-                } else if (url.isEmpty || model.isEmpty) {
-                  snackBar(context,
-                      message: l10n.settingsAiValidatorFillBothFieldsError);
-                } else {
-                  onConfigUpdate(
-                    selectedValidator,
-                    OpenSourceConfig(url: url, model: model),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary500,
-                foregroundColor: AppColors.grayscaleWhite,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              icon: const Icon(Icons.save),
-              label: Text(
-                l10n.settingsAiValidatorSaveConfigButton,
-                style: AppTypography.buttonMain.copyWith(
-                  color: AppColors.grayscaleWhite,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

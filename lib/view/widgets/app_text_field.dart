@@ -17,6 +17,7 @@ class AppTextField extends HookWidget {
     this.textInputAction,
     this.keyboardType,
     this.maxLines = 1,
+    this.obscureText = false,
   });
 
   final TextEditingController? controller;
@@ -30,6 +31,7 @@ class AppTextField extends HookWidget {
   final TextInputAction? textInputAction;
   final TextInputType? keyboardType;
   final int maxLines;
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +73,7 @@ class AppTextField extends HookWidget {
         textInputAction: textInputAction,
         keyboardType: keyboardType,
         maxLines: maxLines,
+        obscureText: obscureText,
         style: AppTypography.mainText.copyWith(
           color: AppColors.grayscale600,
         ),
