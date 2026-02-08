@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/util/unique_emit.dart';
 
 // -- States --
 
@@ -27,7 +28,7 @@ class ImportExportLoadingState extends BuilderState {
   List<Object?> get props => [];
 }
 
-class ImportExportDataState extends BuilderState {
+class ImportExportDataState extends BuilderState with UniqueEmit {
   const ImportExportDataState({
     required this.decks,
     required this.selectedDeckIds,
@@ -52,7 +53,7 @@ class ImportExportDataState extends BuilderState {
   }
 
   @override
-  List<Object?> get props => [decks, selectedDeckIds];
+  List<Object?> get props => uniqueProps;
 }
 
 // Listener States
