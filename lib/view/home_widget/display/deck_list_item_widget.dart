@@ -31,6 +31,7 @@ class DeckListItemWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onTap: () => onDeckClicked?.call(deck),
         child: Padding(
           padding: const EdgeInsets.all(20),
