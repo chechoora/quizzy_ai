@@ -13,6 +13,24 @@ class DeckPremiumManager {
     required this.inAppPurchaseService,
   });
 
+  Stream<List<DeckItemWithPremium>> watchAllowedDecks() {
+    return deckRepository.watchDecks().asyncMap((allDecks) async {
+      int count = 0;
+      final isFeaturePurchased = await inAppPurchaseService
+          .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
+      return allDecks.map((deck) {
+        return DeckItemWithPremium.fromDeck(
+          deckItem: deck,
+          isLocked: PremiumLimitInfo.isLocked(
+            featurePurchased: isFeaturePurchased,
+            count: ++count,
+            limit: PremiumLimitInfo.deckLimit,
+          ),
+        );
+      }).toList();
+    });
+  }
+
   Future<List<DeckItemWithPremium>> fetchAllowedDecks() async {
     final allDecks = await deckRepository.fetchDecks();
     int count = 0;

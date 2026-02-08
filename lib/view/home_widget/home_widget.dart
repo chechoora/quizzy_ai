@@ -21,35 +21,91 @@ import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_dialog_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_text_field.dart';
 
-class HomeWidget extends StatefulWidget {
+class HomeWidget extends HookWidget {
   const HomeWidget({super.key});
 
   @override
-  State<HomeWidget> createState() => _HomeWidgetState();
-}
-
-class _HomeWidgetState extends State<HomeWidget> {
-  final HomeCubit cubit = HomeCubit(
-    deckRepository: getIt<DeckRepository>(),
-    deckPremiumManager: getIt<DeckPremiumManager>(),
-  );
-
-  int _selectedIndex = 0;
-
-  @override
-  void initState() {
-    cubit.fetchDecks();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    cubit.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final cubit = useMemoized(
+      () => HomeCubit(
+        deckRepository: getIt<DeckRepository>(),
+        deckPremiumManager: getIt<DeckPremiumManager>(),
+      ),
+    );
+    final selectedIndex = useState(0);
+
+    useEffect(() {
+      cubit.watchDecks();
+      return cubit.close;
+    }, [cubit]);
+
+    Future<String?> showCreateDeckBottomSheet({String? deckName}) {
+      return showModalBottomSheet<String>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (context) => _CreateDeckBottomSheet(deckName: deckName),
+      );
+    }
+
+    void addDockRequest() {
+      showCreateDeckBottomSheet().then((deckName) {
+        if (deckName is String && deckName.isNotEmpty) {
+          cubit.createDeck(deckName);
+        }
+      });
+    }
+
+    void launchConfirmDeleteRequest(DeckItem deck) {
+      alert(
+        context,
+        content: Text(
+          localize(context).homeDeleteDeckConfirmation(deck.title),
+          style: AppTypography.h4.copyWith(
+            color: AppColors.grayscale600,
+          ),
+        ),
+        primary: AppDialogButton.primary(
+          text: localize(context).homeCancelButton,
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+        secondary: AppDialogButton.destructive(
+          text: localize(context).homeDeleteButton,
+          onPressed: () => Navigator.of(context).pop(true),
+        ),
+      ).then(
+        (value) {
+          if (value ?? false) {
+            cubit.deleteDeck(deck);
+          }
+        },
+      );
+    }
+
+    void launchEditDeckTitleRequest(DeckItem deck) {
+      showCreateDeckBottomSheet(deckName: deck.title).then(
+        (deckName) {
+          if (deckName is String && deckName.isNotEmpty) {
+            cubit.editDeck(deck, deckName);
+          }
+        },
+      );
+    }
+
+    void openDeck(DeckItem deck) {
+      context.push(QuizCardListRoute().path, extra: deck);
+    }
+
+    void showCreateDeckPremiumError() {
+      snackBar(
+        context,
+        message: localize(context).homePremiumDeckLimitMessage,
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: BlocConsumer<HomeCubit, DeckState>(
@@ -59,7 +115,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         },
         builder: (BuildContext context, state) {
           if (state is DeckDataState) {
-            if (_selectedIndex == 0) {
+            if (selectedIndex.value == 0) {
               final deckList = state.deckList;
               if (deckList.isEmpty) {
                 return const _EmptyListWidget();
@@ -67,16 +123,16 @@ class _HomeWidgetState extends State<HomeWidget> {
               return DeckListDisplayWidget(
                 deckList: state.deckList,
                 onDeckRemoveRequest: (deck) {
-                  _launchConfirmDeleteRequest(deck);
+                  launchConfirmDeleteRequest(deck);
                 },
                 onDeckEditRequest: (deck) {
-                  _launchEditDeckTitleRequest(deck);
+                  launchEditDeckTitleRequest(deck);
                 },
                 onDeckClicked: (deck) {
-                  _openDeck(deck);
+                  openDeck(deck);
                 },
               );
-            } else if (_selectedIndex == 1) {
+            } else if (selectedIndex.value == 1) {
               return const SettingsWidget();
             }
             throw ArgumentError('Wrong index');
@@ -92,9 +148,9 @@ class _HomeWidgetState extends State<HomeWidget> {
         listener: (BuildContext context, DeckState state) {
           if (state is RequestCreateDeckState) {
             if (state.canCreateDeck) {
-              _addDockRequest();
+              addDockRequest();
             } else {
-              _showCreateDeckPremiumError();
+              showCreateDeckPremiumError();
             }
           }
         },
@@ -121,7 +177,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                     icon: SvgPicture.asset(
                       'assets/icons/decks.svg',
                       colorFilter: ColorFilter.mode(
-                        _selectedIndex == 0
+                        selectedIndex.value == 0
                             ? AppColors.primary500
                             : AppColors.grayscale500,
                         BlendMode.srcIn,
@@ -129,8 +185,8 @@ class _HomeWidgetState extends State<HomeWidget> {
                       semanticsLabel: localize(context).homeDecksLabel,
                     ),
                     label: localize(context).homeDecksLabel,
-                    isSelected: _selectedIndex == 0,
-                    onTap: () => setState(() => _selectedIndex = 0),
+                    isSelected: selectedIndex.value == 0,
+                    onTap: () => selectedIndex.value = 0,
                   ),
                   AppAddButton(
                     onPressed: () => cubit.addDockRequest(),
@@ -139,7 +195,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                     icon: SvgPicture.asset(
                       'assets/icons/settings.svg',
                       colorFilter: ColorFilter.mode(
-                        _selectedIndex == 1
+                        selectedIndex.value == 1
                             ? AppColors.primary500
                             : AppColors.grayscale500,
                         BlendMode.srcIn,
@@ -147,8 +203,8 @@ class _HomeWidgetState extends State<HomeWidget> {
                       semanticsLabel: localize(context).homeDecksLabel,
                     ),
                     label: localize(context).homeSettingsLabel,
-                    isSelected: _selectedIndex == 1,
-                    onTap: () => setState(() => _selectedIndex = 1),
+                    isSelected: selectedIndex.value == 1,
+                    onTap: () => selectedIndex.value = 1,
                   ),
                 ],
               ),
@@ -159,73 +215,6 @@ class _HomeWidgetState extends State<HomeWidget> {
           ],
         ),
       ),
-    );
-  }
-
-  void _addDockRequest() {
-    _showCreateDeckBottomSheet().then((deckName) {
-      if (deckName is String && deckName.isNotEmpty) {
-        cubit.createDeck(deckName);
-      }
-    });
-  }
-
-  Future<String?> _showCreateDeckBottomSheet({String? deckName}) {
-    return showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => _CreateDeckBottomSheet(deckName: deckName),
-    );
-  }
-
-  void _launchConfirmDeleteRequest(DeckItem deck) {
-    alert(
-      context,
-      content: Text(
-        localize(context).homeDeleteDeckConfirmation(deck.title),
-        style: AppTypography.h4.copyWith(
-          color: AppColors.grayscale600,
-        ),
-      ),
-      primary: AppDialogButton.primary(
-        text: localize(context).homeCancelButton,
-        onPressed: () => Navigator.of(context).pop(false),
-      ),
-      secondary: AppDialogButton.destructive(
-        text: localize(context).homeDeleteButton,
-        onPressed: () => Navigator.of(context).pop(true),
-      ),
-    ).then(
-      (value) {
-        if (value ?? false) {
-          cubit.deleteDeck(deck);
-        }
-      },
-    );
-  }
-
-  void _launchEditDeckTitleRequest(DeckItem deck) {
-    _showCreateDeckBottomSheet(deckName: deck.title).then(
-      (deckName) {
-        if (deckName is String && deckName.isNotEmpty) {
-          cubit.editDeck(deck, deckName);
-        }
-      },
-    );
-  }
-
-  void _openDeck(DeckItem deck) {
-    context.push(QuizCardListRoute().path, extra: deck);
-  }
-
-  void _showCreateDeckPremiumError() {
-    snackBar(
-      context,
-      message: localize(context).homePremiumDeckLimitMessage,
     );
   }
 }

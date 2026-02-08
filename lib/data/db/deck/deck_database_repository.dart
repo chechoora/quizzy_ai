@@ -7,6 +7,10 @@ class DeckDataBaseRepository {
 
   DeckDataBaseRepository(this.appDatabase);
 
+  Stream<List<DeckTableData>> watchAllDecks() {
+    return appDatabase.select(appDatabase.deckTable).watch();
+  }
+
   Future<List<DeckTableData>> fetchAllDecks() {
     return appDatabase.select(appDatabase.deckTable).get();
   }

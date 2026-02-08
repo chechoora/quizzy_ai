@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
@@ -13,32 +15,30 @@ class HomeCubit extends Cubit<DeckState> {
   final DeckRepository deckRepository;
   final DeckPremiumManager deckPremiumManager;
   final List<DeckItemWithPremium> decks = [];
+  StreamSubscription<List<DeckItemWithPremium>>? _decksSubscription;
 
-  Future<void> fetchDecks() async {
-    emit(const DeckLoadingState());
-    final data = await deckPremiumManager.fetchAllowedDecks();
-    decks
-      ..clear()
-      ..addAll(data);
-    emit(DeckDataState(data));
+  void watchDecks() {
+    _decksSubscription?.cancel();
+    _decksSubscription = deckPremiumManager.watchAllowedDecks().listen(
+      (data) {
+        decks
+          ..clear()
+          ..addAll(data);
+        emit(DeckDataState(data));
+      },
+    );
   }
 
   Future<void> createDeck(String deckName) async {
-    emit(const DeckLoadingState());
     deckRepository.saveDeck(deckName);
-    fetchDecks();
   }
 
   void deleteDeck(DeckItem deck) {
-    emit(const DeckLoadingState());
     deckRepository.deleteDeck(deck);
-    fetchDecks();
   }
 
   void editDeck(DeckItem deck, String deckName) {
-    emit(const DeckLoadingState());
     deckRepository.editDeckName(deck, deckName);
-    fetchDecks();
   }
 
   void addDockRequest() async {
@@ -48,6 +48,12 @@ class HomeCubit extends Cubit<DeckState> {
         canCreateDeck: canAddDecks,
       ),
     );
+  }
+
+  @override
+  Future<void> close() {
+    _decksSubscription?.cancel();
+    return super.close();
   }
 }
 
