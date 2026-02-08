@@ -82,18 +82,9 @@ class QuizCardListWidget extends HookWidget {
     }
 
     void showCreateCardPremiumError() {
-      alert(
+      snackBar(
         context,
-        content: Text(
-          localize(context).quizCardListPremiumCardLimitMessage,
-        ),
-        secondary: const SizedBox.shrink(),
-      ).then(
-        (value) {
-          if (value ?? false) {
-            // TODO Navigate to purchase screen
-          }
-        },
+        message: localize(context).quizCardListPremiumCardLimitMessage,
       );
     }
 

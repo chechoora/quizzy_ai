@@ -40,7 +40,7 @@ class MlAnswerValidator extends IAnswerValidator {
     required String userAnswer,
   }) async {
     final correctEmbed =
-        _cache[correctAnswer] ?? await _getEmbedding(userAnswer);
+        _cache[correctAnswer] ?? await _getEmbedding(correctAnswer);
     _cache[correctAnswer] = correctEmbed;
 
     final userEmbed = await _getEmbedding(userAnswer);

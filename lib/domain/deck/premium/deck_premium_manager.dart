@@ -21,7 +21,11 @@ class DeckPremiumManager {
     return allDecks.map((deck) {
       return DeckItemWithPremium.fromDeck(
         deckItem: deck,
-        isLocked: !isFeaturePurchased && ++count < PremiumLimitInfo.deckLimit,
+        isLocked: PremiumLimitInfo.isLocked(
+          featurePurchased: isFeaturePurchased,
+          count: ++count,
+          limit: PremiumLimitInfo.deckLimit,
+        ),
       );
     }).toList();
   }
@@ -30,8 +34,10 @@ class DeckPremiumManager {
     final allDecks = await deckRepository.fetchDecks();
     final isFeaturePurchased = await inAppPurchaseService
         .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
-    return isFeaturePurchased
-        ? true
-        : allDecks.length < PremiumLimitInfo.deckLimit;
+    return PremiumLimitInfo.canAdd(
+      featurePurchased: isFeaturePurchased,
+      count: allDecks.length,
+      limit: PremiumLimitInfo.deckLimit,
+    );
   }
 }

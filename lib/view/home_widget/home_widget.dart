@@ -223,19 +223,9 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   void _showCreateDeckPremiumError() {
-    alert(
+    snackBar(
       context,
-      content: Text(
-        localize(context).homePremiumDeckLimitMessage,
-      ),
-      secondary: const SizedBox.shrink(),
-      //textOK: Text(localize(context).homeUnlockButton),
-    ).then(
-      (value) {
-        if (value ?? false) {
-          // TODO Navigate to purchase screen
-        }
-      },
+      message: localize(context).homePremiumDeckLimitMessage,
     );
   }
 }

@@ -331,6 +331,7 @@ Future<void> _setupServices() async {
     exportService: exportService,
     deckRepository: deckRepository,
     quizCardRepository: quizCardRepository,
+    inAppPurchaseService: getIt<InAppPurchaseService>(),
   );
   getIt.registerSingleton<ImportExportService>(importExportService);
 }

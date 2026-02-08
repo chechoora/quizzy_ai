@@ -20,7 +20,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   final QuizCardRepository quizCardRepository;
   final QuizCardPremiumManager quizCardPremiumManager;
   final QuizCardExeValidator quizCardExeValidator;
-  final items = <QuizCardItem>[];
+  final items = <QuizCardItemWithPremium>[];
 
   Future<void> fetchQuizCardListRequest() async {
     emit(
@@ -33,7 +33,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     );
   }
 
-  Future<List<QuizCardItem>> _fetchCards() async {
+  Future<List<QuizCardItemWithPremium>> _fetchCards() async {
     return items
       ..clear()
       ..addAll(await quizCardPremiumManager.fetchAllowedQuizCard(deckItem));
@@ -77,21 +77,22 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     bool switchSides = false,
   }) async {
     final result = await quizCardExeValidator.isExeValid();
-    final cards = List<QuizCardItem>.from(items);
+    final cards = List<QuizCardItemWithPremium>.from(
+        items.where((card) => !card.isLocked));
     if (isShuffle) {
       cards.shuffle();
     }
     if (switchSides) {
-      final switchedCards = <QuizCardItem>[];
+      final switchedCards = <QuizCardItemWithPremium>[];
       for (var card in cards) {
         switchedCards.add(
-          QuizCardItem(
-            id: card.id,
-            questionText: card.answerText,
-            answerText: card.questionText,
-            deckId: card.deckId,
-            isArchive: card.isArchive,
-          ),
+          QuizCardItemWithPremium(
+              id: card.id,
+              questionText: card.answerText,
+              answerText: card.questionText,
+              deckId: card.deckId,
+              isArchive: card.isArchive,
+              isLocked: card.isLocked),
         );
       }
       cards
@@ -147,7 +148,7 @@ class QuizCardListLoadingState extends BuilderState {
 class QuizCardListDataState extends BuilderState {
   const QuizCardListDataState({required this.quizCarList});
 
-  final List<QuizCardItem> quizCarList;
+  final List<QuizCardItemWithPremium> quizCarList;
 
   @override
   List<Object?> get props => [quizCarList];
@@ -159,7 +160,7 @@ class QuizCardLaunchState extends ListenerState {
     this.isQuickPlay = false,
   });
 
-  final List<QuizCardItem> quizCarList;
+  final List<QuizCardItemWithPremium> quizCarList;
   final bool isQuickPlay;
 }
 

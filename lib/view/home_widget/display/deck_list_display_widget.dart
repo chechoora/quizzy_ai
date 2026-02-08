@@ -13,7 +13,7 @@ class DeckListDisplayWidget extends StatelessWidget {
     super.key,
   });
 
-  final List<DeckItem> deckList;
+  final List<DeckItemWithPremium> deckList;
   final ValueChanged<DeckItem>? onDeckRemoveRequest;
   final ValueChanged<DeckItem>? onDeckEditRequest;
   final ValueChanged<DeckItem>? onDeckClicked;

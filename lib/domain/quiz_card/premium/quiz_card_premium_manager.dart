@@ -2,7 +2,6 @@ import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
-import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 
 import 'package:poc_ai_quiz/data/premium/premium_info.dart';
 
@@ -24,8 +23,10 @@ class QuizCardPremiumManager {
     return allQuizCards.map((quizCard) {
       return QuizCardItemWithPremium.fromQuizCard(
         quizCardItem: quizCard,
-        isLocked:
-            !isFeaturePurchased && ++count < PremiumLimitInfo.quizCardLimit,
+        isLocked: PremiumLimitInfo.isLocked(
+            featurePurchased: isFeaturePurchased,
+            count: ++count,
+            limit: PremiumLimitInfo.quizCardLimit),
       );
     }).toList();
   }
@@ -34,8 +35,10 @@ class QuizCardPremiumManager {
     final allQuizCards = await quizCardRepository.fetchQuizCardItem(deckItem);
     final isFeaturePurchased = await inAppPurchaseService
         .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
-    return isFeaturePurchased
-        ? true
-        : allQuizCards.length < PremiumLimitInfo.quizCardLimit;
+    return PremiumLimitInfo.canAdd(
+      featurePurchased: isFeaturePurchased,
+      count: allQuizCards.length,
+      limit: PremiumLimitInfo.quizCardLimit,
+    );
   }
 }

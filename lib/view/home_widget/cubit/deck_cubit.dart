@@ -12,10 +12,14 @@ class HomeCubit extends Cubit<DeckState> {
 
   final DeckRepository deckRepository;
   final DeckPremiumManager deckPremiumManager;
+  final List<DeckItemWithPremium> decks = [];
 
   Future<void> fetchDecks() async {
     emit(const DeckLoadingState());
     final data = await deckPremiumManager.fetchAllowedDecks();
+    decks
+      ..clear()
+      ..addAll(data);
     emit(DeckDataState(data));
   }
 
@@ -70,7 +74,7 @@ class DeckLoadingState extends BuilderState {
 }
 
 class DeckDataState extends BuilderState {
-  final List<DeckItem> deckList;
+  final List<DeckItemWithPremium> deckList;
 
   const DeckDataState(this.deckList);
 
