@@ -79,8 +79,9 @@ class ValidatorsManager {
       case AnswerValidatorType.openAI:
       case AnswerValidatorType.ml:
       case AnswerValidatorType.ollama:
-      case AnswerValidatorType.quizzyAI:
         return true;
+      case AnswerValidatorType.quizzyAI:
+        return false;
       case AnswerValidatorType.onDeviceAI:
         return defaultTargetPlatform == TargetPlatform.iOS &&
             await onDeviceAIService.isOnDeviceAIAvailable();
