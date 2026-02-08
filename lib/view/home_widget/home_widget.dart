@@ -332,77 +332,80 @@ class _CreateDeckBottomSheet extends HookWidget {
     final text = controller.text.trim();
     final isEditing = deckName != null;
     final l10n = localize(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24.0,
-            vertical: 8.0,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                isEditing ? l10n.homeEditDeckTitle : l10n.homeNewDeckTitle,
-                style: AppTypography.h3.copyWith(
-                  color: AppColors.grayscale600,
+    return SafeArea(
+      top: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 8.0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isEditing ? l10n.homeEditDeckTitle : l10n.homeNewDeckTitle,
+                  style: AppTypography.h3.copyWith(
+                    color: AppColors.grayscale600,
+                  ),
                 ),
-              ),
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close),
-              ),
-            ],
-          ),
-        ),
-        const Divider(
-          height: 0.5,
-          thickness: 0.5,
-          color: AppColors.grayscale300,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24.0,
-            vertical: 8.0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                isEditing
-                    ? l10n.homeEditDeckDescription
-                    : l10n.homeNewDeckDescription,
-                style: AppTypography.mainText.copyWith(
-                  color: AppColors.grayscale500,
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
                 ),
-              ),
-              const SizedBox(height: 16),
-              AppTextField(
-                controller: controller,
-                autofocus: true,
-                hint: l10n.homeNewDeckHint,
-              ),
-              const SizedBox(height: 20),
-              AppButton.primary(
-                text: isEditing
-                    ? l10n.homeSaveDeckButton
-                    : l10n.homeCreateDeckButton,
-                onPressed: text.isNotEmpty
-                    ? () {
-                        Navigator.pop(context, text);
-                      }
-                    : null,
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).viewInsets.bottom + 16,
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+          const Divider(
+            height: 0.5,
+            thickness: 0.5,
+            color: AppColors.grayscale300,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 8.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  isEditing
+                      ? l10n.homeEditDeckDescription
+                      : l10n.homeNewDeckDescription,
+                  style: AppTypography.mainText.copyWith(
+                    color: AppColors.grayscale500,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                AppTextField(
+                  controller: controller,
+                  autofocus: true,
+                  hint: l10n.homeNewDeckHint,
+                ),
+                const SizedBox(height: 20),
+                AppButton.primary(
+                  text: isEditing
+                      ? l10n.homeSaveDeckButton
+                      : l10n.homeCreateDeckButton,
+                  onPressed: text.isNotEmpty
+                      ? () {
+                          Navigator.pop(context, text);
+                        }
+                      : null,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).viewInsets.bottom + 16,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
