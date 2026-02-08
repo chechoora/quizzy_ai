@@ -104,12 +104,22 @@ class QuizExeWidget extends HookWidget {
                   l10n.quizExeScoreLabel((result.score * 100).toInt()),
                   style: AppTypography.h3,
                 ),
-                content: result.explanation != null
-                    ? Text(
-                        l10n.quizExeDetailsLabel(result.explanation!),
-                        style: AppTypography.secondaryText,
-                      )
-                    : null,
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Correct answer: ${result.correctAnswer}',
+                      style: AppTypography.h4,
+                    ),
+                    const SizedBox(height: 4),
+                    result.explanation != null
+                        ? Text(
+                            l10n.quizExeDetailsLabel(result.explanation!),
+                            style: AppTypography.secondaryText,
+                          )
+                        : const SizedBox.shrink(),
+                  ],
+                ),
                 variant: isCorrect
                     ? AppBottomSheetVariant.positive
                     : AppBottomSheetVariant.destructive,

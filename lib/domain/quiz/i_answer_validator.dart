@@ -44,10 +44,12 @@ $userAnswer""";
 
 class AnswerResult {
   // From 0.0 to 1.0
+  final String  correctAnswer;
   final double score;
   final String? explanation;
 
   AnswerResult({
+    required this.correctAnswer,
     required this.score,
     this.explanation,
   });

@@ -101,6 +101,7 @@ ${ValidatorPrompts.geminiEvaluateInstruction}
       _logger.v('Missing points: ${quizScore.missingPoints}');
 
       return AnswerResult(
+        correctAnswer: userAnswer,
         score: quizScore.score / 100.0,
         explanation: quizScore.explanation,
       );

@@ -14,6 +14,7 @@ class QuizzyAnswerValidator extends IAnswerValidator {
     required String userAnswer,
   }) async {
     return _answerFromResponse(
+      correctAnswer,
       await _apiService.validateAnswer(
         body: CheckAnswerRequest(
           question: question,
@@ -24,13 +25,15 @@ class QuizzyAnswerValidator extends IAnswerValidator {
     );
   }
 
-  Future<AnswerResult> _answerFromResponse(Response<dynamic> response) async {
+  Future<AnswerResult> _answerFromResponse(
+      String correctAnswer, Response<dynamic> response) async {
     if (response.statusCode == 200) {
       final data = response.body as Map<String, dynamic>;
       final isCorrect = data['isCorrect'] as bool;
       final feedback = data['feedback'] as String?;
       final confidence = (data['confidence'] as num).toDouble();
       return AnswerResult(
+        correctAnswer: correctAnswer,
         score: isCorrect ? confidence : 0.0,
         explanation: feedback,
       );

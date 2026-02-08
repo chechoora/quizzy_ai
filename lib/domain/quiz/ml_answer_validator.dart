@@ -45,7 +45,7 @@ class MlAnswerValidator extends IAnswerValidator {
 
     final userEmbed = await _getEmbedding(userAnswer);
     final score = _cosineSimilarity(correctEmbed, userEmbed);
-    return AnswerResult(score: score);
+    return AnswerResult(correctAnswer: correctAnswer, score: score);
   }
 
   Future<List<double>> _getEmbedding(String text) async {

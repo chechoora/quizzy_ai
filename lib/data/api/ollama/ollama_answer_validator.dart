@@ -96,7 +96,7 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
           _logger.e('No content in Ollama message');
           throw Exception('No content in Ollama message');
         }
-        return _parseContent(content);
+        return _parseContent(correctAnswer, content);
       }
 
       // OpenAI-compatible format
@@ -113,7 +113,7 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
         throw Exception('No content in Ollama message');
       }
 
-      return _parseContent(content);
+      return _parseContent(correctAnswer, content);
     } catch (e, stackTrace) {
       _logger.e('Error validating answer with Ollama',
           ex: e, stacktrace: stackTrace);
@@ -138,7 +138,7 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
     return normalizedUrl;
   }
 
-  AnswerResult _parseContent(String content) {
+  AnswerResult _parseContent(String correctAnswer, String content) {
     _logger.d('Parsing response content: $content');
 
     // Try to extract JSON from the content
@@ -164,6 +164,7 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
     _logger.v('Missing points: ${quizScore.missingPoints}');
 
     return AnswerResult(
+      correctAnswer: correctAnswer,
       score: quizScore.score / 100.0,
       explanation: quizScore.explanation,
     );

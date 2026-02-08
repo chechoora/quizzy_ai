@@ -108,6 +108,7 @@ ${ValidatorPrompts.claudeToolUseInstruction}
       _logger.v('Missing points: ${quizScore.missingPoints}');
 
       return AnswerResult(
+        correctAnswer: correctAnswer,
         score: quizScore.score / 100.0,
         explanation: quizScore.explanation,
       );
