@@ -48,6 +48,7 @@ class QuizCardListWidget extends HookWidget {
     );
 
     final shuffleValue = useState(false);
+    final switchSidesValue = useState(false);
 
     void addCardRequest() {
       context.push(CreateCardRoute().path).then((cardRequest) {
@@ -128,13 +129,18 @@ class QuizCardListWidget extends HookWidget {
                             onQuickPlayPressed: () => cubit.launchQuizRequest(
                               isQuickPlay: true,
                               isShuffle: shuffleValue.value,
+                              switchSides: switchSidesValue.value,
                             ),
                             onPlayDeckPressed: () => cubit.launchQuizRequest(
                               isShuffle: shuffleValue.value,
+                              switchSides: switchSidesValue.value,
                             ),
                             onShufflePressed: (isShuffle) =>
                                 shuffleValue.value = isShuffle,
+                            onSwitchSidesPressed: (isSwitched) =>
+                                switchSidesValue.value = isSwitched,
                             shuffleEnabled: shuffleValue.value,
+                            switchSides: switchSidesValue.value,
                           ),
                       ],
                     );
@@ -186,13 +192,17 @@ class _BottomButtons extends StatelessWidget {
     this.onQuickPlayPressed,
     this.onPlayDeckPressed,
     this.onShufflePressed,
+    this.onSwitchSidesPressed,
     this.shuffleEnabled = false,
+    this.switchSides = false,
   });
 
   final VoidCallback? onQuickPlayPressed;
   final VoidCallback? onPlayDeckPressed;
   final ValueChanged<bool>? onShufflePressed;
   final bool shuffleEnabled;
+  final ValueChanged<bool>? onSwitchSidesPressed;
+  final bool switchSides;
 
   @override
   Widget build(BuildContext context) {
@@ -203,24 +213,46 @@ class _BottomButtons extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                onShufflePressed?.call(!shuffleEnabled);
-              },
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                shuffleEnabled ? 'Shuffle Cards' : 'Cards in Order',
-                style: AppTypography.buttonSmall.copyWith(
-                  color: AppColors.primary500,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () {
+                  onSwitchSidesPressed?.call(!switchSides);
+                },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  switchSides
+                      ? l10n.quizCardListSideSwitched
+                      : l10n.quizCardListSidesNotSwitched,
+                  style: AppTypography.buttonSmall.copyWith(
+                    color: AppColors.primary500,
+                  ),
                 ),
               ),
-            ),
+              TextButton(
+                onPressed: () {
+                  onShufflePressed?.call(!shuffleEnabled);
+                },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  shuffleEnabled
+                      ? l10n.quizCardListShuffleCards
+                      : l10n.quizCardListCardsInOrder,
+                  style: AppTypography.buttonSmall.copyWith(
+                    color: AppColors.primary500,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           AppButton.primary(

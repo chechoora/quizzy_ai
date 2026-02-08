@@ -74,16 +74,34 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   Future<void> launchQuizRequest({
     bool isQuickPlay = false,
     bool isShuffle = false,
+    bool switchSides = false,
   }) async {
     final result = await quizCardExeValidator.isExeValid();
-    final cars = List<QuizCardItem>.from(items);
+    final cards = List<QuizCardItem>.from(items);
     if (isShuffle) {
-      cars.shuffle();
+      cards.shuffle();
+    }
+    if (switchSides) {
+      final switchedCards = <QuizCardItem>[];
+      for (var card in cards) {
+        switchedCards.add(
+          QuizCardItem(
+            id: card.id,
+            questionText: card.answerText,
+            answerText: card.questionText,
+            deckId: card.deckId,
+            isArchive: card.isArchive,
+          ),
+        );
+      }
+      cards
+        ..clear()
+        ..addAll(switchedCards);
     }
     if (result is QuizCardExeValid) {
       emit(
         QuizCardLaunchState(
-          quizCarList: cars,
+          quizCarList: cards,
           isQuickPlay: isQuickPlay,
         ),
       );

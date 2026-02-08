@@ -115,6 +115,10 @@
   "quizCardListAddCardTooltip": "Add Card",
   "quizCardListPlayDeckButton": "Play the Deck",
   "quizCardListQuickPlayButton": "Quick Play",
+  "quizCardListSideSwitched": "Side switched",
+  "quizCardListSidesNotSwitched": "Sides not switched",
+  "quizCardListShuffleCards": "Shuffle Cards",
+  "quizCardListCardsInOrder": "Cards in Order",
   "quizCardListEditCardAction": "Edit card",
   "quizCardListDeleteCardAction": "Delete card",
 
