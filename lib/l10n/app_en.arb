@@ -202,5 +202,20 @@
       }
     }
   },
-  "importExportCopiedToClipboard": "Copied to clipboard"
+  "importExportCopiedToClipboard": "Copied to clipboard",
+
+  "card": "Card",
+  "deck": "Deck",
+  "importLimitExceeded": "Import limit exceeded: max {limit} {typeName}(s) allowed",
+  "@importLimitExceeded": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      },
+      "typeName": {
+        "type": "String"
+      }
+    }
+  },
+  "importExportError": "Import / Export error"
 }

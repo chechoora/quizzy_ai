@@ -15,14 +15,30 @@ class DeckDataBaseRepository {
     return appDatabase.select(appDatabase.deckTable).get();
   }
 
-  Future<bool> saveDeck(String deckName) async {
+  Future<int> saveDeck(String deckName) async {
     final result = await appDatabase.into(appDatabase.deckTable).insert(
           DeckTableCompanion.insert(
             title: deckName,
             isArchive: false,
           ),
         );
-    return result != -1;
+    return result;
+  }
+
+  Future<List<int>> saveDecks(List<String> list) async {
+    return appDatabase.transaction(() async {
+      final ids = <int>[];
+      for (final deckName in list) {
+        final id = await appDatabase.into(appDatabase.deckTable).insert(
+              DeckTableCompanion.insert(
+                title: deckName,
+                isArchive: false,
+              ),
+            );
+        ids.add(id);
+      }
+      return ids;
+    });
   }
 
   Future<bool> editDeckName(DeckItem deck, String deckName) async {
@@ -50,4 +66,5 @@ class DeckDataBaseRepository {
         .go();
     return result >= 0;
   }
+
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/import_export/exception.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_state.dart';
@@ -27,9 +28,12 @@ class ImportExportCubit extends Cubit<ImportExportState> {
         ..addAll(await deckRepository.fetchDecks());
       _selectedDeckIds.clear();
       emit(ImportExportDataState(decks: _decks, selectedDeckIds: const {}));
-    } catch (e, stackTrace) {
+    } on ImportExportException catch (e, stackTrace) {
       _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
-      emit(ImportExportErrorState(message: 'Failed to load decks: $e'));
+      emit(ImportExportErrorState(exception: e));
+    } on Exception catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(const ImportExportErrorState(exception: ImportExportException()));
     }
   }
 
@@ -75,11 +79,14 @@ class ImportExportCubit extends Cubit<ImportExportState> {
         decks: _decks,
         selectedDeckIds: Set.from(_selectedDeckIds),
       ));
-    } catch (e, stackTrace) {
-      _logger.e('Failed to export decks', ex: e, stacktrace: stackTrace);
-      emit(ImportExportErrorState(message: 'Failed to export: $e'));
-      loadDecks();
+    } on ImportExportException catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(exception: e));
+    } on Exception catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(const ImportExportErrorState(exception: ImportExportException()));
     }
+    loadDecks();
   }
 
   Future<void> importDecksFromFile() async {
@@ -92,17 +99,20 @@ class ImportExportCubit extends Cubit<ImportExportState> {
       }
       emit(ImportExportImportSuccessState(deckCount: importedCount));
       await loadDecks();
-    } catch (e, stackTrace) {
-      _logger.e('Failed to import decks', ex: e, stacktrace: stackTrace);
-      emit(ImportExportErrorState(message: 'Failed to import decks: $e'));
-      loadDecks();
+    } on ImportExportException catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(exception: e));
+    } on Exception catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(const ImportExportErrorState(exception: ImportExportException()));
     }
+    loadDecks();
   }
 
   Future<void> importCardsFromFile() async {
     if (_decks.isEmpty) {
       emit(const ImportExportErrorState(
-        message: 'Create a deck first before importing cards',
+        exception: ImportExportException(),
       ));
       return;
     }
@@ -120,11 +130,14 @@ class ImportExportCubit extends Cubit<ImportExportState> {
       }
       emit(ImportExportImportCardsSuccessState(cardCount: importedCount));
       await loadDecks();
-    } catch (e, stackTrace) {
-      _logger.e('Failed to import cards', ex: e, stacktrace: stackTrace);
-      emit(ImportExportErrorState(message: 'Failed to import cards: $e'));
-      loadDecks();
+    } on ImportExportException catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(exception: e));
+    } on Exception catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(const ImportExportErrorState(exception: ImportExportException()));
     }
+    loadDecks();
   }
 
   Future<void> importDecksFromClipboard() async {
@@ -133,26 +146,25 @@ class ImportExportCubit extends Cubit<ImportExportState> {
       final importedCount =
           await importExportService.importDecksFromClipboard();
       if (importedCount == null) {
-        emit(const ImportExportErrorState(message: 'Clipboard is empty'));
+        emit(const ImportExportErrorState(exception: ImportExportException()));
         await loadDecks();
         return;
       }
       emit(ImportExportImportSuccessState(deckCount: importedCount));
       await loadDecks();
-    } catch (e, stackTrace) {
-      _logger.e('Failed to import decks from clipboard',
-          ex: e, stacktrace: stackTrace);
-      emit(ImportExportErrorState(
-          message: 'Failed to import decks from clipboard: $e'));
-      loadDecks();
+    } on ImportExportException catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(exception: e));
+    } on Exception catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(const ImportExportErrorState(exception: ImportExportException()));
     }
+    loadDecks();
   }
 
   Future<void> importCardsFromClipboard() async {
     if (_decks.isEmpty) {
-      emit(const ImportExportErrorState(
-        message: 'Create a deck first before importing cards',
-      ));
+      emit(const ImportExportErrorState(exception: ImportExportException()));
       return;
     }
     emit(ImportExportSelectDeckState(decks: _decks, fromClipboard: true));
@@ -164,18 +176,18 @@ class ImportExportCubit extends Cubit<ImportExportState> {
       final importedCount =
           await importExportService.importCardsFromClipboard(deckId: deckId);
       if (importedCount == null) {
-        emit(const ImportExportErrorState(message: 'Clipboard is empty'));
+        emit(const ImportExportErrorState(exception: ImportExportException()));
         await loadDecks();
         return;
       }
       emit(ImportExportImportCardsSuccessState(cardCount: importedCount));
       await loadDecks();
-    } catch (e, stackTrace) {
-      _logger.e('Failed to import cards from clipboard',
-          ex: e, stacktrace: stackTrace);
-      emit(ImportExportErrorState(
-          message: 'Failed to import cards from clipboard: $e'));
-      loadDecks();
+    } on ImportExportException catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(exception: e));
+    } on Exception catch (e, stackTrace) {
+      _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
+      emit(const ImportExportErrorState(exception: ImportExportException()));
     }
   }
 }

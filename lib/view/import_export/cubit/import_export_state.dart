@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/import_export/exception.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
 // -- States --
@@ -69,9 +70,9 @@ class ImportExportSelectDeckState extends ListenerState {
 }
 
 class ImportExportErrorState extends ListenerState {
-  const ImportExportErrorState({required this.message});
+  const ImportExportErrorState({required this.exception});
 
-  final String message;
+  final ImportExportException exception;
 }
 
 class ImportExportImportSuccessState extends ListenerState {

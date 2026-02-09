@@ -6,6 +6,8 @@ import 'package:poc_ai_quiz/data/import_export/import_service.dart';
 import 'package:poc_ai_quiz/data/premium/premium_info.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/import_export/exception.dart';
+import 'package:poc_ai_quiz/domain/import_export/model.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:share_plus/share_plus.dart';
@@ -61,7 +63,7 @@ class ImportExportService {
     return _saveImportedCards(cards, deckId: deckId);
   }
 
-  Future<int> _saveImportedDecks(List<DeckImportModel> decks) async {
+  Future<int> _saveImportedDecks(List<PlainDeckModel> decks) async {
     final isPremium = await inAppPurchaseService
         .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
 
@@ -69,9 +71,9 @@ class ImportExportService {
       final existingDecks = await deckRepository.fetchDecks();
       final totalAfterImport = existingDecks.length + decks.length;
       if (totalAfterImport > PremiumLimitInfo.deckLimit) {
-        // TODO: Move to .arb
         throw const ImportLimitExceededException(
-          'Deck limit exceeded. Please purchase full version. You can have up to ${PremiumLimitInfo.deckLimit} decks.',
+          ImportExportType.card,
+          PremiumLimitInfo.quizCardLimit,
         );
       }
     }
@@ -80,8 +82,8 @@ class ImportExportService {
       for (final deck in decks) {
         if (deck.cards.length > PremiumLimitInfo.quizCardLimit) {
           throw const ImportLimitExceededException(
-            'Card limit exceeded. Please purchase full version. Each deck can have up to '
-            '${PremiumLimitInfo.quizCardLimit} cards.',
+            ImportExportType.deck,
+            PremiumLimitInfo.deckLimit,
           );
         }
       }
@@ -89,62 +91,33 @@ class ImportExportService {
 
     var importedCount = 0;
     for (final deck in decks) {
-      final saved = await deckRepository.saveDeck(deck.title);
-      if (!saved) continue;
+      final deckId = await deckRepository.saveDeck(deck.title);
+      if (deckId == -1) continue;
 
-      final allDecks = await deckRepository.fetchDecks();
-      final newDeck = allDecks.lastWhere((d) => d.title == deck.title);
-
-      for (final card in deck.cards) {
-        await quizCardRepository.saveQuizCard(
-          question: card.question,
-          answer: card.answer,
-          deckId: newDeck.id,
-        );
-      }
+      await quizCardRepository.saveQuizCards(deck.cards, deckId);
       importedCount++;
     }
     return importedCount;
   }
 
   Future<int> _saveImportedCards(
-    List<CardImportModel> cards, {
+    List<PlainCardModel> cards, {
     required int deckId,
   }) async {
     final isPremium = await inAppPurchaseService
         .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
 
     if (!isPremium) {
-      final allDecks = await deckRepository.fetchDecks();
-      final deck = allDecks.firstWhere((d) => d.id == deckId);
-      final existingCards = await quizCardRepository.fetchQuizCardItem(deck);
+      final existingCards = await quizCardRepository.fetchQuizCardItem(deckId);
       final totalAfterImport = existingCards.length + cards.length;
       if (totalAfterImport > PremiumLimitInfo.quizCardLimit) {
         throw const ImportLimitExceededException(
-          'Card limit exceeded. Each deck can have up to '
-          '${PremiumLimitInfo.quizCardLimit} cards.',
+          ImportExportType.card,
+          PremiumLimitInfo.quizCardLimit,
         );
       }
     }
 
-    var importedCount = 0;
-    for (final card in cards) {
-      await quizCardRepository.saveQuizCard(
-        question: card.question,
-        answer: card.answer,
-        deckId: deckId,
-      );
-      importedCount++;
-    }
-    return importedCount;
+    return (await quizCardRepository.saveQuizCards(cards, deckId)).length;
   }
-}
-
-class ImportLimitExceededException implements Exception {
-  const ImportLimitExceededException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => message;
 }

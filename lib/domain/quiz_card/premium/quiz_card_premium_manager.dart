@@ -16,7 +16,7 @@ class QuizCardPremiumManager {
 
   Future<List<QuizCardItemWithPremium>> fetchAllowedQuizCard(
       DeckItem deckItem) async {
-    final allQuizCards = await quizCardRepository.fetchQuizCardItem(deckItem);
+    final allQuizCards = await quizCardRepository.fetchQuizCardItem(deckItem.id);
     int count = 0;
     final isFeaturePurchased = await inAppPurchaseService
         .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
@@ -32,7 +32,7 @@ class QuizCardPremiumManager {
   }
 
   Future<bool> canAddQuizCard(DeckItem deckItem) async {
-    final allQuizCards = await quizCardRepository.fetchQuizCardItem(deckItem);
+    final allQuizCards = await quizCardRepository.fetchQuizCardItem(deckItem.id);
     final isFeaturePurchased = await inAppPurchaseService
         .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
     return PremiumLimitInfo.canAdd(

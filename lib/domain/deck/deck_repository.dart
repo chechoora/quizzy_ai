@@ -22,9 +22,13 @@ class DeckRepository {
     return deckDatBaseMapper.mapToDeckItemList(databaseData);
   }
 
-  // TODO: change to id
-  Future<bool> saveDeck(String deckName) {
+  Future<int> saveDeck(String deckName) {
     return dataBaseRepository.saveDeck(deckName.trim());
+  }
+
+  Future<List<int>> saveDecks(List<String> deckNames) {
+    return dataBaseRepository
+        .saveDecks(deckNames.map((e) => e.trim()).toList());
   }
 
   Future<bool> deleteDeck(DeckItem deck) {

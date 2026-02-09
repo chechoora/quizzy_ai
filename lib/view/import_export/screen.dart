@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/import_export/exception.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
@@ -50,7 +51,26 @@ class ImportExportScreen extends HookWidget {
                 listenWhen: (_, next) => next is ListenerState,
                 listener: (context, state) {
                   if (state is ImportExportErrorState) {
-                    snackBar(context, message: state.message, isError: true);
+                    final exception = state.exception;
+                    if (exception is ImportLimitExceededException) {
+                      final type = exception.type;
+                      final limit = exception.limit;
+                      final typeName = type == ImportExportType.card
+                          ? localize(context).card
+                          : localize(context).deck;
+                      snackBar(
+                        context,
+                        message: localize(context).importLimitExceeded(
+                          limit,
+                          typeName,
+                        ),
+                        isError: true,
+                      );
+                    } else {
+                      snackBar(context,
+                          message: localize(context).importExportError,
+                          isError: true);
+                    }
                   }
                   if (state is ImportExportImportSuccessState) {
                     snackBar(
@@ -356,8 +376,8 @@ class _DataContent extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: AppButton.primary(
-            text: localize(context).importExportExportSelectedButton(
-                state.selectedDeckIds.length),
+            text: localize(context)
+                .importExportExportSelectedButton(state.selectedDeckIds.length),
             leadingIcon: Icons.file_upload,
             onPressed:
                 state.hasSelection ? () => cubit.exportSelectedDecks() : null,

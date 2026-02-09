@@ -12,7 +12,7 @@ class ExportService {
     final exportData = <Map<String, dynamic>>[];
 
     for (final deck in decks) {
-      final cards = await quizCardRepository.fetchQuizCardItem(deck);
+      final cards = await quizCardRepository.fetchQuizCardItem(deck.id);
       exportData.add({
         'title': deck.title,
         'cards': cards
