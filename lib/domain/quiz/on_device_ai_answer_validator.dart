@@ -17,8 +17,8 @@ class OnDeviceAIAnswerValidator extends IAnswerValidator {
     _logger.d('Validating answer with on-device AI');
     _logger.v('Question: $question');
     try {
-      // TODO Add question to the validation
       final result = await onDeviceAIService.validateAnswer(
+        question: question,
         userAnswer: userAnswer,
         correctAnswer: correctAnswer,
       );
@@ -26,6 +26,7 @@ class OnDeviceAIAnswerValidator extends IAnswerValidator {
       return AnswerResult(
         correctAnswer: correctAnswer,
         score: result.howCorrect,
+        explanation: result.reasoning,
       );
     } catch (e, stackTrace) {
       _logger.e('Failed to validate answer with on-device AI',

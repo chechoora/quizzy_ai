@@ -17,9 +17,10 @@ class OnDeviceAIService {
 
   /// Validate a user's answer against the correct answer using on-device AI
   Future<CardAnswerResult> validateAnswer({
+    required String question,
     required String userAnswer,
     required String correctAnswer,
   }) async {
-    return await _api.validateAnswer(userAnswer, correctAnswer);
+    return await _api.validateAnswer(question, userAnswer, correctAnswer);
   }
 }

@@ -18,7 +18,6 @@
   "quizExeFinishedTitle": "Quiz Finished",
   "quizExeInProgressTitle": "Quiz in Progress",
   "createDeckTitleLabel": "Title of the deck",
-
   "inAppFeaturesTitle": "In-App Features",
   "inAppFeaturesPurchaseSuccess": "Purchase successful!",
   "inAppFeaturesRestoreSuccess": "Purchases restored successfully!",
@@ -33,7 +32,6 @@
   "inAppFeaturesQuizzyAiDescription": "Use our AI-powered validator to check your quiz answers with high accuracy.",
   "inAppFeaturesQuizzyAiSubtitle": "Yearly subscription",
   "inAppFeaturesSubscribeButton": "Subscribe",
-
   "settingsTitle": "Settings",
   "settingsAiValidatorSubtitleTile": "Configure answer validation settings",
   "settingsInAppFeaturesSubtitle": "Manage premium features",
@@ -111,7 +109,6 @@
   },
   "settingsAiValidatorDeleteButton": "Delete",
   "settingsAiValidatorApplyButton": "Apply",
-
   "quizCardListPremiumCardLimitMessage": "You can not create more cards, please unlock the full version.",
   "quizCardListDeleteCardConfirmation": "Are you sure you want to delete current card?",
   "quizCardListBackTooltip": "Back",
@@ -120,11 +117,10 @@
   "quizCardListQuickPlayButton": "Quick Play",
   "quizCardListSideSwitched": "Side switched",
   "quizCardListSidesNotSwitched": "Sides not switched",
-  "quizCardListShuffleCards": "Shuffle Cards",
+  "quizCardListShuffleCards": "Cards Shuffled",
   "quizCardListCardsInOrder": "Cards in Order",
   "quizCardListEditCardAction": "Edit card",
   "quizCardListDeleteCardAction": "Delete card",
-
   "quizExeScoreLabel": "Score: {score}",
   "@quizExeScoreLabel": {
     "placeholders": {
@@ -142,7 +138,6 @@
     }
   },
   "quizExeNextCardButton": "Next Card",
-
   "homeEmptyStateTitle": "No decks yet",
   "homeEmptyStateDescription": "Create your first deck and start learning!",
   "homeNewDeckTitle": "New deck",
@@ -156,14 +151,11 @@
   "homeDeleteButton": "Delete",
   "homeEditDeckAction": "Edit deck",
   "homeDeleteDeckAction": "Delete deck",
-
   "quizDisplayTypeAnswerLabel": "Type your answer below",
   "quizDisplayTypeAnswerHint": "Type your answer",
   "quizDisplayAnswerButton": "Answer",
   "quizDisplayDontKnowButton": "Don't know",
-
   "dismiss": "Dismiss",
-
   "importExportImportTitle": "Import",
   "importExportImportDescription": "Import from a JSON file or clipboard. Use the matching format:",
   "importExportImportSourceTitle": "Import source",
@@ -203,7 +195,6 @@
     }
   },
   "importExportCopiedToClipboard": "Copied to clipboard",
-
   "card": "Card",
   "deck": "Deck",
   "importLimitExceeded": "Import limit exceeded: max {limit} {typeName}(s) allowed",
