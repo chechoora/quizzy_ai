@@ -21,6 +21,7 @@
   "inAppFeaturesTitle": "In-App Features",
   "inAppFeaturesPurchaseSuccess": "Purchase successful!",
   "inAppFeaturesRestoreSuccess": "Purchases restored successfully!",
+  "inAppFeaturesPurchaseError": "Something went wrong during purchase process",
   "inAppFeaturesUnlimitedTitle": "Unlimited decks & cards",
   "inAppFeaturesUnlimitedDescription": "Create as many decks and cards as you want. No limits.",
   "inAppFeaturesUnlimitedSubtitle": "One-time purchase",

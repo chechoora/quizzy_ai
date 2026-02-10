@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/exception/in_app_purchase_exception.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
+import 'package:poc_ai_quiz/util/unique_emit.dart';
 
 class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
   InAppFeaturesCubit({
@@ -30,7 +32,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
       ));
     } catch (e, stackTrace) {
       _logger.e('Failed to load features', ex: e, stacktrace: stackTrace);
-      emit(InAppFeaturesErrorState(error: e.toString()));
+      emit(const InAppFeaturesErrorState(exception: InAppPurchaseException()));
     }
   }
 
@@ -51,7 +53,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
       await loadFeatures();
     } catch (e, stackTrace) {
       _logger.e('Failed to purchase feature', ex: e, stacktrace: stackTrace);
-      emit(InAppFeaturesErrorState(error: e.toString()));
+      emit(const InAppFeaturesErrorState(exception: InAppPurchaseException()));
       emit(currentState);
     }
   }
@@ -73,7 +75,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
       await loadFeatures();
     } catch (e, stackTrace) {
       _logger.e('Failed to subscribe', ex: e, stacktrace: stackTrace);
-      emit(InAppFeaturesErrorState(error: e.toString()));
+      emit(const InAppFeaturesErrorState(exception: InAppPurchaseException()));
       emit(currentState);
     }
   }
@@ -90,7 +92,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
       await loadFeatures();
     } catch (e, stackTrace) {
       _logger.e('Failed to restore purchases', ex: e, stacktrace: stackTrace);
-      emit(InAppFeaturesErrorState(error: e.toString()));
+      emit(const InAppFeaturesErrorState(exception: InAppPurchaseException()));
       emit(currentState);
     }
   }
@@ -104,11 +106,11 @@ abstract class BuilderState extends InAppFeaturesState {
   const BuilderState();
 }
 
-abstract class ListenerState extends InAppFeaturesState {
+abstract class ListenerState extends InAppFeaturesState with UniqueEmit {
   const ListenerState();
 
   @override
-  List<Object?> get props => [Object()];
+  List<Object?> get props => [...uniqueProps];
 }
 
 class InAppFeaturesLoadingState extends BuilderState {
@@ -142,28 +144,20 @@ class InAppFeaturesDataState extends BuilderState {
   });
 
   @override
-  List<Object?> get props => [isUnlimitedDecksCardsPurchased, isQuizzyAiSubscribed];
+  List<Object?> get props =>
+      [isUnlimitedDecksCardsPurchased, isQuizzyAiSubscribed];
 }
 
 class InAppFeaturesPurchaseSuccessState extends ListenerState {
   const InAppFeaturesPurchaseSuccessState();
-
-  @override
-  List<Object?> get props => super.props;
 }
 
 class InAppFeaturesRestoreSuccessState extends ListenerState {
   const InAppFeaturesRestoreSuccessState();
-
-  @override
-  List<Object?> get props => super.props;
 }
 
 class InAppFeaturesErrorState extends ListenerState {
-  final String error;
+  final InAppPurchaseException exception;
 
-  const InAppFeaturesErrorState({required this.error});
-
-  @override
-  List<Object?> get props => [error, super.props];
+  const InAppFeaturesErrorState({required this.exception});
 }

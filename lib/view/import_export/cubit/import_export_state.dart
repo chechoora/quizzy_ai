@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
-import 'package:poc_ai_quiz/domain/import_export/exception.dart';
+import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
 // -- States --

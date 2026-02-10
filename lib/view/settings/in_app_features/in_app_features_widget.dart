@@ -76,7 +76,7 @@ class SettingsInAppFeaturesWidget extends HookWidget {
                   } else if (state is InAppFeaturesErrorState) {
                     snackBar(
                       context,
-                      message: state.error,
+                      message: l10n.inAppFeaturesPurchaseError,
                       duration: const Duration(seconds: 4),
                       isError: true,
                     );
