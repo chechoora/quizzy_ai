@@ -209,5 +209,14 @@
       }
     }
   },
-  "importExportError": "Import / Export error"
+  "importExportError": "Import / Export error",
+  "importExportImportSubtitle": "From a JSON file or clipboard",
+  "importExportImportDecksButton": "Import Decks",
+  "importExportImportCardsButton": "Import Cards",
+  "importExportViewJsonFormat": "View JSON matching format",
+  "importExportExportDescription": "Decks as JSON for backup or sharing",
+  "importExportAllDecks": "All",
+  "importExportJsonFormatTitle": "JSON matching format",
+  "importExportDecksFormatTitle": "Decks format",
+  "importExportCardsFormatTitle": "Cards format"
 }
