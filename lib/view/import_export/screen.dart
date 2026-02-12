@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
@@ -186,7 +187,7 @@ void _showImportSourceSheet(
               width: double.infinity,
               child: AppButton.primary(
                 text: localize(context).importExportFromFile,
-                leadingIcon: Icons.file_open,
+                leadingIcon: const Icon(Icons.file_open, size: 20),
                 onPressed: () {
                   Navigator.of(sheetContext).pop();
                   onFile();
@@ -198,7 +199,7 @@ void _showImportSourceSheet(
               width: double.infinity,
               child: AppButton.primary(
                 text: localize(context).importExportFromClipboard,
-                leadingIcon: Icons.paste,
+                leadingIcon: const Icon(Icons.paste, size: 20),
                 onPressed: () {
                   Navigator.of(sheetContext).pop();
                   onClipboard();
@@ -349,7 +350,7 @@ void _showExportSelectionSheet(
                   text: localize(context)
                       .importExportExportSelectedButton(
                           dataState.selectedDeckIds.length),
-                  leadingIcon: Icons.upload_rounded,
+                  leadingIcon: const Icon(Icons.upload_rounded, size: 20),
                   onPressed: dataState.hasSelection
                       ? () {
                           Navigator.of(sheetContext).pop();
@@ -406,7 +407,15 @@ class _ImportCard extends StatelessWidget {
       child: Column(
         children: [
           _CardHeader(
-            icon: Icons.download_rounded,
+            icon: SvgPicture.asset(
+              'assets/icons/import.svg',
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppColors.yellow500,
+                BlendMode.srcIn,
+              ),
+            ),
             title: localize(context).importExportImportTitle,
             subtitle: localize(context).importExportImportSubtitle,
           ),
@@ -415,7 +424,15 @@ class _ImportCard extends StatelessWidget {
             width: double.infinity,
             child: AppButton.primary(
               text: localize(context).importExportImportDecksButton,
-              leadingIcon: Icons.layers_rounded,
+              leadingIcon: SvgPicture.asset(
+                'assets/icons/decks_2.svg',
+                width: 20,
+                height: 20,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.grayscaleWhite,
+                  BlendMode.srcIn,
+                ),
+              ),
               onPressed: () => _showImportSourceSheet(
                 context,
                 onFile: () => cubit.importDecksFromFile(),
@@ -428,7 +445,15 @@ class _ImportCard extends StatelessWidget {
             width: double.infinity,
             child: AppButton.primary(
               text: localize(context).importExportImportCardsButton,
-              leadingIcon: Icons.style_rounded,
+              leadingIcon: SvgPicture.asset(
+                'assets/icons/cards.svg',
+                width: 20,
+                height: 20,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.grayscaleWhite,
+                  BlendMode.srcIn,
+                ),
+              ),
               onPressed: () => _showImportSourceSheet(
                 context,
                 onFile: () => cubit.importCardsFromFile(),
@@ -490,7 +515,15 @@ class _ExportCard extends StatelessWidget {
       child: Column(
         children: [
           _CardHeader(
-            icon: Icons.upload_rounded,
+            icon: SvgPicture.asset(
+              'assets/icons/export.svg',
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppColors.yellow500,
+                BlendMode.srcIn,
+              ),
+            ),
             title: localize(context).importExportExportTitle,
             subtitle: localize(context).importExportExportDescription,
           ),
@@ -550,7 +583,7 @@ class _CardHeader extends StatelessWidget {
     required this.subtitle,
   });
 
-  final IconData icon;
+  final Widget icon;
   final String title;
   final String subtitle;
 
@@ -565,11 +598,7 @@ class _CardHeader extends StatelessWidget {
             color: AppColors.yellow100,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            size: 24,
-            color: AppColors.yellow500,
-          ),
+          child: Center(child: icon),
         ),
         const SizedBox(width: 16),
         Column(

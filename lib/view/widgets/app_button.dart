@@ -16,7 +16,7 @@ class AppButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
   final AppButtonVariant variant;
-  final IconData? leadingIcon;
+  final Widget? leadingIcon;
 
   // Convenience constructors
   const AppButton.primary({
@@ -95,7 +95,7 @@ class _PrimaryButton extends StatelessWidget {
 
   final String text;
   final VoidCallback? onPressed;
-  final IconData? leadingIcon;
+  final Widget? leadingIcon;
 
   bool get _isEnabled => onPressed != null;
 
@@ -146,7 +146,7 @@ class _SecondaryButton extends StatelessWidget {
 
   final String text;
   final VoidCallback? onPressed;
-  final IconData? leadingIcon;
+  final Widget? leadingIcon;
 
   bool get _isEnabled => onPressed != null;
 
@@ -205,7 +205,7 @@ class _TertiaryButton extends StatelessWidget {
 
   final String text;
   final VoidCallback? onPressed;
-  final IconData? leadingIcon;
+  final Widget? leadingIcon;
 
   bool get _isEnabled => onPressed != null;
 
@@ -251,7 +251,7 @@ class _PositiveButton extends StatelessWidget {
 
   final String text;
   final VoidCallback? onPressed;
-  final IconData? leadingIcon;
+  final Widget? leadingIcon;
 
   bool get _isEnabled => onPressed != null;
 
@@ -302,7 +302,7 @@ class _DestructiveButton extends StatelessWidget {
 
   final String text;
   final VoidCallback? onPressed;
-  final IconData? leadingIcon;
+  final Widget? leadingIcon;
 
   bool get _isEnabled => onPressed != null;
 
@@ -353,7 +353,7 @@ class _ButtonContent extends StatelessWidget {
 
   final String text;
   final TextStyle textStyle;
-  final IconData? leadingIcon;
+  final Widget? leadingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -361,7 +361,7 @@ class _ButtonContent extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(leadingIcon, size: 20),
+          leadingIcon!,
           const SizedBox(width: 8),
           Text(text, style: textStyle),
         ],

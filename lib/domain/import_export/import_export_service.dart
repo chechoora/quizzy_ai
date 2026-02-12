@@ -72,8 +72,8 @@ class ImportExportService {
       final totalAfterImport = existingDecks.length + decks.length;
       if (totalAfterImport > PremiumLimitInfo.deckLimit) {
         throw const ImportLimitExceededException(
-          ImportExportType.card,
-          PremiumLimitInfo.quizCardLimit,
+          ImportExportType.deck,
+          PremiumLimitInfo.deckLimit,
         );
       }
     }
@@ -82,8 +82,8 @@ class ImportExportService {
       for (final deck in decks) {
         if (deck.cards.length > PremiumLimitInfo.quizCardLimit) {
           throw const ImportLimitExceededException(
-            ImportExportType.deck,
-            PremiumLimitInfo.deckLimit,
+            ImportExportType.card,
+            PremiumLimitInfo.quizCardLimit,
           );
         }
       }
