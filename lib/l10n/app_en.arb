@@ -138,6 +138,14 @@
       }
     }
   },
+  "quizExeCorrectAnswerLabel": "Correct answer: {correctAnswer}",
+  "@quizExeCorrectAnswerLabel": {
+    "placeholders": {
+      "correctAnswer": {
+        "type": "String"
+      }
+    }
+  },
   "quizExeNextCardButton": "Next Card",
   "homeEmptyStateTitle": "No decks yet",
   "homeEmptyStateDescription": "Create your first deck and start learning!",

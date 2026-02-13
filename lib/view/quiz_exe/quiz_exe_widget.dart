@@ -108,14 +108,22 @@ class QuizExeWidget extends HookWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Correct answer: ${result.correctAnswer}',
-                      style: AppTypography.h4,
+                      l10n.quizExeCorrectAnswerLabel(result.correctAnswer),
+                      style: AppTypography.h4.copyWith(
+                        color: isCorrect
+                            ? AppColors.success600
+                            : AppColors.error600,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     result.explanation != null
                         ? Text(
                             l10n.quizExeDetailsLabel(result.explanation!),
-                            style: AppTypography.secondaryText,
+                            style: AppTypography.secondaryText.copyWith(
+                              color: isCorrect
+                                  ? AppColors.success600
+                                  : AppColors.error600,
+                            ),
                           )
                         : const SizedBox.shrink(),
                   ],
@@ -130,9 +138,10 @@ class QuizExeWidget extends HookWidget {
                       : AppButtonVariant.destructive,
                   onPressed: () {
                     Navigator.of(context).pop();
-                    cubit.nextCard();
                   },
                 ),
+              ).then(
+                (_) => cubit.nextCard(),
               );
             }
           },

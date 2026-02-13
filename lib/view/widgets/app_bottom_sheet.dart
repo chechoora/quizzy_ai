@@ -48,39 +48,35 @@ class AppBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = _BottomSheetColors.fromVariant(variant);
+    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
-    return SafeArea(
-      top: false,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: colors.backgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _Header(
-                title: title,
-                icon: colors.icon,
-                iconColor: colors.iconColor,
-              ),
-              if (content != null) ...[
-                const SizedBox(height: 8),
-                content!,
-              ],
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: button,
-              ),
-            ],
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colors.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Header(
+            title: title,
+            icon: colors.icon,
+            iconColor: colors.iconColor,
           ),
-        ),
+          if (content != null) ...[
+            const SizedBox(height: 8),
+            content!,
+          ],
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: button,
+          ),
+          SizedBox(height: bottomPadding),
+        ],
       ),
     );
   }
