@@ -206,7 +206,7 @@
   "importExportCopiedToClipboard": "Copied to clipboard",
   "card": "Card",
   "deck": "Deck",
-  "importLimitExceeded": "Import limit exceeded: max {limit} {typeName}(s) allowed",
+  "importLimitExceeded": "Import limit exceeded: max {limit} {typeName}(s) allowed. Please purchase pro version to import more.",
   "@importLimitExceeded": {
     "placeholders": {
       "limit": {

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
 
 class ImportService {
@@ -52,36 +53,51 @@ class ImportService {
   }
 
   List<PlainDeckModel> parseDecksFromJson(String jsonString) {
-    final data = jsonDecode(jsonString) as Map<String, dynamic>;
-    final decksJson = data['decks'] as List<dynamic>;
+    final data = jsonDecode(jsonString);
+    if (data is! Map<String, dynamic>) throw const ImportExportException();
+    final decksJson = data['decks'];
+    if (decksJson is! List<dynamic>) throw const ImportExportException();
 
     return decksJson.map((deckJson) {
-      final deckMap = deckJson as Map<String, dynamic>;
-      final cardsJson = deckMap['cards'] as List<dynamic>;
+      if (deckJson is! Map<String, dynamic>) throw const ImportExportException();
+      final cardsJson = deckJson['cards'];
+      if (cardsJson is! List<dynamic>) throw const ImportExportException();
+      final title = deckJson['title'];
+      if (title is! String) throw const ImportExportException();
 
       return PlainDeckModel(
-        title: deckMap['title'] as String,
-        cards: cardsJson
-            .map((cardJson) => PlainCardModel(
-                  question:
-                      (cardJson as Map<String, dynamic>)['question'] as String,
-                  answer: cardJson['answer'] as String,
-                ))
-            .toList(),
+        title: title,
+        cards: cardsJson.map((cardJson) {
+          if (cardJson is! Map<String, dynamic>) {
+            throw const ImportExportException();
+          }
+          final question = cardJson['question'];
+          final answer = cardJson['answer'];
+          if (question is! String || answer is! String) {
+            throw const ImportExportException();
+          }
+          return PlainCardModel(question: question, answer: answer);
+        }).toList(),
       );
     }).toList();
   }
 
   List<PlainCardModel> parseCardsFromJson(String jsonString) {
-    final data = jsonDecode(jsonString) as Map<String, dynamic>;
-    final cardsJson = data['cards'] as List<dynamic>;
+    final data = jsonDecode(jsonString);
+    if (data is! Map<String, dynamic>) throw const ImportExportException();
+    final cardsJson = data['cards'];
+    if (cardsJson is! List<dynamic>) throw const ImportExportException();
 
-    return cardsJson
-        .map((cardJson) => PlainCardModel(
-              question:
-                  (cardJson as Map<String, dynamic>)['question'] as String,
-              answer: cardJson['answer'] as String,
-            ))
-        .toList();
+    return cardsJson.map((cardJson) {
+      if (cardJson is! Map<String, dynamic>) {
+        throw const ImportExportException();
+      }
+      final question = cardJson['question'];
+      final answer = cardJson['answer'];
+      if (question is! String || answer is! String) {
+        throw const ImportExportException();
+      }
+      return PlainCardModel(question: question, answer: answer);
+    }).toList();
   }
 }

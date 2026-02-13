@@ -12,7 +12,7 @@ class SimpleLoadingWidget extends StatelessWidget {
       child: const SpinKitSpinningLines(
         size: 32,
         color: AppColors.primary500,
-        duration: Duration(milliseconds: 5000),
+        duration: Duration(milliseconds: 3500),
       ),
     );
   }
