@@ -73,6 +73,18 @@ class SettingsWidget extends StatelessWidget {
                     onTap: () =>
                         context.pushNamed(SettingsInAppFeaturesRoute().name),
                   ),
+                  const SizedBox(height: 12),
+                  _SettingsTile(
+                    icon: const Icon(
+                      Icons.people,
+                      color: AppColors.primary500,
+                      size: 24,
+                    ),
+                    title: localize(context).settingsAppCreditsTitle,
+                    subtitle: localize(context).settingsAppCreditsSubtitle,
+                    onTap: () =>
+                        context.pushNamed(AppCreditsRoute().name),
+                  ),
                 ],
               ),
             ),

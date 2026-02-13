@@ -226,5 +226,11 @@
   "importExportAllDecks": "All",
   "importExportJsonFormatTitle": "JSON matching format",
   "importExportDecksFormatTitle": "Decks format",
-  "importExportCardsFormatTitle": "Cards format"
+  "importExportCardsFormatTitle": "Cards format",
+  "settingsAppCreditsTitle": "App Credits",
+  "settingsAppCreditsSubtitle": "Meet the team behind the app",
+  "appCreditsRoleFlutterDeveloper": "Creator / Flutter Developer",
+  "appCreditsRoleDesigner": "Designer",
+  "appCreditsRoleBackendDeveloper": "Backend Developer",
+  "appCreditsFromUkraine": "From 🇺🇦 with ❤️"
 }

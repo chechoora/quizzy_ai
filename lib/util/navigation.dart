@@ -44,3 +44,7 @@ final class SettingsAIValidatorRoute extends NavigationRoute {
   SettingsAIValidatorRoute()
       : super(name: 'settingsAIValidator', path: '/settingsAIValidator');
 }
+
+final class AppCreditsRoute extends NavigationRoute {
+  AppCreditsRoute() : super(name: 'appCredits', path: '/appCredits');
+}
