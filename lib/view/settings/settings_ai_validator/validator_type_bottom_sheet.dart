@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
+import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_ui_data.dart';
@@ -52,9 +53,19 @@ class _ValidatorTypeBottomSheet extends StatelessWidget {
             validatorItem: item,
             isSelected: isSelected,
             isDisabled: isDisabled,
-            onTap: isDisabled
-                ? null
-                : () => Navigator.of(context).pop(item.type),
+            onTap: () {
+              if (isDisabled) {
+                snackBar(
+                  context,
+                  message: l10n.answerValidatorNotAvailableMessage(
+                    item.type.toDisplayString(),
+                  ),
+                );
+                Navigator.of(context).pop();
+              } else {
+                Navigator.of(context).pop(item.type);
+              }
+            },
           );
         },
       ),

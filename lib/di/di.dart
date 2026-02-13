@@ -194,7 +194,7 @@ Future<void> _setupAPI() async {
 
   // Quizzy API client
   final quizzyApiClient = ChopperClient(
-    baseUrl: Uri.parse('https://quizzy-backend-small-tree-7051.fly.dev'),
+    baseUrl: Uri.parse('https://quizzy-be.fly.dev'),
     services: [
       QuizzyApiService.create(),
     ],

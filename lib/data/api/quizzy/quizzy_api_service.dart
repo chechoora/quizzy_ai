@@ -17,9 +17,9 @@ abstract class QuizzyApiService extends ChopperService {
     @Body() required CheckAnswerRequest body,
   });
 
-  @Get(path: '/ai-tutor/quota')
+  @Get(path: '/users/{appUserId}/balance')
   Future<Response<QuotaResponse>> getQuota({
-    @Query('appUserId') required String appUserId,
+    @Path('appUserId') required String appUserId,
   });
 }
 
@@ -45,21 +45,29 @@ class CheckAnswerRequest {
 }
 
 class QuotaResponse {
-  final double weeklyPercentUsage;
-  final int questionsLeft;
+  final double weeklyBalanceUsd;
+  final double weeklyLimitUsd;
+  final int weeklyBalanceReq;
+  final int weeklyLimitReq;
 
   QuotaResponse({
-    required this.weeklyPercentUsage,
-    required this.questionsLeft,
+    required this.weeklyBalanceUsd,
+    required this.weeklyLimitUsd,
+    required this.weeklyBalanceReq,
+    required this.weeklyLimitReq,
   });
 
   factory QuotaResponse.fromJson(Map<String, dynamic> json) => QuotaResponse(
-        weeklyPercentUsage: (json['weekly_percent_usage'] as num).toDouble(),
-        questionsLeft: json['questions_left'] as int,
+        weeklyBalanceUsd: (json['weeklyBalanceUsd'] as num).toDouble(),
+        weeklyLimitUsd: (json['weeklyLimitUsd'] as num).toDouble(),
+        weeklyBalanceReq: json['weeklyBalanceReq'] as int,
+        weeklyLimitReq: json['weeklyLimitReq'] as int,
       );
 
   Map<String, dynamic> toJson() => {
-        'weekly_percent_usage': weeklyPercentUsage,
-        'questions_left': questionsLeft,
+        'weeklyBalanceUsd': weeklyBalanceUsd,
+        'weeklyLimitUsd': weeklyLimitUsd,
+        'weeklyBalanceReq': weeklyBalanceReq,
+        'weeklyLimitReq': weeklyLimitReq,
       };
 }

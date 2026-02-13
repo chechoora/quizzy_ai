@@ -12,12 +12,6 @@ class UserQuotaRepository {
   });
 
   Stream<QuotaItem> fetchQuota(String appUserId) async* {
-    // yield mock data
-
-    yield QuotaItem(weeklyPercentUsage: 14.3, questionsLeft: 100);
-
-    return;
-
     // Emit cached data first if available
     if (prefDataSource.hasValidCache()) {
       final weeklyPercentUsage = prefDataSource.getWeeklyPercentUsage();
@@ -38,16 +32,21 @@ class UserQuotaRepository {
 
     if (response.isSuccessful && response.body != null) {
       final quotaResponse = response.body!;
-
+      final weeklyPercentUsage =
+          ((quotaResponse.weeklyLimitUsd - quotaResponse.weeklyBalanceUsd) /
+                  quotaResponse.weeklyLimitUsd) *
+              100;
+      final questionsLeft =
+          quotaResponse.weeklyLimitReq - quotaResponse.weeklyBalanceReq;
       // Cache the result
       await prefDataSource.saveQuota(
-        weeklyPercentUsage: quotaResponse.weeklyPercentUsage,
-        questionsLeft: quotaResponse.questionsLeft,
+        weeklyPercentUsage: weeklyPercentUsage,
+        questionsLeft: questionsLeft,
       );
 
       yield QuotaItem(
-        weeklyPercentUsage: quotaResponse.weeklyPercentUsage,
-        questionsLeft: quotaResponse.questionsLeft,
+        weeklyPercentUsage: weeklyPercentUsage,
+        questionsLeft: questionsLeft,
       );
     } else {
       throw Exception('Failed to fetch quota: ${response.error}');
