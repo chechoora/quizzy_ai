@@ -18,10 +18,10 @@
   "quizExeFinishedTitle": "Quiz Finished",
   "quizExeInProgressTitle": "Quiz in Progress",
   "createDeckTitleLabel": "Title of the deck",
-
   "inAppFeaturesTitle": "In-App Features",
   "inAppFeaturesPurchaseSuccess": "Purchase successful!",
   "inAppFeaturesRestoreSuccess": "Purchases restored successfully!",
+  "inAppFeaturesPurchaseError": "Something went wrong during purchase process",
   "inAppFeaturesUnlimitedTitle": "Unlimited decks & cards",
   "inAppFeaturesUnlimitedDescription": "Create as many decks and cards as you want. No limits.",
   "inAppFeaturesUnlimitedSubtitle": "One-time purchase",
@@ -33,7 +33,6 @@
   "inAppFeaturesQuizzyAiDescription": "Use our AI-powered validator to check your quiz answers with high accuracy.",
   "inAppFeaturesQuizzyAiSubtitle": "Yearly subscription",
   "inAppFeaturesSubscribeButton": "Subscribe",
-
   "settingsTitle": "Settings",
   "settingsAiValidatorSubtitleTile": "Configure answer validation settings",
   "settingsInAppFeaturesSubtitle": "Manage premium features",
@@ -111,7 +110,6 @@
   },
   "settingsAiValidatorDeleteButton": "Delete",
   "settingsAiValidatorApplyButton": "Apply",
-
   "quizCardListPremiumCardLimitMessage": "You can not create more cards, please unlock the full version.",
   "quizCardListDeleteCardConfirmation": "Are you sure you want to delete current card?",
   "quizCardListBackTooltip": "Back",
@@ -120,11 +118,10 @@
   "quizCardListQuickPlayButton": "Quick Play",
   "quizCardListSideSwitched": "Side switched",
   "quizCardListSidesNotSwitched": "Sides not switched",
-  "quizCardListShuffleCards": "Shuffle Cards",
+  "quizCardListShuffleCards": "Cards Shuffled",
   "quizCardListCardsInOrder": "Cards in Order",
   "quizCardListEditCardAction": "Edit card",
   "quizCardListDeleteCardAction": "Delete card",
-
   "quizExeScoreLabel": "Score: {score}",
   "@quizExeScoreLabel": {
     "placeholders": {
@@ -142,7 +139,6 @@
     }
   },
   "quizExeNextCardButton": "Next Card",
-
   "homeEmptyStateTitle": "No decks yet",
   "homeEmptyStateDescription": "Create your first deck and start learning!",
   "homeNewDeckTitle": "New deck",
@@ -156,14 +152,11 @@
   "homeDeleteButton": "Delete",
   "homeEditDeckAction": "Edit deck",
   "homeDeleteDeckAction": "Delete deck",
-
   "quizDisplayTypeAnswerLabel": "Type your answer below",
   "quizDisplayTypeAnswerHint": "Type your answer",
   "quizDisplayAnswerButton": "Answer",
   "quizDisplayDontKnowButton": "Don't know",
-
   "dismiss": "Dismiss",
-
   "importExportImportTitle": "Import",
   "importExportImportDescription": "Import from a JSON file or clipboard. Use the matching format:",
   "importExportImportSourceTitle": "Import source",
@@ -202,5 +195,28 @@
       }
     }
   },
-  "importExportCopiedToClipboard": "Copied to clipboard"
+  "importExportCopiedToClipboard": "Copied to clipboard",
+  "card": "Card",
+  "deck": "Deck",
+  "importLimitExceeded": "Import limit exceeded: max {limit} {typeName}(s) allowed",
+  "@importLimitExceeded": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      },
+      "typeName": {
+        "type": "String"
+      }
+    }
+  },
+  "importExportError": "Import / Export error",
+  "importExportImportSubtitle": "From a JSON file or clipboard",
+  "importExportImportDecksButton": "Import Decks",
+  "importExportImportCardsButton": "Import Cards",
+  "importExportViewJsonFormat": "View JSON matching format",
+  "importExportExportDescription": "Decks as JSON for backup or sharing",
+  "importExportAllDecks": "All",
+  "importExportJsonFormatTitle": "JSON matching format",
+  "importExportDecksFormatTitle": "Decks format",
+  "importExportCardsFormatTitle": "Cards format"
 }

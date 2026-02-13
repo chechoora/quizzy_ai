@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
+import 'package:poc_ai_quiz/domain/import_export/model.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
 
@@ -18,7 +19,7 @@ class QuizCardDataBaseRepository {
         .get();
   }
 
-  Future<bool> saveQuizCard({
+  Future<int> saveQuizCard({
     required String question,
     required String answer,
     required int deckId,
@@ -31,7 +32,7 @@ class QuizCardDataBaseRepository {
             isArchive: false,
           ),
         );
-    return result != -1;
+    return result;
   }
 
   Future<bool> deleteQuizCard(int id) async {
@@ -62,5 +63,26 @@ class QuizCardDataBaseRepository {
       ),
     );
     return result >= 0;
+  }
+
+  Future<List<int>> saveQuizCards(
+      List<PlainCardModel> cards, int deckId) async {
+    return appDatabase.transaction(
+      () async {
+        final result = <int>[];
+        for (final card in cards) {
+          final id = await appDatabase.into(appDatabase.quizCardTable).insert(
+                QuizCardTableCompanion.insert(
+                  deckId: deckId,
+                  questionText: card.question,
+                  answerText: card.answer,
+                  isArchive: false,
+                ),
+              );
+          result.add(id);
+        }
+        return result;
+      },
+    );
   }
 }

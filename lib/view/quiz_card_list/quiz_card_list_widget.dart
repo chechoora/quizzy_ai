@@ -82,18 +82,9 @@ class QuizCardListWidget extends HookWidget {
     }
 
     void showCreateCardPremiumError() {
-      alert(
+      snackBar(
         context,
-        content: Text(
-          localize(context).quizCardListPremiumCardLimitMessage,
-        ),
-        secondary: const SizedBox.shrink(),
-      ).then(
-        (value) {
-          if (value ?? false) {
-            // TODO Navigate to purchase screen
-          }
-        },
+        message: localize(context).quizCardListPremiumCardLimitMessage,
       );
     }
 
@@ -257,13 +248,13 @@ class _BottomButtons extends StatelessWidget {
           const SizedBox(height: 8),
           AppButton.primary(
             text: l10n.quizCardListQuickPlayButton,
-            leadingIcon: Icons.bolt,
+            leadingIcon: const Icon(Icons.bolt, size: 20),
             onPressed: onQuickPlayPressed,
           ),
           const SizedBox(height: 16),
           AppButton.secondary(
             text: l10n.quizCardListPlayDeckButton,
-            leadingIcon: Icons.play_arrow,
+            leadingIcon: const Icon(Icons.play_arrow, size: 20),
             onPressed: onPlayDeckPressed,
           ),
         ],

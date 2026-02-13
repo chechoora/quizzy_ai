@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
@@ -12,8 +14,8 @@ import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_cubit.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_state.dart';
-import 'package:poc_ai_quiz/view/widgets/app_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
+import 'package:poc_ai_quiz/view/widgets/app_content_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 
@@ -35,7 +37,7 @@ class ImportExportScreen extends HookWidget {
     }, []);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundSecondary,
       body: SafeArea(
         child: Column(
           children: [
@@ -50,7 +52,26 @@ class ImportExportScreen extends HookWidget {
                 listenWhen: (_, next) => next is ListenerState,
                 listener: (context, state) {
                   if (state is ImportExportErrorState) {
-                    snackBar(context, message: state.message, isError: true);
+                    final exception = state.exception;
+                    if (exception is ImportLimitExceededException) {
+                      final type = exception.type;
+                      final limit = exception.limit;
+                      final typeName = type == ImportExportType.card
+                          ? localize(context).card
+                          : localize(context).deck;
+                      snackBar(
+                        context,
+                        message: localize(context).importLimitExceeded(
+                          limit,
+                          typeName,
+                        ),
+                        isError: true,
+                      );
+                    } else {
+                      snackBar(context,
+                          message: localize(context).importExportError,
+                          isError: true);
+                    }
                   }
                   if (state is ImportExportImportSuccessState) {
                     snackBar(
@@ -105,15 +126,15 @@ void _showDeckPickerSheet(
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
-    builder: (sheetContext) => AppBottomSheet.neutral(
-      title: Text(
-        localize(context).importExportSelectDeckTitle,
-        style: AppTypography.h3.copyWith(color: AppColors.grayscale600),
-      ),
-      content: Column(
+    isScrollControlled: true,
+    builder: (sheetContext) => AppContentBottomSheet(
+      title: localize(context).importExportSelectDeckTitle,
+      content: ListView(
+        shrinkWrap: true,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         children: decks.map((deck) {
           return Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.only(bottom: 8),
             child: GestureDetector(
               onTap: () {
                 Navigator.of(sheetContext).pop();
@@ -142,10 +163,6 @@ void _showDeckPickerSheet(
           );
         }).toList(),
       ),
-      button: AppButton.secondary(
-        text: localize(context).importExportCancelButton,
-        onPressed: () => Navigator.of(sheetContext).pop(),
-      ),
     ),
   );
 }
@@ -158,43 +175,194 @@ void _showImportSourceSheet(
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
-    builder: (sheetContext) => AppBottomSheet.neutral(
-      title: Text(
-        localize(context).importExportImportSourceTitle,
-        style: AppTypography.h3.copyWith(color: AppColors.grayscale600),
+    isScrollControlled: true,
+    builder: (sheetContext) => AppContentBottomSheet(
+      title: localize(context).importExportImportSourceTitle,
+      content: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: AppButton.primary(
+                text: localize(context).importExportFromFile,
+                leadingIcon: const Icon(Icons.file_open, size: 20),
+                onPressed: () {
+                  Navigator.of(sheetContext).pop();
+                  onFile();
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: AppButton.primary(
+                text: localize(context).importExportFromClipboard,
+                leadingIcon: const Icon(Icons.paste, size: 20),
+                onPressed: () {
+                  Navigator.of(sheetContext).pop();
+                  onClipboard();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
-      content: Column(
-        children: [
-          const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            child: AppButton.primary(
-              text: localize(context).importExportFromFile,
-              leadingIcon: Icons.file_open,
-              onPressed: () {
-                Navigator.of(sheetContext).pop();
-                onFile();
+    ),
+  );
+}
+
+void _showJsonFormatSheet(BuildContext context) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => AppContentBottomSheet(
+      title: localize(context).importExportJsonFormatTitle,
+      content: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _JsonExampleCard(
+              title: localize(context).importExportDecksFormatTitle,
+              json: '{\n'
+                  '  "decks": [\n'
+                  '    {\n'
+                  '      "title": "My Deck",\n'
+                  '      "cards": [\n'
+                  '        {\n'
+                  '          "question": "..."\n'
+                  '          "answer": "..."\n'
+                  '        }\n'
+                  '      ]\n'
+                  '    }\n'
+                  '  ]\n'
+                  '}',
+              onCopied: () {
+                Navigator.of(context).pop();
+                snackBar(context,
+                    message:
+                        localize(context).importExportCopiedToClipboard);
               },
             ),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            child: AppButton.primary(
-              text: localize(context).importExportFromClipboard,
-              leadingIcon: Icons.paste,
-              onPressed: () {
-                Navigator.of(sheetContext).pop();
-                onClipboard();
+            const SizedBox(height: 24),
+            _JsonExampleCard(
+              title: localize(context).importExportCardsFormatTitle,
+              json: '{\n'
+                  '  "cards": [\n'
+                  '    {\n'
+                  '      "question": "..."\n'
+                  '      "answer": "..."\n'
+                  '    }\n'
+                  '  ]\n'
+                  '}',
+              onCopied: () {
+                Navigator.of(context).pop();
+                snackBar(context,
+                    message:
+                        localize(context).importExportCopiedToClipboard);
               },
             ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+void _showExportSelectionSheet(
+  BuildContext context,
+  ImportExportCubit cubit,
+  ImportExportDataState initialState,
+) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (sheetContext) =>
+        BlocBuilder<ImportExportCubit, ImportExportState>(
+      bloc: cubit,
+      buildWhen: (_, next) => next is ImportExportDataState,
+      builder: (_, state) {
+        final dataState =
+            state is ImportExportDataState ? state : initialState;
+        return AppContentBottomSheet(
+          title: localize(context).importExportSelectDecksToExport,
+          content: ListView(
+            shrinkWrap: true,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (dataState.allSelected) {
+                        cubit.deselectAllDecks();
+                      } else {
+                        cubit.selectAllDecks();
+                      }
+                    },
+                    child: Text(
+                      dataState.allSelected
+                          ? localize(context).importExportDeselectAll
+                          : localize(context).importExportSelectAll,
+                      style: AppTypography.secondaryText.copyWith(
+                        color: AppColors.primary500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (dataState.decks.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Center(
+                    child: Text(
+                      localize(context).importExportNoDecksAvailable,
+                      style: AppTypography.secondaryText.copyWith(
+                        color: AppColors.grayscale400,
+                      ),
+                    ),
+                  ),
+                )
+              else
+                ...dataState.decks.map((deck) {
+                  final isSelected =
+                      dataState.selectedDeckIds.contains(deck.id);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _DeckSelectionTile(
+                      title: deck.title,
+                      isSelected: isSelected,
+                      onTap: () => cubit.toggleDeckSelection(deck.id),
+                    ),
+                  );
+                }),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: AppButton.primary(
+                  text: localize(context)
+                      .importExportExportSelectedButton(
+                          dataState.selectedDeckIds.length),
+                  leadingIcon: const Icon(Icons.upload_rounded, size: 20),
+                  onPressed: dataState.hasSelection
+                      ? () {
+                          Navigator.of(sheetContext).pop();
+                          cubit.exportSelectedDecks();
+                        }
+                      : null,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      button: AppButton.secondary(
-        text: localize(context).importExportCancelButton,
-        onPressed: () => Navigator.of(sheetContext).pop(),
-      ),
+        );
+      },
     ),
   );
 }
@@ -213,182 +381,243 @@ class _DataContent extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       children: [
-        // -- Import Section --
         const SizedBox(height: 8),
-        _SectionHeader(
-          icon: Icons.file_download,
-          title: localize(context).importExportImportTitle,
-        ),
-        const SizedBox(height: 12),
-        Text(
-          localize(context).importExportImportDescription,
-          style: AppTypography.secondaryText.copyWith(
-            color: AppColors.grayscale500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _JsonExampleCard(
-                title: localize(context).importExportDecksButton,
-                json: '{\n'
-                    '  "decks": [\n'
-                    '    {\n'
-                    '      "title": "My Deck",\n'
-                    '      "cards": [\n'
-                    '        {\n'
-                    '          "question": "...",\n'
-                    '          "answer": "..."\n'
-                    '        }\n'
-                    '      ]\n'
-                    '    }\n'
-                    '  ]\n'
-                    '}',
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _JsonExampleCard(
-                title: localize(context).importExportCardsButton,
-                json: '{\n'
-                    '  "cards": [\n'
-                    '    {\n'
-                    '      "question": "...",\n'
-                    '      "answer": "..."\n'
-                    '    }\n'
-                    '  ]\n'
-                    '}',
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: AppButton.secondary(
-                text: localize(context).importExportDecksButton,
-                leadingIcon: Icons.file_download,
-                onPressed: () => _showImportSourceSheet(
-                  context,
-                  onFile: () => cubit.importDecksFromFile(),
-                  onClipboard: () => cubit.importDecksFromClipboard(),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: AppButton.secondary(
-                text: localize(context).importExportCardsButton,
-                leadingIcon: Icons.file_download,
-                onPressed: () => _showImportSourceSheet(
-                  context,
-                  onFile: () => cubit.importCardsFromFile(),
-                  onClipboard: () => cubit.importCardsFromClipboard(),
-                ),
-              ),
-            ),
-          ],
-        ),
+        _ImportCard(cubit: cubit),
         const SizedBox(height: 32),
-        // -- Export Section --
-        _SectionHeader(
-          icon: Icons.file_upload,
-          title: localize(context).importExportExportTitle,
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Text(
-              localize(context).importExportSelectDecksToExport,
-              style: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale500,
-              ),
-            ),
-            const Spacer(),
-            GestureDetector(
-              onTap: () {
-                if (state.allSelected) {
-                  cubit.deselectAllDecks();
-                } else {
-                  cubit.selectAllDecks();
-                }
-              },
-              child: Text(
-                state.allSelected
-                    ? localize(context).importExportDeselectAll
-                    : localize(context).importExportSelectAll,
-                style: AppTypography.secondaryText.copyWith(
-                  color: AppColors.primary500,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        if (state.decks.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Center(
-              child: Text(
-                localize(context).importExportNoDecksAvailable,
-                style: AppTypography.secondaryText.copyWith(
-                  color: AppColors.grayscale400,
-                ),
-              ),
-            ),
-          )
-        else
-          ...state.decks.map((deck) {
-            final isSelected = state.selectedDeckIds.contains(deck.id);
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: _DeckSelectionTile(
-                title: deck.title,
-                isSelected: isSelected,
-                onTap: () => cubit.toggleDeckSelection(deck.id),
-              ),
-            );
-          }),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: AppButton.primary(
-            text: localize(context).importExportExportSelectedButton(
-                state.selectedDeckIds.length),
-            leadingIcon: Icons.file_upload,
-            onPressed:
-                state.hasSelection ? () => cubit.exportSelectedDecks() : null,
-          ),
-        ),
+        _ExportCard(state: state, cubit: cubit),
         const SizedBox(height: 16),
       ],
     );
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.icon,
-    required this.title,
+class _ImportCard extends StatelessWidget {
+  const _ImportCard({required this.cubit});
+
+  final ImportExportCubit cubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.grayscaleWhite,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          _CardHeader(
+            icon: SvgPicture.asset(
+              'assets/icons/import.svg',
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppColors.yellow500,
+                BlendMode.srcIn,
+              ),
+            ),
+            title: localize(context).importExportImportTitle,
+            subtitle: localize(context).importExportImportSubtitle,
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: AppButton.primary(
+              text: localize(context).importExportImportDecksButton,
+              leadingIcon: SvgPicture.asset(
+                'assets/icons/decks_2.svg',
+                width: 20,
+                height: 20,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.grayscaleWhite,
+                  BlendMode.srcIn,
+                ),
+              ),
+              onPressed: () => _showImportSourceSheet(
+                context,
+                onFile: () => cubit.importDecksFromFile(),
+                onClipboard: () => cubit.importDecksFromClipboard(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: AppButton.primary(
+              text: localize(context).importExportImportCardsButton,
+              leadingIcon: SvgPicture.asset(
+                'assets/icons/cards.svg',
+                width: 20,
+                height: 20,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.grayscaleWhite,
+                  BlendMode.srcIn,
+                ),
+              ),
+              onPressed: () => _showImportSourceSheet(
+                context,
+                onFile: () => cubit.importCardsFromFile(),
+                onClipboard: () => cubit.importCardsFromClipboard(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () => _showJsonFormatSheet(context),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: AppColors.primary500,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    localize(context).importExportViewJsonFormat,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.primary500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExportCard extends StatelessWidget {
+  const _ExportCard({
+    required this.state,
+    required this.cubit,
   });
 
-  final IconData icon;
+  final ImportExportDataState state;
+  final ImportExportCubit cubit;
+
+  @override
+  Widget build(BuildContext context) {
+    final selectionText = state.allSelected || !state.hasSelection
+        ? localize(context).importExportAllDecks
+        : '${state.selectedDeckIds.length}';
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.grayscaleWhite,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          _CardHeader(
+            icon: SvgPicture.asset(
+              'assets/icons/export.svg',
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppColors.yellow500,
+                BlendMode.srcIn,
+              ),
+            ),
+            title: localize(context).importExportExportTitle,
+            subtitle: localize(context).importExportExportDescription,
+          ),
+          const SizedBox(height: 24),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              localize(context).importExportSelectDecksToExport,
+              style: AppTypography.h4.copyWith(
+                color: AppColors.grayscale600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: () {
+              if (!state.hasSelection) {
+                cubit.selectAllDecks();
+              }
+              _showExportSelectionSheet(context, cubit, state);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.grayscale100,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    selectionText,
+                    style: AppTypography.mainText.copyWith(
+                      color: state.hasSelection
+                          ? AppColors.grayscale600
+                          : AppColors.grayscale300,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: AppColors.grayscale600,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CardHeader extends StatelessWidget {
+  const _CardHeader({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final Widget icon;
   final String title;
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.primary500, size: 22),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: AppTypography.h4.copyWith(
-            color: AppColors.grayscale600,
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: AppColors.yellow100,
+            borderRadius: BorderRadius.circular(8),
           ),
+          child: Center(child: icon),
+        ),
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: AppTypography.h3.copyWith(
+                color: AppColors.grayscale600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: AppTypography.secondaryText.copyWith(
+                color: AppColors.grayscale500,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -399,60 +628,61 @@ class _JsonExampleCard extends StatelessWidget {
   const _JsonExampleCard({
     required this.title,
     required this.json,
+    this.onCopied,
   });
 
   final String title;
   final String json;
+  final VoidCallback? onCopied;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.grayscale100,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.grayscale200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                title,
-                style: AppTypography.secondaryText.copyWith(
-                  color: AppColors.primary500,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: AppTypography.h4.copyWith(color: Colors.black),
+        ),
+        const SizedBox(height: 16),
+        Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              padding:
+                  const EdgeInsets.symmetric(vertical: 20, horizontal: 18),
+              decoration: BoxDecoration(
+                color: AppColors.grayscaleWhite,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Text(
+                json,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 14,
+                  height: 20 / 14,
+                  color: AppColors.grayscale500,
                 ),
               ),
-              const Spacer(),
-              GestureDetector(
+            ),
+            Positioned(
+              right: 16,
+              top: 16,
+              child: GestureDetector(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: json));
-                  snackBar(context,
-                      message: localize(context).importExportCopiedToClipboard);
+                  onCopied?.call();
                 },
                 child: const Icon(
                   Icons.copy,
-                  size: 16,
-                  color: AppColors.grayscale400,
+                  size: 24,
+                  color: AppColors.primary500,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            json,
-            style: AppTypography.secondaryText.copyWith(
-              color: AppColors.grayscale600,
-              fontFamily: 'monospace',
-              fontSize: 11,
-              height: 1.4,
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

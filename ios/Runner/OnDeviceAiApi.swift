@@ -132,7 +132,7 @@ protocol OnDeviceAiApi {
   /// Check if on-device AI is available on this platform
   func isOnDeviceAIAvailable(completion: @escaping (Result<Bool, Error>) -> Void)
   /// Validate a user's answer against the correct answer using on-device AI
-  func validateAnswer(userAnswer: String, correctAnswer: String, completion: @escaping (Result<CardAnswerResult, Error>) -> Void)
+  func validateAnswer(question: String, userAnswer: String, correctAnswer: String, completion: @escaping (Result<CardAnswerResult, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -162,9 +162,10 @@ class OnDeviceAiApiSetup {
     if let api = api {
       validateAnswerChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let userAnswerArg = args[0] as! String
-        let correctAnswerArg = args[1] as! String
-        api.validateAnswer(userAnswer: userAnswerArg, correctAnswer: correctAnswerArg) { result in
+        let questionArg = args[0] as! String
+        let userAnswerArg = args[1] as! String
+        let correctAnswerArg = args[2] as! String
+        api.validateAnswer(question: questionArg, userAnswer: userAnswerArg, correctAnswer: correctAnswerArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))

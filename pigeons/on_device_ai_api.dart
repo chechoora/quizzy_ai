@@ -3,7 +3,8 @@ import 'package:pigeon/pigeon.dart';
 @ConfigurePigeon(PigeonOptions(
   dartOut: 'lib/data/api/on_device_ai/generated/on_device_ai.g.dart',
   dartOptions: DartOptions(),
-  kotlinOut: 'android/app/src/main/kotlin/com/chechoora/poc_ai_quiz/OnDeviceAiApi.kt',
+  kotlinOut:
+      'android/app/src/main/kotlin/com/chechoora/poc_ai_quiz/OnDeviceAiApi.kt',
   kotlinOptions: KotlinOptions(
     package: 'com.chechoora.poc_ai_quiz',
   ),
@@ -32,5 +33,6 @@ abstract class OnDeviceAiApi {
 
   /// Validate a user's answer against the correct answer using on-device AI
   @async
-  CardAnswerResult validateAnswer(String userAnswer, String correctAnswer);
+  CardAnswerResult validateAnswer(
+      String question, String userAnswer, String correctAnswer);
 }

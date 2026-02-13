@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
@@ -26,7 +27,15 @@ class SettingsWidget extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   _SettingsTile(
-                    icon: Icons.smart_toy,
+                    icon: SvgPicture.asset(
+                      'assets/icons/stars.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primary500,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     title: localize(context).settingsAiValidatorTitle,
                     subtitle: localize(context).settingsAiValidatorSubtitleTile,
                     onTap: () =>
@@ -34,7 +43,15 @@ class SettingsWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _SettingsTile(
-                    icon: Icons.import_export,
+                    icon: SvgPicture.asset(
+                      'assets/icons/import_export.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primary500,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     title: localize(context).settingsImportExportTitle,
                     subtitle: localize(context).settingsImportExportSubtitle,
                     onTap: () =>
@@ -42,7 +59,15 @@ class SettingsWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _SettingsTile(
-                    icon: Icons.shopping_bag,
+                    icon: SvgPicture.asset(
+                      'assets/icons/crown.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primary500,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     title: localize(context).inAppFeaturesTitle,
                     subtitle: localize(context).settingsInAppFeaturesSubtitle,
                     onTap: () =>
@@ -66,7 +91,7 @@ class _SettingsTile extends StatelessWidget {
     this.onTap,
   });
 
-  final IconData icon;
+  final Widget icon;
   final String title;
   final String subtitle;
   final VoidCallback? onTap;
@@ -83,7 +108,7 @@ class _SettingsTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.primary500, size: 24),
+            icon,
             const SizedBox(width: 16),
             Expanded(
               child: Column(

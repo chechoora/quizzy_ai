@@ -76,7 +76,7 @@ class SettingsInAppFeaturesWidget extends HookWidget {
                   } else if (state is InAppFeaturesErrorState) {
                     snackBar(
                       context,
-                      message: state.error,
+                      message: l10n.inAppFeaturesPurchaseError,
                       duration: const Duration(seconds: 4),
                       isError: true,
                     );
@@ -123,17 +123,17 @@ class _InAppFeaturesContent extends StatelessWidget {
           onPurchase: onPurchaseUnlimitedDecksCards,
         ),
         const SizedBox(height: 24),
-        _FeatureCard(
-          iconAsset: 'assets/icons/quizzy_ai.svg',
-          title: l10n.inAppFeaturesQuizzyAiTitle,
-          description: l10n.inAppFeaturesQuizzyAiDescription,
-          actionTitle: l10n.inAppFeaturesSubscribeButton,
-          purchasedLabel: l10n.inAppFeaturesSubscribed,
-          subtitle: l10n.inAppFeaturesQuizzyAiSubtitle,
-          isPurchased: isQuizzyAiSubscribed,
-          onPurchase: onSubscribeQuizzyAi,
-        ),
-        const SizedBox(height: 24),
+        // _FeatureCard(
+        //   iconAsset: 'assets/icons/quizzy_ai.svg',
+        //   title: l10n.inAppFeaturesQuizzyAiTitle,
+        //   description: l10n.inAppFeaturesQuizzyAiDescription,
+        //   actionTitle: l10n.inAppFeaturesSubscribeButton,
+        //   purchasedLabel: l10n.inAppFeaturesSubscribed,
+        //   subtitle: l10n.inAppFeaturesQuizzyAiSubtitle,
+        //   isPurchased: isQuizzyAiSubscribed,
+        //   onPurchase: onSubscribeQuizzyAi,
+        // ),
+        // const SizedBox(height: 24),
         TextButton.icon(
           onPressed: onRestorePurchases,
           icon: const Icon(Icons.restore, color: AppColors.primary500),

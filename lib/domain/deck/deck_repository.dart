@@ -11,13 +11,24 @@ class DeckRepository {
   final DeckDataBaseRepository dataBaseRepository;
   final DeckDatBaseMapper deckDatBaseMapper;
 
+  Stream<List<DeckItem>> watchDecks() {
+    return dataBaseRepository
+        .watchAllDecks()
+        .map(deckDatBaseMapper.mapToDeckItemList);
+  }
+
   Future<List<DeckItem>> fetchDecks() async {
     final databaseData = await dataBaseRepository.fetchAllDecks();
     return deckDatBaseMapper.mapToDeckItemList(databaseData);
   }
 
-  Future<bool> saveDeck(String deckName) {
+  Future<int> saveDeck(String deckName) {
     return dataBaseRepository.saveDeck(deckName.trim());
+  }
+
+  Future<List<int>> saveDecks(List<String> deckNames) {
+    return dataBaseRepository
+        .saveDecks(deckNames.map((e) => e.trim()).toList());
   }
 
   Future<bool> deleteDeck(DeckItem deck) {

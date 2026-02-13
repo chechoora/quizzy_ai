@@ -31,7 +31,7 @@ class OnDeviceAiApiImplementation: OnDeviceAiApi {
     }
     
     /// Validate a user's answer against the correct answer using on-device AI
-    func validateAnswer(userAnswer: String, correctAnswer: String, completion: @escaping (Result<CardAnswerResult, Error>) -> Void) {
+    func validateAnswer(question: String, userAnswer: String, correctAnswer: String, completion: @escaping (Result<CardAnswerResult, Error>) -> Void) {
         Task {
             do {
                 // First check if the model is available
@@ -69,6 +69,7 @@ class OnDeviceAiApiImplementation: OnDeviceAiApi {
                     let prompt = """
                     Please evaluate this student answer:
                     
+                    Question: "\(question)"
                     Student Answer: "\(userAnswer)"
                     Correct Answer: "\(correctAnswer)"
                     

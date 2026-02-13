@@ -3,9 +3,10 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:poc_ai_quiz/domain/import_export/model.dart';
 
 class ImportService {
-  Future<List<DeckImportModel>?> importDecksFromFile() async {
+  Future<List<PlainDeckModel>?> importDecksFromFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
@@ -18,7 +19,7 @@ class ImportService {
     return parseDecksFromJson(jsonString);
   }
 
-  Future<List<CardImportModel>?> importCardsFromFile() async {
+  Future<List<PlainCardModel>?> importCardsFromFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
@@ -31,13 +32,13 @@ class ImportService {
     return parseCardsFromJson(jsonString);
   }
 
-  Future<List<DeckImportModel>?> importDecksFromClipboard() async {
+  Future<List<PlainDeckModel>?> importDecksFromClipboard() async {
     final text = await _getClipboardText();
     if (text == null) return null;
     return parseDecksFromJson(text);
   }
 
-  Future<List<CardImportModel>?> importCardsFromClipboard() async {
+  Future<List<PlainCardModel>?> importCardsFromClipboard() async {
     final text = await _getClipboardText();
     if (text == null) return null;
     return parseCardsFromJson(text);
@@ -50,7 +51,7 @@ class ImportService {
     return text;
   }
 
-  List<DeckImportModel> parseDecksFromJson(String jsonString) {
+  List<PlainDeckModel> parseDecksFromJson(String jsonString) {
     final data = jsonDecode(jsonString) as Map<String, dynamic>;
     final decksJson = data['decks'] as List<dynamic>;
 
@@ -58,10 +59,10 @@ class ImportService {
       final deckMap = deckJson as Map<String, dynamic>;
       final cardsJson = deckMap['cards'] as List<dynamic>;
 
-      return DeckImportModel(
+      return PlainDeckModel(
         title: deckMap['title'] as String,
         cards: cardsJson
-            .map((cardJson) => CardImportModel(
+            .map((cardJson) => PlainCardModel(
                   question:
                       (cardJson as Map<String, dynamic>)['question'] as String,
                   answer: cardJson['answer'] as String,
@@ -71,36 +72,16 @@ class ImportService {
     }).toList();
   }
 
-  List<CardImportModel> parseCardsFromJson(String jsonString) {
+  List<PlainCardModel> parseCardsFromJson(String jsonString) {
     final data = jsonDecode(jsonString) as Map<String, dynamic>;
     final cardsJson = data['cards'] as List<dynamic>;
 
     return cardsJson
-        .map((cardJson) => CardImportModel(
+        .map((cardJson) => PlainCardModel(
               question:
                   (cardJson as Map<String, dynamic>)['question'] as String,
               answer: cardJson['answer'] as String,
             ))
         .toList();
   }
-}
-
-class DeckImportModel {
-  final String title;
-  final List<CardImportModel> cards;
-
-  DeckImportModel({
-    required this.title,
-    required this.cards,
-  });
-}
-
-class CardImportModel {
-  final String question;
-  final String answer;
-
-  CardImportModel({
-    required this.question,
-    required this.answer,
-  });
 }

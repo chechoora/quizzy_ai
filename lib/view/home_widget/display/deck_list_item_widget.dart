@@ -15,7 +15,7 @@ class DeckListItemWidget extends StatelessWidget {
     super.key,
   });
 
-  final DeckItem deck;
+  final DeckItemWithPremium deck;
   final ValueChanged<DeckItem>? onDeckRemoveRequest;
   final ValueChanged<DeckItem>? onDeckEditRequest;
   final ValueChanged<DeckItem>? onDeckClicked;
@@ -23,52 +23,63 @@ class DeckListItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      elevation: 0,
-      color: AppColors.grayscaleWhite,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => onDeckClicked?.call(deck),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/folder.svg',
-                width: 32,
-                height: 32,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  deck.title,
-                  style: AppTypography.h3.copyWith(
-                    color: AppColors.grayscale600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+    final isLocked = deck.isLocked;
+    return Opacity(
+      opacity: isLocked ? 0.5 : 1.0,
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        elevation: 0,
+        color: AppColors.grayscaleWhite,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: isLocked ? null : () => onDeckClicked?.call(deck),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/folder.svg',
+                  width: 32,
+                  height: 32,
                 ),
-              ),
-              AppMoreButton(
-                actions: [
-                  AppMoreButtonAction(
-                    label: l10n.homeEditDeckAction,
-                    icon: 'assets/icons/edit.svg',
-                    onPressed: () => onDeckEditRequest?.call(deck),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    deck.title,
+                    style: AppTypography.h3.copyWith(
+                      color: AppColors.grayscale600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  AppMoreButtonAction(
-                    label: l10n.homeDeleteDeckAction,
-                    icon: 'assets/icons/delete.svg',
-                    textColor: AppColors.error500,
-                    onPressed: () => onDeckRemoveRequest?.call(deck),
+                ),
+                if (isLocked)
+                  const Icon(
+                    Icons.lock,
+                    size: 24,
+                    color: AppColors.grayscale500,
+                  )
+                else
+                  AppMoreButton(
+                    actions: [
+                      AppMoreButtonAction(
+                        label: l10n.homeEditDeckAction,
+                        icon: 'assets/icons/edit.svg',
+                        onPressed: () => onDeckEditRequest?.call(deck),
+                      ),
+                      AppMoreButtonAction(
+                        label: l10n.homeDeleteDeckAction,
+                        icon: 'assets/icons/delete.svg',
+                        textColor: AppColors.error500,
+                        onPressed: () => onDeckRemoveRequest?.call(deck),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

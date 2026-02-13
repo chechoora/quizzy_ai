@@ -14,7 +14,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
     super.key,
   });
 
-  final List<QuizCardItem> quizCarList;
+  final List<QuizCardItemWithPremium> quizCarList;
   final ValueChanged<QuizCardItem>? onQuizCardEditRequest;
   final ValueChanged<QuizCardItem>? onQuizCardRemoveRequest;
   final VoidCallback? onAddCardRequest;
@@ -32,8 +32,10 @@ class QuizCardListDisplayWidget extends StatelessWidget {
         final item = quizCarList[index];
         return _QuizCardTile(
           quizCardItem: item,
-          onEditPressed: () => onQuizCardEditRequest?.call(item),
-          onDeletePressed: () => onQuizCardRemoveRequest?.call(item),
+          onEditPressed:
+              item.isLocked ? null : () => onQuizCardEditRequest?.call(item),
+          onDeletePressed:
+              item.isLocked ? null : () => onQuizCardRemoveRequest?.call(item),
         );
       },
     );
@@ -47,62 +49,73 @@ class _QuizCardTile extends StatelessWidget {
     this.onDeletePressed,
   });
 
-  final QuizCardItem quizCardItem;
+  final QuizCardItemWithPremium quizCardItem;
   final VoidCallback? onEditPressed;
   final VoidCallback? onDeletePressed;
 
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.grayscaleWhite,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  quizCardItem.questionText,
-                  style: AppTypography.h4.copyWith(
-                    color: AppColors.grayscale600,
+    final isLocked = quizCardItem.isLocked;
+    return Opacity(
+      opacity: isLocked ? 0.5 : 1.0,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.grayscaleWhite,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    quizCardItem.questionText,
+                    style: AppTypography.h4.copyWith(
+                      color: AppColors.grayscale600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  quizCardItem.answerText,
-                  style: AppTypography.secondaryText.copyWith(
-                    color: AppColors.grayscale500,
+                  const SizedBox(height: 8),
+                  Text(
+                    quizCardItem.answerText,
+                    style: AppTypography.secondaryText.copyWith(
+                      color: AppColors.grayscale500,
+                    ),
+                    maxLines: 10,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 10,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          AppMoreButton(
-            actions: [
-              AppMoreButtonAction(
-                label: l10n.quizCardListEditCardAction,
-                icon: 'assets/icons/edit.svg',
-                onPressed: () => onEditPressed?.call(),
+            if (isLocked)
+              const Icon(
+                Icons.lock,
+                size: 24,
+                color: AppColors.grayscale500,
+              )
+            else
+              AppMoreButton(
+                actions: [
+                  AppMoreButtonAction(
+                    label: l10n.quizCardListEditCardAction,
+                    icon: 'assets/icons/edit.svg',
+                    onPressed: () => onEditPressed?.call(),
+                  ),
+                  AppMoreButtonAction(
+                    label: l10n.quizCardListDeleteCardAction,
+                    icon: 'assets/icons/delete.svg',
+                    textColor: AppColors.error500,
+                    onPressed: () => onDeletePressed?.call(),
+                  ),
+                ],
               ),
-              AppMoreButtonAction(
-                label: l10n.quizCardListDeleteCardAction,
-                icon: 'assets/icons/delete.svg',
-                textColor: AppColors.error500,
-                onPressed: () => onDeletePressed?.call(),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
