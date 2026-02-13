@@ -50,16 +50,10 @@ class QuizDisplayWidget extends HookWidget {
                   questionText: quizCardItem.questionText,
                   controller: editController,
                   enabled: !isProcessing,
+                  isProcessing: isProcessing,
                   onTextPassed: onTextPassed,
                   onSkipPassed: onSkipPassed,
                 ),
-                if (isProcessing)
-                  const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: CircularProgressIndicator(
-                      color: AppColors.primary500,
-                    ),
-                  ),
               ],
             ),
           ),
@@ -111,6 +105,7 @@ class _QuizCard extends HookWidget {
     required this.questionText,
     required this.controller,
     required this.enabled,
+    this.isProcessing = false,
     this.onTextPassed,
     this.onSkipPassed,
   });
@@ -118,6 +113,7 @@ class _QuizCard extends HookWidget {
   final String questionText;
   final TextEditingController controller;
   final bool enabled;
+  final bool isProcessing;
   final ValueChanged<String>? onTextPassed;
   final VoidCallback? onSkipPassed;
 
@@ -128,12 +124,45 @@ class _QuizCard extends HookWidget {
       () => controller.text.isNotEmpty,
     );
 
+    final glowController = useAnimationController(
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    useEffect(() {
+      if (isProcessing) {
+        glowController.repeat(reverse: true);
+      } else {
+        glowController.stop();
+        glowController.reset();
+      }
+      return null;
+    }, [isProcessing]);
+
+    final glowValue = useAnimation(glowController);
+    final easedGlow = Curves.easeInOut.transform(glowValue);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.grayscaleWhite,
         borderRadius: BorderRadius.circular(20),
+        border: isProcessing
+            ? Border.all(
+                color: AppColors.pink.withValues(alpha: 0.3 + 0.4 * easedGlow),
+                width: 2,
+              )
+            : null,
+        boxShadow: isProcessing
+            ? [
+                BoxShadow(
+                  color:
+                      AppColors.pink.withValues(alpha: 0.1 + 0.25 * easedGlow),
+                  blurRadius: 8 + 16 * easedGlow,
+                  spreadRadius: 1 + 4 * easedGlow,
+                ),
+              ]
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +210,6 @@ class _QuizCard extends HookWidget {
     );
   }
 }
-
 
 class _ProgressBar extends StatelessWidget {
   const _ProgressBar({required this.progress});

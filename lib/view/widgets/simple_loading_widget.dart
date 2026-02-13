@@ -9,9 +9,10 @@ class SimpleLoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
-      child: const SpinKitHourGlass(
+      child: const SpinKitSpinningLines(
         size: 32,
         color: AppColors.primary500,
+        duration: Duration(milliseconds: 5000),
       ),
     );
   }
