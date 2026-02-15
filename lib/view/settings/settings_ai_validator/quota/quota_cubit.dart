@@ -39,8 +39,7 @@ class QuotaCubit extends Cubit<QuotaState> {
     emit(QuotaLoadingState());
 
     try {
-      final appUserId = await _inAppPurchaseService
-          .getAppUserId(InAppPurchaseFeature.quizzyAi);
+      final appUserId = await _inAppPurchaseService.getAppUserId();
 
       _subscription?.cancel();
       _subscription = _repository.fetchQuota(appUserId).listen(

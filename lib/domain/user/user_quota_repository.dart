@@ -31,13 +31,12 @@ class UserQuotaRepository {
     );
 
     if (response.isSuccessful && response.body != null) {
-      final quotaResponse = response.body!;
+      final quotaResponse = QuotaResponse.fromJson(response.body);
       final weeklyPercentUsage =
           ((quotaResponse.weeklyLimitUsd - quotaResponse.weeklyBalanceUsd) /
                   quotaResponse.weeklyLimitUsd) *
               100;
-      final questionsLeft =
-          quotaResponse.weeklyLimitReq - quotaResponse.weeklyBalanceReq;
+      final questionsLeft = quotaResponse.weeklyBalanceReq;
       // Cache the result
       await prefDataSource.saveQuota(
         weeklyPercentUsage: weeklyPercentUsage,

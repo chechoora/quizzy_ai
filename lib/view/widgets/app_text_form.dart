@@ -16,6 +16,7 @@ class AppTextForm extends HookWidget {
     this.keyboardType,
     this.minLines = 4,
     this.maxLines,
+    this.textCapitalization = TextCapitalization.sentences,
   });
 
   final TextEditingController? controller;
@@ -28,6 +29,7 @@ class AppTextForm extends HookWidget {
   final TextInputType? keyboardType;
   final int minLines;
   final int? maxLines;
+  final TextCapitalization textCapitalization;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +70,7 @@ class AppTextForm extends HookWidget {
         onSubmitted: onSubmitted,
         textInputAction: textInputAction,
         keyboardType: keyboardType ?? TextInputType.multiline,
+        textCapitalization: textCapitalization,
         minLines: minLines,
         maxLines: maxLines,
         textAlignVertical: TextAlignVertical.top,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
+import 'package:poc_ai_quiz/domain/exception/answer_validator_exception.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
@@ -27,11 +28,11 @@ class OllamaAnswerValidator extends IAnswerValidator {
 
       final config = _configProvider.ollamaConfig;
       if (config == null || config is! OpenSourceConfig) {
-        throw Exception('Ollama configuration not found');
+        throw AnswerValidatorException('Ollama configuration not found');
       }
 
       if (!config.isValid) {
-        throw Exception('Invalid Ollama configuration: URL or model is empty');
+        throw AnswerValidatorException('Invalid Ollama configuration: URL or model is empty');
       }
 
       final basePrompt = buildValidationPrompt(
@@ -75,7 +76,7 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
       if (response.statusCode != 200) {
         _logger
             .e('Ollama API request failed with status ${response.statusCode}');
-        throw Exception(
+        throw AnswerValidatorException(
             'Failed to validate answer: ${response.statusCode} - ${response.body}');
       }
 
@@ -89,12 +90,12 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
         final message = responseJson['message'] as Map<String, dynamic>?;
         if (message == null) {
           _logger.e('No content in Ollama response');
-          throw Exception('No content in Ollama response');
+          throw AnswerValidatorException('No content in Ollama response');
         }
         final content = message['content'] as String?;
         if (content == null) {
           _logger.e('No content in Ollama message');
-          throw Exception('No content in Ollama message');
+          throw AnswerValidatorException('No content in Ollama message');
         }
         return _parseContent(correctAnswer, content);
       }
@@ -104,13 +105,13 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
       final message = choice['message'] as Map<String, dynamic>?;
       if (message == null) {
         _logger.e('No message in Ollama choice');
-        throw Exception('No message in Ollama response');
+        throw AnswerValidatorException('No message in Ollama response');
       }
 
       final content = message['content'] as String?;
       if (content == null) {
         _logger.e('No content in Ollama message');
-        throw Exception('No content in Ollama message');
+        throw AnswerValidatorException('No content in Ollama message');
       }
 
       return _parseContent(correctAnswer, content);

@@ -4,6 +4,7 @@ import 'package:poc_ai_quiz/data/api/claude/claude_request_models.dart'
 import 'package:poc_ai_quiz/data/api/claude/claude_response_models.dart'
     as response;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
+import 'package:poc_ai_quiz/domain/exception/answer_validator_exception.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
@@ -74,7 +75,7 @@ ${ValidatorPrompts.claudeToolUseInstruction}
 
       if (!apiResponse.isSuccessful || apiResponse.body == null) {
         _logger.e('Claude API request failed');
-        throw Exception('Failed to validate answer: ${apiResponse.error}');
+        throw AnswerValidatorException('Failed to validate answer: ${apiResponse.error}');
       }
 
       final claudeResponse = response.ClaudeResponse.fromJson(
@@ -82,18 +83,18 @@ ${ValidatorPrompts.claudeToolUseInstruction}
 
       if (claudeResponse.content == null || claudeResponse.content!.isEmpty) {
         _logger.e('No content in Claude response');
-        throw Exception('No content in Claude response');
+        throw AnswerValidatorException('No content in Claude response');
       }
 
       // Find the tool_use content block
       final toolUseContent = claudeResponse.content!.firstWhere(
         (content) => content.type == 'tool_use',
-        orElse: () => throw Exception('No tool_use block in Claude response'),
+        orElse: () => throw AnswerValidatorException('No tool_use block in Claude response'),
       );
 
       if (toolUseContent.input == null) {
         _logger.e('No input in tool_use content');
-        throw Exception('No tool input in Claude response');
+        throw AnswerValidatorException('No tool input in Claude response');
       }
 
       final toolInput = toolUseContent.input!;

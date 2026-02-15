@@ -22,7 +22,7 @@ class InAppPurchaseService {
     return revenueCatPurchaseManager.restorePurchases();
   }
 
-  Future<String> getAppUserId(InAppPurchaseFeature feature) async {
+  Future<String> getAppUserId() async {
     return revenueCatPurchaseManager.getAppUserId();
   }
 }

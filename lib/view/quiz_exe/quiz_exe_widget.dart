@@ -88,9 +88,10 @@ class QuizExeWidget extends HookWidget {
           },
           listener: (BuildContext context, QuizExeState state) {
             if (state is QuizExeErrorState) {
+              final l10n = localize(context);
               snackBar(
                 context,
-                message: state.message,
+                message: l10n.quizExeValidationError,
                 isError: true,
               );
             }

@@ -20,7 +20,7 @@ Your task:
 2. Assess correctness based on meaning, not just exact match
 3. Indicate your confidence level in the assessment
 4. Your main focus: Explain why the correct answer is exactly this way. How it came about or where it came from.
-5. Answer in the language in which you are addressed
+5. Answer in the language in which question is asked.
 
 Be friendly but objective. Encourage correct answers and gently correct mistakes.
 

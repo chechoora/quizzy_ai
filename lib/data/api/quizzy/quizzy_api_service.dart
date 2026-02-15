@@ -14,11 +14,12 @@ abstract class QuizzyApiService extends ChopperService {
 
   @Post(path: '/ai-tutor/check-answer')
   Future<Response> validateAnswer({
+    @Query('userId') required String userId,
     @Body() required CheckAnswerRequest body,
   });
 
   @Get(path: '/users/{appUserId}/balance')
-  Future<Response<QuotaResponse>> getQuota({
+  Future<Response> getQuota({
     @Path('appUserId') required String appUserId,
   });
 }

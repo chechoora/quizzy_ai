@@ -66,9 +66,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
       if (!validationResult.isValid) {
         _logger.w(
             'Initial answer validation failed: ${validationResult.errorMessage}');
-        emit(QuizExeErrorState(
-          message: validationResult.errorMessage ?? 'Invalid answer',
-        ));
+        emit(QuizExeErrorState());
 
         // Restore display card state
         emit(lastDisplayState.copyWith(
@@ -95,9 +93,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     } catch (e, stackTrace) {
       _logger.e('Error checking answer for card: ${quizCardItem.id}',
           ex: e, stacktrace: stackTrace);
-      emit(QuizExeErrorState(
-        message: 'Failed to validate answer: ${e.toString()}',
-      ));
+      emit(QuizExeErrorState());
 
       emit(lastDisplayState);
     }
@@ -162,7 +158,5 @@ class QuizDoneState extends QuizExeState {
 }
 
 class QuizExeErrorState extends QuizExeState {
-  QuizExeErrorState({required this.message});
-
-  final String message;
+  QuizExeErrorState();
 }

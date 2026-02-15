@@ -243,6 +243,7 @@ Future<void> _setupServices() async {
   final quizzyClient = getIt.get<ChopperClient>(instanceName: 'quizzy');
   final quizzyAnswerValidator = QuizzyAnswerValidator(
     quizzyClient.getService<QuizzyApiService>(),
+    getIt.get<InAppPurchaseService>(),
   );
   getIt.registerSingleton<QuizzyAnswerValidator>(quizzyAnswerValidator);
 

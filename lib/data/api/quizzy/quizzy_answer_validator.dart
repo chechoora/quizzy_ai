@@ -1,11 +1,14 @@
 import 'package:chopper/src/response.dart';
 import 'package:poc_ai_quiz/data/api/quizzy/quizzy_api_service.dart';
+import 'package:poc_ai_quiz/domain/exception/answer_validator_exception.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 
 class QuizzyAnswerValidator extends IAnswerValidator {
   final QuizzyApiService _apiService;
+  final InAppPurchaseService _inAppPurchaseService;
 
-  QuizzyAnswerValidator(this._apiService);
+  QuizzyAnswerValidator(this._apiService, this._inAppPurchaseService);
 
   @override
   Future<AnswerResult> validateAnswer({
@@ -13,9 +16,11 @@ class QuizzyAnswerValidator extends IAnswerValidator {
     required String correctAnswer,
     required String userAnswer,
   }) async {
+    final appUserId = await _inAppPurchaseService.getAppUserId();
     return _answerFromResponse(
       correctAnswer,
       await _apiService.validateAnswer(
+        userId: appUserId,
         body: CheckAnswerRequest(
           question: question,
           correctAnswer: correctAnswer,
@@ -38,7 +43,8 @@ class QuizzyAnswerValidator extends IAnswerValidator {
         explanation: feedback,
       );
     } else {
-      throw Exception('Failed to validate answer: ${response.statusCode}');
+      throw AnswerValidatorException(
+          'Failed to validate answer: ${response.statusCode}, ${response.error}');
     }
   }
 }

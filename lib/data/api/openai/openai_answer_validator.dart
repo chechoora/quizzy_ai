@@ -5,6 +5,7 @@ import 'package:poc_ai_quiz/data/api/openai/openai_request_models.dart'
 import 'package:poc_ai_quiz/data/api/openai/openai_response_models.dart'
     as response;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
+import 'package:poc_ai_quiz/domain/exception/answer_validator_exception.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
@@ -74,7 +75,7 @@ ${ValidatorPrompts.jsonResponseInstruction}
 
       if (!apiResponse.isSuccessful || apiResponse.body == null) {
         _logger.e('OpenAI API request failed');
-        throw Exception('Failed to validate answer: ${apiResponse.error}');
+        throw AnswerValidatorException('Failed to validate answer: ${apiResponse.error}');
       }
 
       final openAIResponse = response.OpenAIResponse.fromJson(
@@ -82,13 +83,13 @@ ${ValidatorPrompts.jsonResponseInstruction}
 
       if (openAIResponse.choices == null || openAIResponse.choices!.isEmpty) {
         _logger.e('No choices in OpenAI response');
-        throw Exception('No response choices from OpenAI');
+        throw AnswerValidatorException('No response choices from OpenAI');
       }
 
       final choice = openAIResponse.choices!.first;
       if (choice.message == null || choice.message!.content == null) {
         _logger.e('No content in OpenAI choice');
-        throw Exception('No content in OpenAI response');
+        throw AnswerValidatorException('No content in OpenAI response');
       }
 
       final content = choice.message!.content!;

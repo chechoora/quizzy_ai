@@ -5,6 +5,7 @@ import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_request_models.dart'
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_response_models.dart'
     as response;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
+import 'package:poc_ai_quiz/domain/exception/answer_validator_exception.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
@@ -68,7 +69,7 @@ ${ValidatorPrompts.geminiEvaluateInstruction}
 
       if (!apiResponse.isSuccessful || apiResponse.body == null) {
         _logger.e('Gemini API request failed');
-        throw Exception('Failed to validate answer: ${apiResponse.error}');
+        throw AnswerValidatorException('Failed to validate answer: ${apiResponse.error}');
       }
 
       final geminiResponse = response.GeminiResponse.fromJson(
@@ -77,7 +78,7 @@ ${ValidatorPrompts.geminiEvaluateInstruction}
       if (geminiResponse.candidates == null ||
           geminiResponse.candidates!.isEmpty) {
         _logger.e('No candidates in Gemini response');
-        throw Exception('No response candidates from Gemini');
+        throw AnswerValidatorException('No response candidates from Gemini');
       }
 
       final candidate = geminiResponse.candidates!.first;
@@ -85,7 +86,7 @@ ${ValidatorPrompts.geminiEvaluateInstruction}
           candidate.content!.parts == null ||
           candidate.content!.parts!.isEmpty) {
         _logger.e('No content in Gemini candidate');
-        throw Exception('No content in Gemini response');
+        throw AnswerValidatorException('No content in Gemini response');
       }
 
       final text = candidate.content!.parts!.first.text ?? '';
