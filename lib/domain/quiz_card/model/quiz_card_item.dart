@@ -25,33 +25,3 @@ class QuizCardItem extends Equatable {
         isArchive,
       ];
 }
-
-class QuizCardItemWithPremium extends QuizCardItem with PremiumInfo {
-  QuizCardItemWithPremium({
-    required super.id,
-    required super.deckId,
-    required super.questionText,
-    required super.answerText,
-    required super.isArchive,
-    required bool isLocked,
-  }) {
-    isObjectLocked = isLocked;
-  }
-
-  factory QuizCardItemWithPremium.fromQuizCard({
-    required QuizCardItem quizCardItem,
-    required bool isLocked,
-  }) {
-    return QuizCardItemWithPremium(
-      id: quizCardItem.id,
-      deckId: quizCardItem.deckId,
-      questionText: quizCardItem.questionText,
-      answerText: quizCardItem.answerText,
-      isArchive: quizCardItem.isArchive,
-      isLocked: isLocked,
-    );
-  }
-
-  @override
-  List<Object?> get props => super.props..add(isObjectLocked);
-}

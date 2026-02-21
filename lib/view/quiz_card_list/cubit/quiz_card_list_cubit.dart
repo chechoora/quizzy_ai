@@ -120,24 +120,24 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
 
     // Use selected cards if any, otherwise use all unlocked cards
     final cards = _selectedCardIds.isEmpty
-        ? List<QuizCardItemWithPremium>.from(items)
-        : List<QuizCardItemWithPremium>.from(
+        ? List<QuizCardItem>.from(items)
+        : List<QuizCardItem>.from(
             items.where((card) => _selectedCardIds.contains(card.id)));
 
     if (isShuffle) {
       cards.shuffle();
     }
     if (switchSides) {
-      final switchedCards = <QuizCardItemWithPremium>[];
+      final switchedCards = <QuizCardItem>[];
       for (var card in cards) {
         switchedCards.add(
-          QuizCardItemWithPremium(
-              id: card.id,
-              questionText: card.answerText,
-              answerText: card.questionText,
-              deckId: card.deckId,
-              isArchive: card.isArchive,
-              isLocked: card.isLocked),
+          QuizCardItem(
+            id: card.id,
+            questionText: card.answerText,
+            answerText: card.questionText,
+            deckId: card.deckId,
+            isArchive: card.isArchive,
+          ),
         );
       }
       cards
@@ -223,7 +223,7 @@ class QuizCardLaunchState extends ListenerState {
     this.isQuickPlay = false,
   });
 
-  final List<QuizCardItemWithPremium> quizCarList;
+  final List<QuizCardItem> quizCarList;
   final bool isQuickPlay;
 }
 
