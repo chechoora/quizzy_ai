@@ -222,7 +222,7 @@ class _BottomButtons extends StatelessWidget {
         : l10n.quizCardListPlayDeckButton;
 
     final quizPlayButtonText = hasSelection
-        ? l10n.quizCardListPlaySelectedButton(selectedCount)
+        ? l10n.quizCardListQuickPlaySelectedButton(selectedCount)
         : l10n.quizCardListQuickPlayButton;
 
     return Container(
