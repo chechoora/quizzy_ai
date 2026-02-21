@@ -8,14 +8,20 @@ import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
 import 'package:poc_ai_quiz/domain/exception/answer_validator_exception.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class GeminiAnswerValidator extends IAnswerValidator {
   static final _logger = Logger.withTag('GeminiAnswerValidator');
 
   final GeminiApiService _apiService;
+  final ValidatorConfigProvider _configProvider;
 
-  GeminiAnswerValidator(this._apiService);
+  GeminiAnswerValidator(
+    this._apiService,
+    this._configProvider,
+  );
 
   @override
   Future<AnswerResult> validateAnswer({
@@ -28,6 +34,19 @@ class GeminiAnswerValidator extends IAnswerValidator {
       _logger.v('Question: $question');
       _logger.v('Expected answer: $correctAnswer');
       _logger.v('User answer: $userAnswer');
+
+      final config = _configProvider.geminiConfig;
+      if (config == null || config is! ApiKeyConfig) {
+        throw AnswerValidatorException('Gemini configuration not found');
+      }
+
+      if (!config.isValid) {
+        throw AnswerValidatorException(
+            'Invalid Gemini configuration: API key or model is empty');
+      }
+
+      final model = config.model;
+      _logger.d('Using Gemini model: $model');
 
       final basePrompt = buildValidationPrompt(
         question: question,
@@ -65,6 +84,7 @@ ${ValidatorPrompts.geminiEvaluateInstruction}
       _logger.d('Sending request to Gemini API');
       final apiResponse = await _apiService.generateContent(
         body: geminiRequest.toJson(),
+        model: model,
       );
 
       if (!apiResponse.isSuccessful || apiResponse.body == null) {

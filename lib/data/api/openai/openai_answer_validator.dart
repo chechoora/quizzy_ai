@@ -8,18 +8,20 @@ import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
 import 'package:poc_ai_quiz/domain/exception/answer_validator_exception.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class OpenAIAnswerValidator extends IAnswerValidator {
   static final _logger = Logger.withTag('OpenAIAnswerValidator');
 
   final OpenAIApiService _apiService;
-  final String _model;
+  final ValidatorConfigProvider _configProvider;
 
   OpenAIAnswerValidator(
-    this._apiService, {
-    String model = 'gpt-4o-mini',
-  }) : _model = model;
+    this._apiService,
+    this._configProvider,
+  );
 
   @override
   Future<AnswerResult> validateAnswer({
@@ -31,6 +33,19 @@ class OpenAIAnswerValidator extends IAnswerValidator {
       _logger.d('Validating answer with OpenAI');
       _logger.v('Expected answer: $correctAnswer');
       _logger.v('User answer: $userAnswer');
+
+      final config = _configProvider.openAiConfig;
+      if (config == null || config is! ApiKeyConfig) {
+        throw AnswerValidatorException('OpenAI configuration not found');
+      }
+
+      if (!config.isValid) {
+        throw AnswerValidatorException(
+            'Invalid OpenAI configuration: API key or model is empty');
+      }
+
+      final model = config.model;
+      _logger.d('Using OpenAI model: $model');
 
       final basePrompt = buildValidationPrompt(
         question: question,
@@ -45,7 +60,7 @@ ${ValidatorPrompts.jsonResponseInstruction}
 ''';
 
       final openAIRequest = request.OpenAIRequest(
-        model: _model,
+        model: model,
         messages: [
           request.Message(
             role: 'user',

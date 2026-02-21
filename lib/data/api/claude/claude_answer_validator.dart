@@ -7,18 +7,20 @@ import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
 import 'package:poc_ai_quiz/domain/exception/answer_validator_exception.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class ClaudeAnswerValidator extends IAnswerValidator {
   static final _logger = Logger.withTag('ClaudeAnswerValidator');
 
   final ClaudeApiService _apiService;
-  final String _model;
+  final ValidatorConfigProvider _configProvider;
 
   ClaudeAnswerValidator(
-    this._apiService, {
-    String model = 'claude-3-5-haiku-20241022',
-  }) : _model = model;
+    this._apiService,
+    this._configProvider,
+  );
 
   @override
   Future<AnswerResult> validateAnswer({
@@ -31,6 +33,19 @@ class ClaudeAnswerValidator extends IAnswerValidator {
       _logger.v('Question: $question');
       _logger.v('Expected answer: $correctAnswer');
       _logger.v('User answer: $userAnswer');
+
+      final config = _configProvider.claudeConfig;
+      if (config == null || config is! ApiKeyConfig) {
+        throw AnswerValidatorException('Claude configuration not found');
+      }
+
+      if (!config.isValid) {
+        throw AnswerValidatorException(
+            'Invalid Claude configuration: API key or model is empty');
+      }
+
+      final model = config.model;
+      _logger.d('Using Claude model: $model');
 
       final basePrompt = buildValidationPrompt(
         question: question,
@@ -55,7 +70,7 @@ ${ValidatorPrompts.claudeToolUseInstruction}
       ];
 
       final claudeRequest = request.ClaudeRequest(
-        model: _model,
+        model: model,
         messages: [
           request.Message(
             role: 'user',

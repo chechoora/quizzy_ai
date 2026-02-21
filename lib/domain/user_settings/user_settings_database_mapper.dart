@@ -1,7 +1,6 @@
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/user_settings/model/user_settings_item.dart';
-import 'package:poc_ai_quiz/util/ext.dart';
 
 class UserSettingsDataBaseMapper {
   UserSettingsItem mapToUserSettingsItem(UserSettingsTableData data) {
@@ -13,14 +12,24 @@ class UserSettingsDataBaseMapper {
       id: data.id,
       userId: data.userId,
       answerValidatorType: validatorType,
-      geminiConfig:
-          data.geminiApiKey?.let((key) => ApiKeyConfig(apiKey: key)) ??
-              const ApiKeyConfig(apiKey: ''),
-      claudeConfig:
-          data.claudeApiKey?.let((key) => ApiKeyConfig(apiKey: key)) ??
-              const ApiKeyConfig(apiKey: ''),
-      openConfig: data.openAiApiKey?.let((key) => ApiKeyConfig(apiKey: key)) ??
-          const ApiKeyConfig(apiKey: ''),
+      geminiConfig: (data.geminiApiKey != null || data.geminiModelName != null)
+          ? ApiKeyConfig(
+              apiKey: data.geminiApiKey ?? '',
+              model: data.geminiModelName ?? '',
+            )
+          : ApiKeyConfig.empty(),
+      claudeConfig: (data.claudeApiKey != null || data.claudeModelName != null)
+          ? ApiKeyConfig(
+              apiKey: data.claudeApiKey ?? '',
+              model: data.claudeModelName ?? '',
+            )
+          : ApiKeyConfig.empty(),
+      openConfig: (data.openAiApiKey != null || data.openAiModelName != null)
+          ? ApiKeyConfig(
+              apiKey: data.openAiApiKey ?? '',
+              model: data.openAiModelName ?? '',
+            )
+          : ApiKeyConfig.empty(),
       ollamaConfig:
           (data.ollamaModelUrl != null && data.ollamaModelName != null)
               ? OpenSourceConfig(

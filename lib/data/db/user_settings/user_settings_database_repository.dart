@@ -49,27 +49,42 @@ class UserSettingsDataBaseRepository {
     ));
   }
 
-  Future<void> updateGeminiApiKey(int userId, String? apiKey) async {
+  Future<void> updateGeminiConfig(
+    int userId,
+    String? apiKey,
+    String? model,
+  ) async {
     await (appDatabase.update(appDatabase.userSettingsTable)
           ..where((tbl) => tbl.userId.equals(userId)))
         .write(UserSettingsTableCompanion(
       geminiApiKey: Value(apiKey),
+      geminiModelName: Value(model),
     ));
   }
 
-  Future<void> updateClaudeApiKey(int userId, String? apiKey) async {
+  Future<void> updateClaudeConfig(
+    int userId,
+    String? apiKey,
+    String? model,
+  ) async {
     await (appDatabase.update(appDatabase.userSettingsTable)
           ..where((tbl) => tbl.userId.equals(userId)))
         .write(UserSettingsTableCompanion(
       claudeApiKey: Value(apiKey),
+      claudeModelName: Value(model),
     ));
   }
 
-  Future<void> updateOpenAiApiKey(int userId, String? apiKey) async {
+  Future<void> updateOpenAiConfig(
+    int userId,
+    String? apiKey,
+    String? model,
+  ) async {
     await (appDatabase.update(appDatabase.userSettingsTable)
           ..where((tbl) => tbl.userId.equals(userId)))
         .write(UserSettingsTableCompanion(
       openAiApiKey: Value(apiKey),
+      openAiModelName: Value(model),
     ));
   }
 

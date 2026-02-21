@@ -58,11 +58,17 @@ sealed class ValidatorConfig {
 
 class ApiKeyConfig extends ValidatorConfig {
   final String apiKey;
+  final String model;
 
-  const ApiKeyConfig({required this.apiKey});
+  const ApiKeyConfig({
+    required this.apiKey,
+    required this.model,
+  });
+
+  factory ApiKeyConfig.empty() => const ApiKeyConfig(apiKey: '', model: '');
 
   @override
-  bool get isValid => apiKey.isNotEmpty;
+  bool get isValid => apiKey.isNotEmpty && model.isNotEmpty;
 }
 
 class OpenSourceConfig extends ValidatorConfig {

@@ -46,8 +46,9 @@ class SettingsAIValidatorWidget extends HookWidget {
       }
     }
 
-    void handleApiKeyUpdate(AnswerValidatorType type, String? apiKey) {
-      cubit.updateApiKey(type, apiKey);
+    void handleApiKeyConfigUpdate(
+        AnswerValidatorType type, ApiKeyConfig? config) {
+      cubit.updateApiKeyConfig(type, config);
     }
 
     void handleOpenSourceConfigUpdate(
@@ -79,7 +80,7 @@ class SettingsAIValidatorWidget extends HookWidget {
                       selectedValidator: state.validatorType,
                       validators: state.validators,
                       onValidatorChanged: handleValidatorChange,
-                      onApiKeyUpdate: handleApiKeyUpdate,
+                      onApiKeyConfigUpdate: handleApiKeyConfigUpdate,
                       onOpenSourceConfigUpdate: handleOpenSourceConfigUpdate,
                     );
                   }
@@ -131,14 +132,14 @@ class _ValidatorApiKeyContent extends HookWidget {
     required this.selectedValidator,
     required this.validators,
     required this.onValidatorChanged,
-    required this.onApiKeyUpdate,
+    required this.onApiKeyConfigUpdate,
     required this.onOpenSourceConfigUpdate,
   });
 
   final AnswerValidatorType selectedValidator;
   final List<ValidatorItem> validators;
   final void Function(AnswerValidatorType?) onValidatorChanged;
-  final void Function(AnswerValidatorType, String?) onApiKeyUpdate;
+  final void Function(AnswerValidatorType, ApiKeyConfig?) onApiKeyConfigUpdate;
   final void Function(AnswerValidatorType, OpenSourceConfig?)
       onOpenSourceConfigUpdate;
 
@@ -180,10 +181,10 @@ class _ValidatorApiKeyContent extends HookWidget {
         ),
         const SizedBox(height: 24),
         switch (validatorConfig) {
-          ApiKeyConfig() => _ApiKeyTextField(
-              initialApiKey: validatorConfig.apiKey,
+          ApiKeyConfig() => _ApiKeyWithModelField(
+              initialConfig: validatorConfig,
               selectedValidator: selectedValidator,
-              onApiKeyUpdate: onApiKeyUpdate,
+              onConfigUpdate: onApiKeyConfigUpdate,
             ),
           OpenSourceConfig() => _OpenSourceModelConfigField(
               initialConfig:
@@ -199,16 +200,16 @@ class _ValidatorApiKeyContent extends HookWidget {
   }
 }
 
-class _ApiKeyTextField extends HookWidget {
-  const _ApiKeyTextField({
-    required this.initialApiKey,
+class _ApiKeyWithModelField extends HookWidget {
+  const _ApiKeyWithModelField({
+    required this.initialConfig,
     required this.selectedValidator,
-    required this.onApiKeyUpdate,
+    required this.onConfigUpdate,
   });
 
-  final String? initialApiKey;
+  final ApiKeyConfig? initialConfig;
   final AnswerValidatorType selectedValidator;
-  final void Function(AnswerValidatorType, String?) onApiKeyUpdate;
+  final void Function(AnswerValidatorType, ApiKeyConfig?) onConfigUpdate;
 
   String? _getApiKeyUrl(BuildContext context) {
     final l10n = localize(context);
@@ -241,77 +242,69 @@ class _ApiKeyTextField extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = useTextEditingController(text: initialApiKey ?? '');
-    final isEmpty = useState(controller.text.trim().isEmpty);
-    final isUnchanged =
-        useState(controller.text.trim() == (initialApiKey ?? ''));
+    final apiKeyController =
+        useTextEditingController(text: initialConfig?.apiKey ?? '');
+    final modelController =
+        useTextEditingController(text: initialConfig?.model ?? '');
 
     useEffect(() {
-      controller.text = initialApiKey ?? '';
-      isEmpty.value = controller.text.trim().isEmpty;
-      isUnchanged.value = controller.text.trim() == (initialApiKey ?? '');
+      apiKeyController.text = initialConfig?.apiKey ?? '';
+      modelController.text = initialConfig?.model ?? '';
       return null;
-    }, [selectedValidator, initialApiKey]);
-
-    useEffect(() {
-      void listener() {
-        isEmpty.value = controller.text.trim().isEmpty;
-        isUnchanged.value = controller.text.trim() == (initialApiKey ?? '');
-      }
-
-      controller.addListener(listener);
-      return () => controller.removeListener(listener);
-    }, [controller]);
+    }, [selectedValidator, initialConfig]);
 
     final l10n = localize(context);
-    final hasInitialKey = initialApiKey != null && initialApiKey!.isNotEmpty;
-    final showDeleteButton = hasInitialKey && isUnchanged.value;
-    final apiKeyUrl = _getApiKeyUrl(context);
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.settingsAiValidatorApiKeyTitle,
-                    style: AppTypography.h4.copyWith(
-                      color: AppColors.grayscale600,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  AppTextField(
-                    controller: controller,
-                    hint: l10n.settingsAiValidatorApiKeyHint,
-                    obscureText: true,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            showDeleteButton
-                ? AppButton.destructive(
-                    text: l10n.settingsAiValidatorDeleteButton,
-                    onPressed: () {
-                      onApiKeyUpdate(selectedValidator, null);
-                    },
-                  )
-                : AppButton.primary(
-                    text: l10n.settingsAiValidatorApplyButton,
-                    onPressed: isEmpty.value
-                        ? null
-                        : () {
-                            final apiKey = controller.text.trim();
-                            onApiKeyUpdate(selectedValidator, apiKey);
-                          },
-                  ),
-          ],
+        Text(
+          l10n.settingsAiValidatorApiKeyTitle,
+          style: AppTypography.h4.copyWith(
+            color: AppColors.grayscale600,
+          ),
         ),
-        if (apiKeyUrl != null) ...[
+        const SizedBox(height: 12),
+        AppTextField(
+          controller: apiKeyController,
+          hint: l10n.settingsAiValidatorApiKeyHint,
+          obscureText: true,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          l10n.settingsAiValidatorModelNameLabel,
+          style: AppTypography.h4.copyWith(
+            color: AppColors.grayscale600,
+          ),
+        ),
+        const SizedBox(height: 12),
+        AppTextField(
+          controller: modelController,
+          hint: l10n.settingsAiValidatorModelNameHint,
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: AppButton.primary(
+            text: l10n.settingsAiValidatorSaveConfigButton,
+            onPressed: () {
+              final apiKey = apiKeyController.text.trim();
+              final model = modelController.text.trim();
+              if (apiKey.isEmpty && model.isEmpty) {
+                onConfigUpdate(selectedValidator, null);
+              } else if (apiKey.isEmpty || model.isEmpty) {
+                snackBar(context,
+                    message: l10n.settingsAiValidatorFillBothFieldsError);
+              } else {
+                onConfigUpdate(
+                  selectedValidator,
+                  ApiKeyConfig(apiKey: apiKey, model: model),
+                );
+              }
+            },
+          ),
+        ),
+        if (_getApiKeyUrl(context) != null) ...[
           const SizedBox(height: 4),
           GestureDetector(
             onTap: () => _launchApiKeyUrl(context),

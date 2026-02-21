@@ -18,7 +18,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -37,6 +37,12 @@ class AppDatabase extends _$AppDatabase {
           // Migration for adding Ollama configuration columns
           await m.addColumn(userSettingsTable, userSettingsTable.ollamaModelUrl);
           await m.addColumn(userSettingsTable, userSettingsTable.ollamaModelName);
+        }
+        if (from < 6) {
+          // Migration for adding model name columns for API key validators
+          await m.addColumn(userSettingsTable, userSettingsTable.geminiModelName);
+          await m.addColumn(userSettingsTable, userSettingsTable.claudeModelName);
+          await m.addColumn(userSettingsTable, userSettingsTable.openAiModelName);
         }
       },
     );

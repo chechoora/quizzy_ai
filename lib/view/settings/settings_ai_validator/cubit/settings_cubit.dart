@@ -64,44 +64,44 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
     }
   }
 
-  Future<void> updateApiKey(
-      AnswerValidatorType validatorType, String? apiKey) async {
+  Future<void> updateApiKeyConfig(
+      AnswerValidatorType validatorType, ApiKeyConfig? config) async {
     final currentState = state;
     if (currentState is! SettingsDataState) return;
 
     try {
       final user = await userRepository.fetchCurrentUser();
 
-      // Update the appropriate API key based on validator type
+      // Update the appropriate config based on validator type
       switch (validatorType) {
         case AnswerValidatorType.gemini:
-          await userSettingsRepository.setGeminiApiKey(user.id, apiKey);
+          await userSettingsRepository.setGeminiConfig(user.id, config);
           break;
         case AnswerValidatorType.claude:
-          await userSettingsRepository.setClaudeApiKey(user.id, apiKey);
+          await userSettingsRepository.setClaudeConfig(user.id, config);
           break;
         case AnswerValidatorType.openAI:
-          await userSettingsRepository.setOpenAiApiKey(user.id, apiKey);
+          await userSettingsRepository.setOpenAiConfig(user.id, config);
           break;
         case AnswerValidatorType.onDeviceAI:
         case AnswerValidatorType.ml:
         case AnswerValidatorType.ollama:
         case AnswerValidatorType.quizzyAI:
-          throw ArgumentError('$validatorType does not use API keys');
+          throw ArgumentError('$validatorType does not use ApiKeyConfig');
       }
 
-      // Reload validators to reflect the updated API key
+      // Reload validators to reflect the updated config
       final validators = await validatorsManager.getValidators();
       emit(SettingsApiKeyUpdatedState(validatorType: validatorType));
       emit(SettingsDataState(
         validatorType: currentState.validatorType,
         validators: validators,
       ));
-      _logger.i('Updated API key for: ${validatorType.toDisplayString()}');
+      _logger.i('Updated config for: ${validatorType.toDisplayString()}');
     } catch (e, stackTrace) {
-      _logger.e('Failed to update API key', ex: e, stacktrace: stackTrace);
+      _logger.e('Failed to update config', ex: e, stacktrace: stackTrace);
       emit(SettingsErrorState(
-        error: 'Failed to update API key: ${e.toString()}',
+        error: 'Failed to update config: ${e.toString()}',
       ));
       emit(currentState);
     }

@@ -10,9 +10,15 @@ class UserSettingsTable extends Table {
 
   TextColumn get geminiApiKey => text().nullable()();
 
+  TextColumn get geminiModelName => text().nullable()();
+
   TextColumn get claudeApiKey => text().nullable()();
 
+  TextColumn get claudeModelName => text().nullable()();
+
   TextColumn get openAiApiKey => text().nullable()();
+
+  TextColumn get openAiModelName => text().nullable()();
 
   TextColumn get ollamaModelUrl => text().nullable()();
 

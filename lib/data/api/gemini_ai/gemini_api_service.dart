@@ -11,6 +11,7 @@ abstract class GeminiApiService extends ChopperService {
 
   Future<Response> generateContent({
     required Map<String, dynamic> body,
+    required String model,
   });
 }
 
@@ -18,9 +19,10 @@ class _GeminiApiServiceImpl extends GeminiApiService {
   @override
   Future<Response> generateContent({
     required Map<String, dynamic> body,
+    required String model,
   }) {
     // Manually construct the URL to avoid URI parsing issues with the colon
-    const path = 'gemini-2.5-flash:generateContent';
+    final path = '$model:generateContent';
     final url = Uri.parse(client.baseUrl.toString() + path);
 
     final request = Request(

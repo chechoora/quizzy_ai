@@ -27,31 +27,43 @@ class UserSettingsRepository {
     await dataBaseRepository.updateAnswerValidatorType(userId, validatorType.name);
   }
 
-  Future<ApiKeyConfig?> getGeminiApiKey(int userId) async {
+  Future<ApiKeyConfig?> getGeminiConfig(int userId) async {
     final settings = await fetchUserSettings(userId);
     return settings.geminiConfig;
   }
 
-  Future<void> setGeminiApiKey(int userId, String? apiKey) async {
-    await dataBaseRepository.updateGeminiApiKey(userId, apiKey);
+  Future<void> setGeminiConfig(int userId, ApiKeyConfig? config) async {
+    await dataBaseRepository.updateGeminiConfig(
+      userId,
+      config?.apiKey,
+      config?.model,
+    );
   }
 
-  Future<ApiKeyConfig?> getClaudeApiKey(int userId) async {
+  Future<ApiKeyConfig?> getClaudeConfig(int userId) async {
     final settings = await fetchUserSettings(userId);
     return settings.claudeConfig;
   }
 
-  Future<void> setClaudeApiKey(int userId, String? apiKey) async {
-    await dataBaseRepository.updateClaudeApiKey(userId, apiKey);
+  Future<void> setClaudeConfig(int userId, ApiKeyConfig? config) async {
+    await dataBaseRepository.updateClaudeConfig(
+      userId,
+      config?.apiKey,
+      config?.model,
+    );
   }
 
-  Future<ApiKeyConfig?> getOpenAiApiKey(int userId) async {
+  Future<ApiKeyConfig?> getOpenAiConfig(int userId) async {
     final settings = await fetchUserSettings(userId);
     return settings.openConfig;
   }
 
-  Future<void> setOpenAiApiKey(int userId, String? apiKey) async {
-    await dataBaseRepository.updateOpenAiApiKey(userId, apiKey);
+  Future<void> setOpenAiConfig(int userId, ApiKeyConfig? config) async {
+    await dataBaseRepository.updateOpenAiConfig(
+      userId,
+      config?.apiKey,
+      config?.model,
+    );
   }
 
   Future<void> setOllamaConfig(int userId, OpenSourceConfig? config) async {

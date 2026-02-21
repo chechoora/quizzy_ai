@@ -222,6 +222,7 @@ Future<void> _setupServices() async {
   final geminiApiClient = getIt.get<ChopperClient>(instanceName: 'gemini');
   final geminiAnswerValidator = GeminiAnswerValidator(
     geminiApiClient.getService<GeminiApiService>(),
+    getIt.get<ValidatorConfigProvider>(),
   );
   getIt.registerSingleton<GeminiAnswerValidator>(geminiAnswerValidator);
 
@@ -229,6 +230,7 @@ Future<void> _setupServices() async {
   final claudeApiClient = getIt.get<ChopperClient>(instanceName: 'claude');
   final claudeAnswerValidator = ClaudeAnswerValidator(
     claudeApiClient.getService<ClaudeApiService>(),
+    getIt.get<ValidatorConfigProvider>(),
   );
   getIt.registerSingleton<ClaudeAnswerValidator>(claudeAnswerValidator);
 
@@ -236,6 +238,7 @@ Future<void> _setupServices() async {
   final openAIApiClient = getIt.get<ChopperClient>(instanceName: 'openai');
   final openAIAnswerValidator = OpenAIAnswerValidator(
     openAIApiClient.getService<OpenAIApiService>(),
+    getIt.get<ValidatorConfigProvider>(),
   );
   getIt.registerSingleton<OpenAIAnswerValidator>(openAIAnswerValidator);
 
