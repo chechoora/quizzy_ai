@@ -121,8 +121,8 @@ class QuizCardListWidget extends HookWidget {
                         if (state.quizCarList.isNotEmpty)
                           _BottomButtons(
                             hasSelection: state.hasSelection,
-                            selectedCount: state.selectedUnlockedCount,
-                            allUnlockedSelected: state.allUnlockedSelected,
+                            selectedCount: state.selectedCount,
+                            allSelected: state.allSelected,
                             onSelectAllPressed: () => cubit.selectAllCards(),
                             onClearSelectionPressed: () =>
                                 cubit.clearSelection(),
@@ -191,7 +191,7 @@ class _BottomButtons extends StatelessWidget {
   const _BottomButtons({
     this.hasSelection = false,
     this.selectedCount = 0,
-    this.allUnlockedSelected = false,
+    this.allSelected = false,
     this.onSelectAllPressed,
     this.onClearSelectionPressed,
     this.onQuickPlayPressed,
@@ -204,7 +204,7 @@ class _BottomButtons extends StatelessWidget {
 
   final bool hasSelection;
   final int selectedCount;
-  final bool allUnlockedSelected;
+  final bool allSelected;
   final VoidCallback? onSelectAllPressed;
   final VoidCallback? onClearSelectionPressed;
   final VoidCallback? onQuickPlayPressed;
@@ -221,6 +221,10 @@ class _BottomButtons extends StatelessWidget {
         ? l10n.quizCardListPlaySelectedButton(selectedCount)
         : l10n.quizCardListPlayDeckButton;
 
+    final quizPlayButtonText = hasSelection
+        ? l10n.quizCardListPlaySelectedButton(selectedCount)
+        : l10n.quizCardListQuickPlayButton;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Column(
@@ -234,7 +238,7 @@ class _BottomButtons extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () {
-                    if (allUnlockedSelected) {
+                    if (allSelected) {
                       onClearSelectionPressed?.call();
                     } else {
                       onSelectAllPressed?.call();
@@ -246,7 +250,7 @@ class _BottomButtons extends StatelessWidget {
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: Text(
-                    allUnlockedSelected
+                    allSelected
                         ? l10n.quizCardListClearSelection
                         : l10n.quizCardListSelectAll,
                     style: AppTypography.buttonSmall.copyWith(
@@ -295,7 +299,7 @@ class _BottomButtons extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           AppButton.primary(
-            text: l10n.quizCardListQuickPlayButton,
+            text: quizPlayButtonText,
             leadingIcon: const Icon(Icons.bolt, size: 20),
             onPressed: onQuickPlayPressed,
           ),

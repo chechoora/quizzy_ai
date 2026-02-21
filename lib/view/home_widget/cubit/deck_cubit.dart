@@ -14,12 +14,12 @@ class HomeCubit extends Cubit<DeckState> {
 
   final DeckRepository deckRepository;
   final DeckPremiumManager deckPremiumManager;
-  final List<DeckItemWithPremium> decks = [];
-  StreamSubscription<List<DeckItemWithPremium>>? _decksSubscription;
+  final List<DeckItem> decks = [];
+  StreamSubscription<List<DeckItem>>? _decksSubscription;
 
   void watchDecks() {
     _decksSubscription?.cancel();
-    _decksSubscription = deckPremiumManager.watchAllowedDecks().listen(
+    _decksSubscription = deckRepository.watchDecks().listen(
       (data) {
         decks
           ..clear()
@@ -80,7 +80,7 @@ class DeckLoadingState extends BuilderState {
 }
 
 class DeckDataState extends BuilderState {
-  final List<DeckItemWithPremium> deckList;
+  final List<DeckItem> deckList;
 
   const DeckDataState(this.deckList);
 

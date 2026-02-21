@@ -116,6 +116,14 @@
   "quizCardListAddCardTooltip": "Add Card",
   "quizCardListPlayDeckButton": "Play the Deck",
   "quizCardListQuickPlayButton": "Quick Play",
+  "quizCardListQuickPlaySelectedButton": "Quick Play Selected ({count})",
+  "@quizCardListQuickPlaySelectedButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "quizCardListSideSwitched": "Side switched",
   "quizCardListSidesNotSwitched": "Sides not switched",
   "quizCardListShuffleCards": "Cards Shuffled",
