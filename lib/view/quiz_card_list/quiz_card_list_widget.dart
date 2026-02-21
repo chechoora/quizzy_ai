@@ -110,6 +110,9 @@ class QuizCardListWidget extends HookWidget {
                         Expanded(
                           child: QuizCardListDisplayWidget(
                             quizCarList: state.quizCarList,
+                            selectedCardIds: state.selectedCardIds,
+                            onCardSelectionToggle: (cardId) =>
+                                cubit.toggleCardSelection(cardId),
                             onQuizCardEditRequest: launchEditCardRequest,
                             onQuizCardRemoveRequest: launchConfirmDeleteRequest,
                             onAddCardRequest: () => cubit.addCardRequest(),
@@ -117,6 +120,12 @@ class QuizCardListWidget extends HookWidget {
                         ),
                         if (state.quizCarList.isNotEmpty)
                           _BottomButtons(
+                            hasSelection: state.hasSelection,
+                            selectedCount: state.selectedUnlockedCount,
+                            allUnlockedSelected: state.allUnlockedSelected,
+                            onSelectAllPressed: () => cubit.selectAllCards(),
+                            onClearSelectionPressed: () =>
+                                cubit.clearSelection(),
                             onQuickPlayPressed: () => cubit.launchQuizRequest(
                               isQuickPlay: true,
                               isShuffle: shuffleValue.value,
@@ -180,6 +189,11 @@ class QuizCardListWidget extends HookWidget {
 
 class _BottomButtons extends StatelessWidget {
   const _BottomButtons({
+    this.hasSelection = false,
+    this.selectedCount = 0,
+    this.allUnlockedSelected = false,
+    this.onSelectAllPressed,
+    this.onClearSelectionPressed,
     this.onQuickPlayPressed,
     this.onPlayDeckPressed,
     this.onShufflePressed,
@@ -188,6 +202,11 @@ class _BottomButtons extends StatelessWidget {
     this.switchSides = false,
   });
 
+  final bool hasSelection;
+  final int selectedCount;
+  final bool allUnlockedSelected;
+  final VoidCallback? onSelectAllPressed;
+  final VoidCallback? onClearSelectionPressed;
   final VoidCallback? onQuickPlayPressed;
   final VoidCallback? onPlayDeckPressed;
   final ValueChanged<bool>? onShufflePressed;
@@ -198,52 +217,81 @@ class _BottomButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
+    final playButtonText = hasSelection
+        ? l10n.quizCardListPlaySelectedButton(selectedCount)
+        : l10n.quizCardListPlayDeckButton;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  onSwitchSidesPressed?.call(!switchSides);
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  switchSides
-                      ? l10n.quizCardListSideSwitched
-                      : l10n.quizCardListSidesNotSwitched,
-                  style: AppTypography.buttonSmall.copyWith(
-                    color: AppColors.primary500,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    if (allUnlockedSelected) {
+                      onClearSelectionPressed?.call();
+                    } else {
+                      onSelectAllPressed?.call();
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    allUnlockedSelected
+                        ? l10n.quizCardListClearSelection
+                        : l10n.quizCardListSelectAll,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.primary500,
+                    ),
                   ),
                 ),
-              ),
-              TextButton(
-                onPressed: () {
-                  onShufflePressed?.call(!shuffleEnabled);
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  shuffleEnabled
-                      ? l10n.quizCardListShuffleCards
-                      : l10n.quizCardListCardsInOrder,
-                  style: AppTypography.buttonSmall.copyWith(
-                    color: AppColors.primary500,
+                TextButton(
+                  onPressed: () {
+                    onSwitchSidesPressed?.call(!switchSides);
+                  },
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    switchSides
+                        ? l10n.quizCardListSideSwitched
+                        : l10n.quizCardListSidesNotSwitched,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.primary500,
+                    ),
                   ),
                 ),
-              ),
-            ],
+                TextButton(
+                  onPressed: () {
+                    onShufflePressed?.call(!shuffleEnabled);
+                  },
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    shuffleEnabled
+                        ? l10n.quizCardListShuffleCards
+                        : l10n.quizCardListCardsInOrder,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.primary500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 8),
           AppButton.primary(
@@ -253,7 +301,7 @@ class _BottomButtons extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           AppButton.secondary(
-            text: l10n.quizCardListPlayDeckButton,
+            text: playButtonText,
             leadingIcon: const Icon(Icons.play_arrow, size: 20),
             onPressed: onPlayDeckPressed,
           ),

@@ -21,14 +21,53 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   final QuizCardPremiumManager quizCardPremiumManager;
   final QuizCardExeValidator quizCardExeValidator;
   final items = <QuizCardItemWithPremium>[];
+  final _selectedCardIds = <int>{};
+
+  void toggleCardSelection(int cardId) {
+    if (_selectedCardIds.contains(cardId)) {
+      _selectedCardIds.remove(cardId);
+    } else {
+      _selectedCardIds.add(cardId);
+    }
+    emit(
+      QuizCardListDataState(
+        quizCarList: List.from(items),
+        selectedCardIds: Set.from(_selectedCardIds),
+      ),
+    );
+  }
+
+  void selectAllCards() {
+    _selectedCardIds
+      ..clear()
+      ..addAll(items.where((card) => !card.isLocked).map((card) => card.id));
+    emit(
+      QuizCardListDataState(
+        quizCarList: List.from(items),
+        selectedCardIds: Set.from(_selectedCardIds),
+      ),
+    );
+  }
+
+  void clearSelection() {
+    _selectedCardIds.clear();
+    emit(
+      QuizCardListDataState(
+        quizCarList: List.from(items),
+        selectedCardIds: const {},
+      ),
+    );
+  }
 
   Future<void> fetchQuizCardListRequest() async {
     emit(
       QuizCardListLoadingState(),
     );
+    _selectedCardIds.clear();
     emit(
       QuizCardListDataState(
         quizCarList: await _fetchCards(),
+        selectedCardIds: const {},
       ),
     );
   }
@@ -52,6 +91,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   }
 
   void deleteCard(QuizCardItem card) {
+    _selectedCardIds.remove(card.id);
     emit(
       QuizCardListLoadingState(),
     );
@@ -77,8 +117,25 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     bool switchSides = false,
   }) async {
     final result = await quizCardExeValidator.isExeValid();
-    final cards = List<QuizCardItemWithPremium>.from(
-        items.where((card) => !card.isLocked));
+
+    // Use selected cards if any, otherwise use all unlocked cards
+    final cards = _selectedCardIds.isEmpty
+        ? List<QuizCardItemWithPremium>.from(
+            items.where((card) => !card.isLocked))
+        : List<QuizCardItemWithPremium>.from(
+            items.where((card) =>
+                _selectedCardIds.contains(card.id) && !card.isLocked));
+
+    // Check if we have any cards to play
+    if (cards.isEmpty) {
+      emit(
+        QuizCardListErrorState(
+          message: 'All selected cards are locked. Please select at least one unlocked card or unlock premium features.',
+        ),
+      );
+      return;
+    }
+
     if (isShuffle) {
       cards.shuffle();
     }
@@ -146,12 +203,33 @@ class QuizCardListLoadingState extends BuilderState {
 }
 
 class QuizCardListDataState extends BuilderState {
-  const QuizCardListDataState({required this.quizCarList});
+  const QuizCardListDataState({
+    required this.quizCarList,
+    this.selectedCardIds = const {},
+  });
 
   final List<QuizCardItemWithPremium> quizCarList;
+  final Set<int> selectedCardIds;
+
+  bool get hasSelection => selectedCardIds.isNotEmpty;
+
+  bool get allUnlockedSelected {
+    final unlockedIds = quizCarList
+        .where((card) => !card.isLocked)
+        .map((card) => card.id)
+        .toSet();
+    return unlockedIds.isNotEmpty &&
+        unlockedIds.every((id) => selectedCardIds.contains(id));
+  }
+
+  int get selectedUnlockedCount {
+    return quizCarList
+        .where((card) => selectedCardIds.contains(card.id) && !card.isLocked)
+        .length;
+  }
 
   @override
-  List<Object?> get props => [quizCarList];
+  List<Object?> get props => [quizCarList, selectedCardIds];
 }
 
 class QuizCardLaunchState extends ListenerState {

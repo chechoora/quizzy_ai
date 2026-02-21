@@ -122,6 +122,17 @@
   "quizCardListCardsInOrder": "Cards in Order",
   "quizCardListEditCardAction": "Edit card",
   "quizCardListDeleteCardAction": "Delete card",
+  "quizCardListSelectAll": "Select all",
+  "quizCardListClearSelection": "Clear selection",
+  "quizCardListPlaySelectedButton": "Play Selected ({count})",
+  "@quizCardListPlaySelectedButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "quizCardListNoUnlockedCardsSelected": "All selected cards are locked. Please select at least one unlocked card or unlock premium features.",
   "quizExeScoreLabel": "Score: {score}",
   "@quizExeScoreLabel": {
     "placeholders": {
