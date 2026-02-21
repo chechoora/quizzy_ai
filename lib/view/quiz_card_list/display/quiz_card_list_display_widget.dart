@@ -9,6 +9,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   const QuizCardListDisplayWidget({
     required this.quizCarList,
     this.selectedCardIds = const {},
+    this.isSelectionModeActive = false,
     this.onCardSelectionToggle,
     this.onQuizCardEditRequest,
     this.onQuizCardRemoveRequest,
@@ -18,6 +19,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
 
   final List<QuizCardItem> quizCarList;
   final Set<int> selectedCardIds;
+  final bool isSelectionModeActive;
   final ValueChanged<int>? onCardSelectionToggle;
   final ValueChanged<QuizCardItem>? onQuizCardEditRequest;
   final ValueChanged<QuizCardItem>? onQuizCardRemoveRequest;
@@ -38,7 +40,10 @@ class QuizCardListDisplayWidget extends StatelessWidget {
         return _QuizCardTile(
           quizCardItem: item,
           isSelected: isSelected,
-          onTap: () => onCardSelectionToggle?.call(item.id),
+          showCheckbox: isSelectionModeActive,
+          onTap: isSelectionModeActive
+              ? () => onCardSelectionToggle?.call(item.id)
+              : null,
           onEditPressed: () => onQuizCardEditRequest?.call(item),
           onDeletePressed: () => onQuizCardRemoveRequest?.call(item),
         );
@@ -51,6 +56,7 @@ class _QuizCardTile extends StatelessWidget {
   const _QuizCardTile({
     required this.quizCardItem,
     this.isSelected = false,
+    this.showCheckbox = true,
     this.onTap,
     this.onEditPressed,
     this.onDeletePressed,
@@ -58,6 +64,7 @@ class _QuizCardTile extends StatelessWidget {
 
   final QuizCardItem quizCardItem;
   final bool isSelected;
+  final bool showCheckbox;
   final VoidCallback? onTap;
   final VoidCallback? onEditPressed;
   final VoidCallback? onDeletePressed;
@@ -81,15 +88,16 @@ class _QuizCardTile extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: Icon(
-                isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                color:
-                    isSelected ? AppColors.primary500 : AppColors.grayscale400,
-                size: 24,
+            if (showCheckbox)
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Icon(
+                  isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+                  color:
+                      isSelected ? AppColors.primary500 : AppColors.grayscale400,
+                  size: 24,
+                ),
               ),
-            ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

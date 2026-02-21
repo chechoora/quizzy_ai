@@ -49,6 +49,7 @@ class QuizCardListWidget extends HookWidget {
 
     final shuffleValue = useState(false);
     final switchSidesValue = useState(false);
+    final isSelectionModeActive = useState(false);
 
     void addCardRequest() {
       context.push(CreateCardRoute().path).then((cardRequest) {
@@ -111,6 +112,7 @@ class QuizCardListWidget extends HookWidget {
                           child: QuizCardListDisplayWidget(
                             quizCarList: state.quizCarList,
                             selectedCardIds: state.selectedCardIds,
+                            isSelectionModeActive: isSelectionModeActive.value,
                             onCardSelectionToggle: (cardId) =>
                                 cubit.toggleCardSelection(cardId),
                             onQuizCardEditRequest: launchEditCardRequest,
@@ -123,9 +125,17 @@ class QuizCardListWidget extends HookWidget {
                             hasSelection: state.hasSelection,
                             selectedCount: state.selectedCount,
                             allSelected: state.allSelected,
+                            isSelectionModeActive: isSelectionModeActive.value,
+                            onEnterSelectionMode: (isModeOn) {
+                              isSelectionModeActive.value = isModeOn;
+                              if (!isModeOn) {
+                                cubit.clearSelection();
+                              }
+                            },
                             onSelectAllPressed: () => cubit.selectAllCards(),
-                            onClearSelectionPressed: () =>
-                                cubit.clearSelection(),
+                            onClearSelectionPressed: () {
+                              cubit.clearSelection();
+                            },
                             onQuickPlayPressed: () => cubit.launchQuizRequest(
                               isQuickPlay: true,
                               isShuffle: shuffleValue.value,
@@ -192,6 +202,8 @@ class _BottomButtons extends StatelessWidget {
     this.hasSelection = false,
     this.selectedCount = 0,
     this.allSelected = false,
+    this.isSelectionModeActive = false,
+    this.onEnterSelectionMode,
     this.onSelectAllPressed,
     this.onClearSelectionPressed,
     this.onQuickPlayPressed,
@@ -205,6 +217,8 @@ class _BottomButtons extends StatelessWidget {
   final bool hasSelection;
   final int selectedCount;
   final bool allSelected;
+  final bool isSelectionModeActive;
+  final ValueChanged<bool>? onEnterSelectionMode;
   final VoidCallback? onSelectAllPressed;
   final VoidCallback? onClearSelectionPressed;
   final VoidCallback? onQuickPlayPressed;
@@ -236,27 +250,13 @@ class _BottomButtons extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextButton(
-                  onPressed: () {
-                    if (allSelected) {
-                      onClearSelectionPressed?.call();
-                    } else {
-                      onSelectAllPressed?.call();
-                    }
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Text(
-                    allSelected
-                        ? l10n.quizCardListClearSelection
-                        : l10n.quizCardListSelectAll,
-                    style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.primary500,
-                    ),
-                  ),
+                _SelectButton(
+                  isSelectionModeActive: isSelectionModeActive,
+                  hasSelection: hasSelection,
+                  allSelected: allSelected,
+                  onEnterSelectionMode: onEnterSelectionMode,
+                  onSelectAllPressed: onSelectAllPressed,
+                  onClearSelectionPressed: onClearSelectionPressed,
                 ),
                 TextButton(
                   onPressed: () {
@@ -311,6 +311,97 @@ class _BottomButtons extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SelectButton extends StatelessWidget {
+  const _SelectButton({
+    required this.isSelectionModeActive,
+    required this.hasSelection,
+    required this.allSelected,
+    this.onEnterSelectionMode,
+    this.onSelectAllPressed,
+    this.onClearSelectionPressed,
+  });
+
+  final bool isSelectionModeActive;
+  final bool hasSelection;
+  final bool allSelected;
+  final ValueChanged<bool>? onEnterSelectionMode;
+  final VoidCallback? onSelectAllPressed;
+  final VoidCallback? onClearSelectionPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = localize(context);
+
+    // When selection mode is off: show simple "Select" button
+    if (!isSelectionModeActive) {
+      return TextButton(
+        onPressed: () {
+          onEnterSelectionMode?.call(true);
+        },
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: Text(
+          l10n.quizCardListSelect,
+          style: AppTypography.buttonSmall.copyWith(
+            color: AppColors.primary500,
+          ),
+        ),
+      );
+    }
+
+    // When selection mode is on: show toggle button + close icon
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const SizedBox(width: 8),
+        TextButton(
+          onPressed: () {
+            if (allSelected) {
+              onClearSelectionPressed?.call();
+            } else {
+              onSelectAllPressed?.call();
+            }
+          },
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            allSelected
+                ? l10n.quizCardListClearSelection
+                : l10n.quizCardListSelectAll,
+            style: AppTypography.buttonSmall.copyWith(
+              color: AppColors.primary500,
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        IconButton(
+          onPressed: () {
+            onEnterSelectionMode?.call(false);
+          },
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          style: IconButton.styleFrom(
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          icon: const Icon(
+            Icons.close,
+            color: AppColors.primary500,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 8),
+      ],
     );
   }
 }

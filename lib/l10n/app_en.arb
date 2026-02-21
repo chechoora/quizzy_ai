@@ -130,6 +130,7 @@
   "quizCardListCardsInOrder": "Cards in Order",
   "quizCardListEditCardAction": "Edit card",
   "quizCardListDeleteCardAction": "Delete card",
+  "quizCardListSelect": "Select",
   "quizCardListSelectAll": "Select all",
   "quizCardListClearSelection": "Clear selection",
   "quizCardListPlaySelectedButton": "Play Selected ({count})",
