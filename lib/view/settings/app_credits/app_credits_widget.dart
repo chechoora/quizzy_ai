@@ -8,6 +8,18 @@ import 'package:url_launcher/url_launcher.dart';
 class AppCreditsWidget extends StatelessWidget {
   const AppCreditsWidget({super.key});
 
+  // Team member constants
+  static const _kyryloName = 'Kyrylo Kharchenko';
+  static const _kyryloUrl = 'https://github.com/chechoora';
+
+  static const _volodymyrName = 'Volodymyr Soloviov';
+  static const _volodymyrUrl = 'https://github.com/vartaller';
+
+  static const _alinaName = 'Alina Fedorenko';
+  static const _alinaUrl = 'https://www.linkedin.com/in/a-fedorenko/';
+
+  static const _contactEmail = 'kharchenko.kir@gmail.com';
+
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
@@ -26,28 +38,44 @@ class AppCreditsWidget extends StatelessWidget {
                 children: [
                   _CreditTile(
                     role: l10n.appCreditsRoleFlutterDeveloper,
-                    name: 'Kyrylo Kharchenko',
-                    url: 'https://github.com/chechoora',
+                    name: _kyryloName,
+                    url: _kyryloUrl,
                     icon: Icons.code,
                   ),
                   const SizedBox(height: 12),
                   _CreditTile(
                     role: l10n.appCreditsRoleBackendDeveloper,
-                    name: 'Volodymyr Soloviov',
-                    url: 'https://github.com/vartaller',
+                    name: _volodymyrName,
+                    url: _volodymyrUrl,
                     icon: Icons.dns,
                   ),
                   const SizedBox(height: 12),
                   _CreditTile(
                     role: l10n.appCreditsRoleDesigner,
-                    name: 'Alina Fedorenko',
-                    url: 'https://www.linkedin.com/in/a-fedorenko/',
+                    name: _alinaName,
+                    url: _alinaUrl,
                     icon: Icons.palette,
                   ),
                   const SizedBox(height: 32),
                 ],
               ),
             ),
+            GestureDetector(
+              onTap: () => launchUrl(
+                Uri.parse('mailto:$_contactEmail'),
+                mode: LaunchMode.externalApplication,
+              ),
+              child: Text(
+                l10n.appCreditsContactUs,
+                style: AppTypography.mainText.copyWith(
+                  color: AppColors.primary500,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppColors.primary500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 16),
             Text(
               l10n.appCreditsFromUkraine,
               style: const TextStyle(fontSize: 18),
