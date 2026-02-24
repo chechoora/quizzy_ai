@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
@@ -67,14 +69,17 @@ class ImportExportCubit extends Cubit<ImportExportState> {
     ));
   }
 
-  Future<void> exportSelectedDecks() async {
+  Future<void> exportSelectedDecks([Rect? sharePositionOrigin]) async {
     if (_selectedDeckIds.isEmpty) return;
     emit(const ImportExportLoadingState());
     try {
       final selectedDecks =
           _decks.where((d) => _selectedDeckIds.contains(d.id)).toList();
 
-      await importExportService.exportDecks(selectedDecks);
+      await importExportService.exportDecks(
+        selectedDecks,
+        sharePositionOrigin: sharePositionOrigin,
+      );
       emit(ImportExportDataState(
         decks: _decks,
         selectedDeckIds: Set.from(_selectedDeckIds),

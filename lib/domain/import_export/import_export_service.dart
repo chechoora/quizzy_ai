@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:poc_ai_quiz/data/import_export/export_service.dart';
@@ -27,13 +28,19 @@ class ImportExportService {
   final QuizCardRepository quizCardRepository;
   final InAppPurchaseService inAppPurchaseService;
 
-  Future<void> exportDecks(List<DeckItem> decks) async {
+  Future<void> exportDecks(
+    List<DeckItem> decks, {
+    Rect? sharePositionOrigin,
+  }) async {
     final jsonString = await exportService.exportDecksToJson(decks);
     final tempDir = await getTemporaryDirectory();
     final file = File('${tempDir.path}/quizzy_export.json');
     await file.writeAsString(jsonString);
     await SharePlus.instance.share(
-      ShareParams(files: [XFile(file.path)]),
+      ShareParams(
+        files: [XFile(file.path)],
+        sharePositionOrigin: sharePositionOrigin,
+      ),
     );
   }
 

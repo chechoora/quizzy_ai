@@ -243,8 +243,7 @@ void _showJsonFormatSheet(BuildContext context) {
               onCopied: () {
                 Navigator.of(context).pop();
                 snackBar(context,
-                    message:
-                        localize(context).importExportCopiedToClipboard);
+                    message: localize(context).importExportCopiedToClipboard);
               },
             ),
             const SizedBox(height: 24),
@@ -261,8 +260,7 @@ void _showJsonFormatSheet(BuildContext context) {
               onCopied: () {
                 Navigator.of(context).pop();
                 snackBar(context,
-                    message:
-                        localize(context).importExportCopiedToClipboard);
+                    message: localize(context).importExportCopiedToClipboard);
               },
             ),
           ],
@@ -286,14 +284,12 @@ void _showExportSelectionSheet(
       bloc: cubit,
       buildWhen: (_, next) => next is ImportExportDataState,
       builder: (_, state) {
-        final dataState =
-            state is ImportExportDataState ? state : initialState;
+        final dataState = state is ImportExportDataState ? state : initialState;
         return AppContentBottomSheet(
           title: localize(context).importExportSelectDecksToExport,
           content: ListView(
             shrinkWrap: true,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -347,14 +343,16 @@ void _showExportSelectionSheet(
               SizedBox(
                 width: double.infinity,
                 child: AppButton.primary(
-                  text: localize(context)
-                      .importExportExportSelectedButton(
-                          dataState.selectedDeckIds.length),
+                  text: localize(context).importExportExportSelectedButton(
+                      dataState.selectedDeckIds.length),
                   leadingIcon: const Icon(Icons.upload_rounded, size: 20),
                   onPressed: dataState.hasSelection
                       ? () {
+                          final box = context.findRenderObject() as RenderBox?;
+                          final sharePositionOrigin =
+                              box!.localToGlobal(Offset.zero) & box.size;
                           Navigator.of(sheetContext).pop();
-                          cubit.exportSelectedDecks();
+                          cubit.exportSelectedDecks(sharePositionOrigin);
                         }
                       : null,
                 ),
@@ -649,8 +647,7 @@ class _JsonExampleCard extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              padding:
-                  const EdgeInsets.symmetric(vertical: 20, horizontal: 18),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 18),
               decoration: BoxDecoration(
                 color: AppColors.grayscaleWhite,
                 borderRadius: BorderRadius.circular(15),
