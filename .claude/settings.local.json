@@ -5,7 +5,10 @@
       "Bash(fvm flutter gen-l10n:*)",
       "mcp__ide__getDiagnostics",
       "Bash(fvm flutter packages pub run build_runner build:*)",
-      "Bash(./gradlew signingReport:*)"
+      "Bash(./gradlew signingReport:*)",
+      "Bash(find:*)",
+      "Bash(fvm flutter analyze:*)",
+      "Bash(fvm flutter build:*)"
     ],
     "deny": [],
     "ask": []

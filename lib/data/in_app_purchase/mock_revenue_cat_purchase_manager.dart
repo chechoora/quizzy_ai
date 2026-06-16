@@ -1,5 +1,4 @@
 import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
-import 'package:purchases_flutter/models/customer_info_wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MockCacheRevenueCatPurchaseManager implements RevenueCatPurchaseManager {

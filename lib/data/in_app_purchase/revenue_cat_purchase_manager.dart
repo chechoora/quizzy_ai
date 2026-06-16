@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/env_hide.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';

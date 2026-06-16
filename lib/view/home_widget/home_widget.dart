@@ -9,6 +9,7 @@ import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
@@ -100,9 +101,9 @@ class HomeWidget extends HookWidget {
     }
 
     void showCreateDeckPremiumError() {
-      snackBar(
+      showPaywallBottomSheet(
         context,
-        message: localize(context).homePremiumDeckLimitMessage,
+        limitMessage: localize(context).homePremiumDeckLimitMessage,
       );
     }
 

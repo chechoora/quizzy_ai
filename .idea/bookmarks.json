@@ -1,0 +1,122 @@
+{
+  "quiz": [
+    {
+      "fileDescriptor": "$/lib/view/quiz_exe/quiz_exe_widget.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    }
+  ],
+  "settings": [
+    {
+      "fileDescriptor": "$/lib/view/settings/settings_ai_validator/settings_ai_validator_widget.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    }
+  ],
+  "paywall": [
+    {
+      "fileDescriptor": "$/lib/view/home_widget/home_widget.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    }
+  ],
+  "ui": [
+    {
+      "fileDescriptor": "$/lib/view/home_widget/display/deck_list_display_widget.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    },
+    {
+      "fileDescriptor": "$/lib/view/create_card/display/create_card_display_widget.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    }
+  ],
+  "poc_ai_quiz": [
+    {
+      "fileDescriptor": "$/lib/main.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    },
+    {
+      "fileDescriptor": "$/lib/view/quiz_card_list/quiz_card_list_widget.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    },
+    {
+      "fileDescriptor": "$/lib/di/di.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    },
+    {
+      "fileDescriptor": "$/lib/view/settings/settings_widget.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    }
+  ],
+  "version_upd": [
+    {
+      "fileDescriptor": "$/android/app/build.gradle.kts",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    },
+    {
+      "fileDescriptor": "$/pubspec.yaml",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    }
+  ],
+  "validators": [
+    {
+      "fileDescriptor": "$/lib/data/api/ollama/ollama_answer_validator.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    },
+    {
+      "fileDescriptor": "$/lib/domain/quiz/i_answer_validator.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    }
+  ],
+  "ai": [
+    {
+      "fileDescriptor": "$/lib/data/api/claude/claude_answer_validator.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    },
+    {
+      "fileDescriptor": "$/lib/data/api/gemini_ai/gemini_answer_validator.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    },
+    {
+      "fileDescriptor": "$/lib/data/api/openai/openai_answer_validator.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    }
+  ],
+  "db": [
+    {
+      "fileDescriptor": "$/lib/data/db/quiz_card/quiz_card_database_repository.dart",
+      "linenumber": -1,
+      "name": "",
+      "bookmarkType": "DEFAULT"
+    }
+  ]
+}

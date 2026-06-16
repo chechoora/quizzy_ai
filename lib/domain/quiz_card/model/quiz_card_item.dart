@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:poc_ai_quiz/domain/premium_info.dart';
 
 class QuizCardItem extends Equatable {
   final int id;
