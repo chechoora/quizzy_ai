@@ -98,6 +98,7 @@ class _PaywallBottomSheet extends HookWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
+                      textAlign: TextAlign.center,
                       limitMessage,
                       style: AppTypography.mainText.copyWith(
                         color: AppColors.grayscale500,

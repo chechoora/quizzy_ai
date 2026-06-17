@@ -8,7 +8,11 @@
       "Bash(./gradlew signingReport:*)",
       "Bash(find:*)",
       "Bash(fvm flutter analyze:*)",
-      "Bash(fvm flutter build:*)"
+      "Bash(fvm flutter build:*)",
+      "Bash(pod install:*)",
+      "Bash(fvm dart:*)",
+      "Bash(dart:*)",
+      "Bash(fvm which:*)"
     ],
     "deny": [],
     "ask": []
