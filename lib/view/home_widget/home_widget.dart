@@ -7,6 +7,7 @@ import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
@@ -104,6 +105,7 @@ class HomeWidget extends HookWidget {
       showPaywallBottomSheet(
         context,
         limitMessage: localize(context).homePremiumDeckLimitMessage,
+        feature: InAppPurchaseFeature.unlimitedDecksCards,
       );
     }
 

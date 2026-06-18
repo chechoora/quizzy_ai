@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
-import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_ui_data.dart';
 import 'package:poc_ai_quiz/view/widgets/app_content_bottom_sheet.dart';
 
@@ -53,15 +54,18 @@ class _ValidatorTypeBottomSheet extends StatelessWidget {
             validatorItem: item,
             isSelected: isSelected,
             isDisabled: isDisabled,
-            onTap: () {
+            onTap: () async {
               if (isDisabled) {
-                snackBar(
+                final purchased = await showPaywallBottomSheet(
                   context,
-                  message: l10n.answerValidatorNotAvailableMessage(
+                  limitMessage: l10n.answerValidatorNotAvailableMessage(
                     item.type.toDisplayString(),
                   ),
+                  feature: InAppPurchaseFeature.quizzyAi,
                 );
-                Navigator.of(context).pop();
+                if (purchased == true && context.mounted) {
+                  Navigator.of(context).pop(item.type);
+                }
               } else {
                 Navigator.of(context).pop(item.type);
               }

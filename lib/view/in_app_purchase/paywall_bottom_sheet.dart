@@ -13,6 +13,7 @@ import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 Future<bool?> showPaywallBottomSheet(
   BuildContext context, {
   required String limitMessage,
+  required InAppPurchaseFeature feature,
 }) {
   return showModalBottomSheet<bool>(
     context: context,
@@ -21,20 +22,28 @@ Future<bool?> showPaywallBottomSheet(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
-    builder: (context) => _PaywallBottomSheet(limitMessage: limitMessage),
+    builder: (context) => _PaywallBottomSheet(
+      limitMessage: limitMessage,
+      feature: feature,
+    ),
   );
 }
 
 class _PaywallBottomSheet extends HookWidget {
-  const _PaywallBottomSheet({required this.limitMessage});
+  const _PaywallBottomSheet({
+    required this.limitMessage,
+    required this.feature,
+  });
 
   final String limitMessage;
+  final InAppPurchaseFeature feature;
 
   @override
   Widget build(BuildContext context) {
     final cubit = useMemoized(
       () => PaywallCubit(
         inAppPurchaseService: getIt<InAppPurchaseService>(),
+        feature: feature,
       ),
     );
     useEffect(() => cubit.close, [cubit]);

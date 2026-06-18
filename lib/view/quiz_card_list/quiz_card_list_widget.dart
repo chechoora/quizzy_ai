@@ -6,6 +6,7 @@ import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
@@ -87,6 +88,7 @@ class QuizCardListWidget extends HookWidget {
       showPaywallBottomSheet(
         context,
         limitMessage: localize(context).quizCardListPremiumCardLimitMessage,
+        feature: InAppPurchaseFeature.unlimitedDecksCards,
       );
     }
 

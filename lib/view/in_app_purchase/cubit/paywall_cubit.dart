@@ -7,18 +7,20 @@ import 'package:poc_ai_quiz/util/unique_emit.dart';
 class PaywallCubit extends Cubit<PaywallState> {
   PaywallCubit({
     required this.inAppPurchaseService,
+    required this.feature,
   }) : super(const PaywallIdleState()) {
     _logger = Logger.withTag('PaywallCubit');
   }
 
   final InAppPurchaseService inAppPurchaseService;
+  final InAppPurchaseFeature feature;
   late final Logger _logger;
 
   Future<void> purchase() async {
     emit(const PaywallLoadingState());
     try {
-      final success = await inAppPurchaseService
-          .purchaseFeature(InAppPurchaseFeature.unlimitedDecksCards);
+      final success =
+          await inAppPurchaseService.purchaseFeature(feature);
       if (!success) {
         emit(const PaywallIdleState());
         return;
@@ -35,8 +37,8 @@ class PaywallCubit extends Cubit<PaywallState> {
     emit(const PaywallLoadingState());
     try {
       await inAppPurchaseService.restorePurchasedFeatures();
-      final purchased = await inAppPurchaseService
-          .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
+      final purchased =
+          await inAppPurchaseService.isFeaturePurchased(feature);
       if (!purchased) {
         emit(const PaywallIdleState());
         return;
