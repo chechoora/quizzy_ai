@@ -9,8 +9,10 @@ import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_cubit.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_state.dart';
@@ -50,7 +52,7 @@ class ImportExportScreen extends HookWidget {
                 bloc: cubit,
                 buildWhen: (_, next) => next is BuilderState,
                 listenWhen: (_, next) => next is ListenerState,
-                listener: (context, state) {
+                listener: (context, state) async {
                   if (state is ImportExportErrorState) {
                     final exception = state.exception;
                     if (exception is ImportLimitExceededException) {
@@ -59,14 +61,29 @@ class ImportExportScreen extends HookWidget {
                       final typeName = type == ImportExportType.card
                           ? localize(context).card
                           : localize(context).deck;
-                      snackBar(
+                      final purchased = await showPaywallBottomSheet(
                         context,
-                        message: localize(context).importLimitExceeded(
+                        limitMessage: localize(context).importLimitExceeded(
                           limit,
                           typeName,
                         ),
-                        isError: true,
+                        feature: InAppPurchaseFeature.unlimitedDecksCards,
                       );
+                      if (purchased == true && context.mounted) {
+                        if (type == ImportExportType.deck) {
+                          _showImportSourceSheet(
+                            context,
+                            onFile: () => cubit.importDecksFromFile(),
+                            onClipboard: () => cubit.importDecksFromClipboard(),
+                          );
+                        } else {
+                          _showImportSourceSheet(
+                            context,
+                            onFile: () => cubit.importCardsFromFile(),
+                            onClipboard: () => cubit.importCardsFromClipboard(),
+                          );
+                        }
+                      }
                     } else {
                       snackBar(context,
                           message: localize(context).importExportError,
