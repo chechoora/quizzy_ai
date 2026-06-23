@@ -12,7 +12,11 @@
       "Bash(pod install:*)",
       "Bash(fvm dart:*)",
       "Bash(dart:*)",
-      "Bash(fvm which:*)"
+      "Bash(fvm which:*)",
+      "Bash(grep:*)",
+      "Bash(curl:*)",
+      "Bash(file:*)",
+      "Bash(fvm flutter pub:*)"
     ],
     "deny": [],
     "ask": []
