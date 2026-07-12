@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
-import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
@@ -41,20 +41,41 @@ class AiGenerateCubit extends Cubit<AiGenerateState> {
     required this.aiGenService,
     required this.deckItem,
     required this.quizCardRepository,
-    required this.quizCardPremiumManager,
   }) : super(const AiGenerateInitialState());
 
   final AiGenService aiGenService;
   final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
-  final QuizCardPremiumManager quizCardPremiumManager;
 
   final _logger = Logger.withTag('AiGenerateCubit');
 
   final List<AiGenerateCard> _cards = [];
+
+  /// The deck's existing cards, kept so [save] can clear the deck before
+  /// writing the edited set back.
+  final List<QuizCardItem> _existingCards = [];
   int _localIdCounter = 0;
 
   bool get hasContent => _cards.isNotEmpty;
+
+  /// Loads the deck's existing (non-archived) cards so they are shown as
+  /// editable tiles and included as context for refinement.
+  Future<void> init() async {
+    try {
+      final items = await quizCardRepository.fetchQuizCardItem(deckItem.id);
+      final active = items.where((i) => !i.isArchive).toList();
+      if (active.isEmpty) return;
+      _existingCards
+        ..clear()
+        ..addAll(active);
+      _cards
+        ..clear()
+        ..addAll(active.map(_fromExisting));
+      _emitContent();
+    } catch (e, s) {
+      _logger.e('load existing cards failed', ex: e, stacktrace: s);
+    }
+  }
 
   /// First generation from a prompt. The deck's existing title is passed to the
   /// service as generation context.
@@ -119,6 +140,9 @@ class AiGenerateCubit extends Cubit<AiGenerateState> {
     _emitContent();
   }
 
+  /// Resets the deck: removes all existing cards, then writes the current
+  /// edited set. Simpler than diffing and safe because this screen is
+  /// pro-only, so no premium gating is needed here.
   Future<void> save() async {
     final cards = _cards
         .where((c) => c.question.trim().isNotEmpty || c.answer.trim().isNotEmpty)
@@ -130,14 +154,11 @@ class AiGenerateCubit extends Cubit<AiGenerateState> {
       return;
     }
 
-    final canAddCard = await quizCardPremiumManager.canAddQuizCard(deckItem);
-    if (!canAddCard) {
-      emit(AiGenerateSaveBlockedState());
-      _emitContent();
-      return;
-    }
-
     try {
+      for (final existing in _existingCards) {
+        await quizCardRepository.deleteQuizCard(existing);
+      }
+      _existingCards.clear();
       await quizCardRepository.saveQuizCards(cards, deckItem.id);
       emit(AiGenerateSavedState());
     } catch (e, s) {
@@ -146,6 +167,12 @@ class AiGenerateCubit extends Cubit<AiGenerateState> {
       _emitContent();
     }
   }
+
+  AiGenerateCard _fromExisting(QuizCardItem item) => AiGenerateCard(
+        localId: _nextId(),
+        question: item.questionText,
+        answer: item.answerText,
+      );
 
   AiGenerateCard _toEditable(PlainCardModel model) => AiGenerateCard(
         localId: _nextId(),
@@ -211,10 +238,6 @@ class AiGenerateContentState extends BuilderState {
 
 class AiGenerateSavedState extends ListenerState {
   AiGenerateSavedState();
-}
-
-class AiGenerateSaveBlockedState extends ListenerState {
-  AiGenerateSaveBlockedState();
 }
 
 class AiGenerateErrorState extends ListenerState {

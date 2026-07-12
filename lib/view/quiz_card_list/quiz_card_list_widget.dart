@@ -20,7 +20,6 @@ import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
 import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
-import 'package:poc_ai_quiz/view/widgets/app_add_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 
 class QuizCardListWidget extends HookWidget {
@@ -107,10 +106,6 @@ class QuizCardListWidget extends HookWidget {
             AppSimpleHeader(
               title: deckItem.title,
               onBackPressed: () => context.pop(),
-              trailing: AppAddButton.generateAi(
-                size: 40,
-                onPressed: launchAiGenerate,
-              ),
             ),
             Expanded(
               child: BlocConsumer<QuizCardListCubit, QuizCardListState>(
@@ -131,7 +126,7 @@ class QuizCardListWidget extends HookWidget {
                                 cubit.toggleCardSelection(cardId),
                             onQuizCardEditRequest: launchEditCardRequest,
                             onQuizCardRemoveRequest: launchConfirmDeleteRequest,
-                            onAddCardRequest: () => cubit.addCardRequest(),
+                            onGenerateAiRequest: launchAiGenerate,
                           ),
                         ),
                         if (state.quizCarList.isNotEmpty)

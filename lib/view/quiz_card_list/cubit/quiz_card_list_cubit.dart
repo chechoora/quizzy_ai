@@ -159,15 +159,6 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       );
     }
   }
-
-  void addCardRequest() async {
-    final canAddCard = await quizCardPremiumManager.canAddQuizCard(deckItem);
-    emit(
-      RequestCreateQuizCardState(
-        canCreateCard: canAddCard,
-      ),
-    );
-  }
 }
 
 abstract class QuizCardListState extends Equatable {

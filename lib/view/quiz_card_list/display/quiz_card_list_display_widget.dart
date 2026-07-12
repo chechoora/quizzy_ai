@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
@@ -13,7 +14,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
     this.onCardSelectionToggle,
     this.onQuizCardEditRequest,
     this.onQuizCardRemoveRequest,
-    this.onAddCardRequest,
+    this.onGenerateAiRequest,
     super.key,
   });
 
@@ -23,17 +24,30 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   final ValueChanged<int>? onCardSelectionToggle;
   final ValueChanged<QuizCardItem>? onQuizCardEditRequest;
   final ValueChanged<QuizCardItem>? onQuizCardRemoveRequest;
-  final VoidCallback? onAddCardRequest;
+  final VoidCallback? onGenerateAiRequest;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = localize(context);
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: quizCarList.length + 1,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         if (index == quizCarList.length) {
-          return _AddCardTile(onPressed: onAddCardRequest);
+          return _AddCardTile(
+            title: l10n.aiGenerateAddCardLabel,
+            icon: SvgPicture.asset(
+              'assets/icons/stars.svg',
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppColors.grayscale500,
+                BlendMode.srcIn,
+              ),
+            ),
+            onPressed: onGenerateAiRequest,
+          );
         }
         final item = quizCarList[index];
         final isSelected = selectedCardIds.contains(item.id);
@@ -92,9 +106,12 @@ class _QuizCardTile extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 12),
                 child: Icon(
-                  isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                  color:
-                      isSelected ? AppColors.primary500 : AppColors.grayscale400,
+                  isSelected
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  color: isSelected
+                      ? AppColors.primary500
+                      : AppColors.grayscale400,
                   size: 24,
                 ),
               ),
@@ -145,13 +162,18 @@ class _QuizCardTile extends StatelessWidget {
 }
 
 class _AddCardTile extends StatelessWidget {
-  const _AddCardTile({this.onPressed});
+  const _AddCardTile({
+    required this.title,
+    required this.icon,
+    this.onPressed,
+  });
 
+  final String title;
+  final Widget icon;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = localize(context);
     return Padding(
       padding: const EdgeInsets.only(left: 4, right: 4, bottom: 2),
       child: GestureDetector(
@@ -167,14 +189,10 @@ class _AddCardTile extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.add,
-                  size: 24,
-                  color: AppColors.grayscale500,
-                ),
+                icon,
                 const SizedBox(width: 8),
                 Text(
-                  l10n.quizCardListAddCardTooltip,
+                  title,
                   style: AppTypography.secondaryText.copyWith(
                     color: AppColors.grayscale500,
                   ),

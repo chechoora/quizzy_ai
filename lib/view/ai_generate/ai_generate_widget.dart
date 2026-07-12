@@ -5,8 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
-import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
-import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
@@ -14,7 +12,6 @@ import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/ai_generate/cubit/ai_generate_cubit.dart';
 import 'package:poc_ai_quiz/view/ai_generate/display/editable_card_tile.dart';
-import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/app_text_form.dart';
@@ -33,10 +30,12 @@ class AiGenerateWidget extends HookWidget {
         aiGenService: getIt<AiGenService>(),
         deckItem: deckItem,
         quizCardRepository: getIt<QuizCardRepository>(),
-        quizCardPremiumManager: getIt<QuizCardPremiumManager>(),
       ),
     );
-    useEffect(() => cubit.close, [cubit]);
+    useEffect(() {
+      cubit.init();
+      return cubit.close;
+    }, [cubit]);
 
     final promptController = useTextEditingController();
     final canSend = useListenableSelector(
@@ -65,12 +64,6 @@ class AiGenerateWidget extends HookWidget {
           listener: (context, state) {
             if (state is AiGenerateSavedState) {
               context.pop();
-            } else if (state is AiGenerateSaveBlockedState) {
-              showPaywallBottomSheet(
-                context,
-                limitMessage: l10n.quizCardListPremiumCardLimitMessage,
-                feature: InAppPurchaseFeature.unlimitedDecksCards,
-              );
             } else if (state is AiGenerateErrorState) {
               snackBar(context, message: state.message, isError: true);
             }
@@ -174,7 +167,6 @@ class _CardsList extends StatelessWidget {
         return EditableCardTile(
           key: ValueKey(card.localId),
           card: card,
-          index: index,
           onQuestionChanged: (value) =>
               cubit.updateCard(card.localId, question: value),
           onAnswerChanged: (value) =>
