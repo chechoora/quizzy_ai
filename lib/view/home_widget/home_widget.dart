@@ -194,6 +194,9 @@ class HomeWidget extends HookWidget {
                   AppAddButton(
                     onPressed: () => cubit.addDockRequest(),
                   ),
+                  AppAddButton.generateAi(
+                    onPressed: () => context.push(AiGenerateRoute().path),
+                  ),
                   _NavItem(
                     icon: SvgPicture.asset(
                       'assets/icons/settings.svg',

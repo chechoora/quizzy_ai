@@ -254,5 +254,28 @@
   "appCreditsRoleDesigner": "Designer",
   "appCreditsRoleBackendDeveloper": "Backend Developer",
   "appCreditsContactUs": "Contact us",
-  "appCreditsFromUkraine": "From 🇺🇦 with ❤️"
+  "appCreditsFromUkraine": "From 🇺🇦 with ❤️",
+  "homeAiGenerateLabel": "AI",
+  "aiGenerateTitle": "AI Generate",
+  "aiGenerateInitialTitle": "Generate a deck with AI",
+  "aiGenerateInitialHint": "Describe the deck you want below and we'll create the cards for you.",
+  "aiGeneratePromptHint": "e.g. 10 cards about the solar system",
+  "aiGenerateRefineHint": "Refine the cards, e.g. make them harder",
+  "aiGenerateDeckTitleLabel": "Deck title",
+  "aiGenerateDeckTitleHint": "e.g. World capitals",
+  "aiGenerateSaveButton": "Save Deck",
+  "aiGenerateAddCardLabel": "Add card",
+  "aiGenerateDeleteCardLabel": "Delete card",
+  "aiGenerateCardQuestionLabel": "Question",
+  "aiGenerateCardQuestionHint": "Enter the question",
+  "aiGenerateCardAnswerLabel": "Answer",
+  "aiGenerateCardAnswerHint": "Enter the answer",
+  "aiGenerateCardNumber": "Card {number}",
+  "@aiGenerateCardNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  }
 }

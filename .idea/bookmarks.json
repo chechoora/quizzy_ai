@@ -17,13 +17,13 @@
   ],
   "paywall": [
     {
-      "fileDescriptor": "$/lib/view/in_app_purchase/paywall_bottom_sheet.dart",
+      "fileDescriptor": "$/lib/view/home_widget/home_widget.dart",
       "linenumber": -1,
       "name": "",
       "bookmarkType": "DEFAULT"
     },
     {
-      "fileDescriptor": "$/lib/view/home_widget/home_widget.dart",
+      "fileDescriptor": "$/lib/view/in_app_purchase/paywall_bottom_sheet.dart",
       "linenumber": -1,
       "name": "",
       "bookmarkType": "DEFAULT"

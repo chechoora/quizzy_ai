@@ -17,6 +17,8 @@ import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user_settings/user_settings_database_repository.dart';
+import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
+import 'package:poc_ai_quiz/domain/ai_gen/mock_ai_gen_service.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/mock_revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz/ml_answer_validator.dart';
@@ -338,4 +340,7 @@ Future<void> _setupServices() async {
     inAppPurchaseService: getIt<InAppPurchaseService>(),
   );
   getIt.registerSingleton<ImportExportService>(importExportService);
+
+  // ai generate (mocked)
+  getIt.registerSingleton<AiGenService>(MockAiGenService());
 }
