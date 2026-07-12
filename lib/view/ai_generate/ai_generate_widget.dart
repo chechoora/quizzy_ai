@@ -4,9 +4,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
-import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
-import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
@@ -17,12 +17,13 @@ import 'package:poc_ai_quiz/view/ai_generate/display/editable_card_tile.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
-import 'package:poc_ai_quiz/view/widgets/app_text_field.dart';
 import 'package:poc_ai_quiz/view/widgets/app_text_form.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 
 class AiGenerateWidget extends HookWidget {
-  const AiGenerateWidget({super.key});
+  const AiGenerateWidget({required this.deckItem, super.key});
+
+  final DeckItem deckItem;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +31,9 @@ class AiGenerateWidget extends HookWidget {
     final cubit = useMemoized(
       () => AiGenerateCubit(
         aiGenService: getIt<AiGenService>(),
-        deckRepository: getIt<DeckRepository>(),
+        deckItem: deckItem,
         quizCardRepository: getIt<QuizCardRepository>(),
-        deckPremiumManager: getIt<DeckPremiumManager>(),
+        quizCardPremiumManager: getIt<QuizCardPremiumManager>(),
       ),
     );
     useEffect(() => cubit.close, [cubit]);
@@ -67,7 +68,7 @@ class AiGenerateWidget extends HookWidget {
             } else if (state is AiGenerateSaveBlockedState) {
               showPaywallBottomSheet(
                 context,
-                limitMessage: l10n.homePremiumDeckLimitMessage,
+                limitMessage: l10n.quizCardListPremiumCardLimitMessage,
                 feature: InAppPurchaseFeature.unlimitedDecksCards,
               );
             } else if (state is AiGenerateErrorState) {
@@ -135,7 +136,7 @@ class _Body extends StatelessWidget {
           AbsorbPointer(
             child: Opacity(
               opacity: 0.5,
-              child: _CardsList(cubit: cubit, title: null, cards: cards),
+              child: _CardsList(cubit: cubit, cards: cards),
             ),
           ),
           const Positioned.fill(child: SimpleLoadingWidget()),
@@ -145,7 +146,6 @@ class _Body extends StatelessWidget {
     final content = state as AiGenerateContentState;
     return _CardsList(
       cubit: cubit,
-      title: content.title,
       cards: content.cards,
     );
   }
@@ -154,35 +154,27 @@ class _Body extends StatelessWidget {
 class _CardsList extends StatelessWidget {
   const _CardsList({
     required this.cubit,
-    required this.title,
     required this.cards,
   });
 
   final AiGenerateCubit cubit;
-  final String? title;
   final List<AiGenerateCard> cards;
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      itemCount: cards.length + 2,
+      itemCount: cards.length + 1,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
-        if (index == 0) {
-          return _DeckTitleField(
-            title: title ?? '',
-            onChanged: cubit.setTitle,
-          );
-        }
-        if (index == cards.length + 1) {
+        if (index == cards.length) {
           return _AddCardButton(onPressed: cubit.addCard);
         }
-        final card = cards[index - 1];
+        final card = cards[index];
         return EditableCardTile(
           key: ValueKey(card.localId),
           card: card,
-          index: index - 1,
+          index: index,
           onQuestionChanged: (value) =>
               cubit.updateCard(card.localId, question: value),
           onAnswerChanged: (value) =>
@@ -190,44 +182,6 @@ class _CardsList extends StatelessWidget {
           onDelete: () => cubit.deleteCard(card.localId),
         );
       },
-    );
-  }
-}
-
-/// Deck title field. Re-seeds its controller only when [title] changes from an
-/// AI generation (user edits go through [onChanged] silently and do not change
-/// the [title] prop), so typing is never interrupted.
-class _DeckTitleField extends HookWidget {
-  const _DeckTitleField({required this.title, required this.onChanged});
-
-  final String title;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = localize(context);
-    final controller = useTextEditingController(text: title);
-    useEffect(() {
-      if (controller.text != title) {
-        controller.text = title;
-      }
-      return null;
-    }, [title]);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.aiGenerateDeckTitleLabel,
-          style: AppTypography.h4.copyWith(color: AppColors.grayscale600),
-        ),
-        const SizedBox(height: 8),
-        AppTextField(
-          controller: controller,
-          hint: l10n.aiGenerateDeckTitleHint,
-          onChanged: onChanged,
-        ),
-      ],
     );
   }
 }

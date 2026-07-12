@@ -1,22 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/mock_ai_gen_service.dart';
-import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
-import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/view/ai_generate/cubit/ai_generate_cubit.dart';
 
-class MockDeckRepository extends Mock implements DeckRepository {}
-
 class MockQuizCardRepository extends Mock implements QuizCardRepository {}
 
-class MockDeckPremiumManager extends Mock implements DeckPremiumManager {}
+class MockQuizCardPremiumManager extends Mock
+    implements QuizCardPremiumManager {}
 
 void main() {
-  late MockDeckRepository deckRepository;
+  const deckItem = DeckItem(id: 42, title: 'Space', isArchive: false);
+
   late MockQuizCardRepository quizCardRepository;
-  late MockDeckPremiumManager deckPremiumManager;
+  late MockQuizCardPremiumManager quizCardPremiumManager;
 
   setUpAll(() {
     registerFallbackValue(<PlainCardModel>[]);
@@ -24,26 +24,24 @@ void main() {
 
   AiGenerateCubit buildCubit() => AiGenerateCubit(
         aiGenService: MockAiGenService(),
-        deckRepository: deckRepository,
+        deckItem: deckItem,
         quizCardRepository: quizCardRepository,
-        deckPremiumManager: deckPremiumManager,
+        quizCardPremiumManager: quizCardPremiumManager,
       );
 
   setUp(() {
-    deckRepository = MockDeckRepository();
     quizCardRepository = MockQuizCardRepository();
-    deckPremiumManager = MockDeckPremiumManager();
+    quizCardPremiumManager = MockQuizCardPremiumManager();
   });
 
-  test('generate produces content with cards and a title', () async {
+  test('generate produces content with cards', () async {
     final cubit = buildCubit();
 
-    await cubit.generate('the solar system', title: 'Space');
+    await cubit.generate('the solar system');
 
     final state = cubit.state;
     expect(state, isA<AiGenerateContentState>());
     final content = state as AiGenerateContentState;
-    expect(content.title, 'Space');
     expect(content.cards, isNotEmpty);
     expect(cubit.hasContent, isTrue);
   });
@@ -91,15 +89,14 @@ void main() {
     expect(updated.answer, 'A!');
   });
 
-  test('save persists deck + cards and emits Saved when allowed', () async {
-    when(() => deckPremiumManager.canAddDeck())
+  test('save appends cards to the existing deck and emits Saved', () async {
+    when(() => quizCardPremiumManager.canAddQuizCard(deckItem))
         .thenAnswer((_) async => true);
-    when(() => deckRepository.saveDeck(any())).thenAnswer((_) async => 42);
     when(() => quizCardRepository.saveQuizCards(any(), any()))
         .thenAnswer((_) async => [1, 2, 3, 4]);
 
     final cubit = buildCubit();
-    await cubit.generate('biology', title: 'Cells');
+    await cubit.generate('biology');
 
     final expectation = expectLater(
       cubit.stream,
@@ -108,12 +105,13 @@ void main() {
     await cubit.save();
     await expectation;
 
-    verify(() => deckRepository.saveDeck('Cells')).called(1);
-    verify(() => quizCardRepository.saveQuizCards(any(), 42)).called(1);
+    // Cards are saved into the existing deck; no new deck is created.
+    verify(() => quizCardRepository.saveQuizCards(any(), deckItem.id))
+        .called(1);
   });
 
-  test('save emits SaveBlocked when premium limit reached', () async {
-    when(() => deckPremiumManager.canAddDeck())
+  test('save emits SaveBlocked when card limit reached', () async {
+    when(() => quizCardPremiumManager.canAddQuizCard(deckItem))
         .thenAnswer((_) async => false);
 
     final cubit = buildCubit();
@@ -126,6 +124,6 @@ void main() {
     await cubit.save();
     await expectation;
 
-    verifyNever(() => deckRepository.saveDeck(any()));
+    verifyNever(() => quizCardRepository.saveQuizCards(any(), any()));
   });
 }

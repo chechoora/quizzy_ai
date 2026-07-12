@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
-import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
-import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
@@ -39,33 +39,32 @@ class AiGenerateCard extends Equatable {
 class AiGenerateCubit extends Cubit<AiGenerateState> {
   AiGenerateCubit({
     required this.aiGenService,
-    required this.deckRepository,
+    required this.deckItem,
     required this.quizCardRepository,
-    required this.deckPremiumManager,
+    required this.quizCardPremiumManager,
   }) : super(const AiGenerateInitialState());
 
   final AiGenService aiGenService;
-  final DeckRepository deckRepository;
+  final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
-  final DeckPremiumManager deckPremiumManager;
+  final QuizCardPremiumManager quizCardPremiumManager;
 
   final _logger = Logger.withTag('AiGenerateCubit');
 
-  String _deckTitle = '';
   final List<AiGenerateCard> _cards = [];
   int _localIdCounter = 0;
 
   bool get hasContent => _cards.isNotEmpty;
 
-  /// First generation from a prompt. [title] is the optional user-typed title.
-  Future<void> generate(String prompt, {String? title}) async {
+  /// First generation from a prompt. The deck's existing title is passed to the
+  /// service as generation context.
+  Future<void> generate(String prompt) async {
     if (prompt.trim().isEmpty) return;
     emit(AiGenerateGeneratingState(cards: List.from(_cards)));
     try {
       final deck = await aiGenService.generate(
-        AiGenRequest(prompt: prompt, deckTitle: title),
+        AiGenRequest(prompt: prompt, deckTitle: deckItem.title),
       );
-      _deckTitle = deck.title;
       _cards
         ..clear()
         ..addAll(deck.cards.map(_toEditable));
@@ -85,13 +84,10 @@ class AiGenerateCubit extends Cubit<AiGenerateState> {
       final deck = await aiGenService.generate(
         AiGenRequest(
           prompt: prompt,
-          deckTitle: _deckTitle,
+          deckTitle: deckItem.title,
           currentCards: _cards.map((c) => c.toPlain()).toList(),
         ),
       );
-      if (_deckTitle.trim().isEmpty) {
-        _deckTitle = deck.title;
-      }
       _cards
         ..clear()
         ..addAll(deck.cards.map(_toEditable));
@@ -104,11 +100,6 @@ class AiGenerateCubit extends Cubit<AiGenerateState> {
   }
 
   /// Silent update — does not emit, to avoid resetting inline text controllers.
-  void setTitle(String title) {
-    _deckTitle = title;
-  }
-
-  /// Silent update — see [setTitle].
   void updateCard(int localId, {String? question, String? answer}) {
     final index = _cards.indexWhere((c) => c.localId == localId);
     if (index == -1) return;
@@ -129,7 +120,6 @@ class AiGenerateCubit extends Cubit<AiGenerateState> {
   }
 
   Future<void> save() async {
-    final title = _deckTitle.trim().isEmpty ? 'New AI Deck' : _deckTitle.trim();
     final cards = _cards
         .where((c) => c.question.trim().isNotEmpty || c.answer.trim().isNotEmpty)
         .map((c) => c.toPlain())
@@ -140,20 +130,19 @@ class AiGenerateCubit extends Cubit<AiGenerateState> {
       return;
     }
 
-    final canAddDeck = await deckPremiumManager.canAddDeck();
-    if (!canAddDeck) {
+    final canAddCard = await quizCardPremiumManager.canAddQuizCard(deckItem);
+    if (!canAddCard) {
       emit(AiGenerateSaveBlockedState());
       _emitContent();
       return;
     }
 
     try {
-      final deckId = await deckRepository.saveDeck(title);
-      await quizCardRepository.saveQuizCards(cards, deckId);
+      await quizCardRepository.saveQuizCards(cards, deckItem.id);
       emit(AiGenerateSavedState());
     } catch (e, s) {
       _logger.e('save failed', ex: e, stacktrace: s);
-      emit(AiGenerateErrorState('Failed to save deck. Please try again.'));
+      emit(AiGenerateErrorState('Failed to save cards. Please try again.'));
       _emitContent();
     }
   }
@@ -169,7 +158,7 @@ class AiGenerateCubit extends Cubit<AiGenerateState> {
   void _emitContent() {
     emit(
       AiGenerateContentState(
-        title: _deckTitle,
+        title: deckItem.title,
         cards: List.from(_cards),
       ),
     );

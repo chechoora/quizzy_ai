@@ -7,11 +7,13 @@ class AppSimpleHeader extends StatelessWidget {
   const AppSimpleHeader({
     required this.title,
     this.onBackPressed,
+    this.trailing,
     super.key,
   });
 
   final String title;
   final VoidCallback? onBackPressed;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class AppSimpleHeader extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(width: 40),
+          trailing ?? const SizedBox(width: 40),
         ],
       ),
     );
