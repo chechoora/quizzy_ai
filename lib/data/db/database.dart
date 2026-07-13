@@ -18,7 +18,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration {
@@ -43,6 +43,11 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(userSettingsTable, userSettingsTable.geminiModelName);
           await m.addColumn(userSettingsTable, userSettingsTable.claudeModelName);
           await m.addColumn(userSettingsTable, userSettingsTable.openAiModelName);
+        }
+        if (from < 7) {
+          // Migration for adding the deck generation AI selection column
+          await m.addColumn(
+              userSettingsTable, userSettingsTable.deckGenerationAiType);
         }
       },
     );

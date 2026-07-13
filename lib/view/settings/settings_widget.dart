@@ -44,6 +44,23 @@ class SettingsWidget extends StatelessWidget {
                   const SizedBox(height: 12),
                   _SettingsTile(
                     icon: SvgPicture.asset(
+                      'assets/icons/deck_icon.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primary500,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    title: localize(context).settingsDeckGenerationTitle,
+                    subtitle:
+                        localize(context).settingsDeckGenerationSubtitleTile,
+                    onTap: () =>
+                        context.pushNamed(SettingsDeckGenerationRoute().name),
+                  ),
+                  const SizedBox(height: 12),
+                  _SettingsTile(
+                    icon: SvgPicture.asset(
                       'assets/icons/import_export.svg',
                       width: 24,
                       height: 24,

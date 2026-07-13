@@ -49,6 +49,12 @@ final class SettingsAIValidatorRoute extends NavigationRoute {
       : super(name: 'settingsAIValidator', path: '/settingsAIValidator');
 }
 
+final class SettingsDeckGenerationRoute extends NavigationRoute {
+  SettingsDeckGenerationRoute()
+      : super(
+            name: 'settingsDeckGeneration', path: '/settingsDeckGeneration');
+}
+
 final class AppCreditsRoute extends NavigationRoute {
   AppCreditsRoute() : super(name: 'appCredits', path: '/appCredits');
 }

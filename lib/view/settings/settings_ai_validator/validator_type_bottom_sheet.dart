@@ -14,6 +14,7 @@ Future<AnswerValidatorType?> showValidatorTypeBottomSheet(
   BuildContext context, {
   required AnswerValidatorType selectedValidator,
   required List<ValidatorItem> validators,
+  String? title,
 }) {
   return showModalBottomSheet<AnswerValidatorType>(
     context: context,
@@ -23,6 +24,7 @@ Future<AnswerValidatorType?> showValidatorTypeBottomSheet(
     builder: (context) => _ValidatorTypeBottomSheet(
       selectedValidator: selectedValidator,
       validators: validators,
+      title: title,
     ),
   );
 }
@@ -31,16 +33,18 @@ class _ValidatorTypeBottomSheet extends StatelessWidget {
   const _ValidatorTypeBottomSheet({
     required this.selectedValidator,
     required this.validators,
+    this.title,
   });
 
   final AnswerValidatorType selectedValidator;
   final List<ValidatorItem> validators;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
     return AppContentBottomSheet(
-      title: l10n.answerValidatorDropdownLabel,
+      title: title ?? l10n.answerValidatorDropdownLabel,
       content: ListView.separated(
         shrinkWrap: true,
         padding: const EdgeInsets.all(24),

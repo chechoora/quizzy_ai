@@ -27,6 +27,11 @@ class UserSettingsRepository {
     await dataBaseRepository.updateAnswerValidatorType(userId, validatorType.name);
   }
 
+  Future<void> updateDeckGenerationAiType(
+      int userId, AnswerValidatorType type) async {
+    await dataBaseRepository.updateDeckGenerationAiType(userId, type.name);
+  }
+
   Future<ApiKeyConfig?> getGeminiConfig(int userId) async {
     final settings = await fetchUserSettings(userId);
     return settings.geminiConfig;

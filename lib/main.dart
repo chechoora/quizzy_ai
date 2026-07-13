@@ -20,6 +20,7 @@ import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/in_app_features_widget.dart';
 import 'package:poc_ai_quiz/view/settings/app_credits/app_credits_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/settings_ai_validator_widget.dart';
+import 'package:poc_ai_quiz/view/settings/settings_deck_generation/settings_deck_generation_widget.dart';
 import 'package:fimber/fimber.dart';
 import 'firebase_options.dart';
 
@@ -174,6 +175,13 @@ class MyApp extends StatelessWidget {
         path: SettingsAIValidatorRoute().path,
         builder: (context, state) {
           return const SettingsAIValidatorWidget();
+        },
+      ),
+      GoRoute(
+        name: SettingsDeckGenerationRoute().name,
+        path: SettingsDeckGenerationRoute().path,
+        builder: (context, state) {
+          return const SettingsDeckGenerationWidget();
         },
       ),
       GoRoute(

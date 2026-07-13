@@ -29,6 +29,18 @@ class SettingsService {
         user.id, validatorType);
   }
 
+  Future<AnswerValidatorType> getCurrentDeckGenerationAiType() async {
+    final user = await userRepository.fetchCurrentUser();
+    final userSettings =
+        await userSettingsRepository.fetchUserSettings(user.id);
+    return userSettings.deckGenerationAiType;
+  }
+
+  Future<void> updateDeckGenerationAiType(AnswerValidatorType type) async {
+    final user = await userRepository.fetchCurrentUser();
+    await userSettingsRepository.updateDeckGenerationAiType(user.id, type);
+  }
+
   Future<IAnswerValidator> getAnswerValidator() async {
     final validatorType = await getCurrentValidatorType();
     return validators[validatorType]!;

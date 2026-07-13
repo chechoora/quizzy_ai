@@ -35,6 +35,19 @@
   "inAppFeaturesSubscribeButton": "Subscribe",
   "settingsTitle": "Settings",
   "settingsAiValidatorSubtitleTile": "Configure answer validation settings",
+  "settingsDeckGenerationTitle": "Deck Generation AI",
+  "settingsDeckGenerationSubtitleTile": "Choose the AI used to generate decks",
+  "settingsDeckGenerationLabel": "Deck Generation",
+  "settingsDeckGenerationSubtitle": "Choose which AI generates your decks",
+  "settingsDeckGenerationDropdownLabel": "Generation AI",
+  "settingsDeckGenerationChangedMessage": "Deck generation AI changed to {aiName}",
+  "@settingsDeckGenerationChangedMessage": {
+    "placeholders": {
+      "aiName": {
+        "type": "String"
+      }
+    }
+  },
   "settingsInAppFeaturesSubtitle": "Manage premium features",
   "settingsImportExportTitle": "Import / Export",
   "settingsImportExportSubtitle": "Import or export your decks and cards",

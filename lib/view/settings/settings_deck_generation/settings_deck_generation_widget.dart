@@ -10,18 +10,18 @@ import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:poc_ai_quiz/view/settings/settings_deck_generation/cubit/settings_deck_generation_cubit.dart';
+import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_config_content.dart';
 import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
-import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
-import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_config_content.dart';
 
-class SettingsAIValidatorWidget extends HookWidget {
-  const SettingsAIValidatorWidget({super.key});
+class SettingsDeckGenerationWidget extends HookWidget {
+  const SettingsDeckGenerationWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     final cubit = useMemoized(
-      () => SettingsAIValidatorCubit(
+      () => DeckGenerationCubit(
         settingsService: getIt<SettingsService>(),
         validatorsManager: getIt<ValidatorsManager>(),
         userRepository: getIt<UserRepository>(),
@@ -34,9 +34,9 @@ class SettingsAIValidatorWidget extends HookWidget {
       return cubit.close;
     }, []);
 
-    void handleValidatorChange(AnswerValidatorType? newValidator) {
-      if (newValidator != null) {
-        cubit.updateValidator(newValidator);
+    void handleTypeChange(AnswerValidatorType? newType) {
+      if (newType != null) {
+        cubit.updateType(newType);
       }
     }
 
@@ -59,54 +59,53 @@ class SettingsAIValidatorWidget extends HookWidget {
         child: Column(
           children: [
             AppSimpleHeader(
-              title: l10n.settingsAiValidatorTitle,
+              title: l10n.settingsDeckGenerationTitle,
               onBackPressed: () => Navigator.of(context).pop(),
             ),
             Expanded(
-              child: BlocConsumer<SettingsAIValidatorCubit, SettingsState>(
+              child: BlocConsumer<DeckGenerationCubit, DeckGenerationState>(
                 bloc: cubit,
-                buildWhen: (prevState, nextState) {
-                  return nextState is BuilderState;
-                },
+                buildWhen: (prevState, nextState) => nextState is BuilderState,
                 builder: (BuildContext context, state) {
-                  if (state is SettingsDataState) {
+                  if (state is DeckGenerationDataState) {
                     return ValidatorConfigContent(
-                      selectedValidator: state.validatorType,
-                      validators: state.validators,
-                      sectionLabel: l10n.settingsAiValidatorLabel,
-                      sectionSubtitle: l10n.settingsAiValidatorSubtitle,
-                      dropdownLabel: l10n.answerValidatorDropdownLabel,
-                      onValidatorChanged: handleValidatorChange,
+                      selectedValidator: state.selectedType,
+                      validators: state.providers,
+                      sectionLabel: l10n.settingsDeckGenerationLabel,
+                      sectionSubtitle: l10n.settingsDeckGenerationSubtitle,
+                      dropdownLabel: l10n.settingsDeckGenerationDropdownLabel,
+                      bottomSheetTitle:
+                          l10n.settingsDeckGenerationDropdownLabel,
+                      onValidatorChanged: handleTypeChange,
                       onApiKeyConfigUpdate: handleApiKeyConfigUpdate,
                       onOpenSourceConfigUpdate: handleOpenSourceConfigUpdate,
                     );
                   }
-                  if (state is SettingsLoadingState) {
+                  if (state is DeckGenerationLoadingState) {
                     return const SimpleLoadingWidget();
                   }
                   throw ArgumentError('Wrong state: $state');
                 },
-                listenWhen: (prevState, nextState) {
-                  return nextState is ListenerState;
-                },
-                listener: (BuildContext context, SettingsState state) {
-                  if (state is SettingsUpdateSuccessState) {
+                listenWhen: (prevState, nextState) =>
+                    nextState is ListenerState,
+                listener: (BuildContext context, DeckGenerationState state) {
+                  if (state is DeckGenerationUpdateSuccessState) {
                     snackBar(
                       context,
-                      message: l10n.settingsAiValidatorChangedMessage(
-                        state.validatorType.toDisplayString(),
+                      message: l10n.settingsDeckGenerationChangedMessage(
+                        state.type.toDisplayString(),
                       ),
                       duration: const Duration(seconds: 2),
                     );
-                  } else if (state is SettingsApiKeyUpdatedState) {
+                  } else if (state is DeckGenerationApiKeyUpdatedState) {
                     snackBar(
                       context,
                       message: l10n.settingsAiValidatorApiKeySavedMessage(
-                        state.validatorType.toDisplayString(),
+                        state.type.toDisplayString(),
                       ),
                       duration: const Duration(seconds: 2),
                     );
-                  } else if (state is SettingsErrorState) {
+                  } else if (state is DeckGenerationErrorState) {
                     snackBar(
                       context,
                       message: state.error,
