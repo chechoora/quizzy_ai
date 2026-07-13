@@ -3,35 +3,34 @@ import 'package:mocktail/mocktail.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/mock_ai_gen_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
-import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
-import 'package:poc_ai_quiz/view/ai_generate/cubit/ai_generate_cubit.dart';
+import 'package:poc_ai_quiz/view/deck_edit/cubit/cubit.dart';
 
 class MockQuizCardRepository extends Mock implements QuizCardRepository {}
 
-class MockQuizCardPremiumManager extends Mock
-    implements QuizCardPremiumManager {}
+class MockInAppPurchaseService extends Mock implements InAppPurchaseService {}
 
 void main() {
   const deckItem = DeckItem(id: 42, title: 'Space', isArchive: false);
 
   late MockQuizCardRepository quizCardRepository;
-  late MockQuizCardPremiumManager quizCardPremiumManager;
+  late MockInAppPurchaseService inAppPurchaseService;
 
   setUpAll(() {
     registerFallbackValue(<PlainCardModel>[]);
   });
 
-  AiGenerateCubit buildCubit() => AiGenerateCubit(
+  DeckEditCubit buildCubit() => DeckEditCubit(
         aiGenService: MockAiGenService(),
         deckItem: deckItem,
         quizCardRepository: quizCardRepository,
-        quizCardPremiumManager: quizCardPremiumManager,
+        inAppPurchaseService: inAppPurchaseService,
       );
 
   setUp(() {
     quizCardRepository = MockQuizCardRepository();
-    quizCardPremiumManager = MockQuizCardPremiumManager();
+    inAppPurchaseService = MockInAppPurchaseService();
   });
 
   test('generate produces content with cards', () async {
@@ -89,9 +88,45 @@ void main() {
     expect(updated.answer, 'A!');
   });
 
-  test('save appends cards to the existing deck and emits Saved', () async {
-    when(() => quizCardPremiumManager.canAddQuizCard(deckItem))
+  test('init reflects the AI entitlement in the content state', () async {
+    when(() => quizCardRepository.fetchQuizCardItem(deckItem.id))
+        .thenAnswer((_) async => []);
+    when(() => inAppPurchaseService
+            .isFeaturePurchased(InAppPurchaseFeature.quizzyAi))
+        .thenAnswer((_) async => false);
+
+    final freeCubit = buildCubit();
+    await freeCubit.init();
+    expect((freeCubit.state as AiGenerateContentState).isPremium, isFalse);
+    expect(freeCubit.isPremium, isFalse);
+
+    when(() => inAppPurchaseService
+            .isFeaturePurchased(InAppPurchaseFeature.quizzyAi))
         .thenAnswer((_) async => true);
+
+    final premiumCubit = buildCubit();
+    await premiumCubit.init();
+    expect((premiumCubit.state as AiGenerateContentState).isPremium, isTrue);
+  });
+
+  test('onAiUnlocked flips the mode to premium', () async {
+    when(() => quizCardRepository.fetchQuizCardItem(deckItem.id))
+        .thenAnswer((_) async => []);
+    when(() => inAppPurchaseService
+            .isFeaturePurchased(InAppPurchaseFeature.quizzyAi))
+        .thenAnswer((_) async => false);
+
+    final cubit = buildCubit();
+    await cubit.init();
+    expect(cubit.isPremium, isFalse);
+
+    cubit.onAiUnlocked();
+
+    expect(cubit.isPremium, isTrue);
+    expect((cubit.state as AiGenerateContentState).isPremium, isTrue);
+  });
+
+  test('save writes cards to the existing deck and emits Saved', () async {
     when(() => quizCardRepository.saveQuizCards(any(), any()))
         .thenAnswer((_) async => [1, 2, 3, 4]);
 
@@ -108,22 +143,5 @@ void main() {
     // Cards are saved into the existing deck; no new deck is created.
     verify(() => quizCardRepository.saveQuizCards(any(), deckItem.id))
         .called(1);
-  });
-
-  test('save emits SaveBlocked when card limit reached', () async {
-    when(() => quizCardPremiumManager.canAddQuizCard(deckItem))
-        .thenAnswer((_) async => false);
-
-    final cubit = buildCubit();
-    await cubit.generate('chemistry');
-
-    final expectation = expectLater(
-      cubit.stream,
-      emitsThrough(isA<AiGenerateSaveBlockedState>()),
-    );
-    await cubit.save();
-    await expectation;
-
-    verifyNever(() => quizCardRepository.saveQuizCards(any(), any()));
   });
 }

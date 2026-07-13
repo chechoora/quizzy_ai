@@ -11,8 +11,8 @@ import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/util/app_theme.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
-import 'package:poc_ai_quiz/view/ai_generate/ai_generate_widget.dart';
 import 'package:poc_ai_quiz/view/create_card/create_card_widget.dart';
+import 'package:poc_ai_quiz/view/deck_edit/deck_edit_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/home_widget.dart';
 import 'package:poc_ai_quiz/view/import_export/screen.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
@@ -159,7 +159,7 @@ class MyApp extends StatelessWidget {
         path: AiGenerateRoute().path,
         builder: (context, state) {
           final deckItem = state.extra as DeckItem;
-          return AiGenerateWidget(deckItem: deckItem);
+          return DeckEditWidget(deckItem: deckItem);
         },
       ),
       GoRoute(

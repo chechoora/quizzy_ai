@@ -5,20 +5,22 @@ import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/ai_generate/cubit/ai_generate_cubit.dart';
-import 'package:poc_ai_quiz/view/ai_generate/display/editable_card_tile.dart';
+import 'package:poc_ai_quiz/view/deck_edit/cubit/cubit.dart';
+import 'package:poc_ai_quiz/view/deck_edit/display/editable_card_tile.dart';
+import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
 import 'package:poc_ai_quiz/view/widgets/app_text_form.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 
-class AiGenerateWidget extends HookWidget {
-  const AiGenerateWidget({required this.deckItem, super.key});
+class DeckEditWidget extends HookWidget {
+  const DeckEditWidget({required this.deckItem, super.key});
 
   final DeckItem deckItem;
 
@@ -26,10 +28,11 @@ class AiGenerateWidget extends HookWidget {
   Widget build(BuildContext context) {
     final l10n = localize(context);
     final cubit = useMemoized(
-      () => AiGenerateCubit(
+      () => DeckEditCubit(
         aiGenService: getIt<AiGenService>(),
         deckItem: deckItem,
         quizCardRepository: getIt<QuizCardRepository>(),
+        inAppPurchaseService: getIt<InAppPurchaseService>(),
       ),
     );
     useEffect(() {
@@ -55,10 +58,21 @@ class AiGenerateWidget extends HookWidget {
       promptController.clear();
     }
 
+    Future<void> unlockAi() async {
+      final purchased = await showPaywallBottomSheet(
+        context,
+        limitMessage: l10n.aiGenerateUnlockMessage,
+        feature: InAppPurchaseFeature.quizzyAi,
+      );
+      if (purchased == true && context.mounted) {
+        cubit.onAiUnlocked();
+      }
+    }
+
     return Scaffold(
       backgroundColor: AppColors.backgroundSecondary,
       body: SafeArea(
-        child: BlocListener<AiGenerateCubit, AiGenerateState>(
+        child: BlocListener<DeckEditCubit, AiGenerateState>(
           bloc: cubit,
           listenWhen: (prev, next) => next is ListenerState,
           listener: (context, state) {
@@ -75,19 +89,26 @@ class AiGenerateWidget extends HookWidget {
                 onBackPressed: () => context.pop(),
               ),
               Expanded(
-                child: BlocBuilder<AiGenerateCubit, AiGenerateState>(
+                child: BlocBuilder<DeckEditCubit, AiGenerateState>(
                   bloc: cubit,
                   buildWhen: (prev, next) => next is BuilderState,
                   builder: (context, state) => _Body(cubit: cubit, state: state),
                 ),
               ),
-              BlocBuilder<AiGenerateCubit, AiGenerateState>(
+              BlocBuilder<DeckEditCubit, AiGenerateState>(
                 bloc: cubit,
                 buildWhen: (prev, next) => next is BuilderState,
                 builder: (context, state) {
                   final isGenerating = state is AiGenerateGeneratingState;
                   final hasContent = state is AiGenerateContentState &&
                       state.cards.isNotEmpty;
+                  if (!cubit.isPremium) {
+                    return _FreeBottomBar(
+                      showSave: hasContent,
+                      onSave: cubit.save,
+                      onUnlock: unlockAi,
+                    );
+                  }
                   return _Composer(
                     controller: promptController,
                     hint: cubit.hasContent
@@ -111,13 +132,13 @@ class AiGenerateWidget extends HookWidget {
 class _Body extends StatelessWidget {
   const _Body({required this.cubit, required this.state});
 
-  final AiGenerateCubit cubit;
+  final DeckEditCubit cubit;
   final AiGenerateState state;
 
   @override
   Widget build(BuildContext context) {
     if (state is AiGenerateInitialState) {
-      return const _InitialHint();
+      return const SimpleLoadingWidget();
     }
     if (state is AiGenerateGeneratingState) {
       final cards = (state as AiGenerateGeneratingState).cards;
@@ -150,8 +171,8 @@ class _CardsList extends StatelessWidget {
     required this.cards,
   });
 
-  final AiGenerateCubit cubit;
-  final List<AiGenerateCard> cards;
+  final DeckEditCubit cubit;
+  final List<EditCard> cards;
 
   @override
   Widget build(BuildContext context) {
@@ -178,39 +199,6 @@ class _CardsList extends StatelessWidget {
   }
 }
 
-class _InitialHint extends StatelessWidget {
-  const _InitialHint();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = localize(context);
-    return Container(
-      alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.auto_awesome, size: 56, color: AppColors.primary500),
-          const SizedBox(height: 16),
-          Text(
-            l10n.aiGenerateInitialTitle,
-            textAlign: TextAlign.center,
-            style: AppTypography.h3.copyWith(color: AppColors.grayscale600),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.aiGenerateInitialHint,
-            textAlign: TextAlign.center,
-            style: AppTypography.mainText.copyWith(
-              color: AppColors.grayscale500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _AddCardButton extends StatelessWidget {
   const _AddCardButton({required this.onPressed});
 
@@ -223,6 +211,71 @@ class _AddCardButton extends StatelessWidget {
       text: l10n.aiGenerateAddCardLabel,
       leadingIcon: const Icon(Icons.add, size: 20),
       onPressed: onPressed,
+    );
+  }
+}
+
+class _FreeBottomBar extends StatelessWidget {
+  const _FreeBottomBar({
+    required this.showSave,
+    required this.onSave,
+    required this.onUnlock,
+  });
+
+  final bool showSave;
+  final VoidCallback onSave;
+  final VoidCallback onUnlock;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = localize(context);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (showSave) ...[
+            AppButton.primary(
+              text: l10n.aiGenerateSaveButton,
+              onPressed: onSave,
+            ),
+            const SizedBox(height: 12),
+          ],
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.auto_awesome,
+                  size: 18, color: AppColors.primary500),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  l10n.aiGenerateUnlockTitle,
+                  style: AppTypography.secondaryText.copyWith(
+                    color: AppColors.grayscale500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          AppButton.secondary(
+            text: l10n.aiGenerateUnlockButton,
+            leadingIcon: const Icon(Icons.lock_open, size: 20),
+            onPressed: onUnlock,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -273,7 +326,7 @@ class _Composer extends StatelessWidget {
             const SizedBox(height: 12),
           ],
           Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: AppTextForm(

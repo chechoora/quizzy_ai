@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
 import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/ai_generate/cubit/ai_generate_cubit.dart';
+import 'package:poc_ai_quiz/view/deck_edit/cubit/cubit.dart';
 import 'package:poc_ai_quiz/view/widgets/app_more_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_text_form.dart';
 
@@ -19,7 +19,7 @@ class EditableCardTile extends HookWidget {
     super.key,
   });
 
-  final AiGenerateCard card;
+  final EditCard card;
   final ValueChanged<String> onQuestionChanged;
   final ValueChanged<String> onAnswerChanged;
   final VoidCallback onDelete;
@@ -55,7 +55,7 @@ class EditableCardTile extends HookWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               Text(
                 l10n.aiGenerateCardQuestionLabel,
                 style: AppTypography.smallText.copyWith(

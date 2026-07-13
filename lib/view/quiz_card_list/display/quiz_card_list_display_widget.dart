@@ -36,7 +36,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
       itemBuilder: (context, index) {
         if (index == quizCarList.length) {
           return _AddCardTile(
-            title: l10n.aiGenerateAddCardLabel,
+            title: 'Deck Editor',
             icon: SvgPicture.asset(
               'assets/icons/stars.svg',
               width: 24,
