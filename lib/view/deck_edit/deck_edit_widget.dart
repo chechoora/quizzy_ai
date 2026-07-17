@@ -62,7 +62,7 @@ class DeckEditWidget extends HookWidget {
       final purchased = await showPaywallBottomSheet(
         context,
         limitMessage: l10n.aiGenerateUnlockMessage,
-        feature: InAppPurchaseFeature.quizzyAi,
+        feature: InAppPurchaseFeature.unlimitedDecksCards,
       );
       if (purchased == true && context.mounted) {
         cubit.onAiUnlocked();

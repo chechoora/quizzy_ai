@@ -72,7 +72,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
   Future<void> init() async {
     try {
       _isPremium = await inAppPurchaseService
-          .isFeaturePurchased(InAppPurchaseFeature.quizzyAi);
+          .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
       final items = await quizCardRepository.fetchQuizCardItem(deckItem.id);
       final active = items.where((i) => !i.isArchive).toList();
       _existingCards
