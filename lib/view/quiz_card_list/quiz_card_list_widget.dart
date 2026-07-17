@@ -61,9 +61,9 @@ class QuizCardListWidget extends HookWidget {
       });
     }
 
-    void launchAiGenerate() {
+    void launchDeckEdit() {
       context
-          .push(AiGenerateRoute().path, extra: deckItem)
+          .push(DeckEditRoute().path, extra: deckItem)
           .then((_) => cubit.fetchQuizCardListRequest());
     }
 
@@ -106,6 +106,26 @@ class QuizCardListWidget extends HookWidget {
             AppSimpleHeader(
               title: deckItem.title,
               onBackPressed: () => context.pop(),
+              trailing: ElevatedButton(
+                onPressed: () => launchDeckEdit(),
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: EdgeInsets.zero,
+                  elevation: 0,
+                ).copyWith(
+                  backgroundColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return Colors.transparent;
+                    }
+                    return AppColors.grayscaleWhite;
+                  }),
+                ),
+                child: const Icon(
+                  Icons.edit,
+                  color: AppColors.grayscale600,
+                  size: 32 * 0.6,
+                ),
+              ),
             ),
             Expanded(
               child: BlocConsumer<QuizCardListCubit, QuizCardListState>(
@@ -126,7 +146,7 @@ class QuizCardListWidget extends HookWidget {
                                 cubit.toggleCardSelection(cardId),
                             onQuizCardEditRequest: launchEditCardRequest,
                             onQuizCardRemoveRequest: launchConfirmDeleteRequest,
-                            onGenerateAiRequest: launchAiGenerate,
+                            onAddCardRequest: () => cubit.addCardRequest(),
                           ),
                         ),
                         if (state.quizCarList.isNotEmpty)

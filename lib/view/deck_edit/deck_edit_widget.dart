@@ -85,14 +85,15 @@ class DeckEditWidget extends HookWidget {
           child: Column(
             children: [
               AppSimpleHeader(
-                title: l10n.aiGenerateTitle,
+                title: 'Edit ${deckItem.title}',
                 onBackPressed: () => context.pop(),
               ),
               Expanded(
                 child: BlocBuilder<DeckEditCubit, AiGenerateState>(
                   bloc: cubit,
                   buildWhen: (prev, next) => next is BuilderState,
-                  builder: (context, state) => _Body(cubit: cubit, state: state),
+                  builder: (context, state) =>
+                      _Body(cubit: cubit, state: state),
                 ),
               ),
               BlocBuilder<DeckEditCubit, AiGenerateState>(
@@ -100,8 +101,8 @@ class DeckEditWidget extends HookWidget {
                 buildWhen: (prev, next) => next is BuilderState,
                 builder: (context, state) {
                   final isGenerating = state is AiGenerateGeneratingState;
-                  final hasContent = state is AiGenerateContentState &&
-                      state.cards.isNotEmpty;
+                  final hasContent =
+                      state is AiGenerateContentState && state.cards.isNotEmpty;
                   if (!cubit.isPremium) {
                     return _FreeBottomBar(
                       showSave: hasContent,

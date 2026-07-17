@@ -14,7 +14,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
     this.onCardSelectionToggle,
     this.onQuizCardEditRequest,
     this.onQuizCardRemoveRequest,
-    this.onGenerateAiRequest,
+    this.onAddCardRequest,
     super.key,
   });
 
@@ -24,7 +24,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   final ValueChanged<int>? onCardSelectionToggle;
   final ValueChanged<QuizCardItem>? onQuizCardEditRequest;
   final ValueChanged<QuizCardItem>? onQuizCardRemoveRequest;
-  final VoidCallback? onGenerateAiRequest;
+  final VoidCallback? onAddCardRequest;
 
   @override
   Widget build(BuildContext context) {
@@ -36,17 +36,13 @@ class QuizCardListDisplayWidget extends StatelessWidget {
       itemBuilder: (context, index) {
         if (index == quizCarList.length) {
           return _AddCardTile(
-            title: 'Deck Editor',
-            icon: SvgPicture.asset(
-              'assets/icons/stars.svg',
-              width: 24,
-              height: 24,
-              colorFilter: const ColorFilter.mode(
-                AppColors.grayscale500,
-                BlendMode.srcIn,
-              ),
+            title: l10n.quizCardListAddCardTooltip,
+            icon: const Icon(
+              Icons.add,
+              size: 24,
+              color: AppColors.grayscale500,
             ),
-            onPressed: onGenerateAiRequest,
+            onPressed: onAddCardRequest,
           );
         }
         final item = quizCarList[index];

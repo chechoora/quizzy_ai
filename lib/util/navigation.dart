@@ -31,8 +31,8 @@ final class CreateCardRoute extends NavigationRoute {
   CreateCardRoute() : super(name: 'createCard', path: '/createCard');
 }
 
-final class AiGenerateRoute extends NavigationRoute {
-  AiGenerateRoute() : super(name: 'aiGenerate', path: '/aiGenerate');
+final class DeckEditRoute extends NavigationRoute {
+  DeckEditRoute() : super(name: 'deckEdit', path: '/deckEdit');
 }
 
 final class SettingsInAppFeaturesRoute extends NavigationRoute {

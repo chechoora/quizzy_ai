@@ -156,8 +156,8 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
-        name: AiGenerateRoute().name,
-        path: AiGenerateRoute().path,
+        name: DeckEditRoute().name,
+        path: DeckEditRoute().path,
         builder: (context, state) {
           final deckItem = state.extra as DeckItem;
           return DeckEditWidget(deckItem: deckItem);
