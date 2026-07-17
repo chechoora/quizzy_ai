@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
@@ -94,6 +96,14 @@ class _OnboardingBottomSheet extends StatelessWidget {
                   title: l10n.onboardingItemPremiumTitle,
                   description: l10n.onboardingItemPremiumDescription,
                 ),
+                if (Platform.isIOS) ...[
+                  const SizedBox(height: 16),
+                  _OnboardingItem(
+                    iconAsset: 'assets/icons/cloud.svg',
+                    title: l10n.onboardingItemBackupTitle,
+                    description: l10n.onboardingItemBackupDescription,
+                  ),
+                ],
                 const SizedBox(height: 24),
                 AppButton.primary(
                   text: l10n.onboardingContinueButton,
