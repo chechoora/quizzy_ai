@@ -41,6 +41,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
+import 'package:poc_ai_quiz/domain/onboarding/onboarding_service.dart';
 import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user/user_quota_repository.dart';
@@ -108,6 +109,13 @@ Future<void> _setupRepositories() async {
     userSettingsDataBaseMapper: UserSettingsDataBaseMapper(),
   );
   getIt.registerSingleton<UserSettingsRepository>(userSettingsRepository);
+
+  // onboarding
+  final onboardingService = OnboardingService(
+    userRepository: userRepository,
+    userSettingsRepository: userSettingsRepository,
+  );
+  getIt.registerSingleton<OnboardingService>(onboardingService);
 
   // deck
   final deckRepository = DeckRepository(

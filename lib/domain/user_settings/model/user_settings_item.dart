@@ -10,6 +10,7 @@ class UserSettingsItem {
     required this.claudeConfig,
     required this.openConfig,
     required this.ollamaConfig,
+    required this.onboardingCompleted,
   });
 
   final int id;
@@ -20,4 +21,5 @@ class UserSettingsItem {
   final ApiKeyConfig claudeConfig;
   final ApiKeyConfig openConfig;
   final OpenSourceConfig ollamaConfig;
+  final bool onboardingCompleted;
 }

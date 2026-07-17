@@ -74,4 +74,13 @@ class UserSettingsRepository {
   Future<void> setOllamaConfig(int userId, OpenSourceConfig? config) async {
     await dataBaseRepository.updateOllamaConfig(userId, config?.url, config?.model);
   }
+
+  Future<bool> isOnboardingCompleted(int userId) async {
+    final settings = await fetchUserSettings(userId);
+    return settings.onboardingCompleted;
+  }
+
+  Future<void> setOnboardingCompleted(int userId) async {
+    await dataBaseRepository.updateOnboardingCompleted(userId, true);
+  }
 }

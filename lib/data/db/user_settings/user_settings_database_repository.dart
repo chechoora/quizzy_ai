@@ -96,6 +96,14 @@ class UserSettingsDataBaseRepository {
     ));
   }
 
+  Future<void> updateOnboardingCompleted(int userId, bool completed) async {
+    await (appDatabase.update(appDatabase.userSettingsTable)
+          ..where((tbl) => tbl.userId.equals(userId)))
+        .write(UserSettingsTableCompanion(
+      onboardingCompleted: Value(completed),
+    ));
+  }
+
   Future<void> updateOllamaConfig(
     int userId,
     String? url,

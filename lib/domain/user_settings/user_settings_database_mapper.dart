@@ -42,6 +42,7 @@ class UserSettingsDataBaseMapper {
                   model: data.ollamaModelName!,
                 )
               : OpenSourceConfig.empty(),
+      onboardingCompleted: data.onboardingCompleted,
     );
   }
 }

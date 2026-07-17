@@ -293,5 +293,18 @@
         "type": "int"
       }
     }
-  }
+  },
+  "onboardingTitle": "Welcome to Quizzy AI",
+  "onboardingIntro": "Learn anything with AI-powered flashcards. Here's what you can do:",
+  "onboardingItemApiKeysTitle": "Bring your own AI",
+  "onboardingItemApiKeysDescription": "Connect your own API keys for Gemini, Claude, OpenAI or a local Ollama model.",
+  "onboardingItemModelTitle": "Pick your model",
+  "onboardingItemModelDescription": "Choose which AI model validates your answers and generates content.",
+  "onboardingItemGenerateTitle": "Generate decks with AI",
+  "onboardingItemGenerateDescription": "Describe a topic and let AI create a whole deck of quiz cards for you.",
+  "onboardingItemPremiumTitle": "Go unlimited",
+  "onboardingItemPremiumDescription": "Unlock unlimited decks and cards with a one-time premium purchase.",
+  "onboardingContinueButton": "Get started",
+  "onboardingPaywallTitle": "Unlock premium",
+  "onboardingPaywallIntro": "Get the most out of Quizzy AI with our premium features:"
 }

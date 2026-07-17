@@ -8,6 +8,7 @@ import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/onboarding/onboarding_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
@@ -17,6 +18,8 @@ import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/cubit/deck_cubit.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.dart';
+import 'package:poc_ai_quiz/view/onboarding/onboarding_bottom_sheet.dart';
+import 'package:poc_ai_quiz/view/onboarding/onboarding_paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
 import 'package:poc_ai_quiz/view/widgets/app_add_button.dart';
 import 'package:poc_ai_quiz/view/widgets/app_button.dart';
@@ -32,12 +35,14 @@ class HomeWidget extends HookWidget {
       () => HomeCubit(
         deckRepository: getIt<DeckRepository>(),
         deckPremiumManager: getIt<DeckPremiumManager>(),
+        onboardingService: getIt<OnboardingService>(),
       ),
     );
     final selectedIndex = useState(0);
 
     useEffect(() {
       cubit.watchDecks();
+      cubit.checkOnboarding();
       return cubit.close;
     }, [cubit]);
 
@@ -101,6 +106,13 @@ class HomeWidget extends HookWidget {
       context.push(QuizCardListRoute().path, extra: deck);
     }
 
+    void startOnboardingFlow() async {
+      await showOnboardingBottomSheet(context);
+      if (!context.mounted) return;
+      await showOnboardingPaywallBottomSheet(context);
+      cubit.completeOnboarding();
+    }
+
     void showCreateDeckPremiumError() {
       showPaywallBottomSheet(
         context,
@@ -155,6 +167,8 @@ class HomeWidget extends HookWidget {
             } else {
               showCreateDeckPremiumError();
             }
+          } else if (state is ShowOnboardingState) {
+            startOnboardingFlow();
           }
         },
       ),

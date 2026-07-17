@@ -5,15 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/onboarding/onboarding_service.dart';
 
 class HomeCubit extends Cubit<DeckState> {
   HomeCubit({
     required this.deckRepository,
     required this.deckPremiumManager,
+    required this.onboardingService,
   }) : super(const DeckLoadingState());
 
   final DeckRepository deckRepository;
   final DeckPremiumManager deckPremiumManager;
+  final OnboardingService onboardingService;
   final List<DeckItem> decks = [];
   StreamSubscription<List<DeckItem>>? _decksSubscription;
 
@@ -39,6 +42,17 @@ class HomeCubit extends Cubit<DeckState> {
 
   void editDeck(DeckItem deck, String deckName) {
     deckRepository.editDeckName(deck, deckName);
+  }
+
+  Future<void> checkOnboarding() async {
+    final completed = await onboardingService.isOnboardingCompleted();
+    if (!completed) {
+      emit(const ShowOnboardingState());
+    }
+  }
+
+  Future<void> completeOnboarding() {
+    return onboardingService.completeOnboarding();
   }
 
   void addDockRequest() async {
@@ -94,4 +108,8 @@ class RequestCreateDeckState extends ListenerState {
   const RequestCreateDeckState({
     required this.canCreateDeck,
   });
+}
+
+class ShowOnboardingState extends ListenerState {
+  const ShowOnboardingState();
 }
