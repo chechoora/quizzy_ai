@@ -7,6 +7,7 @@ class DeckDatBaseMapper {
         .map(
           (e) => DeckItem(
             id: e.id,
+            uid: e.uid,
             title: e.title,
             isArchive: e.isArchive,
           ),

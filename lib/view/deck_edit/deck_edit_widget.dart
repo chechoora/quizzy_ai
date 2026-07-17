@@ -55,7 +55,6 @@ class DeckEditWidget extends HookWidget {
       } else {
         cubit.generate(prompt);
       }
-      promptController.clear();
     }
 
     Future<void> unlockAi() async {
@@ -80,6 +79,8 @@ class DeckEditWidget extends HookWidget {
               context.pop();
             } else if (state is AiGenerateErrorState) {
               snackBar(context, message: state.message, isError: true);
+            } else if (state is AiGenerateSuccessState) {
+              promptController.clear();
             }
           },
           child: Column(

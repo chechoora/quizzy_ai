@@ -108,6 +108,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       _cards
         ..clear()
         ..addAll(deck.cards.map(_toEditable));
+      emit(AiGenerateSuccessState());
       _emitContent();
     } catch (e, s) {
       _logger.e('generate failed', ex: e, stacktrace: s);
@@ -134,6 +135,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       _cards
         ..clear()
         ..addAll(deck.cards.map(_toEditable));
+      emit(AiGenerateSuccessState());
       _emitContent();
     } catch (e, s) {
       _logger.e('refine failed', ex: e, stacktrace: s);
@@ -273,4 +275,8 @@ class AiGenerateErrorState extends ListenerState {
   AiGenerateErrorState(this.message);
 
   final String message;
+}
+
+class AiGenerateSuccessState extends ListenerState {
+  AiGenerateSuccessState();
 }

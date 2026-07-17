@@ -42,6 +42,9 @@ import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
 import 'package:poc_ai_quiz/domain/onboarding/onboarding_service.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/icloud_backup_service.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/icloud_restore_service.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/backup_scheduler.dart';
 import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user/user_quota_repository.dart';
@@ -374,14 +377,37 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<ExportService>(exportService);
 
+  // iCloud backup (iOS only) — service, scheduler, and the auto-backup
+  // chokepoint wired onto the deck/card repositories.
+  final icloudBackupService = IcloudBackupService();
+  getIt.registerSingleton<IcloudBackupService>(icloudBackupService);
+
+  final backupScheduler = BackupScheduler(
+    deckRepository: deckRepository,
+    quizCardRepository: quizCardRepository,
+    exportService: exportService,
+    icloudBackupService: icloudBackupService,
+  );
+  getIt.registerSingleton<BackupScheduler>(backupScheduler);
+  backupScheduler.start();
+
   final importExportService = ImportExportService(
     importService: importService,
     exportService: exportService,
     deckRepository: deckRepository,
     quizCardRepository: quizCardRepository,
     inAppPurchaseService: getIt<InAppPurchaseService>(),
+    icloudBackupService: icloudBackupService,
   );
   getIt.registerSingleton<ImportExportService>(importExportService);
+
+  final icloudRestoreService = ICloudRestoreService(
+    prefs: getIt<SharedPreferences>(),
+    deckRepository: deckRepository,
+    icloudBackupService: icloudBackupService,
+    importExportService: importExportService,
+  );
+  getIt.registerSingleton<ICloudRestoreService>(icloudRestoreService);
 
   // ai deck generation - uses settings to get the selected provider
   getIt.registerSingleton<AiGenService>(

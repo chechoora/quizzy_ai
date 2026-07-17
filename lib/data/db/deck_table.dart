@@ -1,7 +1,17 @@
 import 'package:drift/drift.dart';
 
+// Uniqueness of [uid] is enforced with a unique index rather than a column-level
+// UNIQUE constraint: SQLite cannot add a UNIQUE column via `ALTER TABLE ADD
+// COLUMN`, so a column constraint would break the additive migration. A unique
+// index works for both fresh installs and upgrades and still allows multiple
+// NULLs (rows created before the uid backfill).
+@TableIndex(name: 'deck_table_uid', columns: {#uid}, unique: true)
 class DeckTable extends Table {
   IntColumn get id => integer().autoIncrement()();
+
+  /// Stable, timestamp-based unique id used for idempotent iCloud
+  /// backup/restore (dedupe across devices). Nullable for additive migration.
+  IntColumn get uid => integer().nullable()();
 
   TextColumn get title => text().withLength(min: 3)();
 
@@ -11,8 +21,13 @@ class DeckTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@TableIndex(name: 'quiz_card_table_uid', columns: {#uid}, unique: true)
 class QuizCardTable extends Table {
   IntColumn get id => integer().autoIncrement()();
+
+  /// Stable, timestamp-based unique id used for idempotent iCloud
+  /// backup/restore (dedupe across devices). Nullable for additive migration.
+  IntColumn get uid => integer().nullable()();
 
   IntColumn get deckId => integer().references(DeckTable, #id)();
 

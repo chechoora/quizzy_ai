@@ -306,5 +306,37 @@
   "onboardingItemPremiumDescription": "Unlock unlimited decks and cards with a one-time premium purchase.",
   "onboardingContinueButton": "Get started",
   "onboardingPaywallTitle": "Unlock premium",
-  "onboardingPaywallIntro": "Get the most out of Quizzy AI with our premium features:"
+  "onboardingPaywallIntro": "Get the most out of Quizzy AI with our premium features:",
+  "importExportICloudTitle": "iCloud Backup",
+  "importExportICloudDescription": "Your decks and cards are backed up automatically to your private iCloud.",
+  "importExportICloudStatusAvailable": "iCloud available",
+  "importExportICloudStatusNoAccount": "No iCloud account. Sign in to iCloud in Settings to enable backup.",
+  "importExportICloudStatusRestricted": "iCloud is restricted on this device.",
+  "importExportICloudStatusUnavailable": "iCloud is currently unavailable.",
+  "importExportICloudLastBackup": "Last backup: {date}",
+  "@importExportICloudLastBackup": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "importExportICloudNoBackup": "No backup yet",
+  "importExportICloudRestoreButton": "Restore from iCloud",
+  "importExportICloudRestoreConfirmTitle": "Restore from iCloud?",
+  "importExportICloudRestoreConfirmMessage": "This merges your iCloud backup into this device. Existing decks and cards are kept and updated — nothing is duplicated.",
+  "importExportICloudRestoreConfirmButton": "Restore",
+  "importExportICloudRestoreSuccess": "Restored {deckCount} deck(s) from iCloud",
+  "@importExportICloudRestoreSuccess": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      }
+    }
+  },
+  "importExportICloudRestoreEmpty": "No iCloud backup found",
+  "cleanInstallRestoreTitle": "Restore your decks?",
+  "cleanInstallRestoreMessage": "We found an iCloud backup. Would you like to restore your decks and cards?",
+  "cleanInstallRestoreButton": "Restore",
+  "cleanInstallSkipButton": "Skip"
 }

@@ -66,6 +66,7 @@ class ImportService {
       if (title is! String) throw const ImportExportException();
 
       return PlainDeckModel(
+        uid: _parseOptionalId(deckJson['id']),
         title: title,
         cards: cardsJson.map((cardJson) {
           if (cardJson is! Map<String, dynamic>) {
@@ -76,10 +77,22 @@ class ImportService {
           if (question is! String || answer is! String) {
             throw const ImportExportException();
           }
-          return PlainCardModel(question: question, answer: answer);
+          return PlainCardModel(
+            uid: _parseOptionalId(cardJson['id']),
+            question: question,
+            answer: answer,
+          );
         }).toList(),
       );
     }).toList();
+  }
+
+  /// Reads the optional internal `id` field used by iCloud backups. Absent for
+  /// user-authored imports (a fresh uid is assigned at save time).
+  int? _parseOptionalId(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return null;
   }
 
   List<PlainCardModel> parseCardsFromJson(String jsonString) {
@@ -97,7 +110,11 @@ class ImportService {
       if (question is! String || answer is! String) {
         throw const ImportExportException();
       }
-      return PlainCardModel(question: question, answer: answer);
+      return PlainCardModel(
+        uid: _parseOptionalId(cardJson['id']),
+        question: question,
+        answer: answer,
+      );
     }).toList();
   }
 }
