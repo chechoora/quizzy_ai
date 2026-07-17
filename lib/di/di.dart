@@ -18,7 +18,12 @@ import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart
 import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user_settings/user_settings_database_repository.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
-import 'package:poc_ai_quiz/domain/ai_gen/mock_ai_gen_service.dart';
+import 'package:poc_ai_quiz/data/api/claude/claude_deck_generator.dart';
+import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_deck_generator.dart';
+import 'package:poc_ai_quiz/data/api/ollama/ollama_deck_generator.dart';
+import 'package:poc_ai_quiz/data/api/openai/openai_deck_generator.dart';
+import 'package:poc_ai_quiz/data/api/quizzy/quizzy_deck_generator.dart';
+import 'package:poc_ai_quiz/domain/ai_gen/i_deck_generator.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/mock_revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz/ml_answer_validator.dart';
@@ -228,6 +233,12 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<GeminiAnswerValidator>(geminiAnswerValidator);
 
+  final geminiDeckGenerator = GeminiDeckGenerator(
+    geminiApiClient.getService<GeminiApiService>(),
+    getIt.get<ValidatorConfigProvider>(),
+  );
+  getIt.registerSingleton<GeminiDeckGenerator>(geminiDeckGenerator);
+
   // Claude answer validator
   final claudeApiClient = getIt.get<ChopperClient>(instanceName: 'claude');
   final claudeAnswerValidator = ClaudeAnswerValidator(
@@ -235,6 +246,12 @@ Future<void> _setupServices() async {
     getIt.get<ValidatorConfigProvider>(),
   );
   getIt.registerSingleton<ClaudeAnswerValidator>(claudeAnswerValidator);
+
+  final claudeDeckGenerator = ClaudeDeckGenerator(
+    claudeApiClient.getService<ClaudeApiService>(),
+    getIt.get<ValidatorConfigProvider>(),
+  );
+  getIt.registerSingleton<ClaudeDeckGenerator>(claudeDeckGenerator);
 
   // OpenAI answer validator
   final openAIApiClient = getIt.get<ChopperClient>(instanceName: 'openai');
@@ -244,6 +261,12 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<OpenAIAnswerValidator>(openAIAnswerValidator);
 
+  final openAIDeckGenerator = OpenAIDeckGenerator(
+    openAIApiClient.getService<OpenAIApiService>(),
+    getIt.get<ValidatorConfigProvider>(),
+  );
+  getIt.registerSingleton<OpenAIDeckGenerator>(openAIDeckGenerator);
+
   // Quizzy answer validator
   final quizzyClient = getIt.get<ChopperClient>(instanceName: 'quizzy');
   final quizzyAnswerValidator = QuizzyAnswerValidator(
@@ -251,6 +274,12 @@ Future<void> _setupServices() async {
     getIt.get<InAppPurchaseService>(),
   );
   getIt.registerSingleton<QuizzyAnswerValidator>(quizzyAnswerValidator);
+
+  final quizzyDeckGenerator = QuizzyDeckGenerator(
+    quizzyClient.getService<QuizzyApiService>(),
+    getIt.get<InAppPurchaseService>(),
+  );
+  getIt.registerSingleton<QuizzyDeckGenerator>(quizzyDeckGenerator);
 
   // User quota repository
   final userQuotaPrefDataSource = UserQuotaPrefDataSource(
@@ -269,6 +298,11 @@ Future<void> _setupServices() async {
     getIt.get<ValidatorConfigProvider>(),
   );
   getIt.registerSingleton<OllamaAnswerValidator>(ollamaAnswerValidator);
+
+  final ollamaDeckGenerator = OllamaDeckGenerator(
+    getIt.get<ValidatorConfigProvider>(),
+  );
+  getIt.registerSingleton<OllamaDeckGenerator>(ollamaDeckGenerator);
 
   // Get already registered repositories
   final userRepository = getIt.get<UserRepository>();
@@ -341,6 +375,17 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<ImportExportService>(importExportService);
 
-  // ai generate (mocked)
-  getIt.registerSingleton<AiGenService>(MockAiGenService());
+  // ai deck generation - uses settings to get the selected provider
+  getIt.registerSingleton<AiGenService>(
+    AiGenService(
+      settingsService: settingsService,
+      generators: <AnswerValidatorType, IDeckGenerator>{
+        AnswerValidatorType.gemini: geminiDeckGenerator,
+        AnswerValidatorType.claude: claudeDeckGenerator,
+        AnswerValidatorType.openAI: openAIDeckGenerator,
+        AnswerValidatorType.ollama: ollamaDeckGenerator,
+        AnswerValidatorType.quizzyAI: quizzyDeckGenerator,
+      },
+    ),
+  );
 }
