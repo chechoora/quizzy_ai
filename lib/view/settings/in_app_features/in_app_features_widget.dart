@@ -6,11 +6,8 @@ import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart'
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/widgets/feature_purchase_card.dart';
-import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/cubit/in_app_features_cubit.dart';
 
 class SettingsInAppFeaturesWidget extends HookWidget {

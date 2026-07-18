@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/create_card/display/create_card_display_widget.dart';
 
 class CreateCardWidget extends StatefulWidget {

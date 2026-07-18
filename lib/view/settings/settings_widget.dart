@@ -3,8 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 
 class SettingsWidget extends StatelessWidget {
   const SettingsWidget({super.key});

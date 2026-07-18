@@ -4,12 +4,9 @@ import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/quota/quota_display_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_bottom_sheet.dart';
-import 'package:poc_ai_quiz/view/widgets/app_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_text_field.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Shared provider-selection + per-provider config UI, used by both the AI

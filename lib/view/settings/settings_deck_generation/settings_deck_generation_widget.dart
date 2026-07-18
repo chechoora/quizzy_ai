@@ -9,11 +9,9 @@ import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/settings/settings_deck_generation/cubit/settings_deck_generation_cubit.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_config_content.dart';
-import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
-import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 
 class SettingsDeckGenerationWidget extends HookWidget {
   const SettingsDeckGenerationWidget({super.key});

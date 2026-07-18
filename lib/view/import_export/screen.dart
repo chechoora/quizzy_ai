@@ -15,16 +15,10 @@ import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_cubit.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_state.dart';
-import 'package:poc_ai_quiz/view/widgets/app_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_content_bottom_sheet.dart';
-import 'package:poc_ai_quiz/view/widgets/app_dialog_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
-import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 
 class ImportExportScreen extends HookWidget {
   const ImportExportScreen({super.key});

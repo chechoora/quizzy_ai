@@ -5,11 +5,8 @@ import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/user/user_quota_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/quota/quota_cubit.dart';
-import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
-import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 
 class QuotaDisplayWidget extends HookWidget {
   const QuotaDisplayWidget({super.key});

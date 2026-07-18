@@ -15,18 +15,12 @@ import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/home_widget/cubit/deck_cubit.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.dart';
 import 'package:poc_ai_quiz/view/onboarding/onboarding_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/onboarding/onboarding_paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
-import 'package:poc_ai_quiz/view/widgets/app_add_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_dialog_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_text_field.dart';
 
 class HomeWidget extends HookWidget {
   const HomeWidget({super.key});

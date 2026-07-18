@@ -3,10 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/widgets/app_close_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_text_form.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 
 class QuizDisplayWidget extends HookWidget {
   const QuizDisplayWidget({

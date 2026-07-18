@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/deck_edit/cubit/cubit.dart';
-import 'package:poc_ai_quiz/view/widgets/app_more_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_text_form.dart';
 
 /// A single editable AI-generated card: inline question + answer fields with a
 /// delete action. Controllers are seeded once from [card]; edits are reported

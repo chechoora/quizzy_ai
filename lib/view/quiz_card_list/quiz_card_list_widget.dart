@@ -14,13 +14,9 @@ import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
-import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
-import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 
 class QuizCardListWidget extends HookWidget {
   const QuizCardListWidget({
