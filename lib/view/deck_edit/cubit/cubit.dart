@@ -62,6 +62,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
   /// Whether the user owns the AI (`quizzyAi`) entitlement. Free users can edit
   /// cards but the AI composer is replaced by an unlock CTA.
   bool _isPremium = false;
+
   bool get isPremium => _isPremium;
 
   bool get hasContent => _cards.isNotEmpty;
@@ -112,7 +113,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       _emitContent();
     } catch (e, s) {
       _logger.e('generate failed', ex: e, stacktrace: s);
-      emit(AiGenerateErrorState('Failed to generate cards. Please try again.'));
+      emit(AiGenerateErrorState(e.toString()));
       _emitContent();
     }
   }
@@ -139,7 +140,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       _emitContent();
     } catch (e, s) {
       _logger.e('refine failed', ex: e, stacktrace: s);
-      emit(AiGenerateErrorState('Failed to refine cards. Please try again.'));
+      emit(AiGenerateErrorState(e.toString()));
       _emitContent();
     }
   }
@@ -148,8 +149,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
   void updateCard(int localId, {String? question, String? answer}) {
     final index = _cards.indexWhere((c) => c.localId == localId);
     if (index == -1) return;
-    _cards[index] =
-        _cards[index].copyWith(question: question, answer: answer);
+    _cards[index] = _cards[index].copyWith(question: question, answer: answer);
   }
 
   void addCard() {
@@ -169,7 +169,8 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
   /// pro-only, so no premium gating is needed here.
   Future<void> save() async {
     final cards = _cards
-        .where((c) => c.question.trim().isNotEmpty || c.answer.trim().isNotEmpty)
+        .where(
+            (c) => c.question.trim().isNotEmpty || c.answer.trim().isNotEmpty)
         .map((c) => c.toPlain())
         .toList();
     if (cards.isEmpty) {

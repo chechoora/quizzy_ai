@@ -20,7 +20,7 @@ class OpenAIRequest {
       'model': model,
       'messages': messages.map((m) => m.toJson()).toList(),
       if (temperature != null) 'temperature': temperature,
-      if (maxTokens != null) 'max_tokens': maxTokens,
+      if (maxTokens != null) 'max_completion_tokens': maxTokens,
       if (topP != null) 'top_p': topP,
       if (responseFormat != null) 'response_format': responseFormat,
     };

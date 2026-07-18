@@ -117,7 +117,7 @@ class QuizCardListWidget extends HookWidget {
                   }),
                 ),
                 child: const Icon(
-                  Icons.edit,
+                  Icons.integration_instructions,
                   color: AppColors.grayscale600,
                   size: 32 * 0.6,
                 ),
