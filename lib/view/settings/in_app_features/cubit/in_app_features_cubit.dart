@@ -2,17 +2,21 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/exception/in_app_purchase_exception.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
 class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
   InAppFeaturesCubit({
     required this.inAppPurchaseService,
+    required this.settingsService,
   }) : super(const InAppFeaturesLoadingState()) {
     _logger = Logger.withTag('InAppFeaturesCubit');
   }
 
   final InAppPurchaseService inAppPurchaseService;
+  final SettingsService settingsService;
   late final Logger _logger;
 
   Future<void> loadFeatures() async {
@@ -72,11 +76,25 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
       }
       emit(const InAppFeaturesPurchaseSuccessState());
       _logger.i('Subscribed to Quizzy AI');
+      await _setQuizzyAiAsDefault();
       await loadFeatures();
     } catch (e, stackTrace) {
       _logger.e('Failed to subscribe', ex: e, stacktrace: stackTrace);
       emit(const InAppFeaturesErrorState(exception: InAppPurchaseException()));
       emit(currentState);
+    }
+  }
+
+  Future<void> _setQuizzyAiAsDefault() async {
+    _logger.d('Setting Quizzy AI as default validator and deck generator');
+    try {
+      await settingsService.updateValidatorType(AnswerValidatorType.quizzyAI);
+      await settingsService
+          .updateDeckGenerationAiType(AnswerValidatorType.quizzyAI);
+      _logger.i('Quizzy AI set as default validator and deck generator');
+    } catch (e, stackTrace) {
+      _logger.e('Failed to set Quizzy AI as default',
+          ex: e, stacktrace: stackTrace);
     }
   }
 

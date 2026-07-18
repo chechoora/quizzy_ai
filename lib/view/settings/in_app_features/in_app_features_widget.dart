@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/theme/app_colors.dart';
@@ -20,6 +21,7 @@ class SettingsInAppFeaturesWidget extends HookWidget {
     final cubit = useMemoized(
       () => InAppFeaturesCubit(
         inAppPurchaseService: getIt<InAppPurchaseService>(),
+        settingsService: getIt<SettingsService>(),
       ),
     );
 
