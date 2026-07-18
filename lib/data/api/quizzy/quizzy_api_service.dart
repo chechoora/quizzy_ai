@@ -19,7 +19,7 @@ abstract class QuizzyApiService extends ChopperService {
     @Body() required CheckAnswerRequest body,
   });
 
-  @Post(path: '/ai-tutor/generate-deck')
+  @Post(path: '/decks/generate')
   Future<Response> generateDeck({
     @Query('userId') required String userId,
     @Body() required GenerateDeckRequest body,
