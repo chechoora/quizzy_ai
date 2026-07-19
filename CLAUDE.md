@@ -149,14 +149,18 @@ Generated file: `database.g.dart`
 ```dart
 import 'package:poc_ai_quiz/util/logger.dart';
 
-final _logger = Logger.withTag('ClassName');
-_logger.d('Debug message');
-_logger.i('Info message');
-_logger.w('Warning message');
-_logger.e('Error message', ex: exception, stacktrace: stackTrace);
+logger.d('Debug message');
+logger.i('Info message');
+logger.w('Warning message');
+logger.e('Error message', ex: exception, stacktrace: stackTrace);
 ```
 
-**Every new class you create must be covered with logs.** Give it a `Logger.withTag('ClassName')` field and log:
+**Inject the `Logger` — never construct it inside the class.** Take a `final Logger logger;`
+constructor parameter and pass `Logger.withTag('ClassName')` from the composition root
+(e.g. `lib/di/di.dart`). This keeps the logger mockable in tests. Do NOT create it inline
+with `final _logger = Logger.withTag('ClassName');`.
+
+**Every new class you create must be covered with logs.** Give it an injected `logger` field and log:
 - `d` at the start of each public method with its key arguments, and at significant branch points / decisions (e.g. why an early return happened).
 - `i` for successful outcomes of meaningful operations (uploads, restores, saves).
 - `w` for expected-but-notable conditions (a skipped operation, an unavailable resource).

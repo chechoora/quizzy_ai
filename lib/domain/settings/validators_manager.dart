@@ -5,6 +5,7 @@ import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
+import 'package:poc_ai_quiz/util/logger.dart';
 
 import '../user_settings/model/user_settings_item.dart' show UserSettingsItem;
 
@@ -14,11 +15,19 @@ class ValidatorsManager {
   final OnDeviceAIService onDeviceAIService;
   final InAppPurchaseService inAppPurchaseService;
 
+  /// When false (e.g. the `quizzypro` flavor) bring-your-own-key providers
+  /// (Gemini, Claude, OpenAI, Ollama) are excluded from the validator list.
+  final bool enableByok;
+
+  final Logger logger;
+
   ValidatorsManager({
     required this.userRepository,
     required this.userSettingsRepository,
     required this.onDeviceAIService,
     required this.inAppPurchaseService,
+    required this.enableByok,
+    required this.logger,
   });
 
   Future<List<ValidatorItem>> getValidators() async {
@@ -74,11 +83,17 @@ class ValidatorsManager {
 
   Future _isValidatorsAvailable(AnswerValidatorType type) async {
     switch (type) {
+      // Bring-your-own-key providers: hidden entirely when BYOK is disabled.
       case AnswerValidatorType.claude:
       case AnswerValidatorType.gemini:
       case AnswerValidatorType.openAI:
-      case AnswerValidatorType.ml:
       case AnswerValidatorType.ollama:
+        if (!enableByok) {
+          logger.d('Skipping BYOK validator $type: BYOK disabled');
+          return false;
+        }
+        return true;
+      case AnswerValidatorType.ml:
       case AnswerValidatorType.quizzyAI:
         return true;
       case AnswerValidatorType.onDeviceAI:

@@ -1,6 +1,7 @@
 import 'package:chopper/chopper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_api_service.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_header_interceptor.dart';
@@ -327,12 +328,15 @@ Future<void> _setupServices() async {
     userSettingsRepository: userSettingsRepository,
     onDeviceAIService: onDeviceAIService,
     inAppPurchaseService: getIt<InAppPurchaseService>(),
+    enableByok: getIt<AppConfig>().enableByok,
+    logger: Logger.withTag('ValidatorsManager'),
   );
   getIt.registerSingleton<ValidatorsManager>(validatorsManager);
 
   final settingsService = SettingsService(
       userRepository: userRepository,
       userSettingsRepository: userSettingsRepository,
+      enableByok: getIt<AppConfig>().enableByok,
       validators: {
         AnswerValidatorType.onDeviceAI: onDeviceAIAnswerValidator,
         AnswerValidatorType.gemini: geminiAnswerValidator,
