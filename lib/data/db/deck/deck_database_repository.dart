@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
@@ -6,10 +7,21 @@ import 'package:poc_ai_quiz/util/uid_generator.dart';
 class DeckDataBaseRepository {
   final AppDatabase appDatabase;
 
+  static const _listEquality = ListEquality<DeckTableData>();
+
   DeckDataBaseRepository(this.appDatabase);
 
+  /// `.watch()` re-emits on every write to the table, including no-op
+  /// updates that write back identical values (e.g. sync's remote-wins
+  /// upsert). `distinct()` needs an explicit equality here because
+  /// `List<DeckTableData>`'s default `==` is identity, not element-wise —
+  /// without it every emission is a new list instance and distinct() never
+  /// suppresses anything, defeating its purpose.
   Stream<List<DeckTableData>> watchAllDecks() {
-    return appDatabase.select(appDatabase.deckTable).watch();
+    return appDatabase
+        .select(appDatabase.deckTable)
+        .watch()
+        .distinct(_listEquality.equals);
   }
 
   Future<List<DeckTableData>> fetchAllDecks() {

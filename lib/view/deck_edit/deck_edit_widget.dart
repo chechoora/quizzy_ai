@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
@@ -28,6 +29,7 @@ class DeckEditWidget extends HookWidget {
         deckItem: deckItem,
         quizCardRepository: getIt<QuizCardRepository>(),
         inAppPurchaseService: getIt<InAppPurchaseService>(),
+        isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
       ),
     );
     useEffect(() {
@@ -56,7 +58,7 @@ class DeckEditWidget extends HookWidget {
       final purchased = await showPaywallBottomSheet(
         context,
         limitMessage: l10n.aiGenerateUnlockMessage,
-        feature: InAppPurchaseFeature.unlimitedDecksCards,
+        feature: cubit.unlockFeature,
       );
       if (purchased == true && context.mounted) {
         cubit.onAiUnlocked();

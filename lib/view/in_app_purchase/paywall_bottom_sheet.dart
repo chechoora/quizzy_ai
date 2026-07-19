@@ -46,6 +46,22 @@ class _PaywallBottomSheet extends HookWidget {
     );
     final errorMessage = useState<String?>(null);
     final l10n = localize(context);
+    final isSubscription = feature == InAppPurchaseFeature.quizzyAi;
+    final iconAsset = isSubscription
+        ? 'assets/icons/quizzy_ai.svg'
+        : 'assets/icons/infinity.svg';
+    final title = isSubscription
+        ? l10n.inAppFeaturesQuizzyAiTitle
+        : l10n.inAppFeaturesUnlimitedTitle;
+    final description = isSubscription
+        ? l10n.inAppFeaturesQuizzyAiDescription
+        : l10n.inAppFeaturesUnlimitedDescription;
+    final subtitle = isSubscription
+        ? l10n.inAppFeaturesQuizzyAiSubtitle
+        : l10n.inAppFeaturesUnlimitedSubtitle;
+    final actionTitle = isSubscription
+        ? l10n.inAppFeaturesSubscribeButton
+        : l10n.inAppFeaturesPurchaseButton;
 
     return BlocConsumer<PaywallCubit, PaywallState>(
       bloc: cubit,
@@ -77,7 +93,7 @@ class _PaywallBottomSheet extends HookWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      l10n.inAppFeaturesUnlimitedTitle,
+                      title,
                       style: AppTypography.h3.copyWith(
                         color: AppColors.grayscale600,
                       ),
@@ -112,7 +128,7 @@ class _PaywallBottomSheet extends HookWidget {
                     const SizedBox(height: 16),
                     Center(
                       child: SvgPicture.asset(
-                        'assets/icons/infinity.svg',
+                        iconAsset,
                         width: 48,
                         height: 48,
                         colorFilter: const ColorFilter.mode(
@@ -123,7 +139,7 @@ class _PaywallBottomSheet extends HookWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      l10n.inAppFeaturesUnlimitedDescription,
+                      description,
                       style: AppTypography.secondaryText.copyWith(
                         color: AppColors.grayscale500,
                       ),
@@ -131,7 +147,7 @@ class _PaywallBottomSheet extends HookWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      l10n.inAppFeaturesUnlimitedSubtitle,
+                      subtitle,
                       style: AppTypography.secondaryText.copyWith(
                         color: AppColors.grayscale400,
                       ),
@@ -142,7 +158,7 @@ class _PaywallBottomSheet extends HookWidget {
                       const Center(child: CircularProgressIndicator())
                     else
                       AppButton.primary(
-                        text: l10n.inAppFeaturesPurchaseButton,
+                        text: actionTitle,
                         onPressed: () {
                           errorMessage.value = null;
                           cubit.purchase();

@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
@@ -7,6 +8,8 @@ import 'package:poc_ai_quiz/util/uid_generator.dart';
 
 class QuizCardDataBaseRepository {
   final AppDatabase appDatabase;
+
+  static const _listEquality = ListEquality<QuizCardTableData>();
 
   QuizCardDataBaseRepository(this.appDatabase);
 
@@ -21,9 +24,14 @@ class QuizCardDataBaseRepository {
   }
 
   /// Watches all cards across every deck. Emits on any card insert/update/
-  /// delete, used to trigger the iCloud auto-backup.
+  /// delete, used to trigger the iCloud auto-backup and remote sync.
+  /// `distinct()` needs an explicit equality — see [DeckDataBaseRepository.
+  /// watchAllDecks] for why the default one is a no-op for lists.
   Stream<List<QuizCardTableData>> watchAllCards() {
-    return appDatabase.select(appDatabase.quizCardTable).watch();
+    return appDatabase
+        .select(appDatabase.quizCardTable)
+        .watch()
+        .distinct(_listEquality.equals);
   }
 
   Future<int> saveQuizCard({
@@ -123,10 +131,7 @@ class QuizCardDataBaseRepository {
     final rows = await (appDatabase.select(appDatabase.quizCardTable)
           ..where((table) => table.deckId.isValue(deckId)))
         .get();
-    return rows
-        .map((r) => r.uid)
-        .whereType<int>()
-        .toSet();
+    return rows.map((r) => r.uid).whereType<int>().toSet();
   }
 
   /// Inserts cards preserving their backup uid (used by iCloud restore).
