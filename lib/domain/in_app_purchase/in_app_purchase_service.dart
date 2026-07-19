@@ -14,7 +14,7 @@ class InAppPurchaseService {
       return revenueCatPurchaseManager
           .isFeaturePurchased(InAppPurchaseFeature.quizzyAi.toRevenueCatId());
     }
-    return revenueCatPurchaseManager.purchaseOffering(
+    return revenueCatPurchaseManager.isFeaturePurchased(
         InAppPurchaseFeature.unlimitedDecksCards.toRevenueCatId());
   }
 
