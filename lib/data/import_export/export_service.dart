@@ -14,9 +14,12 @@ class ExportService {
     for (final deck in decks) {
       final cards = await quizCardRepository.fetchQuizCardItem(deck.id);
       exportData.add({
+        // Internal, optional id used for idempotent iCloud restore (dedupe).
+        'id': deck.uid,
         'title': deck.title,
         'cards': cards
             .map((c) => {
+                  'id': c.uid,
                   'question': c.questionText,
                   'answer': c.answerText,
                 })

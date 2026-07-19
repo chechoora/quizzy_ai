@@ -27,6 +27,16 @@ enum AnswerValidatorType {
   }
 }
 
+/// Providers offered for AI deck generation. Excludes On-Device AI and the
+/// ML Model, which are answer-validation only.
+const kDeckGenerationAiTypes = [
+  AnswerValidatorType.claude,
+  AnswerValidatorType.openAI,
+  AnswerValidatorType.gemini,
+  AnswerValidatorType.quizzyAI,
+  AnswerValidatorType.ollama,
+];
+
 enum ValidatorCategory {
   cloud,
   onDevice,

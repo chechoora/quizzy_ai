@@ -8,10 +8,15 @@ class UserSettingsDataBaseMapper {
       (e) => e.name == data.answerValidatorType,
       orElse: () => AnswerValidatorType.ml,
     );
+    final deckGenerationAiType = AnswerValidatorType.values.firstWhere(
+      (e) => e.name == data.deckGenerationAiType,
+      orElse: () => AnswerValidatorType.claude,
+    );
     return UserSettingsItem(
       id: data.id,
       userId: data.userId,
       answerValidatorType: validatorType,
+      deckGenerationAiType: deckGenerationAiType,
       geminiConfig: (data.geminiApiKey != null || data.geminiModelName != null)
           ? ApiKeyConfig(
               apiKey: data.geminiApiKey ?? '',
@@ -37,6 +42,7 @@ class UserSettingsDataBaseMapper {
                   model: data.ollamaModelName!,
                 )
               : OpenSourceConfig.empty(),
+      onboardingCompleted: data.onboardingCompleted,
     );
   }
 }

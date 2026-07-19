@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/icloud_backup_service.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_state.dart';
@@ -22,6 +23,18 @@ class ImportExportCubit extends Cubit<ImportExportState> {
   final List<DeckItem> _decks = [];
   final Set<int> _selectedDeckIds = {};
 
+  IcloudAccountStatus? _iCloudStatus;
+  DateTime? _iCloudLastBackup;
+
+  ImportExportDataState _buildDataState() {
+    return ImportExportDataState(
+      decks: _decks,
+      selectedDeckIds: Set.from(_selectedDeckIds),
+      iCloudStatus: _iCloudStatus,
+      iCloudLastBackup: _iCloudLastBackup,
+    );
+  }
+
   Future<void> loadDecks() async {
     emit(const ImportExportLoadingState());
     try {
@@ -29,7 +42,7 @@ class ImportExportCubit extends Cubit<ImportExportState> {
         ..clear()
         ..addAll(await deckRepository.fetchDecks());
       _selectedDeckIds.clear();
-      emit(ImportExportDataState(decks: _decks, selectedDeckIds: const {}));
+      emit(_buildDataState());
     } on ImportExportException catch (e, stackTrace) {
       _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
       emit(ImportExportErrorState(exception: e));
@@ -45,28 +58,19 @@ class ImportExportCubit extends Cubit<ImportExportState> {
     } else {
       _selectedDeckIds.add(deckId);
     }
-    emit(ImportExportDataState(
-      decks: _decks,
-      selectedDeckIds: _selectedDeckIds,
-    ));
+    emit(_buildDataState());
   }
 
   void selectAllDecks() {
     _selectedDeckIds
       ..clear()
       ..addAll(_decks.map((d) => d.id));
-    emit(ImportExportDataState(
-      decks: _decks,
-      selectedDeckIds: _selectedDeckIds,
-    ));
+    emit(_buildDataState());
   }
 
   void deselectAllDecks() {
     _selectedDeckIds.clear();
-    emit(ImportExportDataState(
-      decks: _decks,
-      selectedDeckIds: _selectedDeckIds,
-    ));
+    emit(_buildDataState());
   }
 
   Future<void> exportSelectedDecks([Rect? sharePositionOrigin]) async {
@@ -80,10 +84,7 @@ class ImportExportCubit extends Cubit<ImportExportState> {
         selectedDecks,
         sharePositionOrigin: sharePositionOrigin,
       );
-      emit(ImportExportDataState(
-        decks: _decks,
-        selectedDeckIds: Set.from(_selectedDeckIds),
-      ));
+      emit(_buildDataState());
     } on ImportExportException catch (e, stackTrace) {
       _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
       emit(ImportExportErrorState(exception: e));
@@ -194,5 +195,43 @@ class ImportExportCubit extends Cubit<ImportExportState> {
       _logger.e('Failed to load decks', ex: e, stacktrace: stackTrace);
       emit(const ImportExportErrorState(exception: ImportExportException()));
     }
+  }
+
+  /// Loads iCloud account status and last-backup date, then re-emits the data
+  /// state so the iCloud tile reflects it. Safe to call on any platform.
+  Future<void> loadICloudStatus() async {
+    try {
+      _iCloudStatus = await importExportService.icloudAccountStatus();
+      final metadata = await importExportService.icloudBackupMetadata();
+      _iCloudLastBackup = metadata == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(metadata.updatedAtEpochMs);
+    } catch (e, stackTrace) {
+      _logger.e('Failed to load iCloud status', ex: e, stacktrace: stackTrace);
+    }
+    if (state is ImportExportDataState) {
+      emit(_buildDataState());
+    }
+  }
+
+  Future<void> restoreFromICloud() async {
+    emit(const ImportExportLoadingState());
+    try {
+      final restoredCount = await importExportService.restoreFromICloud();
+      if (restoredCount == null) {
+        emit(const ImportExportICloudRestoreEmptyState());
+        await loadDecks();
+        return;
+      }
+      emit(ImportExportICloudRestoreSuccessState(deckCount: restoredCount));
+    } on ImportExportException catch (e, stackTrace) {
+      _logger.e('Failed to restore from iCloud', ex: e, stacktrace: stackTrace);
+      emit(ImportExportErrorState(exception: e));
+    } on Exception catch (e, stackTrace) {
+      _logger.e('Failed to restore from iCloud', ex: e, stacktrace: stackTrace);
+      emit(const ImportExportErrorState(exception: ImportExportException()));
+    }
+    await loadDecks();
+    await loadICloudStatus();
   }
 }

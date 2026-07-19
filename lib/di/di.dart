@@ -17,6 +17,13 @@ import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user_settings/user_settings_database_repository.dart';
+import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
+import 'package:poc_ai_quiz/data/api/claude/claude_deck_generator.dart';
+import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_deck_generator.dart';
+import 'package:poc_ai_quiz/data/api/ollama/ollama_deck_generator.dart';
+import 'package:poc_ai_quiz/data/api/openai/openai_deck_generator.dart';
+import 'package:poc_ai_quiz/data/api/quizzy/quizzy_deck_generator.dart';
+import 'package:poc_ai_quiz/domain/ai_gen/i_deck_generator.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/mock_revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz/ml_answer_validator.dart';
@@ -34,6 +41,10 @@ import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/on_device_ai/on_device_ai_service.dart';
+import 'package:poc_ai_quiz/domain/onboarding/onboarding_service.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/icloud_backup_service.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/icloud_restore_service.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/backup_scheduler.dart';
 import 'package:poc_ai_quiz/domain/user/user_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/user/user_repository.dart';
 import 'package:poc_ai_quiz/domain/user/user_quota_repository.dart';
@@ -101,6 +112,13 @@ Future<void> _setupRepositories() async {
     userSettingsDataBaseMapper: UserSettingsDataBaseMapper(),
   );
   getIt.registerSingleton<UserSettingsRepository>(userSettingsRepository);
+
+  // onboarding
+  final onboardingService = OnboardingService(
+    userRepository: userRepository,
+    userSettingsRepository: userSettingsRepository,
+  );
+  getIt.registerSingleton<OnboardingService>(onboardingService);
 
   // deck
   final deckRepository = DeckRepository(
@@ -226,6 +244,12 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<GeminiAnswerValidator>(geminiAnswerValidator);
 
+  final geminiDeckGenerator = GeminiDeckGenerator(
+    geminiApiClient.getService<GeminiApiService>(),
+    getIt.get<ValidatorConfigProvider>(),
+  );
+  getIt.registerSingleton<GeminiDeckGenerator>(geminiDeckGenerator);
+
   // Claude answer validator
   final claudeApiClient = getIt.get<ChopperClient>(instanceName: 'claude');
   final claudeAnswerValidator = ClaudeAnswerValidator(
@@ -233,6 +257,12 @@ Future<void> _setupServices() async {
     getIt.get<ValidatorConfigProvider>(),
   );
   getIt.registerSingleton<ClaudeAnswerValidator>(claudeAnswerValidator);
+
+  final claudeDeckGenerator = ClaudeDeckGenerator(
+    claudeApiClient.getService<ClaudeApiService>(),
+    getIt.get<ValidatorConfigProvider>(),
+  );
+  getIt.registerSingleton<ClaudeDeckGenerator>(claudeDeckGenerator);
 
   // OpenAI answer validator
   final openAIApiClient = getIt.get<ChopperClient>(instanceName: 'openai');
@@ -242,6 +272,12 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<OpenAIAnswerValidator>(openAIAnswerValidator);
 
+  final openAIDeckGenerator = OpenAIDeckGenerator(
+    openAIApiClient.getService<OpenAIApiService>(),
+    getIt.get<ValidatorConfigProvider>(),
+  );
+  getIt.registerSingleton<OpenAIDeckGenerator>(openAIDeckGenerator);
+
   // Quizzy answer validator
   final quizzyClient = getIt.get<ChopperClient>(instanceName: 'quizzy');
   final quizzyAnswerValidator = QuizzyAnswerValidator(
@@ -249,6 +285,12 @@ Future<void> _setupServices() async {
     getIt.get<InAppPurchaseService>(),
   );
   getIt.registerSingleton<QuizzyAnswerValidator>(quizzyAnswerValidator);
+
+  final quizzyDeckGenerator = QuizzyDeckGenerator(
+    quizzyClient.getService<QuizzyApiService>(),
+    getIt.get<InAppPurchaseService>(),
+  );
+  getIt.registerSingleton<QuizzyDeckGenerator>(quizzyDeckGenerator);
 
   // User quota repository
   final userQuotaPrefDataSource = UserQuotaPrefDataSource(
@@ -267,6 +309,11 @@ Future<void> _setupServices() async {
     getIt.get<ValidatorConfigProvider>(),
   );
   getIt.registerSingleton<OllamaAnswerValidator>(ollamaAnswerValidator);
+
+  final ollamaDeckGenerator = OllamaDeckGenerator(
+    getIt.get<ValidatorConfigProvider>(),
+  );
+  getIt.registerSingleton<OllamaDeckGenerator>(ollamaDeckGenerator);
 
   // Get already registered repositories
   final userRepository = getIt.get<UserRepository>();
@@ -330,12 +377,49 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<ExportService>(exportService);
 
+  // iCloud backup (iOS only) — service, scheduler, and the auto-backup
+  // chokepoint wired onto the deck/card repositories.
+  final icloudBackupService = IcloudBackupService();
+  getIt.registerSingleton<IcloudBackupService>(icloudBackupService);
+
+  final backupScheduler = BackupScheduler(
+    deckRepository: deckRepository,
+    quizCardRepository: quizCardRepository,
+    exportService: exportService,
+    icloudBackupService: icloudBackupService,
+  );
+  getIt.registerSingleton<BackupScheduler>(backupScheduler);
+  backupScheduler.start();
+
   final importExportService = ImportExportService(
     importService: importService,
     exportService: exportService,
     deckRepository: deckRepository,
     quizCardRepository: quizCardRepository,
     inAppPurchaseService: getIt<InAppPurchaseService>(),
+    icloudBackupService: icloudBackupService,
   );
   getIt.registerSingleton<ImportExportService>(importExportService);
+
+  final icloudRestoreService = ICloudRestoreService(
+    prefs: getIt<SharedPreferences>(),
+    deckRepository: deckRepository,
+    icloudBackupService: icloudBackupService,
+    importExportService: importExportService,
+  );
+  getIt.registerSingleton<ICloudRestoreService>(icloudRestoreService);
+
+  // ai deck generation - uses settings to get the selected provider
+  getIt.registerSingleton<AiGenService>(
+    AiGenService(
+      settingsService: settingsService,
+      generators: <AnswerValidatorType, IDeckGenerator>{
+        AnswerValidatorType.gemini: geminiDeckGenerator,
+        AnswerValidatorType.claude: claudeDeckGenerator,
+        AnswerValidatorType.openAI: openAIDeckGenerator,
+        AnswerValidatorType.ollama: ollamaDeckGenerator,
+        AnswerValidatorType.quizzyAI: quizzyDeckGenerator,
+      },
+    ),
+  );
 }

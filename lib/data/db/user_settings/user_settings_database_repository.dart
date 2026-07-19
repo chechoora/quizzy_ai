@@ -49,6 +49,14 @@ class UserSettingsDataBaseRepository {
     ));
   }
 
+  Future<void> updateDeckGenerationAiType(int userId, String type) async {
+    await (appDatabase.update(appDatabase.userSettingsTable)
+          ..where((tbl) => tbl.userId.equals(userId)))
+        .write(UserSettingsTableCompanion(
+      deckGenerationAiType: Value(type),
+    ));
+  }
+
   Future<void> updateGeminiConfig(
     int userId,
     String? apiKey,
@@ -85,6 +93,14 @@ class UserSettingsDataBaseRepository {
         .write(UserSettingsTableCompanion(
       openAiApiKey: Value(apiKey),
       openAiModelName: Value(model),
+    ));
+  }
+
+  Future<void> updateOnboardingCompleted(int userId, bool completed) async {
+    await (appDatabase.update(appDatabase.userSettingsTable)
+          ..where((tbl) => tbl.userId.equals(userId)))
+        .write(UserSettingsTableCompanion(
+      onboardingCompleted: Value(completed),
     ));
   }
 

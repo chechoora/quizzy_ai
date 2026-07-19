@@ -2,6 +2,19 @@
 
     <uses-permission android:name="com.android.vending.BILLING" />
 
+    <!-- Required on Android 11+ (API 30) so url_launcher's canLaunchUrl can see
+         a browser when opening https links; without it the query returns false. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+    </queries>
+
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"

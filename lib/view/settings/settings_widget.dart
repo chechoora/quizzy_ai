@@ -3,8 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 
 class SettingsWidget extends StatelessWidget {
   const SettingsWidget({super.key});
@@ -40,6 +39,23 @@ class SettingsWidget extends StatelessWidget {
                     subtitle: localize(context).settingsAiValidatorSubtitleTile,
                     onTap: () =>
                         context.pushNamed(SettingsAIValidatorRoute().name),
+                  ),
+                  const SizedBox(height: 12),
+                  _SettingsTile(
+                    icon: SvgPicture.asset(
+                      'assets/icons/deck_icon.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primary500,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    title: localize(context).settingsDeckGenerationTitle,
+                    subtitle:
+                        localize(context).settingsDeckGenerationSubtitleTile,
+                    onTap: () =>
+                        context.pushNamed(SettingsDeckGenerationRoute().name),
                   ),
                   const SizedBox(height: 12),
                   _SettingsTile(

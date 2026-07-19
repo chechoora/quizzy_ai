@@ -12,6 +12,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/util/app_theme.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/view/create_card/create_card_widget.dart';
+import 'package:poc_ai_quiz/view/deck_edit/deck_edit_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/home_widget.dart';
 import 'package:poc_ai_quiz/view/import_export/screen.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
@@ -19,6 +20,7 @@ import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/in_app_features_widget.dart';
 import 'package:poc_ai_quiz/view/settings/app_credits/app_credits_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/settings_ai_validator_widget.dart';
+import 'package:poc_ai_quiz/view/settings/settings_deck_generation/settings_deck_generation_widget.dart';
 import 'package:fimber/fimber.dart';
 import 'firebase_options.dart';
 
@@ -154,6 +156,14 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
+        name: DeckEditRoute().name,
+        path: DeckEditRoute().path,
+        builder: (context, state) {
+          final deckItem = state.extra as DeckItem;
+          return DeckEditWidget(deckItem: deckItem);
+        },
+      ),
+      GoRoute(
         name: SettingsInAppFeaturesRoute().name,
         path: SettingsInAppFeaturesRoute().path,
         builder: (context, state) {
@@ -165,6 +175,13 @@ class MyApp extends StatelessWidget {
         path: SettingsAIValidatorRoute().path,
         builder: (context, state) {
           return const SettingsAIValidatorWidget();
+        },
+      ),
+      GoRoute(
+        name: SettingsDeckGenerationRoute().name,
+        path: SettingsDeckGenerationRoute().path,
+        builder: (context, state) {
+          return const SettingsDeckGenerationWidget();
         },
       ),
       GoRoute(

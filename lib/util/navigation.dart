@@ -31,6 +31,10 @@ final class CreateCardRoute extends NavigationRoute {
   CreateCardRoute() : super(name: 'createCard', path: '/createCard');
 }
 
+final class DeckEditRoute extends NavigationRoute {
+  DeckEditRoute() : super(name: 'deckEdit', path: '/deckEdit');
+}
+
 final class SettingsInAppFeaturesRoute extends NavigationRoute {
   SettingsInAppFeaturesRoute() : super(name: 'inAppFeatures', path: '/inAppFeatures');
 }
@@ -43,6 +47,12 @@ final class SettingsImportExportRoute extends NavigationRoute {
 final class SettingsAIValidatorRoute extends NavigationRoute {
   SettingsAIValidatorRoute()
       : super(name: 'settingsAIValidator', path: '/settingsAIValidator');
+}
+
+final class SettingsDeckGenerationRoute extends NavigationRoute {
+  SettingsDeckGenerationRoute()
+      : super(
+            name: 'settingsDeckGeneration', path: '/settingsDeckGeneration');
 }
 
 final class AppCreditsRoute extends NavigationRoute {

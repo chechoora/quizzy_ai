@@ -18,7 +18,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration {
@@ -43,6 +43,40 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(userSettingsTable, userSettingsTable.geminiModelName);
           await m.addColumn(userSettingsTable, userSettingsTable.claudeModelName);
           await m.addColumn(userSettingsTable, userSettingsTable.openAiModelName);
+        }
+        if (from < 7) {
+          // Migration for adding the deck generation AI selection column
+          await m.addColumn(
+              userSettingsTable, userSettingsTable.deckGenerationAiType);
+        }
+        if (from < 8) {
+          // Migration for adding the onboarding completion flag
+          await m.addColumn(
+              userSettingsTable, userSettingsTable.onboardingCompleted);
+        }
+        if (from < 9) {
+          // Migration for adding stable timestamp-based uid columns used for
+          // idempotent iCloud backup/restore. The columns are added without a
+          // UNIQUE constraint (SQLite cannot add a UNIQUE column via ALTER
+          // TABLE); existing rows are backfilled with unique values derived
+          // from their row id, then a unique index enforces uniqueness.
+          await m.addColumn(deckTable, deckTable.uid);
+          await m.addColumn(quizCardTable, quizCardTable.uid);
+          final base = DateTime.now().millisecondsSinceEpoch;
+          await customStatement(
+            'UPDATE deck_table SET uid = $base + id WHERE uid IS NULL',
+          );
+          await customStatement(
+            'UPDATE quiz_card_table SET uid = $base + id WHERE uid IS NULL',
+          );
+          await customStatement(
+            'CREATE UNIQUE INDEX IF NOT EXISTS deck_table_uid '
+            'ON deck_table (uid)',
+          );
+          await customStatement(
+            'CREATE UNIQUE INDEX IF NOT EXISTS quiz_card_table_uid '
+            'ON quiz_card_table (uid)',
+          );
         }
       },
     );

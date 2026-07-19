@@ -16,7 +16,15 @@
       "Bash(grep:*)",
       "Bash(curl:*)",
       "Bash(file:*)",
-      "Bash(fvm flutter pub:*)"
+      "Bash(fvm flutter pub:*)",
+      "Bash(awk -F: '{s+=$2} END {print s}')",
+      "WebFetch(domain:pub.dev)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Read(//private/tmp/**)",
+      "Bash(rm -rf fort)",
+      "Bash(gh repo *)",
+      "Bash(gh api *)",
+      "Bash(gh search *)"
     ],
     "deny": [],
     "ask": []

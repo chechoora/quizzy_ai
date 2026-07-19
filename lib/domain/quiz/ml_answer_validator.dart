@@ -1,7 +1,8 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
-import 'package:onnxruntime/onnxruntime.dart';
+import 'package:flutter_onnxruntime/flutter_onnxruntime.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
@@ -14,23 +15,28 @@ class MlAnswerValidator extends IAnswerValidator {
   @override
   Future<void> initialize() async {
     _logger.d('Initializing ML Answer Validator...');
-    final vocabText = await rootBundle.loadString('assets/model/vocab.txt');
-    _vocab.clear();
-    final lines = vocabText.split('\n');
-    for (int i = 0; i < lines.length; i++) {
-      if (lines[i].isNotEmpty) _vocab[lines[i]] = i;
+    try {
+      final vocabText = await rootBundle.loadString('assets/model/vocab.txt');
+      _vocab.clear();
+      final lines = vocabText.split('\n');
+      for (int i = 0; i < lines.length; i++) {
+        if (lines[i].isNotEmpty) _vocab[lines[i]] = i;
+      }
+      _logger.d('Vocabulary loaded: ${_vocab.length} tokens');
+
+      // Load ONNX model from asset via flutter_onnxruntime (ships a
+      // 16 KB-aligned ONNX Runtime, required by Google Play for Android 15+).
+      final ort = OnnxRuntime();
+      _session = await ort
+          .createSessionFromAsset('assets/model/all_minilm_l6_v2.onnx');
+      _logger.i(
+          'ONNX model loaded. inputs=${_session!.inputNames}, outputs=${_session!.outputNames}');
+    } catch (ex, stacktrace) {
+      // Never let a native-load / model failure crash app startup. The ML
+      // validator simply stays unavailable; other validators keep working.
+      _logger.e('Failed to initialize ML Answer Validator',
+          ex: ex, stacktrace: stacktrace);
     }
-    _logger.d('Vocabulary loaded: ${_vocab.length} tokens');
-
-    // Load ONNX model
-    // Load ONNX model from asset
-    final modelBytes =
-        await rootBundle.load('assets/model/all_minilm_l6_v2.onnx');
-    final modelData = modelBytes.buffer.asUint8List();
-
-    final sessionOptions = OrtSessionOptions();
-    _session = OrtSession.fromBuffer(modelData, sessionOptions);
-    _logger.d('ONNX model loaded successfully.');
   }
 
   @override
@@ -39,6 +45,12 @@ class MlAnswerValidator extends IAnswerValidator {
     required String correctAnswer,
     required String userAnswer,
   }) async {
+    _logger.d('validateAnswer: correctAnswer="$correctAnswer"');
+    if (_session == null) {
+      _logger.e('validateAnswer called but ONNX session is not initialized');
+      throw Exception('ML Answer Validator is not initialized');
+    }
+
     final correctEmbed =
         _cache[correctAnswer] ?? await _getEmbedding(correctAnswer);
     _cache[correctAnswer] = correctEmbed;
@@ -62,65 +74,67 @@ class MlAnswerValidator extends IAnswerValidator {
     final attentionMask = List.generate(128, (i) => i < tokens.length ? 1 : 0);
     final tokenTypeIds = List.filled(128, 0);
 
-    // Run ONNX inference with 3 inputs
+    // Run ONNX inference with 3 int64 inputs (shape [1, 128]).
     final inputOrt =
-        OrtValueTensor.createTensorWithDataList([inputIds], [1, 128]);
+        await OrtValue.fromList(Int64List.fromList(inputIds), [1, 128]);
     final maskOrt =
-        OrtValueTensor.createTensorWithDataList([attentionMask], [1, 128]);
+        await OrtValue.fromList(Int64List.fromList(attentionMask), [1, 128]);
     final typeOrt =
-        OrtValueTensor.createTensorWithDataList([tokenTypeIds], [1, 128]);
+        await OrtValue.fromList(Int64List.fromList(tokenTypeIds), [1, 128]);
 
-    final outputs = _session!.run(
-      OrtRunOptions(),
-      {
+    Map<String, OrtValue> outputs = {};
+    try {
+      outputs = await _session!.run({
         'input_ids': inputOrt,
         'attention_mask': maskOrt,
         'token_type_ids': typeOrt,
-      },
-    );
+      });
 
-    // ⭐ FIX: The output is [batch, sequence, hidden_dim]
-    // We need to do mean pooling ourselves
-    final lastHiddenState = outputs?[0]?.value as List;
+      // Output is [batch, sequence, hidden_dim]; do mean pooling ourselves.
+      final outName = _session!.outputNames.first;
+      final lastHiddenState = await outputs[outName]!.asList();
 
-    // Mean pooling: average all token embeddings
-    final batchOutput = lastHiddenState[0] as List; // Get first batch
-    final embeddingDim = (batchOutput[0] as List).length;
+      // Mean pooling: average all token embeddings
+      final batchOutput = lastHiddenState[0] as List; // Get first batch
+      final embeddingDim = (batchOutput[0] as List).length;
 
-    // Calculate mean across all tokens (ignoring padding)
-    final embedding = List<double>.filled(embeddingDim, 0.0);
-    int validTokens = attentionMask.where((m) => m == 1).length;
+      // Calculate mean across all tokens (ignoring padding)
+      final embedding = List<double>.filled(embeddingDim, 0.0);
+      int validTokens = attentionMask.where((m) => m == 1).length;
 
-    for (int i = 0; i < validTokens; i++) {
-      final tokenEmbed = batchOutput[i] as List;
+      for (int i = 0; i < validTokens; i++) {
+        final tokenEmbed = batchOutput[i] as List;
+        for (int j = 0; j < embeddingDim; j++) {
+          embedding[j] += (tokenEmbed[j] as num).toDouble();
+        }
+      }
+
+      // Average
       for (int j = 0; j < embeddingDim; j++) {
-        embedding[j] += (tokenEmbed[j] as num).toDouble();
+        embedding[j] /= validTokens;
+      }
+
+      // Normalize (L2 normalization)
+      double norm = 0.0;
+      for (var val in embedding) {
+        norm += val * val;
+      }
+      norm = sqrt(norm);
+
+      for (int i = 0; i < embedding.length; i++) {
+        embedding[i] /= norm;
+      }
+
+      return embedding;
+    } finally {
+      // Clean up native resources
+      await inputOrt.dispose();
+      await maskOrt.dispose();
+      await typeOrt.dispose();
+      for (final tensor in outputs.values) {
+        await tensor.dispose();
       }
     }
-
-    // Average
-    for (int j = 0; j < embeddingDim; j++) {
-      embedding[j] /= validTokens;
-    }
-
-    // Normalize (L2 normalization)
-    double norm = 0.0;
-    for (var val in embedding) {
-      norm += val * val;
-    }
-    norm = sqrt(norm);
-
-    for (int i = 0; i < embedding.length; i++) {
-      embedding[i] /= norm;
-    }
-
-    // Clean up
-    inputOrt.release();
-    maskOrt.release();
-    typeOrt.release();
-    outputs?[0]?.release();
-
-    return embedding;
   }
 
   List<String> _tokenize(String text) {

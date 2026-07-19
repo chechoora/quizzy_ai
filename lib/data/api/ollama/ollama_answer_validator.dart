@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:poc_ai_quiz/data/api/gemini_ai/quiz_score_model.dart';
+import 'package:poc_ai_quiz/data/api/ollama/ollama_support.dart';
 import 'package:poc_ai_quiz/domain/exception/answer_validator_exception.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/validator_prompts.dart';
@@ -62,7 +63,7 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
         'stream': false,
       };
 
-      final url = _buildUrl(config.url);
+      final url = buildOllamaUrl(config.url);
       _logger.d('Sending request to Ollama API at $url');
 
       final response = await http.post(
@@ -83,35 +84,10 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
       final responseJson = jsonDecode(response.body) as Map<String, dynamic>;
       _logger.d('Received response from Ollama');
 
-      // Parse response - Ollama uses OpenAI-compatible format
-      final choices = responseJson['choices'] as List<dynamic>?;
-      if (choices == null || choices.isEmpty) {
-        // Try Ollama native format
-        final message = responseJson['message'] as Map<String, dynamic>?;
-        if (message == null) {
-          _logger.e('No content in Ollama response');
-          throw AnswerValidatorException('No content in Ollama response');
-        }
-        final content = message['content'] as String?;
-        if (content == null) {
-          _logger.e('No content in Ollama message');
-          throw AnswerValidatorException('No content in Ollama message');
-        }
-        return _parseContent(correctAnswer, content);
-      }
-
-      // OpenAI-compatible format
-      final choice = choices.first as Map<String, dynamic>;
-      final message = choice['message'] as Map<String, dynamic>?;
-      if (message == null) {
-        _logger.e('No message in Ollama choice');
-        throw AnswerValidatorException('No message in Ollama response');
-      }
-
-      final content = message['content'] as String?;
+      final content = extractOllamaContent(responseJson);
       if (content == null) {
-        _logger.e('No content in Ollama message');
-        throw AnswerValidatorException('No content in Ollama message');
+        _logger.e('No content in Ollama response');
+        throw AnswerValidatorException('No content in Ollama response');
       }
 
       return _parseContent(correctAnswer, content);
@@ -122,41 +98,11 @@ ${ValidatorPrompts.jsonOnlyInstruction}''';
     }
   }
 
-  String _buildUrl(String baseUrl) {
-    var normalizedUrl = baseUrl.trim();
-
-    // Add http:// scheme if missing
-    if (!normalizedUrl.startsWith('http://') &&
-        !normalizedUrl.startsWith('https://')) {
-      normalizedUrl = 'http://$normalizedUrl';
-    }
-
-    // Remove trailing slash if present
-    if (normalizedUrl.endsWith('/')) {
-      normalizedUrl = normalizedUrl.substring(0, normalizedUrl.length - 1);
-    }
-
-    return normalizedUrl;
-  }
-
   AnswerResult _parseContent(String correctAnswer, String content) {
     _logger.d('Parsing response content: $content');
 
-    // Try to extract JSON from the content
-    String jsonString = content.trim();
-
-    // Handle markdown code blocks if present
-    if (jsonString.startsWith('```json')) {
-      jsonString = jsonString.substring(7);
-    } else if (jsonString.startsWith('```')) {
-      jsonString = jsonString.substring(3);
-    }
-    if (jsonString.endsWith('```')) {
-      jsonString = jsonString.substring(0, jsonString.length - 3);
-    }
-    jsonString = jsonString.trim();
-
-    final jsonResponse = jsonDecode(jsonString) as Map<String, dynamic>;
+    final jsonResponse =
+        jsonDecode(stripJsonFences(content)) as Map<String, dynamic>;
     final quizScore = QuizScore.fromJson(jsonResponse);
 
     _logger.i('Validation score: ${quizScore.score}');

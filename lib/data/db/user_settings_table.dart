@@ -8,6 +8,9 @@ class UserSettingsTable extends Table {
 
   TextColumn get answerValidatorType => text().withDefault(const Constant('ml'))();
 
+  TextColumn get deckGenerationAiType =>
+      text().withDefault(const Constant('claude'))();
+
   TextColumn get geminiApiKey => text().nullable()();
 
   TextColumn get geminiModelName => text().nullable()();
@@ -23,4 +26,7 @@ class UserSettingsTable extends Table {
   TextColumn get ollamaModelUrl => text().nullable()();
 
   TextColumn get ollamaModelName => text().nullable()();
+
+  BoolColumn get onboardingCompleted =>
+      boolean().withDefault(const Constant(false))();
 }

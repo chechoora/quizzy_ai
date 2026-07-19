@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/domain/quiz/model/quiz_results.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/widgets/app_close_button.dart'
-    show AppCloseButton;
+import 'package:quizzy_design/quizzy_design.dart';
 
 class QuizDoneWidget extends StatelessWidget {
   const QuizDoneWidget({

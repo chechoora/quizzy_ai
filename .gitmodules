@@ -1,0 +1,4 @@
+[submodule "packages/quizzy_design"]
+	path = packages/quizzy_design
+	url = https://github.com/chechoora/quizzy_design.git
+	branch = main

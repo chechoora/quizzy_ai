@@ -4,16 +4,15 @@ import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart'
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_ui_data.dart';
-import 'package:poc_ai_quiz/view/widgets/app_content_bottom_sheet.dart';
 
 Future<AnswerValidatorType?> showValidatorTypeBottomSheet(
   BuildContext context, {
   required AnswerValidatorType selectedValidator,
   required List<ValidatorItem> validators,
+  String? title,
 }) {
   return showModalBottomSheet<AnswerValidatorType>(
     context: context,
@@ -23,6 +22,7 @@ Future<AnswerValidatorType?> showValidatorTypeBottomSheet(
     builder: (context) => _ValidatorTypeBottomSheet(
       selectedValidator: selectedValidator,
       validators: validators,
+      title: title,
     ),
   );
 }
@@ -31,16 +31,18 @@ class _ValidatorTypeBottomSheet extends StatelessWidget {
   const _ValidatorTypeBottomSheet({
     required this.selectedValidator,
     required this.validators,
+    this.title,
   });
 
   final AnswerValidatorType selectedValidator;
   final List<ValidatorItem> validators;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
     return AppContentBottomSheet(
-      title: l10n.answerValidatorDropdownLabel,
+      title: title ?? l10n.answerValidatorDropdownLabel,
       content: ListView.separated(
         shrinkWrap: true,
         padding: const EdgeInsets.all(24),

@@ -7,21 +7,20 @@ import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/icloud_restore_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/onboarding/onboarding_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/home_widget/cubit/deck_cubit.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.dart';
+import 'package:poc_ai_quiz/view/onboarding/onboarding_bottom_sheet.dart';
+import 'package:poc_ai_quiz/view/onboarding/onboarding_paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
-import 'package:poc_ai_quiz/view/widgets/app_add_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_dialog_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_text_field.dart';
 
 class HomeWidget extends HookWidget {
   const HomeWidget({super.key});
@@ -32,12 +31,15 @@ class HomeWidget extends HookWidget {
       () => HomeCubit(
         deckRepository: getIt<DeckRepository>(),
         deckPremiumManager: getIt<DeckPremiumManager>(),
+        onboardingService: getIt<OnboardingService>(),
+        iCloudRestoreService: getIt<ICloudRestoreService>(),
       ),
     );
     final selectedIndex = useState(0);
 
     useEffect(() {
       cubit.watchDecks();
+      cubit.checkOnboarding();
       return cubit.close;
     }, [cubit]);
 
@@ -101,6 +103,14 @@ class HomeWidget extends HookWidget {
       context.push(QuizCardListRoute().path, extra: deck);
     }
 
+    void startOnboardingFlow() async {
+      await showOnboardingBottomSheet(context);
+      if (!context.mounted) return;
+      await showOnboardingPaywallBottomSheet(context);
+      await cubit.completeOnboarding();
+      cubit.checkICloudRestore();
+    }
+
     void showCreateDeckPremiumError() {
       showPaywallBottomSheet(
         context,
@@ -155,6 +165,32 @@ class HomeWidget extends HookWidget {
             } else {
               showCreateDeckPremiumError();
             }
+          } else if (state is ShowOnboardingState) {
+            startOnboardingFlow();
+          } else if (state is ShowICloudRestoreState) {
+            _offerICloudRestore(context, cubit);
+          } else if (state is ICloudRestoreSuccessState) {
+            snackBar(
+              context,
+              message: localize(context)
+                  .importExportICloudRestoreSuccess(state.deckCount),
+            );
+          } else if (state is ICloudRestoreLimitState) {
+            final typeName = state.exception.type == ImportExportType.card
+                ? localize(context).card
+                : localize(context).deck;
+            showPaywallBottomSheet(
+              context,
+              limitMessage: localize(context)
+                  .importLimitExceeded(state.exception.limit, typeName),
+              feature: InAppPurchaseFeature.unlimitedDecksCards,
+            );
+          } else if (state is ICloudRestoreErrorState) {
+            snackBar(
+              context,
+              message: localize(context).importExportError,
+              isError: true,
+            );
           }
         },
       ),
@@ -219,6 +255,36 @@ class HomeWidget extends HookWidget {
         ),
       ),
     );
+  }
+}
+
+/// Shows the one-time clean-install restore dialog. The decision to offer it
+/// (and the flag persistence) lives in [HomeCubit]/`ICloudRestoreService`; this
+/// only renders the dialog and hands the choice back to the cubit.
+Future<void> _offerICloudRestore(BuildContext context, HomeCubit cubit) async {
+  final l10n = localize(context);
+  final restore = await alert(
+    context,
+    title: Text(
+      l10n.cleanInstallRestoreTitle,
+      style: AppTypography.h3.copyWith(color: AppColors.grayscale600),
+    ),
+    content: Text(
+      l10n.cleanInstallRestoreMessage,
+      style: AppTypography.h4.copyWith(color: AppColors.grayscale600),
+    ),
+    primary: AppDialogButton.primary(
+      text: l10n.cleanInstallRestoreButton,
+      onPressed: () => Navigator.of(context).pop(true),
+    ),
+    secondary: AppDialogButton.destructive(
+      text: l10n.cleanInstallSkipButton,
+      onPressed: () => Navigator.of(context).pop(false),
+    ),
+  );
+
+  if (restore == true) {
+    cubit.restoreFromICloud();
   }
 }
 

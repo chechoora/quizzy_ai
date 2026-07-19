@@ -1,25 +1,24 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:intl/intl.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/icloud_backup_service.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_cubit.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_state.dart';
-import 'package:poc_ai_quiz/view/widgets/app_button.dart';
-import 'package:poc_ai_quiz/view/widgets/app_content_bottom_sheet.dart';
-import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
-import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
 
 class ImportExportScreen extends HookWidget {
   const ImportExportScreen({super.key});
@@ -35,6 +34,7 @@ class ImportExportScreen extends HookWidget {
 
     useEffect(() {
       cubit.loadDecks();
+      cubit.loadICloudStatus();
       return cubit.close;
     }, []);
 
@@ -102,6 +102,19 @@ class ImportExportScreen extends HookWidget {
                       context,
                       message: localize(context)
                           .importExportImportCardsSuccess(state.cardCount),
+                    );
+                  }
+                  if (state is ImportExportICloudRestoreSuccessState) {
+                    snackBar(
+                      context,
+                      message: localize(context)
+                          .importExportICloudRestoreSuccess(state.deckCount),
+                    );
+                  }
+                  if (state is ImportExportICloudRestoreEmptyState) {
+                    snackBar(
+                      context,
+                      message: localize(context).importExportICloudRestoreEmpty,
                     );
                   }
                   if (state is ImportExportSelectDeckState) {
@@ -398,10 +411,164 @@ class _DataContent extends StatelessWidget {
       children: [
         const SizedBox(height: 8),
         _ImportCard(cubit: cubit),
-        const SizedBox(height: 32),
+        const SizedBox(height: 16),
         _ExportCard(state: state, cubit: cubit),
         const SizedBox(height: 16),
+        // iCloud backup is iOS-only.
+        if (Platform.isIOS) ...[
+          _ICloudCard(state: state, cubit: cubit),
+          const SizedBox(height: 32),
+        ],
       ],
+    );
+  }
+}
+
+class _ICloudCard extends StatelessWidget {
+  const _ICloudCard({
+    required this.state,
+    required this.cubit,
+  });
+
+  final ImportExportDataState state;
+  final ImportExportCubit cubit;
+
+  String _statusText(BuildContext context) {
+    switch (state.iCloudStatus) {
+      case IcloudAccountStatus.available:
+        return localize(context).importExportICloudStatusAvailable;
+      case IcloudAccountStatus.restricted:
+        return localize(context).importExportICloudStatusRestricted;
+      case IcloudAccountStatus.noAccount:
+        return localize(context).importExportICloudStatusNoAccount;
+      case IcloudAccountStatus.couldNotDetermine:
+      case IcloudAccountStatus.temporarilyUnavailable:
+      case null:
+        return localize(context).importExportICloudStatusUnavailable;
+    }
+  }
+
+  String _lastBackupText(BuildContext context) {
+    final date = state.iCloudLastBackup;
+    if (date == null) {
+      return localize(context).importExportICloudNoBackup;
+    }
+    final formatted = DateFormat.yMMMd().add_jm().format(date);
+    return localize(context).importExportICloudLastBackup(formatted);
+  }
+
+  void _confirmRestore(BuildContext context) {
+    alert(
+      context,
+      title: Text(
+        localize(context).importExportICloudRestoreConfirmTitle,
+        style: AppTypography.h3.copyWith(color: AppColors.grayscale600),
+      ),
+      content: Text(
+        localize(context).importExportICloudRestoreConfirmMessage,
+        style: AppTypography.h4.copyWith(color: AppColors.grayscale600),
+      ),
+      primary: AppDialogButton.primary(
+        text: localize(context).importExportICloudRestoreConfirmButton,
+        onPressed: () => Navigator.of(context).pop(true),
+      ),
+      secondary: AppDialogButton.destructive(
+        text: localize(context).importExportCancelButton,
+        onPressed: () => Navigator.of(context).pop(false),
+      ),
+    ).then((value) {
+      if (value ?? false) {
+        cubit.restoreFromICloud();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final available = state.iCloudAvailable;
+    final hasBackup = state.iCloudLastBackup != null;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.grayscaleWhite,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CardHeader(
+            icon: SvgPicture.asset(
+              'assets/icons/cloud.svg',
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                AppColors.yellow500,
+                BlendMode.srcIn,
+              ),
+            ),
+            title: localize(context).importExportICloudTitle,
+            subtitle: localize(context).importExportICloudDescription,
+          ),
+          const SizedBox(height: 20),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.grayscale100,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      available
+                          ? Icons.cloud_done_outlined
+                          : Icons.cloud_off_outlined,
+                      size: 18,
+                      color: available
+                          ? AppColors.primary500
+                          : AppColors.grayscale400,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _statusText(context),
+                        style: AppTypography.secondaryText.copyWith(
+                          color: AppColors.grayscale600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _lastBackupText(context),
+                  style: AppTypography.secondaryText.copyWith(
+                    color: AppColors.grayscale500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: AppButton.primary(
+              text: localize(context).importExportICloudRestoreButton,
+              leadingIcon: const Icon(
+                Icons.cloud_download_outlined,
+                size: 20,
+                color: AppColors.grayscaleWhite,
+              ),
+              onPressed: available && hasBackup
+                  ? () => _confirmRestore(context)
+                  : null,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -616,23 +783,25 @@ class _CardHeader extends StatelessWidget {
           child: Center(child: icon),
         ),
         const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: AppTypography.h3.copyWith(
-                color: AppColors.grayscale600,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppTypography.h3.copyWith(
+                  color: AppColors.grayscale600,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale500,
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: AppTypography.secondaryText.copyWith(
+                  color: AppColors.grayscale500,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

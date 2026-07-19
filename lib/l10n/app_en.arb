@@ -23,7 +23,7 @@
   "inAppFeaturesRestoreSuccess": "Purchases restored successfully!",
   "inAppFeaturesPurchaseError": "Something went wrong during purchase process",
   "inAppFeaturesUnlimitedTitle": "Unlimited decks & cards",
-  "inAppFeaturesUnlimitedDescription": "Create as many decks and cards as you want. No limits.",
+  "inAppFeaturesUnlimitedDescription": "Create as many decks and cards as you want. Unlock AI cards generation. No limits.",
   "inAppFeaturesUnlimitedSubtitle": "One-time purchase",
   "inAppFeaturesPurchased": "Purchased",
   "inAppFeaturesSubscribed": "Subscribed",
@@ -35,6 +35,19 @@
   "inAppFeaturesSubscribeButton": "Subscribe",
   "settingsTitle": "Settings",
   "settingsAiValidatorSubtitleTile": "Configure answer validation settings",
+  "settingsDeckGenerationTitle": "Deck Generation AI",
+  "settingsDeckGenerationSubtitleTile": "Choose the AI used to generate decks",
+  "settingsDeckGenerationLabel": "Deck Generation",
+  "settingsDeckGenerationSubtitle": "Choose which AI generates your decks",
+  "settingsDeckGenerationDropdownLabel": "Generation AI",
+  "settingsDeckGenerationChangedMessage": "Deck generation AI changed to {aiName}",
+  "@settingsDeckGenerationChangedMessage": {
+    "placeholders": {
+      "aiName": {
+        "type": "String"
+      }
+    }
+  },
   "settingsInAppFeaturesSubtitle": "Manage premium features",
   "settingsImportExportTitle": "Import / Export",
   "settingsImportExportSubtitle": "Import or export your decks and cards",
@@ -254,5 +267,78 @@
   "appCreditsRoleDesigner": "Designer",
   "appCreditsRoleBackendDeveloper": "Backend Developer",
   "appCreditsContactUs": "Contact us",
-  "appCreditsFromUkraine": "From 🇺🇦 with ❤️"
+  "appCreditsFromUkraine": "From 🇺🇦 with ❤️",
+  "homeAiGenerateLabel": "AI",
+  "aiGenerateTitle": "AI Generate",
+  "aiGenerateInitialTitle": "Generate a deck with AI",
+  "aiGenerateInitialHint": "Describe the deck you want below and we'll create the cards for you.",
+  "aiGeneratePromptHint": "e.g. 10 cards about the solar system",
+  "aiGenerateRefineHint": "Refine the cards, e.g. make them harder",
+  "aiGenerateDeckTitleLabel": "Deck title",
+  "aiGenerateDeckTitleHint": "e.g. World capitals",
+  "aiGenerateSaveButton": "Save Deck",
+  "aiGenerateUnlockTitle": "Unlock AI generation",
+  "aiGenerateUnlockButton": "Unlock full version",
+  "aiGenerateUnlockMessage": "Upgrade to generate and refine your cards with AI.",
+  "aiGenerateAddCardLabel": "Add card",
+  "aiGenerateDeleteCardLabel": "Delete card",
+  "aiGenerateCardQuestionLabel": "Question",
+  "aiGenerateCardQuestionHint": "Enter the question",
+  "aiGenerateCardAnswerLabel": "Answer",
+  "aiGenerateCardAnswerHint": "Enter the answer",
+  "aiGenerateCardNumber": "Card {number}",
+  "@aiGenerateCardNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingTitle": "Welcome to Quizzy AI",
+  "onboardingIntro": "Learn anything with AI-powered flashcards. Here's what you can do:",
+  "onboardingItemApiKeysTitle": "Bring your own AI",
+  "onboardingItemApiKeysDescription": "Connect your own API keys for Gemini, Claude, OpenAI or a local Ollama model.",
+  "onboardingItemModelTitle": "Pick your model",
+  "onboardingItemModelDescription": "Choose which AI model validates your answers and generates content.",
+  "onboardingItemGenerateTitle": "Generate decks with AI",
+  "onboardingItemGenerateDescription": "Describe a topic and let AI create a whole deck of quiz cards for you.",
+  "onboardingItemPremiumTitle": "Go unlimited",
+  "onboardingItemPremiumDescription": "Unlock unlimited decks and cards with a one-time premium purchase.",
+  "onboardingItemBackupTitle": "Automatic iCloud backup",
+  "onboardingItemBackupDescription": "Your decks and cards are backed up to your private iCloud and restored on any of your devices.",
+  "onboardingContinueButton": "Get started",
+  "onboardingPaywallTitle": "Unlock premium",
+  "onboardingPaywallIntro": "Get the most out of Quizzy AI with our premium features:",
+  "importExportICloudTitle": "iCloud Backup",
+  "importExportICloudDescription": "Your decks and cards are backed up automatically to your private iCloud.",
+  "importExportICloudStatusAvailable": "iCloud available",
+  "importExportICloudStatusNoAccount": "No iCloud account. Sign in to iCloud in Settings to enable backup.",
+  "importExportICloudStatusRestricted": "iCloud is restricted on this device.",
+  "importExportICloudStatusUnavailable": "iCloud is currently unavailable.",
+  "importExportICloudLastBackup": "Last backup: {date}",
+  "@importExportICloudLastBackup": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "importExportICloudNoBackup": "No backup yet",
+  "importExportICloudRestoreButton": "Restore from iCloud",
+  "importExportICloudRestoreConfirmTitle": "Restore from iCloud?",
+  "importExportICloudRestoreConfirmMessage": "This merges your iCloud backup into this device. Existing decks and cards are kept and updated — nothing is duplicated.",
+  "importExportICloudRestoreConfirmButton": "Restore",
+  "importExportICloudRestoreSuccess": "Restored {deckCount} deck(s) from iCloud",
+  "@importExportICloudRestoreSuccess": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      }
+    }
+  },
+  "importExportICloudRestoreEmpty": "No iCloud backup found",
+  "cleanInstallRestoreTitle": "Restore your decks?",
+  "cleanInstallRestoreMessage": "We found an iCloud backup. Would you like to restore your decks and cards?",
+  "cleanInstallRestoreButton": "Restore",
+  "cleanInstallSkipButton": "Skip"
 }

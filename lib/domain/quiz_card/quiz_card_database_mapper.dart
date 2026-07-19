@@ -7,6 +7,7 @@ class QuizCardDataBaseMapper {
         .map(
           (e) => QuizCardItem(
             id: e.id,
+            uid: e.uid,
             deckId: e.deckId,
             questionText: e.questionText,
             answerText: e.answerText,

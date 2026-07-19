@@ -38,4 +38,14 @@ class DeckRepository {
   Future<bool> editDeckName(DeckItem deck, String deckName) {
     return dataBaseRepository.editDeckName(deck, deckName.trim());
   }
+
+  /// Returns the local row id of the deck with the given backup [uid], or null.
+  Future<int?> findDeckIdByUid(int uid) {
+    return dataBaseRepository.findDeckIdByUid(uid);
+  }
+
+  /// Inserts a deck preserving its backup [uid] (used by iCloud restore).
+  Future<int> saveDeckWithUid(String title, int uid) {
+    return dataBaseRepository.saveDeckWithUid(title.trim(), uid);
+  }
 }

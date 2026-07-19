@@ -27,6 +27,11 @@ class UserSettingsRepository {
     await dataBaseRepository.updateAnswerValidatorType(userId, validatorType.name);
   }
 
+  Future<void> updateDeckGenerationAiType(
+      int userId, AnswerValidatorType type) async {
+    await dataBaseRepository.updateDeckGenerationAiType(userId, type.name);
+  }
+
   Future<ApiKeyConfig?> getGeminiConfig(int userId) async {
     final settings = await fetchUserSettings(userId);
     return settings.geminiConfig;
@@ -68,5 +73,14 @@ class UserSettingsRepository {
 
   Future<void> setOllamaConfig(int userId, OpenSourceConfig? config) async {
     await dataBaseRepository.updateOllamaConfig(userId, config?.url, config?.model);
+  }
+
+  Future<bool> isOnboardingCompleted(int userId) async {
+    final settings = await fetchUserSettings(userId);
+    return settings.onboardingCompleted;
+  }
+
+  Future<void> setOnboardingCompleted(int userId) async {
+    await dataBaseRepository.updateOnboardingCompleted(userId, true);
   }
 }

@@ -14,13 +14,9 @@ import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
-import 'package:poc_ai_quiz/util/theme/app_colors.dart';
-import 'package:poc_ai_quiz/util/theme/app_typography.dart';
-import 'package:poc_ai_quiz/view/widgets/simple_loading_widget.dart';
+import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
-import 'package:poc_ai_quiz/view/widgets/app_simple_header.dart';
-import 'package:poc_ai_quiz/view/widgets/app_button.dart';
 
 class QuizCardListWidget extends HookWidget {
   const QuizCardListWidget({
@@ -59,6 +55,12 @@ class QuizCardListWidget extends HookWidget {
           cubit.createQuizCardItem(cardRequest);
         }
       });
+    }
+
+    void launchDeckEdit() {
+      context
+          .push(DeckEditRoute().path, extra: deckItem)
+          .then((_) => cubit.fetchQuizCardListRequest());
     }
 
     void launchConfirmDeleteRequest(QuizCardItem card) {
@@ -100,6 +102,26 @@ class QuizCardListWidget extends HookWidget {
             AppSimpleHeader(
               title: deckItem.title,
               onBackPressed: () => context.pop(),
+              trailing: ElevatedButton(
+                onPressed: () => launchDeckEdit(),
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: EdgeInsets.zero,
+                  elevation: 0,
+                ).copyWith(
+                  backgroundColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return Colors.transparent;
+                    }
+                    return AppColors.grayscaleWhite;
+                  }),
+                ),
+                child: const Icon(
+                  Icons.integration_instructions,
+                  color: AppColors.grayscale600,
+                  size: 32 * 0.6,
+                ),
+              ),
             ),
             Expanded(
               child: BlocConsumer<QuizCardListCubit, QuizCardListState>(

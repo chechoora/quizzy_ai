@@ -14,6 +14,10 @@ import Flutter
     let implementation = OnDeviceAiApiImplementation()
     OnDeviceAiApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: implementation)
 
+    // Set up the CloudKit backup implementation
+    let cloudKitBackup = CloudKitBackupApiImplementation()
+    CloudKitBackupApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: cloudKitBackup)
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

@@ -5,15 +5,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/icloud_restore_service.dart';
+import 'package:poc_ai_quiz/domain/onboarding/onboarding_service.dart';
 
 class HomeCubit extends Cubit<DeckState> {
   HomeCubit({
     required this.deckRepository,
     required this.deckPremiumManager,
+    required this.onboardingService,
+    required this.iCloudRestoreService,
   }) : super(const DeckLoadingState());
 
   final DeckRepository deckRepository;
   final DeckPremiumManager deckPremiumManager;
+  final OnboardingService onboardingService;
+  final ICloudRestoreService iCloudRestoreService;
   final List<DeckItem> decks = [];
   StreamSubscription<List<DeckItem>>? _decksSubscription;
 
@@ -39,6 +46,39 @@ class HomeCubit extends Cubit<DeckState> {
 
   void editDeck(DeckItem deck, String deckName) {
     deckRepository.editDeckName(deck, deckName);
+  }
+
+  Future<void> checkOnboarding() async {
+    final completed = await onboardingService.isOnboardingCompleted();
+    if (!completed) {
+      emit(const ShowOnboardingState());
+    }
+  }
+
+  Future<void> completeOnboarding() {
+    return onboardingService.completeOnboarding();
+  }
+
+  /// On a clean install, decides whether to offer a one-time iCloud restore and
+  /// emits [ShowICloudRestoreState] if so (marking the prompt as shown).
+  Future<void> checkICloudRestore() async {
+    if (await iCloudRestoreService.shouldOfferRestore()) {
+      await iCloudRestoreService.markPromptShown();
+      emit(const ShowICloudRestoreState());
+    }
+  }
+
+  Future<void> restoreFromICloud() async {
+    try {
+      final restoredCount = await iCloudRestoreService.restore();
+      if (restoredCount != null) {
+        emit(ICloudRestoreSuccessState(restoredCount));
+      }
+    } on ImportLimitExceededException catch (e) {
+      emit(ICloudRestoreLimitState(e));
+    } catch (_) {
+      emit(const ICloudRestoreErrorState());
+    }
   }
 
   void addDockRequest() async {
@@ -94,4 +134,28 @@ class RequestCreateDeckState extends ListenerState {
   const RequestCreateDeckState({
     required this.canCreateDeck,
   });
+}
+
+class ShowOnboardingState extends ListenerState {
+  const ShowOnboardingState();
+}
+
+class ShowICloudRestoreState extends ListenerState {
+  const ShowICloudRestoreState();
+}
+
+class ICloudRestoreSuccessState extends ListenerState {
+  const ICloudRestoreSuccessState(this.deckCount);
+
+  final int deckCount;
+}
+
+class ICloudRestoreLimitState extends ListenerState {
+  const ICloudRestoreLimitState(this.exception);
+
+  final ImportLimitExceededException exception;
+}
+
+class ICloudRestoreErrorState extends ListenerState {
+  const ICloudRestoreErrorState();
 }

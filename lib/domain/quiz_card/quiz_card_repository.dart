@@ -18,6 +18,13 @@ class QuizCardRepository {
     return dataBaseMapper.mapToQuizCardItemList(databaseData);
   }
 
+  /// Emits on any change to any card (used to trigger iCloud auto-backup).
+  Stream<List<QuizCardItem>> watchCards() {
+    return dataBaseRepository
+        .watchAllCards()
+        .map(dataBaseMapper.mapToQuizCardItemList);
+  }
+
   Future<int> saveQuizCard({
     required String question,
     required String answer,
@@ -44,7 +51,22 @@ class QuizCardRepository {
     );
   }
 
-  Future<List<int>> saveQuizCards(List<PlainCardModel> cards, int deckId) async {
+  Future<List<int>> saveQuizCards(List<PlainCardModel> cards, int deckId) {
     return dataBaseRepository.saveQuizCards(cards, deckId);
+  }
+
+  /// The set of (non-null) card uids currently stored for [deckId].
+  Future<Set<int>> fetchCardUids(int deckId) {
+    return dataBaseRepository.fetchCardUids(deckId);
+  }
+
+  /// Inserts cards preserving their backup uid (used by iCloud restore).
+  Future<List<int>> saveCardsWithUid(List<PlainCardModel> cards, int deckId) {
+    return dataBaseRepository.saveCardsWithUid(cards, deckId);
+  }
+
+  /// Updates the text of the card identified by its backup uid (restore).
+  Future<bool> updateCardByUid(int deckId, PlainCardModel card) {
+    return dataBaseRepository.updateCardByUid(deckId, card);
   }
 }

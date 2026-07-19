@@ -1,4 +1,5 @@
 import 'package:chopper/chopper.dart';
+import 'package:poc_ai_quiz/domain/import_export/model.dart';
 
 part 'quizzy_api_service.chopper.dart';
 
@@ -18,10 +19,37 @@ abstract class QuizzyApiService extends ChopperService {
     @Body() required CheckAnswerRequest body,
   });
 
+  @Post(path: '/decks/generate')
+  Future<Response> generateDeck({
+    @Query('userId') required String userId,
+    @Body() required GenerateDeckRequest body,
+  });
+
   @Get(path: '/users/{appUserId}/balance')
   Future<Response> getQuota({
     @Path('appUserId') required String appUserId,
   });
+}
+
+class GenerateDeckRequest {
+  final String prompt;
+  final String? deckTitle;
+  final List<PlainCardModel> currentCards;
+
+  GenerateDeckRequest({
+    required this.prompt,
+    this.deckTitle,
+    this.currentCards = const [],
+  });
+
+  Map<String, dynamic> toJson() => {
+        'prompt': prompt,
+        if (deckTitle != null) 'deckTitle': deckTitle,
+        if (currentCards.isNotEmpty)
+          'currentCards': currentCards
+              .map((c) => {'question': c.question, 'answer': c.answer})
+              .toList(),
+      };
 }
 
 class CheckAnswerRequest {

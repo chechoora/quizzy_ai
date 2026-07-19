@@ -122,8 +122,14 @@ final _logger = Logger.withTag('ClassName');
 _logger.d('Debug message');
 _logger.i('Info message');
 _logger.w('Warning message');
-_logger.e('Error message', exception, stackTrace);
+_logger.e('Error message', ex: exception, stacktrace: stackTrace);
 ```
+
+**Every new class you create must be covered with logs.** Give it a `Logger.withTag('ClassName')` field and log:
+- `d` at the start of each public method with its key arguments, and at significant branch points / decisions (e.g. why an early return happened).
+- `i` for successful outcomes of meaningful operations (uploads, restores, saves).
+- `w` for expected-but-notable conditions (a skipped operation, an unavailable resource).
+- `e` (with `ex:` and `stacktrace:`) in every `catch` block; rethrow if the caller needs to handle it.
 
 ## Testing
 
