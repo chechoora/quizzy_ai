@@ -10,10 +10,16 @@ class SettingsService {
   final UserSettingsRepository userSettingsRepository;
   final Map<AnswerValidatorType, IAnswerValidator> validators;
 
+  /// When false (e.g. the `quizzypro` flavor) deck generation is forced to the
+  /// managed Quizzy AI provider, since the bring-your-own-key generators are
+  /// removed.
+  final bool enableByok;
+
   SettingsService({
     required this.userRepository,
     required this.userSettingsRepository,
     required this.validators,
+    required this.enableByok,
   });
 
   Future<AnswerValidatorType> getCurrentValidatorType() async {
@@ -30,6 +36,9 @@ class SettingsService {
   }
 
   Future<AnswerValidatorType> getCurrentDeckGenerationAiType() async {
+    // With BYOK disabled the only surviving generator is the managed Quizzy AI
+    // provider, so ignore any stored (potentially BYOK) selection.
+    if (!enableByok) return AnswerValidatorType.quizzyAI;
     final user = await userRepository.fetchCurrentUser();
     final userSettings =
         await userSettingsRepository.fetchUserSettings(user.id);

@@ -30,3 +30,11 @@ doc/api/
 .fvm/
 
 android/.idea
+
+# Flutter build logs
+*.log
+
+# Signing keys & secrets — never commit these
+android/release_key.properties
+android/release_key.jks
+lib/util/env_hide.dart

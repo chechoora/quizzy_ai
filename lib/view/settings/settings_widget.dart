@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:poc_ai_quiz/config/app_config.dart';
+import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:quizzy_design/quizzy_design.dart';
@@ -10,6 +12,9 @@ class SettingsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Deck Generation & Import/Export are bring-your-own-key surfaces, hidden
+    // when BYOK is disabled (e.g. the `quizzypro` flavor).
+    final enableByok = getIt<AppConfig>().enableByok;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -41,23 +46,25 @@ class SettingsWidget extends StatelessWidget {
                         context.pushNamed(SettingsAIValidatorRoute().name),
                   ),
                   const SizedBox(height: 12),
-                  _SettingsTile(
-                    icon: SvgPicture.asset(
-                      'assets/icons/deck_icon.svg',
-                      width: 24,
-                      height: 24,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.primary500,
-                        BlendMode.srcIn,
+                  if (enableByok) ...[
+                    _SettingsTile(
+                      icon: SvgPicture.asset(
+                        'assets/icons/deck_icon.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.primary500,
+                          BlendMode.srcIn,
+                        ),
                       ),
+                      title: localize(context).settingsDeckGenerationTitle,
+                      subtitle:
+                          localize(context).settingsDeckGenerationSubtitleTile,
+                      onTap: () =>
+                          context.pushNamed(SettingsDeckGenerationRoute().name),
                     ),
-                    title: localize(context).settingsDeckGenerationTitle,
-                    subtitle:
-                        localize(context).settingsDeckGenerationSubtitleTile,
-                    onTap: () =>
-                        context.pushNamed(SettingsDeckGenerationRoute().name),
-                  ),
-                  const SizedBox(height: 12),
+                    const SizedBox(height: 12),
+                  ],
                   _SettingsTile(
                     icon: SvgPicture.asset(
                       'assets/icons/import_export.svg',
@@ -98,8 +105,7 @@ class SettingsWidget extends StatelessWidget {
                     ),
                     title: localize(context).settingsAppCreditsTitle,
                     subtitle: localize(context).settingsAppCreditsSubtitle,
-                    onTap: () =>
-                        context.pushNamed(AppCreditsRoute().name),
+                    onTap: () => context.pushNamed(AppCreditsRoute().name),
                   ),
                 ],
               ),

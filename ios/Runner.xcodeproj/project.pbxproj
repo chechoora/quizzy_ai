@@ -19,7 +19,7 @@
 		5606D4A12E90042300B96600 /* CloudKitBackupApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5606D4A02E90042300B96600 /* CloudKitBackupApi.swift */; };
 		5606D4A22E90042300B96600 /* CloudKitBackupApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5606D4A02E90042300B96600 /* CloudKitBackupApi.swift */; };
 		5606D4A42E90051400B96600 /* CloudKitBackupApiImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5606D4A32E90051400B96600 /* CloudKitBackupApiImplementation.swift */; };
-		6AB8854CF501618DBA20FA09 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BE9B1A91BCDE41776B9A08AA /* GoogleService-Info.plist */; };
+		5D00608FD9B4E647E073B891 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3E86F782F7B14B63E985F5B4 /* GoogleService-Info.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
@@ -50,11 +50,17 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A073D9B6487A97A8442C426 /* Pods-RunnerTests.release-quizzypro.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release-quizzypro.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release-quizzypro.xcconfig"; sourceTree = "<group>"; };
+		0E1BEAB341138A376F50C393 /* Profile-quizzy.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Profile-quizzy.xcconfig"; path = "Flutter/Profile-quizzy.xcconfig"; sourceTree = "<group>"; };
+		0F486F42993C99DD7F5E410E /* Profile-quizzypro.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Profile-quizzypro.xcconfig"; path = "Flutter/Profile-quizzypro.xcconfig"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		1AC3BE88C946D27BE57252E6 /* Pods-Runner.debug-quizzy.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-quizzy.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-quizzy.xcconfig"; sourceTree = "<group>"; };
+		1E992006C0FB294763A9DF25 /* Pods-Runner.profile-quizzy.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-quizzy.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-quizzy.xcconfig"; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		3E86F782F7B14B63E985F5B4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4752BBF44D57F18F41BEB676 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		506F4FF0CC4E6752347EF229 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		5606D3952E90042300B96600 /* OnDeviceAiApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceAiApi.swift; sourceTree = "<group>"; };
@@ -63,10 +69,15 @@
 		5606D4A02E90042300B96600 /* CloudKitBackupApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitBackupApi.swift; sourceTree = "<group>"; };
 		5606D4A32E90051400B96600 /* CloudKitBackupApiImplementation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitBackupApiImplementation.swift; sourceTree = "<group>"; };
 		56C9BC65300AC8400087275A /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		5BE2A2D845CA9C753E0056FB /* Pods-Runner.profile-quizzypro.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-quizzypro.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-quizzypro.xcconfig"; sourceTree = "<group>"; };
+		63C1CFF51C2EC721E635D1EB /* Pods-RunnerTests.profile-quizzypro.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile-quizzypro.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile-quizzypro.xcconfig"; sourceTree = "<group>"; };
 		6D0B3960731225B485F18971 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E3BB35472719B94CAF18A41 /* Pods-Runner.debug-quizzypro.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-quizzypro.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-quizzypro.xcconfig"; sourceTree = "<group>"; };
+		6EC1163F01AE76A70B73D256 /* Pods-RunnerTests.debug-quizzy.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug-quizzy.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug-quizzy.xcconfig"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		93B18190370BC8B3514A878D /* Pods-RunnerTests.profile-quizzy.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile-quizzy.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile-quizzy.xcconfig"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -74,12 +85,19 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		98ECAF1A8747D524611BE26E /* Debug-quizzypro.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Debug-quizzypro.xcconfig"; path = "Flutter/Debug-quizzypro.xcconfig"; sourceTree = "<group>"; };
+		A006172B8492D62079975AB9 /* Pods-Runner.release-quizzy.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release-quizzy.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release-quizzy.xcconfig"; sourceTree = "<group>"; };
 		A848EABED6D302B3EFC7C711 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
-		BE9B1A91BCDE41776B9A08AA /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B92AB102F9DC0ED4F7CB07CE /* Release-quizzy.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Release-quizzy.xcconfig"; path = "Flutter/Release-quizzy.xcconfig"; sourceTree = "<group>"; };
 		C147B7B596F2A5EAA687541F /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		C6237042B42079DC0027146E /* Pods-RunnerTests.debug-quizzypro.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug-quizzypro.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug-quizzypro.xcconfig"; sourceTree = "<group>"; };
+		C656E7C9512C6A89C0C5B906 /* Pods-Runner.release-quizzypro.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release-quizzypro.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release-quizzypro.xcconfig"; sourceTree = "<group>"; };
 		C99ACC6D94B075974E47DC26 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		CDD1EE9F2CAC0856E0BB1A1A /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CFFCCA865FA217DA1BD7FD05 /* Release-quizzypro.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Release-quizzypro.xcconfig"; path = "Flutter/Release-quizzypro.xcconfig"; sourceTree = "<group>"; };
 		E4C49E183779DBDE1C35B7CA /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+		FA41B56810C1514B2A7C7F47 /* Debug-quizzy.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Debug-quizzy.xcconfig"; path = "Flutter/Debug-quizzy.xcconfig"; sourceTree = "<group>"; };
+		FC5F4B9BA84DFA41844E0B18 /* Pods-RunnerTests.release-quizzy.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release-quizzy.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release-quizzy.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +146,18 @@
 				4752BBF44D57F18F41BEB676 /* Pods-RunnerTests.debug.xcconfig */,
 				E4C49E183779DBDE1C35B7CA /* Pods-RunnerTests.release.xcconfig */,
 				C99ACC6D94B075974E47DC26 /* Pods-RunnerTests.profile.xcconfig */,
+				1AC3BE88C946D27BE57252E6 /* Pods-Runner.debug-quizzy.xcconfig */,
+				6E3BB35472719B94CAF18A41 /* Pods-Runner.debug-quizzypro.xcconfig */,
+				A006172B8492D62079975AB9 /* Pods-Runner.release-quizzy.xcconfig */,
+				C656E7C9512C6A89C0C5B906 /* Pods-Runner.release-quizzypro.xcconfig */,
+				1E992006C0FB294763A9DF25 /* Pods-Runner.profile-quizzy.xcconfig */,
+				5BE2A2D845CA9C753E0056FB /* Pods-Runner.profile-quizzypro.xcconfig */,
+				6EC1163F01AE76A70B73D256 /* Pods-RunnerTests.debug-quizzy.xcconfig */,
+				C6237042B42079DC0027146E /* Pods-RunnerTests.debug-quizzypro.xcconfig */,
+				FC5F4B9BA84DFA41844E0B18 /* Pods-RunnerTests.release-quizzy.xcconfig */,
+				0A073D9B6487A97A8442C426 /* Pods-RunnerTests.release-quizzypro.xcconfig */,
+				93B18190370BC8B3514A878D /* Pods-RunnerTests.profile-quizzy.xcconfig */,
+				63C1CFF51C2EC721E635D1EB /* Pods-RunnerTests.profile-quizzypro.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -139,6 +169,12 @@
 				9740EEB21CF90195004384FC /* Debug.xcconfig */,
 				7AFA3C8E1D35360C0083082E /* Release.xcconfig */,
 				9740EEB31CF90195004384FC /* Generated.xcconfig */,
+				FA41B56810C1514B2A7C7F47 /* Debug-quizzy.xcconfig */,
+				B92AB102F9DC0ED4F7CB07CE /* Release-quizzy.xcconfig */,
+				0E1BEAB341138A376F50C393 /* Profile-quizzy.xcconfig */,
+				98ECAF1A8747D524611BE26E /* Debug-quizzypro.xcconfig */,
+				CFFCCA865FA217DA1BD7FD05 /* Release-quizzypro.xcconfig */,
+				0F486F42993C99DD7F5E410E /* Profile-quizzypro.xcconfig */,
 			);
 			name = Flutter;
 			sourceTree = "<group>";
@@ -151,8 +187,8 @@
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				8B883D1CE807D87BFB1E8598 /* Pods */,
-				BE9B1A91BCDE41776B9A08AA /* GoogleService-Info.plist */,
 				3E10EA43A95C2F2653D53E31 /* Frameworks */,
+				3E86F782F7B14B63E985F5B4 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -221,6 +257,7 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				F38478DC1A493CD61A993F03 /* FlutterFire: "flutterfire upload-crashlytics-symbols" */,
 				A83A56EB9C6CDEE4734A5AA9 /* [CP] Copy Pods Resources */,
+				9315D02378162CC80A34CF3D /* Copy flavor GoogleService-Info.plist */,
 			);
 			buildRules = (
 			);
@@ -287,7 +324,7 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
-				6AB8854CF501618DBA20FA09 /* GoogleService-Info.plist in Resources */,
+				5D00608FD9B4E647E073B891 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,6 +390,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
+		};
+		9315D02378162CC80A34CF3D /* Copy flavor GoogleService-Info.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy flavor GoogleService-Info.plist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# quizzy uses the bundled Runner/GoogleService-Info.plist.\n# Other flavors override it with their own config/<flavor>/ copy.\nif [ \"${FLAVOR}\" != \"quizzy\" ]; then\n  SRC=\"${PROJECT_DIR}/config/${FLAVOR}/GoogleService-Info.plist\"\n  DST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n  if [ -f \"$SRC\" ]; then\n    echo \"Overriding GoogleService-Info.plist for flavor ${FLAVOR}\"\n    cp \"$SRC\" \"$DST\"\n  else\n    echo \"warning: Missing $SRC for flavor ${FLAVOR}; Firebase will not be configured.\"\n  fi\nfi\n";
 		};
 		9740EEB61CF901F6004384FC /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -460,7 +515,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		249021D3217E4FDB00AE95B9 /* Profile */ = {
+		1653921A32F7C0A6482C153D /* Release-quizzy */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -508,41 +563,87 @@
 				STRIP_STYLE = "non-global";
 				STRIP_SWIFT_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Profile;
+			name = "Release-quizzy";
 		};
-		249021D4217E4FDB00AE95B9 /* Profile */ = {
+		2CC26C412C03F283EDC8FEDB /* Release-quizzypro */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 26;
-				DEVELOPMENT_TEAM = NUQM9SMQSZ;
-				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Quizzy AI";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 26;
-				PRODUCT_BUNDLE_IDENTIFIER = com.chechoora.quizzy;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
-				VERSIONING_SYSTEM = "apple-generic";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = "non-global";
+				STRIP_SWIFT_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
-			name = Profile;
+			name = "Release-quizzypro";
 		};
-		331C8088294A63A400263BE5 /* Debug */ = {
+		42B8CD7E2AC4D916EED22F6F /* Profile-quizzy */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4752BBF44D57F18F41BEB676 /* Pods-RunnerTests.debug.xcconfig */;
+			baseConfigurationReference = 93B18190370BC8B3514A878D /* Pods-RunnerTests.profile-quizzy.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.pocAiQuiz.RunnerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
+			};
+			name = "Profile-quizzy";
+		};
+		430865ABC9D3BD243B79CB26 /* Debug-quizzy */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6EC1163F01AE76A70B73D256 /* Pods-RunnerTests.debug-quizzy.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -556,11 +657,11 @@
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
 			};
-			name = Debug;
+			name = "Debug-quizzy";
 		};
-		331C8089294A63A400263BE5 /* Release */ = {
+		47B6DA386BFCEF8B14818191 /* Release-quizzy */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E4C49E183779DBDE1C35B7CA /* Pods-RunnerTests.release.xcconfig */;
+			baseConfigurationReference = FC5F4B9BA84DFA41844E0B18 /* Pods-RunnerTests.release-quizzy.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -572,11 +673,11 @@
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
 			};
-			name = Release;
+			name = "Release-quizzy";
 		};
-		331C808A294A63A400263BE5 /* Profile */ = {
+		4880521D5D7425B92F4DB9B7 /* Release-quizzypro */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C99ACC6D94B075974E47DC26 /* Pods-RunnerTests.profile.xcconfig */;
+			baseConfigurationReference = 0A073D9B6487A97A8442C426 /* Pods-RunnerTests.release-quizzypro.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -588,9 +689,36 @@
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
 			};
-			name = Profile;
+			name = "Release-quizzypro";
 		};
-		97C147031CF9000F007C117D /* Debug */ = {
+		5B059515D03C34C52E994447 /* Debug-quizzy */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA41B56810C1514B2A7C7F47 /* Debug-quizzy.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CURRENT_PROJECT_VERSION = 26;
+				DEVELOPMENT_TEAM = NUQM9SMQSZ;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 26;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = "Debug-quizzy";
+		};
+		6CC883392246399B1BA4B0C6 /* Debug-quizzy */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -646,9 +774,9 @@
 				STRIP_SWIFT_SYMBOLS = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
-			name = Debug;
+			name = "Debug-quizzy";
 		};
-		97C147041CF9000F007C117D /* Release */ = {
+		72FC4CEF3239A28AD86A2285 /* Profile-quizzypro */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -696,16 +824,48 @@
 				STRIP_STYLE = "non-global";
 				STRIP_SWIFT_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Release;
+			name = "Profile-quizzypro";
 		};
-		97C147061CF9000F007C117D /* Debug */ = {
+		8D758F2FD0F58B99F81EBEA7 /* Profile-quizzypro */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
+			baseConfigurationReference = 63C1CFF51C2EC721E635D1EB /* Pods-RunnerTests.profile-quizzypro.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.pocAiQuiz.RunnerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
+			};
+			name = "Profile-quizzypro";
+		};
+		96BB3D966040C6BA93D45F36 /* Debug-quizzypro */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C6237042B42079DC0027146E /* Pods-RunnerTests.debug-quizzypro.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.pocAiQuiz.RunnerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
+			};
+			name = "Debug-quizzypro";
+		};
+		A82F451BA071716E057F0180 /* Profile-quizzy */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E1BEAB341138A376F50C393 /* Profile-quizzy.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -714,7 +874,7 @@
 				DEVELOPMENT_TEAM = NUQM9SMQSZ;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Quizzy AI";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -722,18 +882,206 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 26;
-				PRODUCT_BUNDLE_IDENTIFIER = com.chechoora.quizzy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = "Profile-quizzy";
+		};
+		B8B010FB6CB0A9BB6675CBC8 /* Profile-quizzypro */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0F486F42993C99DD7F5E410E /* Profile-quizzypro.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CURRENT_PROJECT_VERSION = 26;
+				DEVELOPMENT_TEAM = NUQM9SMQSZ;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 26;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = "Profile-quizzypro";
+		};
+		C09EEFF70DA01A055BDE2A01 /* Profile-quizzy */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = "non-global";
+				STRIP_SWIFT_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Profile-quizzy";
+		};
+		CF46DBE90DB47619E1102B84 /* Release-quizzy */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B92AB102F9DC0ED4F7CB07CE /* Release-quizzy.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CURRENT_PROJECT_VERSION = 26;
+				DEVELOPMENT_TEAM = NUQM9SMQSZ;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 26;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = "Release-quizzy";
+		};
+		D8DC8479C3FA512B15419B97 /* Debug-quizzypro */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = "non-global";
+				STRIP_SWIFT_SYMBOLS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-quizzypro";
+		};
+		ECE197B4C228D0D96A6002CD /* Debug-quizzypro */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 98ECAF1A8747D524611BE26E /* Debug-quizzypro.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CURRENT_PROJECT_VERSION = 26;
+				DEVELOPMENT_TEAM = NUQM9SMQSZ;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 26;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
-			name = Debug;
+			name = "Debug-quizzypro";
 		};
-		97C147071CF9000F007C117D /* Release */ = {
+		EDAAFFF63F959D106CC65C2E /* Release-quizzypro */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			baseConfigurationReference = CFFCCA865FA217DA1BD7FD05 /* Release-quizzypro.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -742,7 +1090,7 @@
 				DEVELOPMENT_TEAM = NUQM9SMQSZ;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Quizzy AI";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -750,13 +1098,12 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 26;
-				PRODUCT_BUNDLE_IDENTIFIER = com.chechoora.quizzy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
-			name = Release;
+			name = "Release-quizzypro";
 		};
 /* End XCBuildConfiguration section */
 
@@ -764,9 +1111,12 @@
 		331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				331C8088294A63A400263BE5 /* Debug */,
-				331C8089294A63A400263BE5 /* Release */,
-				331C808A294A63A400263BE5 /* Profile */,
+				430865ABC9D3BD243B79CB26 /* Debug-quizzy */,
+				96BB3D966040C6BA93D45F36 /* Debug-quizzypro */,
+				47B6DA386BFCEF8B14818191 /* Release-quizzy */,
+				4880521D5D7425B92F4DB9B7 /* Release-quizzypro */,
+				42B8CD7E2AC4D916EED22F6F /* Profile-quizzy */,
+				8D758F2FD0F58B99F81EBEA7 /* Profile-quizzypro */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -774,9 +1124,12 @@
 		97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				97C147031CF9000F007C117D /* Debug */,
-				97C147041CF9000F007C117D /* Release */,
-				249021D3217E4FDB00AE95B9 /* Profile */,
+				6CC883392246399B1BA4B0C6 /* Debug-quizzy */,
+				D8DC8479C3FA512B15419B97 /* Debug-quizzypro */,
+				1653921A32F7C0A6482C153D /* Release-quizzy */,
+				2CC26C412C03F283EDC8FEDB /* Release-quizzypro */,
+				C09EEFF70DA01A055BDE2A01 /* Profile-quizzy */,
+				72FC4CEF3239A28AD86A2285 /* Profile-quizzypro */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -784,9 +1137,12 @@
 		97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				97C147061CF9000F007C117D /* Debug */,
-				97C147071CF9000F007C117D /* Release */,
-				249021D4217E4FDB00AE95B9 /* Profile */,
+				5B059515D03C34C52E994447 /* Debug-quizzy */,
+				ECE197B4C228D0D96A6002CD /* Debug-quizzypro */,
+				CF46DBE90DB47619E1102B84 /* Release-quizzy */,
+				EDAAFFF63F959D106CC65C2E /* Release-quizzypro */,
+				A82F451BA071716E057F0180 /* Profile-quizzy */,
+				B8B010FB6CB0A9BB6675CBC8 /* Profile-quizzypro */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
