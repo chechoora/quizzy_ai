@@ -36,7 +36,8 @@
       "Bash(/usr/bin/plutil -lint Info.plist Info-quizzypro.plist)",
       "Bash(/usr/bin/plutil -lint Runner.xcodeproj/project.pbxproj)",
       "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; cat -n {}')",
-      "Bash(xargs -I{} echo {})"
+      "Bash(xargs -I{} echo {})",
+      "Bash(rg *)"
     ],
     "deny": [],
     "ask": []

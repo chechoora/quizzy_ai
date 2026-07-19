@@ -117,6 +117,18 @@ class AppDatabase extends _$AppDatabase {
       },
     );
   }
+
+  /// Wipes every row from every table. Used on sign-out / account deletion so
+  /// the next user to sign in on this device starts from a clean local slate.
+  Future<void> clearAllTables() async {
+    await transaction(() async {
+      await delete(deckTable).go();
+      await delete(quizCardTable).go();
+      await delete(userTable).go();
+      await delete(userSettingsTable).go();
+      await delete(syncTombstoneTable).go();
+    });
+  }
 }
 
 LazyDatabase _openConnection() {

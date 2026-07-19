@@ -73,6 +73,7 @@ import 'package:poc_ai_quiz/data/import_export/export_service.dart';
 import 'package:poc_ai_quiz/data/import_export/import_service.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/logout/logout_manager.dart';
 
 final getIt = GetIt.instance;
 
@@ -494,6 +495,14 @@ Future<void> _setupServices() async {
     importExportService: importExportService,
   );
   getIt.registerSingleton<ICloudRestoreService>(icloudRestoreService);
+
+  final logoutManager = LogoutManager(
+    appDatabase: getIt.get<AppDatabase>(),
+    userQuotaRepository: userQuotaRepository,
+    icloudRestoreService: icloudRestoreService,
+    logger: Logger.withTag('LogoutManager'),
+  );
+  getIt.registerSingleton<LogoutManager>(logoutManager);
 
   // ai deck generation - uses settings to get the selected provider
   getIt.registerSingleton<AiGenService>(
