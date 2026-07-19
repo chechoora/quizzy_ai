@@ -43,10 +43,41 @@ A Flutter quiz application with AI-powered answer validation. Create flashcard d
    fvm flutter packages pub run build_runner build
    ```
 
-4. Run the app:
+4. Run the app (pick a flavor — see [Flavors](#flavors)):
    ```bash
-   fvm flutter run
+   fvm flutter run --flavor quizzy -t lib/main_quizzy.dart
    ```
+
+## Flavors
+
+The app is built in two flavors from the same codebase:
+
+| Flavor      | App name       | Android applicationId        | Entry point                 |
+|-------------|----------------|------------------------------|-----------------------------|
+| `quizzy`    | Quizzy AI      | `com.chechoora.quizzy`       | `lib/main_quizzy.dart`      |
+| `quizzypro` | Quizzy AI Pro  | `com.chechoora.quizzy.pro`   | `lib/main_quizzypro.dart`   |
+
+Always pass both `--flavor` and the matching `-t` entry point:
+
+```bash
+# Run
+fvm flutter run   --flavor quizzy    -t lib/main_quizzy.dart
+fvm flutter run   --flavor quizzypro -t lib/main_quizzypro.dart
+
+# Build (Android)
+fvm flutter build apk --flavor quizzy    -t lib/main_quizzy.dart --debug
+fvm flutter build apk --flavor quizzypro -t lib/main_quizzypro.dart --debug
+
+# Build (iOS)
+fvm flutter build ios --flavor quizzy    -t lib/main_quizzy.dart --debug --no-codesign
+fvm flutter build ios --flavor quizzypro -t lib/main_quizzypro.dart --debug --no-codesign
+```
+
+> **quizzypro Firebase setup:** the Pro flavor uses a separate Firebase app
+> (`com.chechoora.quizzy.pro`) under the same "Quizzy AI" project. Before it can
+> build, add `android/app/src/quizzypro/google-services.json` and
+> `ios/config/quizzypro/GoogleService-Info.plist` (see the READMEs in those
+> folders).
 
 ## Configuration
 

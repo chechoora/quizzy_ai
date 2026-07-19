@@ -1,0 +1,51 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "quizzy (debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_quizzy.dart",
+      "args": ["--flavor", "quizzy"]
+    },
+    {
+      "name": "quizzy (profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main_quizzy.dart",
+      "args": ["--flavor", "quizzy"]
+    },
+    {
+      "name": "quizzy (release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main_quizzy.dart",
+      "args": ["--flavor", "quizzy"]
+    },
+    {
+      "name": "quizzypro (debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_quizzypro.dart",
+      "args": ["--flavor", "quizzypro"]
+    },
+    {
+      "name": "quizzypro (profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main_quizzypro.dart",
+      "args": ["--flavor", "quizzypro"]
+    },
+    {
+      "name": "quizzypro (release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main_quizzypro.dart",
+      "args": ["--flavor", "quizzypro"]
+    }
+  ]
+}

@@ -5,8 +5,17 @@ Development guidance for Claude Code when working with this repository.
 ## Commands
 
 ```bash
-# Run the app
-fvm flutter run
+# Run the app (must pass a flavor + matching entry point — see Flavors)
+fvm flutter run --flavor quizzy    -t lib/main_quizzy.dart
+fvm flutter run --flavor quizzypro -t lib/main_quizzypro.dart
+
+# Build Android APK (debug)
+fvm flutter build apk --flavor quizzy    -t lib/main_quizzy.dart --debug
+fvm flutter build apk --flavor quizzypro -t lib/main_quizzypro.dart --debug
+
+# Build iOS (debug, no code signing)
+fvm flutter build ios --flavor quizzy    -t lib/main_quizzy.dart --debug --no-codesign
+fvm flutter build ios --flavor quizzypro -t lib/main_quizzypro.dart --debug --no-codesign
 
 # Run tests
 fvm flutter test
@@ -23,6 +32,28 @@ fvm flutter packages pub run build_runner build --delete-conflicting-outputs
 # Generate Pigeon platform channel code
 fvm dart run pigeon --input <input_file>
 ```
+
+## Flavors
+
+Two build flavors share one codebase (infrastructure in `lib/config/app_config.dart`):
+
+| Flavor      | App name      | Android applicationId      | iOS bundle id              | Entry point                |
+|-------------|---------------|----------------------------|----------------------------|----------------------------|
+| `quizzy`    | Quizzy AI     | `com.chechoora.quizzy`     | `com.chechoora.quizzy`     | `lib/main_quizzy.dart`     |
+| `quizzypro` | Quizzy AI Pro | `com.chechoora.quizzy.pro` | `com.chechoora.quizzy.pro` | `lib/main_quizzypro.dart`  |
+
+- Each entry point builds an `AppConfig` and calls `mainCommon(config)` in `main.dart`.
+  `AppConfig` is registered in GetIt (`getIt<AppConfig>()`). Its `enableByok` /
+  `requireAuth` flags are declared for later and NOT consumed anywhere yet.
+- Always pass `--flavor <name>` together with `-t lib/main_<name>.dart`.
+- Firebase: `quizzy` uses `android/app/google-services.json` /
+  `ios/Runner/GoogleService-Info.plist` (unchanged defaults). `quizzypro` needs a
+  separate Firebase app (same "Quizzy AI" project) — drop
+  `android/app/src/quizzypro/google-services.json` and
+  `ios/config/quizzypro/GoogleService-Info.plist` (see the READMEs there). On iOS the
+  "Copy flavor GoogleService-Info.plist" build phase overrides the bundled plist with
+  the flavor's copy for any non-`quizzy` flavor.
+- After changing iOS build configurations, run `cd ios && pod install`.
 
 ## Architecture
 

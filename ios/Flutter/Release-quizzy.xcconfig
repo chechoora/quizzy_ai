@@ -1,0 +1,5 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release-quizzy.xcconfig"
+#include "Generated.xcconfig"
+FLAVOR = quizzy
+PRODUCT_BUNDLE_IDENTIFIER = com.chechoora.quizzy
+APP_DISPLAY_NAME = Quizzy AI

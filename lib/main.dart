@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
@@ -26,10 +27,17 @@ import 'firebase_options.dart';
 
 import 'l10n/app_localizations.dart';
 
-Future<void> main() async {
+/// Shared application bootstrap used by every flavor entry point
+/// (`main_quizzy.dart` / `main_quizzypro.dart`).
+Future<void> mainCommon(AppConfig config) async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
     Fimber.plantTree(DebugTree());
+    Fimber.i(
+      'Starting app: flavor=${config.flavor}, appName=${config.appName}',
+    );
+
+    getIt.registerSingleton<AppConfig>(config);
 
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

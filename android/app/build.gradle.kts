@@ -51,6 +51,20 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+
+    flavorDimensions += "app"
+    productFlavors {
+        create("quizzy") {
+            dimension = "app"
+            // applicationId stays com.chechoora.quizzy (default)
+            resValue("string", "app_name", "Quizzy AI")
+        }
+        create("quizzypro") {
+            dimension = "app"
+            applicationIdSuffix = ".pro" // -> com.chechoora.quizzy.pro
+            resValue("string", "app_name", "Quizzy AI Pro")
+        }
+    }
 }
 
 flutter {
