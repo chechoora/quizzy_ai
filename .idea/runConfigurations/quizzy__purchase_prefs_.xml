@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="quizzy (purchase prefs)" type="FlutterRunConfigurationType" factoryName="Flutter">
+    <option name="buildFlavor" value="quizzy" />
+    <option name="additionalArgs" value="--dart-define=PURCHASE_TYPE=mock_pref" />
+    <option name="filePath" value="$PROJECT_DIR$/lib/main_quizzy.dart" />
+    <method v="2" />
+  </configuration>
+</component>
