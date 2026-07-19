@@ -173,6 +173,7 @@ Future<void> _setupInAppPurchase() async {
   getIt.registerSingleton<RevenueCatPurchaseManager>(revenueCatPurchaseManager);
   final inAppPurchaseService = InAppPurchaseService(
     revenueCatPurchaseManager: revenueCatPurchaseManager,
+    isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
   );
   getIt.registerSingleton<InAppPurchaseService>(inAppPurchaseService);
 }
@@ -341,6 +342,7 @@ Future<void> _setupServices() async {
     onDeviceAIService: onDeviceAIService,
     inAppPurchaseService: getIt<InAppPurchaseService>(),
     enableByok: getIt<AppConfig>().enableByok,
+    isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
     logger: Logger.withTag('ValidatorsManager'),
   );
   getIt.registerSingleton<ValidatorsManager>(validatorsManager);

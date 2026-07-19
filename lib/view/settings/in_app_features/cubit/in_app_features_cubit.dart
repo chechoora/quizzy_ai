@@ -11,75 +11,62 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
   InAppFeaturesCubit({
     required this.inAppPurchaseService,
     required this.settingsService,
+    required this.isSubscriptionOnly,
   }) : super(const InAppFeaturesLoadingState()) {
     _logger = Logger.withTag('InAppFeaturesCubit');
   }
 
   final InAppPurchaseService inAppPurchaseService;
   final SettingsService settingsService;
+
+  /// When true (the `quizzypro` flavor) only the Quizzy AI subscription is
+  /// offered; when false (the `quizzy` flavor) only the one-time "unlimited
+  /// decks/cards" purchase is offered.
+  final bool isSubscriptionOnly;
+
   late final Logger _logger;
 
   Future<void> loadFeatures() async {
     emit(const InAppFeaturesLoadingState());
     try {
-      final isUnlimitedDecksCardsPurchased =
-          await inAppPurchaseService.isFeaturePurchased(
-        InAppPurchaseFeature.unlimitedDecksCards,
-      );
-      final isQuizzyAiSubscribed =
-          await inAppPurchaseService.isFeaturePurchased(
-        InAppPurchaseFeature.quizzyAi,
-      );
-      emit(InAppFeaturesDataState(
-        isUnlimitedDecksCardsPurchased: isUnlimitedDecksCardsPurchased,
-        isQuizzyAiSubscribed: isQuizzyAiSubscribed,
-      ));
+      if (isSubscriptionOnly) {
+        final isSubscribed = await inAppPurchaseService.isFeaturePurchased(
+          InAppPurchaseFeature.quizzyAi,
+        );
+        emit(InAppFeaturesQuizzyAiState(isSubscribed: isSubscribed));
+      } else {
+        final isPurchased = await inAppPurchaseService.isFeaturePurchased(
+          InAppPurchaseFeature.unlimitedDecksCards,
+        );
+        emit(InAppFeaturesFullUnlockState(isPurchased: isPurchased));
+      }
     } catch (e, stackTrace) {
       _logger.e('Failed to load features', ex: e, stacktrace: stackTrace);
       emit(const InAppFeaturesErrorState(exception: InAppPurchaseException()));
     }
   }
 
-  Future<void> purchaseUnlimitedDecksCards() async {
+  Future<void> purchase() async {
     final currentState = state;
     if (currentState is! InAppFeaturesDataState) return;
 
     emit(const InAppFeaturesPurchasingState());
     try {
-      final result = await inAppPurchaseService.purchaseFeature(
-        InAppPurchaseFeature.unlimitedDecksCards,
-      );
+      final feature = isSubscriptionOnly
+          ? InAppPurchaseFeature.quizzyAi
+          : InAppPurchaseFeature.unlimitedDecksCards;
+      final result = await inAppPurchaseService.purchaseFeature(feature);
       if (!result) {
         throw Exception('Purchase was not completed successfully');
       }
       emit(const InAppFeaturesPurchaseSuccessState());
-      _logger.i('Purchased unlimited decks/cards feature');
+      _logger.i('Purchased feature $feature');
+      if (isSubscriptionOnly) {
+        await _setQuizzyAiAsDefault();
+      }
       await loadFeatures();
     } catch (e, stackTrace) {
       _logger.e('Failed to purchase feature', ex: e, stacktrace: stackTrace);
-      emit(const InAppFeaturesErrorState(exception: InAppPurchaseException()));
-      emit(currentState);
-    }
-  }
-
-  Future<void> subscribeQuizzyAi() async {
-    final currentState = state;
-    if (currentState is! InAppFeaturesDataState) return;
-
-    emit(const InAppFeaturesPurchasingState());
-    try {
-      final result = await inAppPurchaseService.purchaseFeature(
-        InAppPurchaseFeature.quizzyAi,
-      );
-      if (!result) {
-        throw Exception('Subscription was not completed successfully');
-      }
-      emit(const InAppFeaturesPurchaseSuccessState());
-      _logger.i('Subscribed to Quizzy AI');
-      await _setQuizzyAiAsDefault();
-      await loadFeatures();
-    } catch (e, stackTrace) {
-      _logger.e('Failed to subscribe', ex: e, stacktrace: stackTrace);
       emit(const InAppFeaturesErrorState(exception: InAppPurchaseException()));
       emit(currentState);
     }
@@ -152,18 +139,26 @@ class InAppFeaturesRestoringState extends BuilderState {
   List<Object?> get props => [];
 }
 
-class InAppFeaturesDataState extends BuilderState {
-  final bool isUnlimitedDecksCardsPurchased;
-  final bool isQuizzyAiSubscribed;
+abstract class InAppFeaturesDataState extends BuilderState {
+  const InAppFeaturesDataState();
+}
 
-  const InAppFeaturesDataState({
-    required this.isUnlimitedDecksCardsPurchased,
-    required this.isQuizzyAiSubscribed,
-  });
+class InAppFeaturesFullUnlockState extends InAppFeaturesDataState {
+  final bool isPurchased;
+
+  const InAppFeaturesFullUnlockState({required this.isPurchased});
 
   @override
-  List<Object?> get props =>
-      [isUnlimitedDecksCardsPurchased, isQuizzyAiSubscribed];
+  List<Object?> get props => [isPurchased];
+}
+
+class InAppFeaturesQuizzyAiState extends InAppFeaturesDataState {
+  final bool isSubscribed;
+
+  const InAppFeaturesQuizzyAiState({required this.isSubscribed});
+
+  @override
+  List<Object?> get props => [isSubscribed];
 }
 
 class InAppFeaturesPurchaseSuccessState extends ListenerState {

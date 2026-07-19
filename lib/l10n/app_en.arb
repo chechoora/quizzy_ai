@@ -30,7 +30,7 @@
   "inAppFeaturesPurchaseButton": "Unlock",
   "inAppFeaturesRestoreButton": "Restore Purchases",
   "inAppFeaturesQuizzyAiTitle": "Quizzy validator",
-  "inAppFeaturesQuizzyAiDescription": "Use our AI-powered validator to check your quiz answers with high accuracy.",
+  "inAppFeaturesQuizzyAiDescription": "Use our AI-powered validator to check your quiz answers with high accuracy. Also includes unlimited decks & cards and AI deck generation.",
   "inAppFeaturesQuizzyAiSubtitle": "Yearly subscription",
   "inAppFeaturesSubscribeButton": "Subscribe",
   "settingsTitle": "Settings",

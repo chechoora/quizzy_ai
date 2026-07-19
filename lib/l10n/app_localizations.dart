@@ -234,7 +234,7 @@ abstract class AppLocalizations {
   /// No description provided for @inAppFeaturesQuizzyAiDescription.
   ///
   /// In en, this message translates to:
-  /// **'Use our AI-powered validator to check your quiz answers with high accuracy.'**
+  /// **'Use our AI-powered validator to check your quiz answers with high accuracy. Also includes unlimited decks & cards and AI deck generation.'**
   String get inAppFeaturesQuizzyAiDescription;
 
   /// No description provided for @inAppFeaturesQuizzyAiSubtitle.

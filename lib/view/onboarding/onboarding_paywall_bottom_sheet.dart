@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
@@ -30,6 +31,7 @@ class _OnboardingPaywallBottomSheet extends HookWidget {
       () => InAppFeaturesCubit(
         inAppPurchaseService: getIt<InAppPurchaseService>(),
         settingsService: getIt<SettingsService>(),
+        isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
       ),
     );
     useEffect(() {
@@ -48,9 +50,9 @@ class _OnboardingPaywallBottomSheet extends HookWidget {
       listener: (context, state) {
         if (state is InAppFeaturesErrorState) {
           errorMessage.value = l10n.inAppFeaturesPurchaseError;
-        } else if (state is InAppFeaturesDataState &&
-            state.isUnlimitedDecksCardsPurchased &&
-            state.isQuizzyAiSubscribed) {
+        } else if ((state is InAppFeaturesFullUnlockState &&
+                state.isPurchased) ||
+            (state is InAppFeaturesQuizzyAiState && state.isSubscribed)) {
           Navigator.pop(context);
         }
       },
@@ -97,13 +99,9 @@ class _OnboardingPaywallBottomSheet extends HookWidget {
                     ? _PaywallContent(
                         state: state,
                         errorMessage: errorMessage.value,
-                        onPurchaseUnlimitedDecksCards: () {
+                        onPurchase: () {
                           errorMessage.value = null;
-                          cubit.purchaseUnlimitedDecksCards();
-                        },
-                        onSubscribeQuizzyAi: () {
-                          errorMessage.value = null;
-                          cubit.subscribeQuizzyAi();
+                          cubit.purchase();
                         },
                         onRestorePurchases: () {
                           errorMessage.value = null;
@@ -127,15 +125,13 @@ class _PaywallContent extends StatelessWidget {
   const _PaywallContent({
     required this.state,
     required this.errorMessage,
-    required this.onPurchaseUnlimitedDecksCards,
-    required this.onSubscribeQuizzyAi,
+    required this.onPurchase,
     required this.onRestorePurchases,
   });
 
   final InAppFeaturesDataState state;
   final String? errorMessage;
-  final VoidCallback onPurchaseUnlimitedDecksCards;
-  final VoidCallback onSubscribeQuizzyAi;
+  final VoidCallback onPurchase;
   final VoidCallback onRestorePurchases;
 
   @override
@@ -153,27 +149,28 @@ class _PaywallContent extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
-        FeaturePurchaseCard(
-          iconAsset: 'assets/icons/infinity.svg',
-          title: l10n.inAppFeaturesUnlimitedTitle,
-          description: l10n.inAppFeaturesUnlimitedDescription,
-          actionTitle: l10n.inAppFeaturesPurchaseButton,
-          purchasedLabel: l10n.inAppFeaturesPurchased,
-          subtitle: l10n.inAppFeaturesUnlimitedSubtitle,
-          isPurchased: state.isUnlimitedDecksCardsPurchased,
-          onPurchase: onPurchaseUnlimitedDecksCards,
-        ),
-        const SizedBox(height: 16),
-        FeaturePurchaseCard(
-          iconAsset: 'assets/icons/quizzy_ai.svg',
-          title: l10n.inAppFeaturesQuizzyAiTitle,
-          description: l10n.inAppFeaturesQuizzyAiDescription,
-          actionTitle: l10n.inAppFeaturesSubscribeButton,
-          purchasedLabel: l10n.inAppFeaturesSubscribed,
-          subtitle: l10n.inAppFeaturesQuizzyAiSubtitle,
-          isPurchased: state.isQuizzyAiSubscribed,
-          onPurchase: onSubscribeQuizzyAi,
-        ),
+        if (state is InAppFeaturesFullUnlockState)
+          FeaturePurchaseCard(
+            iconAsset: 'assets/icons/infinity.svg',
+            title: l10n.inAppFeaturesUnlimitedTitle,
+            description: l10n.inAppFeaturesUnlimitedDescription,
+            actionTitle: l10n.inAppFeaturesPurchaseButton,
+            purchasedLabel: l10n.inAppFeaturesPurchased,
+            subtitle: l10n.inAppFeaturesUnlimitedSubtitle,
+            isPurchased: (state as InAppFeaturesFullUnlockState).isPurchased,
+            onPurchase: onPurchase,
+          )
+        else if (state is InAppFeaturesQuizzyAiState)
+          FeaturePurchaseCard(
+            iconAsset: 'assets/icons/quizzy_ai.svg',
+            title: l10n.inAppFeaturesQuizzyAiTitle,
+            description: l10n.inAppFeaturesQuizzyAiDescription,
+            actionTitle: l10n.inAppFeaturesSubscribeButton,
+            purchasedLabel: l10n.inAppFeaturesSubscribed,
+            subtitle: l10n.inAppFeaturesQuizzyAiSubtitle,
+            isPurchased: (state as InAppFeaturesQuizzyAiState).isSubscribed,
+            onPurchase: onPurchase,
+          ),
         if (errorMessage != null) ...[
           const SizedBox(height: 8),
           Text(
