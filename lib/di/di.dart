@@ -1,7 +1,10 @@
 import 'package:chopper/chopper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
+import 'package:poc_ai_quiz/data/auth/firebase_auth_service.dart';
+import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_api_service.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_header_interceptor.dart';
@@ -69,8 +72,17 @@ Future<void> setupDi() async {
   await _setupRepositories();
   await _setupApiKeysProvider();
   await _setupInAppPurchase();
+  await _setupAuth();
   await _setupAPI();
   await _setupServices();
+}
+
+Future<void> _setupAuth() async {
+  final authService = FirebaseAuthService(
+    firebaseAuth: FirebaseAuth.instance,
+    logger: Logger.withTag('FirebaseAuthService'),
+  );
+  getIt.registerSingleton<AuthService>(authService);
 }
 
 Future<void> _setupSharedPreferences() async {
@@ -161,6 +173,7 @@ Future<void> _setupInAppPurchase() async {
   getIt.registerSingleton<RevenueCatPurchaseManager>(revenueCatPurchaseManager);
   final inAppPurchaseService = InAppPurchaseService(
     revenueCatPurchaseManager: revenueCatPurchaseManager,
+    isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
   );
   getIt.registerSingleton<InAppPurchaseService>(inAppPurchaseService);
 }
@@ -329,6 +342,7 @@ Future<void> _setupServices() async {
     onDeviceAIService: onDeviceAIService,
     inAppPurchaseService: getIt<InAppPurchaseService>(),
     enableByok: getIt<AppConfig>().enableByok,
+    isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
     logger: Logger.withTag('ValidatorsManager'),
   );
   getIt.registerSingleton<ValidatorsManager>(validatorsManager);
@@ -383,7 +397,9 @@ Future<void> _setupServices() async {
 
   // iCloud backup (iOS only) — service, scheduler, and the auto-backup
   // chokepoint wired onto the deck/card repositories.
-  final icloudBackupService = IcloudBackupService();
+  final icloudBackupService = IcloudBackupService(
+    enabled: getIt<AppConfig>().enableIcloudBackup,
+  );
   getIt.registerSingleton<IcloudBackupService>(icloudBackupService);
 
   final backupScheduler = BackupScheduler(

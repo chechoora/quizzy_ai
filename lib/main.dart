@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/util/app_theme.dart';
@@ -22,6 +23,7 @@ import 'package:poc_ai_quiz/view/settings/in_app_features/in_app_features_widget
 import 'package:poc_ai_quiz/view/settings/app_credits/app_credits_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/settings_ai_validator_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_deck_generation/settings_deck_generation_widget.dart';
+import 'package:poc_ai_quiz/view/auth/auth_widget.dart';
 import 'package:fimber/fimber.dart';
 import 'firebase_options.dart';
 
@@ -57,7 +59,28 @@ Future<void> mainCommon(AppConfig config) async {
     };
 
     await setupDi();
-    runApp(MyApp());
+
+    // Auth gating: only the flavors that require auth (quizzyPro) start on the
+    // AuthScreen and react to sign-in / sign-out. quizzy is unaffected.
+    final authService = getIt<AuthService>();
+    final initialLocation =
+        config.requireAuth && authService.currentUser == null
+            ? AuthRoute().path
+            : HomeRoute().path;
+    final router = buildAppRouter(initialLocation: initialLocation);
+
+    if (config.requireAuth) {
+      authService.authStateChanges.listen((user) {
+        if (user == null) {
+          Fimber.i('Auth state changed: user signed out');
+          router.go(AuthRoute().path);
+        } else {
+          Fimber.i('Auth state changed: user signed in uid=${user.uid}');
+        }
+      });
+    }
+
+    runApp(MyApp(router: router));
   } catch (e, stackTrace) {
     if (Firebase.apps.isNotEmpty) {
       FirebaseCrashlytics.instance.recordError(e, stackTrace, fatal: true);
@@ -118,12 +141,20 @@ class ErrorApp extends StatelessWidget {
   }
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
-
-  final _routerConfig = GoRouter(
-    initialLocation: '/',
+/// Builds the app's [GoRouter]. [initialLocation] lets the caller decide the
+/// start destination (e.g. the AuthScreen when auth is required and no user is
+/// signed in).
+GoRouter buildAppRouter({required String initialLocation}) {
+  return GoRouter(
+    initialLocation: initialLocation,
     routes: [
+      GoRoute(
+        name: AuthRoute().name,
+        path: AuthRoute().path,
+        builder: (context, state) {
+          return const AuthWidget();
+        },
+      ),
       GoRoute(
         name: HomeRoute().name,
         // Optional, add name to your routes. Allows you navigate by name instead of path
@@ -208,13 +239,19 @@ class MyApp extends StatelessWidget {
       ),
     ],
   );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key, required this.router});
+
+  final GoRouter router;
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: _routerConfig,
+      routerConfig: router,
       theme: AppTheme.lightTheme,
       localizationsDelegates: const [
         AppLocalizations.delegate,

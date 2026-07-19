@@ -9,9 +9,6 @@ enum Flavor {
 
 /// Compile-time application configuration, built by each flavor entry point
 /// (`main_quizzy.dart` / `main_quizzypro.dart`) and injected via GetIt.
-///
-/// The [enableByok] and [requireAuth] flags are declared for later use and are
-/// intentionally NOT consumed anywhere yet.
 class AppConfig {
   /// Human-readable app name (also used natively for the display name).
   final String appName;
@@ -19,16 +16,32 @@ class AppConfig {
   /// The active build flavor.
   final Flavor flavor;
 
-  /// Whether bring-your-own-key (BYOK) features are enabled. Not consumed yet.
+  /// Whether bring-your-own-key (BYOK) features are enabled.
   final bool enableByok;
 
-  /// Whether authentication is required to use the app. Not consumed yet.
+  /// Whether authentication is required to use the app.
   final bool requireAuth;
+
+  /// Whether iCloud backup/restore is enabled. `quizzyPro` has no need for it
+  /// (it's account/subscription-backed instead), so it stays off there.
+  final bool enableIcloudBackup;
+
+  /// Whether the app offers only the Quizzy AI subscription. `quizzyPro`
+  /// sets this to true (subscription unlocks everything, no separate
+  /// one-time purchase); `quizzy` sets it to false (one-time "unlimited
+  /// decks/cards" purchase only, no Quizzy AI subscription/validator).
+  final bool isSubscriptionOnly;
 
   const AppConfig({
     required this.appName,
     required this.flavor,
     required this.enableByok,
     required this.requireAuth,
+    required this.enableIcloudBackup,
+    required this.isSubscriptionOnly,
   });
+
+  bool getIsDeckGeneratorEditEnabled() {
+    return enableByok;
+  }
 }

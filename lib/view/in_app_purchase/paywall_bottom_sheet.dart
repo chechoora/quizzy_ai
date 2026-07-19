@@ -44,8 +44,6 @@ class _PaywallBottomSheet extends HookWidget {
         feature: feature,
       ),
     );
-    useEffect(() => cubit.close, [cubit]);
-
     final errorMessage = useState<String?>(null);
     final l10n = localize(context);
 

@@ -80,7 +80,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inAppFeaturesQuizzyAiTitle => 'Quizzy validator';
 
   @override
-  String get inAppFeaturesQuizzyAiDescription => 'Use our AI-powered validator to check your quiz answers with high accuracy.';
+  String get inAppFeaturesQuizzyAiDescription => 'Use our AI-powered validator to check your quiz answers with high accuracy. Also includes unlimited decks & cards and AI deck generation.';
 
   @override
   String get inAppFeaturesQuizzyAiSubtitle => 'Yearly subscription';
@@ -483,6 +483,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAppCreditsSubtitle => 'Meet the team behind the app';
+
+  @override
+  String get settingsSignOutTitle => 'Sign out';
+
+  @override
+  String get settingsSignOutSubtitle => 'Sign out of your account';
+
+  @override
+  String get settingsSignOutConfirm => 'Are you sure you want to sign out?';
+
+  @override
+  String get settingsDeleteAccountTitle => 'Delete account';
+
+  @override
+  String get settingsDeleteAccountSubtitle => 'Permanently delete your account';
+
+  @override
+  String get settingsDeleteAccountConfirm => 'This will permanently delete your account. This action cannot be undone. Are you sure?';
+
+  @override
+  String get authSubtitle => 'Sign in to continue';
+
+  @override
+  String get authSignInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get authSignInWithApple => 'Sign in with Apple';
+
+  @override
+  String get authErrorGeneric => 'Something went wrong. Please try again.';
 
   @override
   String get appCreditsRoleFlutterDeveloper => 'Creator / Flutter Developer';

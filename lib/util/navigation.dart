@@ -12,6 +12,10 @@ final class HomeRoute extends NavigationRoute {
   HomeRoute() : super(name: 'home', path: '/');
 }
 
+final class AuthRoute extends NavigationRoute {
+  AuthRoute() : super(name: 'auth', path: '/auth');
+}
+
 final class QuizCardListRoute extends NavigationRoute {
   QuizCardListRoute() : super(name: 'quilCardList', path: '/quilCardList');
 }

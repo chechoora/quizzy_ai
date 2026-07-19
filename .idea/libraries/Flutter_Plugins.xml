@@ -32,6 +32,8 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/in_app_purchase_android-0.4.0+10" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.29" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_onnxruntime-1.8.2" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_auth_web-5.15.3" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_auth-5.7.0" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

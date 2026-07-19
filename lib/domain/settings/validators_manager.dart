@@ -19,6 +19,10 @@ class ValidatorsManager {
   /// (Gemini, Claude, OpenAI, Ollama) are excluded from the validator list.
   final bool enableByok;
 
+  /// When true (the `quizzypro` flavor) the managed Quizzy AI validator is
+  /// offered; when false (the `quizzy` flavor) it's excluded from the list.
+  final bool isSubscriptionOnly;
+
   final Logger logger;
 
   ValidatorsManager({
@@ -27,6 +31,7 @@ class ValidatorsManager {
     required this.onDeviceAIService,
     required this.inAppPurchaseService,
     required this.enableByok,
+    required this.isSubscriptionOnly,
     required this.logger,
   });
 
@@ -94,7 +99,12 @@ class ValidatorsManager {
         }
         return true;
       case AnswerValidatorType.ml:
+        return true;
       case AnswerValidatorType.quizzyAI:
+        if (!isSubscriptionOnly) {
+          logger.d('Skipping Quizzy AI validator: subscription-only disabled');
+          return false;
+        }
         return true;
       case AnswerValidatorType.onDeviceAI:
         return defaultTargetPlatform == TargetPlatform.iOS &&

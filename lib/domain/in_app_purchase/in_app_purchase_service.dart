@@ -2,19 +2,31 @@ import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.da
 
 class InAppPurchaseService {
   final RevenueCatPurchaseManager revenueCatPurchaseManager;
+  final bool isSubscriptionOnly;
 
   InAppPurchaseService({
     required this.revenueCatPurchaseManager,
+    required this.isSubscriptionOnly,
   });
 
   Future<bool> isFeaturePurchased(InAppPurchaseFeature feature) async {
-    return revenueCatPurchaseManager
-        .isFeaturePurchased(feature.toRevenueCatId());
+    if (isSubscriptionOnly) {
+      return revenueCatPurchaseManager
+          .isFeaturePurchased(InAppPurchaseFeature.quizzyAi.toRevenueCatId());
+    }
+    return revenueCatPurchaseManager.isFeaturePurchased(
+        InAppPurchaseFeature.unlimitedDecksCards.toRevenueCatId());
   }
 
   // Purchase a product
   Future<bool> purchaseFeature(InAppPurchaseFeature feature) async {
-    return revenueCatPurchaseManager.purchaseOffering(feature.toRevenueCatId());
+    if (isSubscriptionOnly) {
+      return revenueCatPurchaseManager
+          .purchaseOffering(InAppPurchaseFeature.quizzyAi.toRevenueCatId());
+    } else {
+      return revenueCatPurchaseManager.purchaseOffering(
+          InAppPurchaseFeature.unlimitedDecksCards.toRevenueCatId());
+    }
   }
 
   // Restore previous purchases
@@ -28,7 +40,9 @@ class InAppPurchaseService {
 }
 
 enum InAppPurchaseFeature {
+  // Quizzy AI
   unlimitedDecksCards,
+  // Quizzy AI PRO subscription
   quizzyAi;
 }
 

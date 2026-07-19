@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:intl/intl.dart';
+import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
@@ -414,8 +415,8 @@ class _DataContent extends StatelessWidget {
         const SizedBox(height: 16),
         _ExportCard(state: state, cubit: cubit),
         const SizedBox(height: 16),
-        // iCloud backup is iOS-only.
-        if (Platform.isIOS) ...[
+        // Disabled for flavors that don't use it.
+        if (Platform.isIOS && getIt<AppConfig>().enableIcloudBackup) ...[
           _ICloudCard(state: state, cubit: cubit),
           const SizedBox(height: 32),
         ],
