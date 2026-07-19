@@ -899,7 +899,7 @@
 				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = NUQM9SMQSZ;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_FILE = Runner/Info-quizzypro.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -1062,7 +1062,7 @@
 				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = NUQM9SMQSZ;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_FILE = Runner/Info-quizzypro.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -1089,7 +1089,7 @@
 				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = NUQM9SMQSZ;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_FILE = Runner/Info-quizzypro.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "$(APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;

@@ -27,7 +27,14 @@
       "Bash(gh search *)",
       "Bash(fvm flutter *)",
       "Bash(echo \"EXIT:$?\")",
-      "Bash(rm *)"
+      "Bash(rm *)",
+      "Bash(/usr/libexec/PlistBuddy -c \"Print :CFBundleURLTypes\" ios/Runner/Info.plist)",
+      "Bash(/usr/libexec/PlistBuddy -c \"Print :REVERSED_CLIENT_ID\" ios/Runner/GoogleService-Info.plist)",
+      "Bash(/usr/libexec/PlistBuddy -c \"Print :BUNDLE_ID\" ios/Runner/GoogleService-Info.plist)",
+      "Bash(/usr/libexec/PlistBuddy -c \"Print :REVERSED_CLIENT_ID\" ios/config/quizzypro/GoogleService-Info.plist)",
+      "Bash(/usr/libexec/PlistBuddy -c \"Print :BUNDLE_ID\" ios/config/quizzypro/GoogleService-Info.plist)",
+      "Bash(/usr/bin/plutil -lint Info.plist Info-quizzypro.plist)",
+      "Bash(/usr/bin/plutil -lint Runner.xcodeproj/project.pbxproj)"
     ],
     "deny": [],
     "ask": []

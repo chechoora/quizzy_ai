@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
+import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/view/auth/cubit/auth_cubit.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 
@@ -38,12 +40,13 @@ class AuthWidget extends HookWidget {
             if (state is AuthErrorState) {
               snackBar(
                 context,
-                message: state.error.isEmpty ? l10n.authErrorGeneric : state.error,
+                message:
+                    state.error.isEmpty ? l10n.authErrorGeneric : state.error,
                 isError: true,
               );
+            } else if (state is AuthSignedInState) {
+              context.pushReplacementNamed(HomeRoute().name);
             }
-            // AuthSignedInState navigation is handled by the router redirect
-            // (refreshListenable on auth state), so nothing to do here.
           },
           builder: (context, state) {
             final isLoading = state is AuthLoadingState;
@@ -70,19 +73,18 @@ class AuthWidget extends HookWidget {
                           color: AppColors.grayscale500,
                         ),
                       ),
-                      const SizedBox(height: 48),
+                      const SizedBox(height: 12),
                       AppButton.primary(
                         text: l10n.authSignInWithGoogle,
                         leadingIcon: const Icon(Icons.login, size: 20),
-                        onPressed:
-                            isLoading ? null : cubit.signInWithGoogle,
+                        onPressed: isLoading ? null : cubit.signInWithGoogle,
                       ),
-                      const SizedBox(height: 16),
-                      AppButton.secondary(
-                        text: l10n.authSignInWithApple,
-                        leadingIcon: const Icon(Icons.apple, size: 22),
-                        onPressed: isLoading ? null : cubit.signInWithApple,
-                      ),
+                      // const SizedBox(height: 16),
+                      // AppButton.secondary(
+                      //   text: l10n.authSignInWithApple,
+                      //   leadingIcon: const Icon(Icons.apple, size: 22),
+                      //   onPressed: isLoading ? null : cubit.signInWithApple,
+                      // ),
                     ],
                   ),
                 ),

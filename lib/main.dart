@@ -71,9 +71,12 @@ Future<void> mainCommon(AppConfig config) async {
 
     if (config.requireAuth) {
       authService.authStateChanges.listen((user) {
-        router.goNamed(
-          user == null ? AuthRoute().name : HomeRoute().name,
-        );
+        if (user == null) {
+          Fimber.i('Auth state changed: user signed out');
+          router.go(AuthRoute().path);
+        } else {
+          Fimber.i('Auth state changed: user signed in uid=${user.uid}');
+        }
       });
     }
 
