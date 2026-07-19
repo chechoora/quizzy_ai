@@ -17,6 +17,10 @@ fvm flutter build apk --flavor quizzypro -t lib/main_quizzypro.dart --debug
 fvm flutter build ios --flavor quizzy    -t lib/main_quizzy.dart --debug --no-codesign
 fvm flutter build ios --flavor quizzypro -t lib/main_quizzypro.dart --debug --no-codesign
 
+# Build Android App Bundle (release, for Play Store)
+fvm flutter build appbundle --flavor quizzy    -t lib/main_quizzy.dart --release
+fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release
+
 # Run tests
 fvm flutter test
 
@@ -54,6 +58,9 @@ Two build flavors share one codebase (infrastructure in `lib/config/app_config.d
   "Copy flavor GoogleService-Info.plist" build phase overrides the bundled plist with
   the flavor's copy for any non-`quizzy` flavor.
 - After changing iOS build configurations, run `cd ios && pod install`.
+- Release Android builds are signed using `android/release_key.properties`
+  (keystore path + credentials, gitignored), referenced by
+  `android/app/build.gradle.kts`. It must exist before running `appbundle --release`.
 
 ## Architecture
 

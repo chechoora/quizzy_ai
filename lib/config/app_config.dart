@@ -40,4 +40,8 @@ class AppConfig {
     required this.enableIcloudBackup,
     required this.isSubscriptionOnly,
   });
+
+  bool getIsDeckGeneratorEditEnabled() {
+    return enableByok;
+  }
 }

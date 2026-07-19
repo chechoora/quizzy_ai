@@ -71,7 +71,15 @@ fvm flutter build apk --flavor quizzypro -t lib/main_quizzypro.dart --debug
 # Build (iOS)
 fvm flutter build ios --flavor quizzy    -t lib/main_quizzy.dart --debug --no-codesign
 fvm flutter build ios --flavor quizzypro -t lib/main_quizzypro.dart --debug --no-codesign
+
+# Build (Android App Bundle, release — for Play Store)
+fvm flutter build appbundle --flavor quizzy    -t lib/main_quizzy.dart --release
+fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release
 ```
+
+> **Release signing:** Android release builds are signed using
+> `android/release_key.properties` (keystore path + credentials, gitignored).
+> It must exist before running the `appbundle --release` commands above.
 
 > **quizzypro Firebase setup:** the Pro flavor uses a separate Firebase app
 > (`com.chechoora.quizzy.pro`) under the same "Quizzy AI" project. Before it can
