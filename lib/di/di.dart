@@ -23,8 +23,11 @@ import 'package:poc_ai_quiz/data/api/quizzy_backend/quizzy_backend_auth_intercep
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
+import 'package:poc_ai_quiz/data/db/sync/sync_tombstone_repository.dart';
 import 'package:poc_ai_quiz/data/db/user/user_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/user_settings/user_settings_database_repository.dart';
+import 'package:poc_ai_quiz/domain/sync/deck_card_sync_service.dart';
+import 'package:poc_ai_quiz/domain/sync/sync_scheduler.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_deck_generator.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_deck_generator.dart';
@@ -458,6 +461,35 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<BackupScheduler>(backupScheduler);
   backupScheduler.start();
+
+  // Two-way remote sync (quizzyPro only) — mirrors the iCloud backup
+  // scheduler above; gated via AppConfig.enableRemoteSync passed as a
+  // constructor flag (not an `if` around registration), same as
+  // icloudBackupService/backupScheduler.
+  final syncTombstoneRepository =
+      SyncTombstoneRepository(getIt.get<AppDatabase>());
+  getIt.registerSingleton<SyncTombstoneRepository>(syncTombstoneRepository);
+
+  final deckCardSyncService = DeckCardSyncService(
+    deckRepository: deckRepository,
+    quizCardRepository: quizCardRepository,
+    decksRepository: getIt.get<DecksRepository>(),
+    cardsRepository: getIt.get<CardsRepository>(),
+    tombstoneRepository: syncTombstoneRepository,
+    logger: Logger.withTag('DeckCardSyncService'),
+  );
+  getIt.registerSingleton<DeckCardSyncService>(deckCardSyncService);
+
+  final syncScheduler = SyncScheduler(
+    deckRepository: deckRepository,
+    quizCardRepository: quizCardRepository,
+    syncService: deckCardSyncService,
+    authService: getIt.get<AuthService>(),
+    logger: Logger.withTag('SyncScheduler'),
+    enabled: getIt<AppConfig>().enableRemoteSync,
+  );
+  getIt.registerSingleton<SyncScheduler>(syncScheduler);
+  syncScheduler.start();
 
   final importExportService = ImportExportService(
     importService: importService,

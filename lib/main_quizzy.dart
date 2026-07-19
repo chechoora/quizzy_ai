@@ -9,6 +9,7 @@ Future<void> main() => mainCommon(
         enableByok: true,
         requireAuth: false,
         enableIcloudBackup: true,
-        isSubscriptionOnly: false
+        isSubscriptionOnly: false,
+        enableRemoteSync: false,
       ),
     );

@@ -52,7 +52,8 @@ class CardsRepository {
       if (!response.isSuccessful) {
         logger.e('deleteCard: failed with status ${response.statusCode}');
         throw QuizzyBackendException(
-            'Failed to delete card: ${response.statusCode}, ${response.error}');
+            'Failed to delete card: ${response.statusCode}, ${response.error}',
+            statusCode: response.statusCode);
       }
       logger.i('deleteCard: success, id=$id');
     } catch (e, stackTrace) {

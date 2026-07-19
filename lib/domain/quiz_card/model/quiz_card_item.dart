@@ -8,6 +8,12 @@ class QuizCardItem extends Equatable {
   final String answerText;
   final bool isArchive;
 
+  /// quizzy-ai-pro backend id, or null if this card has never been synced.
+  final String? remoteId;
+
+  /// True when this card has local changes not yet pushed to the backend.
+  final bool isDirty;
+
   const QuizCardItem({
     required this.id,
     required this.deckId,
@@ -15,6 +21,8 @@ class QuizCardItem extends Equatable {
     required this.answerText,
     required this.isArchive,
     this.uid,
+    this.remoteId,
+    this.isDirty = false,
   });
 
   @override
@@ -25,5 +33,7 @@ class QuizCardItem extends Equatable {
         questionText,
         answerText,
         isArchive,
+        remoteId,
+        isDirty,
       ];
 }

@@ -32,6 +32,11 @@ class AppConfig {
   /// decks/cards" purchase only, no Quizzy AI subscription/validator).
   final bool isSubscriptionOnly;
 
+  /// Whether two-way remote sync with the quizzy-ai-pro backend is enabled.
+  /// `quizzyPro` is account/subscription-backed and needs it; `quizzy` is
+  /// local-only and stays off.
+  final bool enableRemoteSync;
+
   const AppConfig({
     required this.appName,
     required this.flavor,
@@ -39,6 +44,7 @@ class AppConfig {
     required this.requireAuth,
     required this.enableIcloudBackup,
     required this.isSubscriptionOnly,
+    required this.enableRemoteSync,
   });
 
   bool getIsDeckGeneratorEditEnabled() {

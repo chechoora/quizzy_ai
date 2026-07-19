@@ -41,8 +41,25 @@ class $DeckTableTable extends DeckTable
       requiredDuringInsert: true,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_archive" IN (0, 1))'));
+  static const VerificationMeta _remoteIdMeta =
+      const VerificationMeta('remoteId');
   @override
-  List<GeneratedColumn> get $columns => [id, uid, title, isArchive];
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+      'remote_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isDirtyMeta =
+      const VerificationMeta('isDirty');
+  @override
+  late final GeneratedColumn<bool> isDirty = GeneratedColumn<bool>(
+      'is_dirty', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_dirty" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, uid, title, isArchive, remoteId, isDirty];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -72,6 +89,14 @@ class $DeckTableTable extends DeckTable
     } else if (isInserting) {
       context.missing(_isArchiveMeta);
     }
+    if (data.containsKey('remote_id')) {
+      context.handle(_remoteIdMeta,
+          remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta));
+    }
+    if (data.containsKey('is_dirty')) {
+      context.handle(_isDirtyMeta,
+          isDirty.isAcceptableOrUnknown(data['is_dirty']!, _isDirtyMeta));
+    }
     return context;
   }
 
@@ -89,6 +114,10 @@ class $DeckTableTable extends DeckTable
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       isArchive: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_archive'])!,
+      remoteId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
+      isDirty: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_dirty'])!,
     );
   }
 
@@ -106,11 +135,23 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
   final int? uid;
   final String title;
   final bool isArchive;
+
+  /// quizzy-ai-pro backend id once this deck has been created remotely.
+  /// Null means it has never been pushed. Unique index allows multiple
+  /// NULLs (SQLite), which is required since most local rows start unsynced.
+  final String? remoteId;
+
+  /// True when this row has local changes not yet pushed to the backend.
+  /// Defaults to true so every new insert (and every pre-existing row,
+  /// backfilled by the v10 migration) is picked up by the next push cycle.
+  final bool isDirty;
   const DeckTableData(
       {required this.id,
       this.uid,
       required this.title,
-      required this.isArchive});
+      required this.isArchive,
+      this.remoteId,
+      required this.isDirty});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -120,6 +161,10 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
     }
     map['title'] = Variable<String>(title);
     map['is_archive'] = Variable<bool>(isArchive);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    map['is_dirty'] = Variable<bool>(isDirty);
     return map;
   }
 
@@ -129,6 +174,10 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       uid: uid == null && nullToAbsent ? const Value.absent() : Value(uid),
       title: Value(title),
       isArchive: Value(isArchive),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      isDirty: Value(isDirty),
     );
   }
 
@@ -140,6 +189,8 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       uid: serializer.fromJson<int?>(json['uid']),
       title: serializer.fromJson<String>(json['title']),
       isArchive: serializer.fromJson<bool>(json['isArchive']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      isDirty: serializer.fromJson<bool>(json['isDirty']),
     );
   }
   @override
@@ -150,6 +201,8 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       'uid': serializer.toJson<int?>(uid),
       'title': serializer.toJson<String>(title),
       'isArchive': serializer.toJson<bool>(isArchive),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'isDirty': serializer.toJson<bool>(isDirty),
     };
   }
 
@@ -157,12 +210,16 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           {int? id,
           Value<int?> uid = const Value.absent(),
           String? title,
-          bool? isArchive}) =>
+          bool? isArchive,
+          Value<String?> remoteId = const Value.absent(),
+          bool? isDirty}) =>
       DeckTableData(
         id: id ?? this.id,
         uid: uid.present ? uid.value : this.uid,
         title: title ?? this.title,
         isArchive: isArchive ?? this.isArchive,
+        remoteId: remoteId.present ? remoteId.value : this.remoteId,
+        isDirty: isDirty ?? this.isDirty,
       );
   DeckTableData copyWithCompanion(DeckTableCompanion data) {
     return DeckTableData(
@@ -170,6 +227,8 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       uid: data.uid.present ? data.uid.value : this.uid,
       title: data.title.present ? data.title.value : this.title,
       isArchive: data.isArchive.present ? data.isArchive.value : this.isArchive,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      isDirty: data.isDirty.present ? data.isDirty.value : this.isDirty,
     );
   }
 
@@ -179,13 +238,15 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           ..write('id: $id, ')
           ..write('uid: $uid, ')
           ..write('title: $title, ')
-          ..write('isArchive: $isArchive')
+          ..write('isArchive: $isArchive, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDirty: $isDirty')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, uid, title, isArchive);
+  int get hashCode => Object.hash(id, uid, title, isArchive, remoteId, isDirty);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -193,7 +254,9 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           other.id == this.id &&
           other.uid == this.uid &&
           other.title == this.title &&
-          other.isArchive == this.isArchive);
+          other.isArchive == this.isArchive &&
+          other.remoteId == this.remoteId &&
+          other.isDirty == this.isDirty);
 }
 
 class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
@@ -201,17 +264,23 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
   final Value<int?> uid;
   final Value<String> title;
   final Value<bool> isArchive;
+  final Value<String?> remoteId;
+  final Value<bool> isDirty;
   const DeckTableCompanion({
     this.id = const Value.absent(),
     this.uid = const Value.absent(),
     this.title = const Value.absent(),
     this.isArchive = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDirty = const Value.absent(),
   });
   DeckTableCompanion.insert({
     this.id = const Value.absent(),
     this.uid = const Value.absent(),
     required String title,
     required bool isArchive,
+    this.remoteId = const Value.absent(),
+    this.isDirty = const Value.absent(),
   })  : title = Value(title),
         isArchive = Value(isArchive);
   static Insertable<DeckTableData> custom({
@@ -219,12 +288,16 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     Expression<int>? uid,
     Expression<String>? title,
     Expression<bool>? isArchive,
+    Expression<String>? remoteId,
+    Expression<bool>? isDirty,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uid != null) 'uid': uid,
       if (title != null) 'title': title,
       if (isArchive != null) 'is_archive': isArchive,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (isDirty != null) 'is_dirty': isDirty,
     });
   }
 
@@ -232,12 +305,16 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       {Value<int>? id,
       Value<int?>? uid,
       Value<String>? title,
-      Value<bool>? isArchive}) {
+      Value<bool>? isArchive,
+      Value<String?>? remoteId,
+      Value<bool>? isDirty}) {
     return DeckTableCompanion(
       id: id ?? this.id,
       uid: uid ?? this.uid,
       title: title ?? this.title,
       isArchive: isArchive ?? this.isArchive,
+      remoteId: remoteId ?? this.remoteId,
+      isDirty: isDirty ?? this.isDirty,
     );
   }
 
@@ -256,6 +333,12 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     if (isArchive.present) {
       map['is_archive'] = Variable<bool>(isArchive.value);
     }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (isDirty.present) {
+      map['is_dirty'] = Variable<bool>(isDirty.value);
+    }
     return map;
   }
 
@@ -265,7 +348,9 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
           ..write('id: $id, ')
           ..write('uid: $uid, ')
           ..write('title: $title, ')
-          ..write('isArchive: $isArchive')
+          ..write('isArchive: $isArchive, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDirty: $isDirty')
           ..write(')'))
         .toString();
   }
@@ -328,9 +413,25 @@ class $QuizCardTableTable extends QuizCardTable
       requiredDuringInsert: true,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_archive" IN (0, 1))'));
+  static const VerificationMeta _remoteIdMeta =
+      const VerificationMeta('remoteId');
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+      'remote_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isDirtyMeta =
+      const VerificationMeta('isDirty');
+  @override
+  late final GeneratedColumn<bool> isDirty = GeneratedColumn<bool>(
+      'is_dirty', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_dirty" IN (0, 1))'),
+      defaultValue: const Constant(true));
   @override
   List<GeneratedColumn> get $columns =>
-      [id, uid, deckId, questionText, answerText, isArchive];
+      [id, uid, deckId, questionText, answerText, isArchive, remoteId, isDirty];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -376,6 +477,14 @@ class $QuizCardTableTable extends QuizCardTable
     } else if (isInserting) {
       context.missing(_isArchiveMeta);
     }
+    if (data.containsKey('remote_id')) {
+      context.handle(_remoteIdMeta,
+          remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta));
+    }
+    if (data.containsKey('is_dirty')) {
+      context.handle(_isDirtyMeta,
+          isDirty.isAcceptableOrUnknown(data['is_dirty']!, _isDirtyMeta));
+    }
     return context;
   }
 
@@ -397,6 +506,10 @@ class $QuizCardTableTable extends QuizCardTable
           .read(DriftSqlType.string, data['${effectivePrefix}answer_text'])!,
       isArchive: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_archive'])!,
+      remoteId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
+      isDirty: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_dirty'])!,
     );
   }
 
@@ -417,13 +530,21 @@ class QuizCardTableData extends DataClass
   final String questionText;
   final String answerText;
   final bool isArchive;
+
+  /// quizzy-ai-pro backend id once this card has been created remotely.
+  final String? remoteId;
+
+  /// True when this row has local changes not yet pushed to the backend.
+  final bool isDirty;
   const QuizCardTableData(
       {required this.id,
       this.uid,
       required this.deckId,
       required this.questionText,
       required this.answerText,
-      required this.isArchive});
+      required this.isArchive,
+      this.remoteId,
+      required this.isDirty});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -435,6 +556,10 @@ class QuizCardTableData extends DataClass
     map['question_text'] = Variable<String>(questionText);
     map['answer_text'] = Variable<String>(answerText);
     map['is_archive'] = Variable<bool>(isArchive);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    map['is_dirty'] = Variable<bool>(isDirty);
     return map;
   }
 
@@ -446,6 +571,10 @@ class QuizCardTableData extends DataClass
       questionText: Value(questionText),
       answerText: Value(answerText),
       isArchive: Value(isArchive),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      isDirty: Value(isDirty),
     );
   }
 
@@ -459,6 +588,8 @@ class QuizCardTableData extends DataClass
       questionText: serializer.fromJson<String>(json['questionText']),
       answerText: serializer.fromJson<String>(json['answerText']),
       isArchive: serializer.fromJson<bool>(json['isArchive']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      isDirty: serializer.fromJson<bool>(json['isDirty']),
     );
   }
   @override
@@ -471,6 +602,8 @@ class QuizCardTableData extends DataClass
       'questionText': serializer.toJson<String>(questionText),
       'answerText': serializer.toJson<String>(answerText),
       'isArchive': serializer.toJson<bool>(isArchive),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'isDirty': serializer.toJson<bool>(isDirty),
     };
   }
 
@@ -480,7 +613,9 @@ class QuizCardTableData extends DataClass
           int? deckId,
           String? questionText,
           String? answerText,
-          bool? isArchive}) =>
+          bool? isArchive,
+          Value<String?> remoteId = const Value.absent(),
+          bool? isDirty}) =>
       QuizCardTableData(
         id: id ?? this.id,
         uid: uid.present ? uid.value : this.uid,
@@ -488,6 +623,8 @@ class QuizCardTableData extends DataClass
         questionText: questionText ?? this.questionText,
         answerText: answerText ?? this.answerText,
         isArchive: isArchive ?? this.isArchive,
+        remoteId: remoteId.present ? remoteId.value : this.remoteId,
+        isDirty: isDirty ?? this.isDirty,
       );
   QuizCardTableData copyWithCompanion(QuizCardTableCompanion data) {
     return QuizCardTableData(
@@ -500,6 +637,8 @@ class QuizCardTableData extends DataClass
       answerText:
           data.answerText.present ? data.answerText.value : this.answerText,
       isArchive: data.isArchive.present ? data.isArchive.value : this.isArchive,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      isDirty: data.isDirty.present ? data.isDirty.value : this.isDirty,
     );
   }
 
@@ -511,14 +650,16 @@ class QuizCardTableData extends DataClass
           ..write('deckId: $deckId, ')
           ..write('questionText: $questionText, ')
           ..write('answerText: $answerText, ')
-          ..write('isArchive: $isArchive')
+          ..write('isArchive: $isArchive, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDirty: $isDirty')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, uid, deckId, questionText, answerText, isArchive);
+  int get hashCode => Object.hash(
+      id, uid, deckId, questionText, answerText, isArchive, remoteId, isDirty);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -528,7 +669,9 @@ class QuizCardTableData extends DataClass
           other.deckId == this.deckId &&
           other.questionText == this.questionText &&
           other.answerText == this.answerText &&
-          other.isArchive == this.isArchive);
+          other.isArchive == this.isArchive &&
+          other.remoteId == this.remoteId &&
+          other.isDirty == this.isDirty);
 }
 
 class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
@@ -538,6 +681,8 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
   final Value<String> questionText;
   final Value<String> answerText;
   final Value<bool> isArchive;
+  final Value<String?> remoteId;
+  final Value<bool> isDirty;
   const QuizCardTableCompanion({
     this.id = const Value.absent(),
     this.uid = const Value.absent(),
@@ -545,6 +690,8 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
     this.questionText = const Value.absent(),
     this.answerText = const Value.absent(),
     this.isArchive = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDirty = const Value.absent(),
   });
   QuizCardTableCompanion.insert({
     this.id = const Value.absent(),
@@ -553,6 +700,8 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
     required String questionText,
     required String answerText,
     required bool isArchive,
+    this.remoteId = const Value.absent(),
+    this.isDirty = const Value.absent(),
   })  : deckId = Value(deckId),
         questionText = Value(questionText),
         answerText = Value(answerText),
@@ -564,6 +713,8 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
     Expression<String>? questionText,
     Expression<String>? answerText,
     Expression<bool>? isArchive,
+    Expression<String>? remoteId,
+    Expression<bool>? isDirty,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -572,6 +723,8 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
       if (questionText != null) 'question_text': questionText,
       if (answerText != null) 'answer_text': answerText,
       if (isArchive != null) 'is_archive': isArchive,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (isDirty != null) 'is_dirty': isDirty,
     });
   }
 
@@ -581,7 +734,9 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
       Value<int>? deckId,
       Value<String>? questionText,
       Value<String>? answerText,
-      Value<bool>? isArchive}) {
+      Value<bool>? isArchive,
+      Value<String?>? remoteId,
+      Value<bool>? isDirty}) {
     return QuizCardTableCompanion(
       id: id ?? this.id,
       uid: uid ?? this.uid,
@@ -589,6 +744,8 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
       questionText: questionText ?? this.questionText,
       answerText: answerText ?? this.answerText,
       isArchive: isArchive ?? this.isArchive,
+      remoteId: remoteId ?? this.remoteId,
+      isDirty: isDirty ?? this.isDirty,
     );
   }
 
@@ -613,6 +770,12 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
     if (isArchive.present) {
       map['is_archive'] = Variable<bool>(isArchive.value);
     }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (isDirty.present) {
+      map['is_dirty'] = Variable<bool>(isDirty.value);
+    }
     return map;
   }
 
@@ -624,7 +787,9 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
           ..write('deckId: $deckId, ')
           ..write('questionText: $questionText, ')
           ..write('answerText: $answerText, ')
-          ..write('isArchive: $isArchive')
+          ..write('isArchive: $isArchive, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDirty: $isDirty')
           ..write(')'))
         .toString();
   }
@@ -1474,6 +1639,276 @@ class UserSettingsTableCompanion
   }
 }
 
+class $SyncTombstoneTableTable extends SyncTombstoneTable
+    with TableInfo<$SyncTombstoneTableTable, SyncTombstoneTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SyncTombstoneTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _entityTypeMeta =
+      const VerificationMeta('entityType');
+  @override
+  late final GeneratedColumn<String> entityType = GeneratedColumn<String>(
+      'entity_type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _remoteIdMeta =
+      const VerificationMeta('remoteId');
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+      'remote_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [id, entityType, remoteId, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sync_tombstone_table';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<SyncTombstoneTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('entity_type')) {
+      context.handle(
+          _entityTypeMeta,
+          entityType.isAcceptableOrUnknown(
+              data['entity_type']!, _entityTypeMeta));
+    } else if (isInserting) {
+      context.missing(_entityTypeMeta);
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(_remoteIdMeta,
+          remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta));
+    } else if (isInserting) {
+      context.missing(_remoteIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SyncTombstoneTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SyncTombstoneTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      entityType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}entity_type'])!,
+      remoteId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}remote_id'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $SyncTombstoneTableTable createAlias(String alias) {
+    return $SyncTombstoneTableTable(attachedDatabase, alias);
+  }
+}
+
+class SyncTombstoneTableData extends DataClass
+    implements Insertable<SyncTombstoneTableData> {
+  final int id;
+
+  /// 'deck' | 'card'.
+  final String entityType;
+
+  /// The backend id to DELETE remotely.
+  final String remoteId;
+  final DateTime createdAt;
+  const SyncTombstoneTableData(
+      {required this.id,
+      required this.entityType,
+      required this.remoteId,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['entity_type'] = Variable<String>(entityType);
+    map['remote_id'] = Variable<String>(remoteId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  SyncTombstoneTableCompanion toCompanion(bool nullToAbsent) {
+    return SyncTombstoneTableCompanion(
+      id: Value(id),
+      entityType: Value(entityType),
+      remoteId: Value(remoteId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory SyncTombstoneTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SyncTombstoneTableData(
+      id: serializer.fromJson<int>(json['id']),
+      entityType: serializer.fromJson<String>(json['entityType']),
+      remoteId: serializer.fromJson<String>(json['remoteId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'entityType': serializer.toJson<String>(entityType),
+      'remoteId': serializer.toJson<String>(remoteId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  SyncTombstoneTableData copyWith(
+          {int? id,
+          String? entityType,
+          String? remoteId,
+          DateTime? createdAt}) =>
+      SyncTombstoneTableData(
+        id: id ?? this.id,
+        entityType: entityType ?? this.entityType,
+        remoteId: remoteId ?? this.remoteId,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  SyncTombstoneTableData copyWithCompanion(SyncTombstoneTableCompanion data) {
+    return SyncTombstoneTableData(
+      id: data.id.present ? data.id.value : this.id,
+      entityType:
+          data.entityType.present ? data.entityType.value : this.entityType,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncTombstoneTableData(')
+          ..write('id: $id, ')
+          ..write('entityType: $entityType, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, entityType, remoteId, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SyncTombstoneTableData &&
+          other.id == this.id &&
+          other.entityType == this.entityType &&
+          other.remoteId == this.remoteId &&
+          other.createdAt == this.createdAt);
+}
+
+class SyncTombstoneTableCompanion
+    extends UpdateCompanion<SyncTombstoneTableData> {
+  final Value<int> id;
+  final Value<String> entityType;
+  final Value<String> remoteId;
+  final Value<DateTime> createdAt;
+  const SyncTombstoneTableCompanion({
+    this.id = const Value.absent(),
+    this.entityType = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  SyncTombstoneTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String entityType,
+    required String remoteId,
+    this.createdAt = const Value.absent(),
+  })  : entityType = Value(entityType),
+        remoteId = Value(remoteId);
+  static Insertable<SyncTombstoneTableData> custom({
+    Expression<int>? id,
+    Expression<String>? entityType,
+    Expression<String>? remoteId,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (entityType != null) 'entity_type': entityType,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  SyncTombstoneTableCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? entityType,
+      Value<String>? remoteId,
+      Value<DateTime>? createdAt}) {
+    return SyncTombstoneTableCompanion(
+      id: id ?? this.id,
+      entityType: entityType ?? this.entityType,
+      remoteId: remoteId ?? this.remoteId,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (entityType.present) {
+      map['entity_type'] = Variable<String>(entityType.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncTombstoneTableCompanion(')
+          ..write('id: $id, ')
+          ..write('entityType: $entityType, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1482,10 +1917,19 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $UserTableTable userTable = $UserTableTable(this);
   late final $UserSettingsTableTable userSettingsTable =
       $UserSettingsTableTable(this);
+  late final $SyncTombstoneTableTable syncTombstoneTable =
+      $SyncTombstoneTableTable(this);
   late final Index deckTableUid = Index('deck_table_uid',
       'CREATE UNIQUE INDEX deck_table_uid ON deck_table (uid)');
+  late final Index deckTableRemoteId = Index('deck_table_remote_id',
+      'CREATE UNIQUE INDEX deck_table_remote_id ON deck_table (remote_id)');
   late final Index quizCardTableUid = Index('quiz_card_table_uid',
       'CREATE UNIQUE INDEX quiz_card_table_uid ON quiz_card_table (uid)');
+  late final Index quizCardTableRemoteId = Index('quiz_card_table_remote_id',
+      'CREATE UNIQUE INDEX quiz_card_table_remote_id ON quiz_card_table (remote_id)');
+  late final Index syncTombstoneEntityRemoteId = Index(
+      'sync_tombstone_entity_remote_id',
+      'CREATE UNIQUE INDEX sync_tombstone_entity_remote_id ON sync_tombstone_table (entity_type, remote_id)');
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1495,8 +1939,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         quizCardTable,
         userTable,
         userSettingsTable,
+        syncTombstoneTable,
         deckTableUid,
-        quizCardTableUid
+        deckTableRemoteId,
+        quizCardTableUid,
+        quizCardTableRemoteId,
+        syncTombstoneEntityRemoteId
       ];
 }
 
@@ -1505,12 +1953,16 @@ typedef $$DeckTableTableCreateCompanionBuilder = DeckTableCompanion Function({
   Value<int?> uid,
   required String title,
   required bool isArchive,
+  Value<String?> remoteId,
+  Value<bool> isDirty,
 });
 typedef $$DeckTableTableUpdateCompanionBuilder = DeckTableCompanion Function({
   Value<int> id,
   Value<int?> uid,
   Value<String> title,
   Value<bool> isArchive,
+  Value<String?> remoteId,
+  Value<bool> isDirty,
 });
 
 final class $$DeckTableTableReferences
@@ -1554,6 +2006,12 @@ class $$DeckTableTableFilterComposer
   ColumnFilters<bool> get isArchive => $composableBuilder(
       column: $table.isArchive, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get remoteId => $composableBuilder(
+      column: $table.remoteId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isDirty => $composableBuilder(
+      column: $table.isDirty, builder: (column) => ColumnFilters(column));
+
   Expression<bool> quizCardTableRefs(
       Expression<bool> Function($$QuizCardTableTableFilterComposer f) f) {
     final $$QuizCardTableTableFilterComposer composer = $composerBuilder(
@@ -1596,6 +2054,12 @@ class $$DeckTableTableOrderingComposer
 
   ColumnOrderings<bool> get isArchive => $composableBuilder(
       column: $table.isArchive, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+      column: $table.remoteId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isDirty => $composableBuilder(
+      column: $table.isDirty, builder: (column) => ColumnOrderings(column));
 }
 
 class $$DeckTableTableAnnotationComposer
@@ -1618,6 +2082,12 @@ class $$DeckTableTableAnnotationComposer
 
   GeneratedColumn<bool> get isArchive =>
       $composableBuilder(column: $table.isArchive, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDirty =>
+      $composableBuilder(column: $table.isDirty, builder: (column) => column);
 
   Expression<T> quizCardTableRefs<T extends Object>(
       Expression<T> Function($$QuizCardTableTableAnnotationComposer a) f) {
@@ -1668,24 +2138,32 @@ class $$DeckTableTableTableManager extends RootTableManager<
             Value<int?> uid = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<bool> isArchive = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDirty = const Value.absent(),
           }) =>
               DeckTableCompanion(
             id: id,
             uid: uid,
             title: title,
             isArchive: isArchive,
+            remoteId: remoteId,
+            isDirty: isDirty,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int?> uid = const Value.absent(),
             required String title,
             required bool isArchive,
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDirty = const Value.absent(),
           }) =>
               DeckTableCompanion.insert(
             id: id,
             uid: uid,
             title: title,
             isArchive: isArchive,
+            remoteId: remoteId,
+            isDirty: isDirty,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
@@ -1741,6 +2219,8 @@ typedef $$QuizCardTableTableCreateCompanionBuilder = QuizCardTableCompanion
   required String questionText,
   required String answerText,
   required bool isArchive,
+  Value<String?> remoteId,
+  Value<bool> isDirty,
 });
 typedef $$QuizCardTableTableUpdateCompanionBuilder = QuizCardTableCompanion
     Function({
@@ -1750,6 +2230,8 @@ typedef $$QuizCardTableTableUpdateCompanionBuilder = QuizCardTableCompanion
   Value<String> questionText,
   Value<String> answerText,
   Value<bool> isArchive,
+  Value<String?> remoteId,
+  Value<bool> isDirty,
 });
 
 final class $$QuizCardTableTableReferences extends BaseReferences<_$AppDatabase,
@@ -1795,6 +2277,12 @@ class $$QuizCardTableTableFilterComposer
 
   ColumnFilters<bool> get isArchive => $composableBuilder(
       column: $table.isArchive, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+      column: $table.remoteId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isDirty => $composableBuilder(
+      column: $table.isDirty, builder: (column) => ColumnFilters(column));
 
   $$DeckTableTableFilterComposer get deckId {
     final $$DeckTableTableFilterComposer composer = $composerBuilder(
@@ -1842,6 +2330,12 @@ class $$QuizCardTableTableOrderingComposer
   ColumnOrderings<bool> get isArchive => $composableBuilder(
       column: $table.isArchive, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+      column: $table.remoteId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isDirty => $composableBuilder(
+      column: $table.isDirty, builder: (column) => ColumnOrderings(column));
+
   $$DeckTableTableOrderingComposer get deckId {
     final $$DeckTableTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -1886,6 +2380,12 @@ class $$QuizCardTableTableAnnotationComposer
 
   GeneratedColumn<bool> get isArchive =>
       $composableBuilder(column: $table.isArchive, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDirty =>
+      $composableBuilder(column: $table.isDirty, builder: (column) => column);
 
   $$DeckTableTableAnnotationComposer get deckId {
     final $$DeckTableTableAnnotationComposer composer = $composerBuilder(
@@ -1937,6 +2437,8 @@ class $$QuizCardTableTableTableManager extends RootTableManager<
             Value<String> questionText = const Value.absent(),
             Value<String> answerText = const Value.absent(),
             Value<bool> isArchive = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDirty = const Value.absent(),
           }) =>
               QuizCardTableCompanion(
             id: id,
@@ -1945,6 +2447,8 @@ class $$QuizCardTableTableTableManager extends RootTableManager<
             questionText: questionText,
             answerText: answerText,
             isArchive: isArchive,
+            remoteId: remoteId,
+            isDirty: isDirty,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -1953,6 +2457,8 @@ class $$QuizCardTableTableTableManager extends RootTableManager<
             required String questionText,
             required String answerText,
             required bool isArchive,
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDirty = const Value.absent(),
           }) =>
               QuizCardTableCompanion.insert(
             id: id,
@@ -1961,6 +2467,8 @@ class $$QuizCardTableTableTableManager extends RootTableManager<
             questionText: questionText,
             answerText: answerText,
             isArchive: isArchive,
+            remoteId: remoteId,
+            isDirty: isDirty,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
@@ -2620,6 +3128,162 @@ typedef $$UserSettingsTableTableProcessedTableManager = ProcessedTableManager<
     (UserSettingsTableData, $$UserSettingsTableTableReferences),
     UserSettingsTableData,
     PrefetchHooks Function({bool userId})>;
+typedef $$SyncTombstoneTableTableCreateCompanionBuilder
+    = SyncTombstoneTableCompanion Function({
+  Value<int> id,
+  required String entityType,
+  required String remoteId,
+  Value<DateTime> createdAt,
+});
+typedef $$SyncTombstoneTableTableUpdateCompanionBuilder
+    = SyncTombstoneTableCompanion Function({
+  Value<int> id,
+  Value<String> entityType,
+  Value<String> remoteId,
+  Value<DateTime> createdAt,
+});
+
+class $$SyncTombstoneTableTableFilterComposer
+    extends Composer<_$AppDatabase, $SyncTombstoneTableTable> {
+  $$SyncTombstoneTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get entityType => $composableBuilder(
+      column: $table.entityType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+      column: $table.remoteId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$SyncTombstoneTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $SyncTombstoneTableTable> {
+  $$SyncTombstoneTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get entityType => $composableBuilder(
+      column: $table.entityType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+      column: $table.remoteId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$SyncTombstoneTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SyncTombstoneTableTable> {
+  $$SyncTombstoneTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get entityType => $composableBuilder(
+      column: $table.entityType, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$SyncTombstoneTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SyncTombstoneTableTable,
+    SyncTombstoneTableData,
+    $$SyncTombstoneTableTableFilterComposer,
+    $$SyncTombstoneTableTableOrderingComposer,
+    $$SyncTombstoneTableTableAnnotationComposer,
+    $$SyncTombstoneTableTableCreateCompanionBuilder,
+    $$SyncTombstoneTableTableUpdateCompanionBuilder,
+    (
+      SyncTombstoneTableData,
+      BaseReferences<_$AppDatabase, $SyncTombstoneTableTable,
+          SyncTombstoneTableData>
+    ),
+    SyncTombstoneTableData,
+    PrefetchHooks Function()> {
+  $$SyncTombstoneTableTableTableManager(
+      _$AppDatabase db, $SyncTombstoneTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SyncTombstoneTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SyncTombstoneTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SyncTombstoneTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> entityType = const Value.absent(),
+            Value<String> remoteId = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              SyncTombstoneTableCompanion(
+            id: id,
+            entityType: entityType,
+            remoteId: remoteId,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String entityType,
+            required String remoteId,
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              SyncTombstoneTableCompanion.insert(
+            id: id,
+            entityType: entityType,
+            remoteId: remoteId,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$SyncTombstoneTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SyncTombstoneTableTable,
+    SyncTombstoneTableData,
+    $$SyncTombstoneTableTableFilterComposer,
+    $$SyncTombstoneTableTableOrderingComposer,
+    $$SyncTombstoneTableTableAnnotationComposer,
+    $$SyncTombstoneTableTableCreateCompanionBuilder,
+    $$SyncTombstoneTableTableUpdateCompanionBuilder,
+    (
+      SyncTombstoneTableData,
+      BaseReferences<_$AppDatabase, $SyncTombstoneTableTable,
+          SyncTombstoneTableData>
+    ),
+    SyncTombstoneTableData,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2632,4 +3296,6 @@ class $AppDatabaseManager {
       $$UserTableTableTableManager(_db, _db.userTable);
   $$UserSettingsTableTableTableManager get userSettingsTable =>
       $$UserSettingsTableTableTableManager(_db, _db.userSettingsTable);
+  $$SyncTombstoneTableTableTableManager get syncTombstoneTable =>
+      $$SyncTombstoneTableTableTableManager(_db, _db.syncTombstoneTable);
 }

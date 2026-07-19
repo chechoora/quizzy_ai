@@ -10,6 +10,8 @@ class DeckDatBaseMapper {
             uid: e.uid,
             title: e.title,
             isArchive: e.isArchive,
+            remoteId: e.remoteId,
+            isDirty: e.isDirty,
           ),
         )
         .toList();

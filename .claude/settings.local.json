@@ -35,7 +35,8 @@
       "Bash(/usr/libexec/PlistBuddy -c \"Print :BUNDLE_ID\" ios/config/quizzypro/GoogleService-Info.plist)",
       "Bash(/usr/bin/plutil -lint Info.plist Info-quizzypro.plist)",
       "Bash(/usr/bin/plutil -lint Runner.xcodeproj/project.pbxproj)",
-      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; cat -n {}')"
+      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; cat -n {}')",
+      "Bash(xargs -I{} echo {})"
     ],
     "deny": [],
     "ask": []

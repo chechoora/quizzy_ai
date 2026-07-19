@@ -162,7 +162,8 @@ class DecksRepository {
       if (!response.isSuccessful) {
         logger.e('deleteDeck: failed with status ${response.statusCode}');
         throw QuizzyBackendException(
-            'Failed to delete deck: ${response.statusCode}, ${response.error}');
+            'Failed to delete deck: ${response.statusCode}, ${response.error}',
+            statusCode: response.statusCode);
       }
       logger.i('deleteDeck: success, id=$id');
     } catch (e, stackTrace) {
