@@ -10,14 +10,19 @@ export 'package:poc_ai_quiz/data/api/cloud_kit_backup/generated/cloud_kit_backup
 /// call degrades gracefully (returns a safe default / null) when the native
 /// side is unavailable or errors.
 class IcloudBackupService {
-  IcloudBackupService({CloudKitBackupApi? api})
+  IcloudBackupService({required this.enabled, CloudKitBackupApi? api})
       : _api = api ?? CloudKitBackupApi();
+
+  /// Whether iCloud backup is enabled for this app flavor
+  /// (`AppConfig.enableIcloudBackup`).
+  final bool enabled;
 
   final CloudKitBackupApi _api;
   final _logger = Logger.withTag('IcloudBackupService');
 
-  /// Whether iCloud backup is supported on this platform at all.
-  bool get isSupported => Platform.isIOS;
+  /// Whether iCloud backup is supported on this platform and enabled for
+  /// this app flavor.
+  bool get isSupported => enabled && Platform.isIOS;
 
   Future<IcloudAccountStatus> accountStatus() async {
     if (!isSupported) {

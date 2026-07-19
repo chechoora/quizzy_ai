@@ -8,5 +8,6 @@ Future<void> main() => mainCommon(
         flavor: Flavor.quizzy,
         enableByok: true,
         requireAuth: false,
+        enableIcloudBackup: true,
       ),
     );

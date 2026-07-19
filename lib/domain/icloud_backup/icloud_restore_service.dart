@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/icloud_backup/icloud_backup_service.dart';
@@ -28,7 +26,7 @@ class ICloudRestoreService {
 
   final _logger = Logger.withTag('ICloudRestoreService');
 
-  bool get isSupported => Platform.isIOS;
+  bool get isSupported => icloudBackupService.isSupported;
 
   bool get hasPromptBeenShown => prefs.getBool(_promptShownKey) ?? false;
 
