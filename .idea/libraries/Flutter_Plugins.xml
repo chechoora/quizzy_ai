@@ -6,7 +6,6 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/file_picker-8.3.7" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/shared_preferences_linux-2.4.1" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/onnxruntime-1.4.1" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.6" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core-3.15.2" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1" />
@@ -32,6 +31,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/jni_flutter-1.0.1" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/in_app_purchase_android-0.4.0+10" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.29" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_onnxruntime-1.8.2" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

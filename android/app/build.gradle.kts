@@ -51,20 +51,6 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
-
-    // Support 16 KB memory page sizes (required by Google Play for Android 15+).
-    // The `onnxruntime` Flutter plugin (v1.4.1) bundles an old, 4 KB-aligned
-    // libonnxruntime.so. We ship a 16 KB-aligned build (ONNX Runtime 1.20.0) in
-    // this module's jniLibs and let it win the merge over the plugin's copy.
-    packaging {
-        jniLibs {
-            useLegacyPackaging = false
-            pickFirsts += setOf(
-                "lib/arm64-v8a/libonnxruntime.so",
-                "lib/armeabi-v7a/libonnxruntime.so",
-            )
-        }
-    }
 }
 
 flutter {
