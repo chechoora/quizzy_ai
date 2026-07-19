@@ -33,6 +33,24 @@ class FirebaseAuthService implements AuthService {
       _firebaseAuth.authStateChanges().map(_mapUser);
 
   @override
+  Future<String?> getIdToken() async {
+    logger.d('getIdToken: starting');
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      logger.w('getIdToken: no signed-in account');
+      return null;
+    }
+    try {
+      final token = await user.getIdToken();
+      logger.d('getIdToken: success');
+      return token;
+    } catch (e, stackTrace) {
+      logger.e('getIdToken: failed', ex: e, stacktrace: stackTrace);
+      return null;
+    }
+  }
+
+  @override
   Future<AuthUser> signInWithGoogle() {
     logger.d('signInWithGoogle: starting');
     return _signInWithProvider(GoogleAuthProvider(), providerName: 'Google');

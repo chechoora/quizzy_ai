@@ -16,6 +16,10 @@ import 'package:poc_ai_quiz/data/api/openai/openai_api_service.dart';
 import 'package:poc_ai_quiz/data/api/openai/openai_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/api/ollama/ollama_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/quizzy/quizzy_ai_interceptor.dart';
+import 'package:poc_ai_quiz/data/api/quizzy_backend/ai_tutor_api_service.dart';
+import 'package:poc_ai_quiz/data/api/quizzy_backend/cards_api_service.dart';
+import 'package:poc_ai_quiz/data/api/quizzy_backend/decks_api_service.dart';
+import 'package:poc_ai_quiz/data/api/quizzy_backend/quizzy_backend_auth_interceptor.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
@@ -59,6 +63,9 @@ import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/data/api/quizzy/quizzy_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/quizzy/quizzy_api_service.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/ai_tutor_repository.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/cards_repository.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/decks_repository.dart';
 import 'package:poc_ai_quiz/data/import_export/export_service.dart';
 import 'package:poc_ai_quiz/data/import_export/import_service.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
@@ -237,6 +244,25 @@ Future<void> _setupAPI() async {
   );
   getIt.registerSingleton<ChopperClient>(quizzyApiClient,
       instanceName: 'quizzy');
+
+  // Quizzy Pro backend API client (Decks/Cards/AiTutor, Firebase-authenticated)
+  final quizzyBackendApiClient = ChopperClient(
+    baseUrl: Uri.parse('https://quizzy-ai-pro-be.fly.dev'),
+    services: [
+      DecksApiService.create(),
+      CardsApiService.create(),
+      AiTutorApiService.create(),
+    ],
+    interceptors: [
+      QuizzyBackendAuthInterceptor(
+        authService: getIt.get<AuthService>(),
+        logger: Logger.withTag('QuizzyBackendAuthInterceptor'),
+      ),
+    ],
+    converter: const JsonConverter(),
+  );
+  getIt.registerSingleton<ChopperClient>(quizzyBackendApiClient,
+      instanceName: 'quizzyBackend');
 }
 
 Future<void> _setupServices() async {
@@ -305,6 +331,28 @@ Future<void> _setupServices() async {
     getIt.get<InAppPurchaseService>(),
   );
   getIt.registerSingleton<QuizzyDeckGenerator>(quizzyDeckGenerator);
+
+  // Quizzy Pro backend repositories (Decks/Cards/AiTutor)
+  final quizzyBackendClient =
+      getIt.get<ChopperClient>(instanceName: 'quizzyBackend');
+
+  final decksRepository = DecksRepository(
+    apiService: quizzyBackendClient.getService<DecksApiService>(),
+    logger: Logger.withTag('DecksRepository'),
+  );
+  getIt.registerSingleton<DecksRepository>(decksRepository);
+
+  final cardsRepository = CardsRepository(
+    apiService: quizzyBackendClient.getService<CardsApiService>(),
+    logger: Logger.withTag('CardsRepository'),
+  );
+  getIt.registerSingleton<CardsRepository>(cardsRepository);
+
+  final aiTutorRepository = AiTutorRepository(
+    apiService: quizzyBackendClient.getService<AiTutorApiService>(),
+    logger: Logger.withTag('AiTutorRepository'),
+  );
+  getIt.registerSingleton<AiTutorRepository>(aiTutorRepository);
 
   // User quota repository
   final userQuotaPrefDataSource = UserQuotaPrefDataSource(
