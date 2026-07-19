@@ -225,6 +225,28 @@ class GenerateDeckResponseDto {
       );
 }
 
+class UserBalanceDto {
+  final num weeklyBalanceUsd;
+  final num weeklyLimitUsd;
+  final num weeklyBalanceReq;
+  final num weeklyLimitReq;
+
+  UserBalanceDto({
+    required this.weeklyBalanceUsd,
+    required this.weeklyLimitUsd,
+    required this.weeklyBalanceReq,
+    required this.weeklyLimitReq,
+  });
+
+  factory UserBalanceDto.fromJson(Map<String, dynamic> json) =>
+      UserBalanceDto(
+        weeklyBalanceUsd: json['weeklyBalanceUsd'] as num,
+        weeklyLimitUsd: json['weeklyLimitUsd'] as num,
+        weeklyBalanceReq: json['weeklyBalanceReq'] as num,
+        weeklyLimitReq: json['weeklyLimitReq'] as num,
+      );
+}
+
 class CheckAnswerDto {
   final String question;
   final String userAnswer;

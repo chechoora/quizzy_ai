@@ -15,11 +15,13 @@ import 'package:poc_ai_quiz/data/api/openai/openai_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/openai/openai_api_service.dart';
 import 'package:poc_ai_quiz/data/api/openai/openai_header_interceptor.dart';
 import 'package:poc_ai_quiz/data/api/ollama/ollama_answer_validator.dart';
-import 'package:poc_ai_quiz/data/api/quizzy/quizzy_ai_interceptor.dart';
+import 'package:poc_ai_quiz/data/api/quizzy_backend/ai_tutor_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/ai_tutor_api_service.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/cards_api_service.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/decks_api_service.dart';
+import 'package:poc_ai_quiz/data/api/quizzy_backend/decks_deck_generator.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/quizzy_backend_auth_interceptor.dart';
+import 'package:poc_ai_quiz/data/api/quizzy_backend/user_api_service.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/data/db/quiz_card/quiz_card_database_repository.dart';
@@ -33,7 +35,6 @@ import 'package:poc_ai_quiz/data/api/claude/claude_deck_generator.dart';
 import 'package:poc_ai_quiz/data/api/gemini_ai/gemini_deck_generator.dart';
 import 'package:poc_ai_quiz/data/api/ollama/ollama_deck_generator.dart';
 import 'package:poc_ai_quiz/data/api/openai/openai_deck_generator.dart';
-import 'package:poc_ai_quiz/data/api/quizzy/quizzy_deck_generator.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/i_deck_generator.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/mock_revenue_cat_purchase_manager.dart';
 import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
@@ -64,11 +65,10 @@ import 'package:poc_ai_quiz/domain/user_settings/user_settings_database_mapper.d
 import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
-import 'package:poc_ai_quiz/data/api/quizzy/quizzy_answer_validator.dart';
-import 'package:poc_ai_quiz/data/api/quizzy/quizzy_api_service.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/ai_tutor_repository.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/cards_repository.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/decks_repository.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/user_balance_repository.dart';
 import 'package:poc_ai_quiz/data/import_export/export_service.dart';
 import 'package:poc_ai_quiz/data/import_export/import_service.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
@@ -234,27 +234,14 @@ Future<void> _setupAPI() async {
   getIt.registerSingleton<ChopperClient>(openAIApiClient,
       instanceName: 'openai');
 
-  // Quizzy API client
-  final quizzyApiClient = ChopperClient(
-    baseUrl: Uri.parse('https://quizzy-be.fly.dev'),
-    services: [
-      QuizzyApiService.create(),
-    ],
-    interceptors: [
-      QuizzyAIInterceptor(),
-    ],
-    converter: const JsonConverter(),
-  );
-  getIt.registerSingleton<ChopperClient>(quizzyApiClient,
-      instanceName: 'quizzy');
-
-  // Quizzy Pro backend API client (Decks/Cards/AiTutor, Firebase-authenticated)
+  // Quizzy Pro backend API client (Decks/Cards/AiTutor/User, Firebase-authenticated)
   final quizzyBackendApiClient = ChopperClient(
     baseUrl: Uri.parse('https://quizzy-ai-pro-be.fly.dev'),
     services: [
       DecksApiService.create(),
       CardsApiService.create(),
       AiTutorApiService.create(),
+      UserApiService.create(),
     ],
     interceptors: [
       QuizzyBackendAuthInterceptor(
@@ -321,21 +308,7 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<OpenAIDeckGenerator>(openAIDeckGenerator);
 
-  // Quizzy answer validator
-  final quizzyClient = getIt.get<ChopperClient>(instanceName: 'quizzy');
-  final quizzyAnswerValidator = QuizzyAnswerValidator(
-    quizzyClient.getService<QuizzyApiService>(),
-    getIt.get<InAppPurchaseService>(),
-  );
-  getIt.registerSingleton<QuizzyAnswerValidator>(quizzyAnswerValidator);
-
-  final quizzyDeckGenerator = QuizzyDeckGenerator(
-    quizzyClient.getService<QuizzyApiService>(),
-    getIt.get<InAppPurchaseService>(),
-  );
-  getIt.registerSingleton<QuizzyDeckGenerator>(quizzyDeckGenerator);
-
-  // Quizzy Pro backend repositories (Decks/Cards/AiTutor)
+  // Quizzy Pro backend repositories (Decks/Cards/AiTutor/User)
   final quizzyBackendClient =
       getIt.get<ChopperClient>(instanceName: 'quizzyBackend');
 
@@ -357,6 +330,19 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<AiTutorRepository>(aiTutorRepository);
 
+  final userBalanceRepository = UserBalanceRepository(
+    apiService: quizzyBackendClient.getService<UserApiService>(),
+    logger: Logger.withTag('UserBalanceRepository'),
+  );
+  getIt.registerSingleton<UserBalanceRepository>(userBalanceRepository);
+
+  // AiTutor-backed answer validator & Decks-backed deck generator
+  final aiTutorAnswerValidator = AiTutorAnswerValidator(aiTutorRepository);
+  getIt.registerSingleton<AiTutorAnswerValidator>(aiTutorAnswerValidator);
+
+  final decksDeckGenerator = DecksDeckGenerator(decksRepository);
+  getIt.registerSingleton<DecksDeckGenerator>(decksDeckGenerator);
+
   // User quota repository
   final userQuotaPrefDataSource = UserQuotaPrefDataSource(
     prefs: getIt.get<SharedPreferences>(),
@@ -364,7 +350,7 @@ Future<void> _setupServices() async {
   getIt.registerSingleton<UserQuotaPrefDataSource>(userQuotaPrefDataSource);
 
   final userQuotaRepository = UserQuotaRepository(
-    apiService: quizzyClient.getService<QuizzyApiService>(),
+    userBalanceRepository: userBalanceRepository,
     prefDataSource: userQuotaPrefDataSource,
   );
   getIt.registerSingleton<UserQuotaRepository>(userQuotaRepository);
@@ -409,7 +395,7 @@ Future<void> _setupServices() async {
         AnswerValidatorType.openAI: openAIAnswerValidator,
         AnswerValidatorType.ollama: ollamaAnswerValidator,
         AnswerValidatorType.ml: mlAnswerValidator,
-        AnswerValidatorType.quizzyAI: quizzyAnswerValidator,
+        AnswerValidatorType.quizzyAI: aiTutorAnswerValidator,
       });
   getIt.registerSingleton<SettingsService>(settingsService);
 
@@ -518,7 +504,7 @@ Future<void> _setupServices() async {
         AnswerValidatorType.claude: claudeDeckGenerator,
         AnswerValidatorType.openAI: openAIDeckGenerator,
         AnswerValidatorType.ollama: ollamaDeckGenerator,
-        AnswerValidatorType.quizzyAI: quizzyDeckGenerator,
+        AnswerValidatorType.quizzyAI: decksDeckGenerator,
       },
     ),
   );
