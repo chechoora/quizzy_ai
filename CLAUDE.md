@@ -21,6 +21,11 @@ fvm flutter build ios --flavor quizzypro -t lib/main_quizzypro.dart --debug --no
 fvm flutter build appbundle --flavor quizzy    -t lib/main_quizzy.dart --release
 fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release
 
+# Build iOS IPA (release, for App Store/TestFlight — requires ios/ExportOptions.plist,
+# see note below)
+fvm flutter build ipa --flavor quizzy    -t lib/main_quizzy.dart --export-options-plist=ios/ExportOptions.plist
+fvm flutter build ipa --flavor quizzypro -t lib/main_quizzypro.dart --export-options-plist=ios/ExportOptions.plist
+
 # Run tests
 fvm flutter test
 
@@ -61,6 +66,12 @@ Two build flavors share one codebase (infrastructure in `lib/config/app_config.d
 - Release Android builds are signed using `android/release_key.properties`
   (keystore path + credentials, gitignored), referenced by
   `android/app/build.gradle.kts`. It must exist before running `appbundle --release`.
+- `flutter build ipa` **must** be passed `--export-options-plist=ios/ExportOptions.plist`.
+  Without it, `xcodebuild -exportArchive` fails with a generic `error: exportArchive Copy
+  failed` — the failure is in Xcode's dSYM-symbol packaging step, not signing (do not chase
+  code-signing/account errors in the log when this happens, they're red herrings).
+  `ios/ExportOptions.plist` sets `uploadSymbols` to `false` to sidestep it (do not hardcode
+  this again as a one-off flag — it's fixed to actually work — reuse the checked-in plist).
 
 ## Release Versioning
 

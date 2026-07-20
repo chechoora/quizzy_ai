@@ -21,7 +21,7 @@ flags are wired into Android/iOS.
 ```bash
 fvm flutter build apk       --flavor quizzy -t lib/main_quizzy.dart --release --build-name=2.3.0 --build-number=45
 fvm flutter build appbundle --flavor quizzy -t lib/main_quizzy.dart --release --build-name=2.3.0 --build-number=45
-fvm flutter build ipa       --flavor quizzy -t lib/main_quizzy.dart --build-name=2.3.0 --build-number=45
+fvm flutter build ipa       --flavor quizzy -t lib/main_quizzy.dart --build-name=2.3.0 --build-number=45 --export-options-plist=ios/ExportOptions.plist
 ```
 
 ### quizzypro — `1.0.0+1`
@@ -29,7 +29,7 @@ fvm flutter build ipa       --flavor quizzy -t lib/main_quizzy.dart --build-name
 ```bash
 fvm flutter build apk       --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=1
 fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=1
-fvm flutter build ipa       --flavor quizzypro -t lib/main_quizzypro.dart --build-name=1.0.0 --build-number=1
+fvm flutter build ipa       --flavor quizzypro -t lib/main_quizzypro.dart --build-name=1.0.0 --build-number=1 --export-options-plist=ios/ExportOptions.plist
 ```
 
 ## Bumping a version
