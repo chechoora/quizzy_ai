@@ -178,6 +178,7 @@ Future<void> _setupInAppPurchase() async {
     default:
       revenueCatPurchaseManager = RevenueCatPurchaseManager(
         Logger.withTag('RevenueCatPurchaseManager'),
+        getIt<AppConfig>().flavor,
       );
   }
   await revenueCatPurchaseManager.initialize();

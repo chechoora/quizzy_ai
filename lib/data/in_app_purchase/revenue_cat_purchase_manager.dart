@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/util/env_hide.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -9,20 +10,26 @@ class RevenueCatPurchaseManager {
   static const quizzyAiOffering = 'quizzy_ai';
 
   final Logger _logger;
+  final Flavor _flavor;
 
-  RevenueCatPurchaseManager(this._logger);
+  RevenueCatPurchaseManager(this._logger, this._flavor);
 
   Future<void> initialize() async {
-    _logger.d('Initializing RevenueCat');
+    _logger.d('Initializing RevenueCat for flavor: $_flavor');
     await Purchases.setLogLevel(LogLevel.debug);
 
+    final isPro = _flavor == Flavor.quizzyPro;
     PurchasesConfiguration configuration;
     if (Platform.isAndroid) {
       _logger.d('Configuring for Android');
-      configuration = PurchasesConfiguration(RevenueCat.androidApiKey);
+      configuration = PurchasesConfiguration(
+        isPro ? RevenueCat.androidApiKeyPro : RevenueCat.androidApiKey,
+      );
     } else if (Platform.isIOS) {
       _logger.d('Configuring for iOS');
-      configuration = PurchasesConfiguration(RevenueCat.iOSApiKey);
+      configuration = PurchasesConfiguration(
+        isPro ? RevenueCat.iOSApiKeyPro : RevenueCat.iOSApiKey,
+      );
     } else {
       _logger.e('Unsupported platform');
       throw UnsupportedError('Unsupported platform for RevenueCat');
