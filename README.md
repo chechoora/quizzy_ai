@@ -87,6 +87,15 @@ fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --rele
 > `ios/config/quizzypro/GoogleService-Info.plist` (see the READMEs in those
 > folders).
 
+### Versioned release builds
+
+`quizzy` and `quizzypro` are versioned independently — pass `--build-name=<version>`
+and `--build-number=<build>` on the CLI for every release build (omitting them falls
+back to `pubspec.yaml`'s shared `version:` field).
+
+**Current version numbers and ready-to-copy build commands (apk/appbundle/ipa, both
+flavors) live in [VERSIONS.md](VERSIONS.md).**
+
 ## Configuration
 
 ### AI Provider Setup

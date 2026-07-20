@@ -62,6 +62,28 @@ Two build flavors share one codebase (infrastructure in `lib/config/app_config.d
   (keystore path + credentials, gitignored), referenced by
   `android/app/build.gradle.kts`. It must exist before running `appbundle --release`.
 
+## Release Versioning
+
+`quizzy` and `quizzypro` are versioned **independently**. There is no per-flavor
+version stored in `pubspec.yaml` — each release build must pass
+`--build-name=<version>` and `--build-number=<build>` explicitly on the CLI.
+Without these flags, both platforms fall back to `pubspec.yaml`'s `version:`
+field (shared by both flavors — only meant as a dev-time default for plain
+`flutter run`).
+
+**Current version numbers and ready-to-copy build commands live in
+[VERSIONS.md](VERSIONS.md)** — bump the numbers there before every release.
+
+How the flags are wired (fixed to actually work — do not hardcode these again):
+- Android: `android/app/build.gradle.kts` → `versionCode = flutter.versionCode`,
+  `versionName = flutter.versionName` (both read from the CLI flags / pubspec).
+- iOS: `ios/Runner/Info.plist` (quizzy) and `ios/Runner/Info-quizzypro.plist`
+  (quizzypro) → `CFBundleVersion = $(FLUTTER_BUILD_NUMBER)`,
+  `CFBundleShortVersionString = $(FLUTTER_BUILD_NAME)`. The 6 Runner-target build
+  configs in `ios/Runner.xcodeproj/project.pbxproj` mirror this via
+  `CURRENT_PROJECT_VERSION = $(FLUTTER_BUILD_NUMBER)` /
+  `MARKETING_VERSION = $(FLUTTER_BUILD_NAME)`.
+
 ## Architecture
 
 Clean architecture with BLoC pattern:
