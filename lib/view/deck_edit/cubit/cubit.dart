@@ -43,12 +43,18 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
     required this.deckItem,
     required this.quizCardRepository,
     required this.inAppPurchaseService,
+    required this.isSubscriptionOnly,
   }) : super(const AiGenerateInitialState());
 
   final AiGenService aiGenService;
   final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
   final InAppPurchaseService inAppPurchaseService;
+
+  /// When true (the `quizzypro` flavor) only the Quizzy AI subscription is
+  /// offered; when false (the `quizzy` flavor) only the one-time "unlimited
+  /// decks/cards" purchase is offered.
+  final bool isSubscriptionOnly;
 
   final _logger = Logger.withTag('AiGenerateCubit');
 
@@ -67,13 +73,20 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
 
   bool get hasContent => _cards.isNotEmpty;
 
+  /// The purchase feature to gate/unlock on this screen, resolved from the
+  /// active flavor: `quizzyAi` subscription on `quizzypro`, the one-time
+  /// `unlimitedDecksCards` purchase on `quizzy`.
+  InAppPurchaseFeature get unlockFeature => isSubscriptionOnly
+      ? InAppPurchaseFeature.quizzyAi
+      : InAppPurchaseFeature.unlimitedDecksCards;
+
   /// Resolves the AI entitlement and loads the deck's existing (non-archived)
   /// cards so they are shown as editable tiles and included as context for
   /// refinement.
   Future<void> init() async {
     try {
-      _isPremium = await inAppPurchaseService
-          .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards);
+      _isPremium =
+          await inAppPurchaseService.isFeaturePurchased(unlockFeature);
       final items = await quizCardRepository.fetchQuizCardItem(deckItem.id);
       final active = items.where((i) => !i.isArchive).toList();
       _existingCards

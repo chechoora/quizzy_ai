@@ -29,6 +29,12 @@ abstract class AuthService {
   /// Emits the current account on every auth-state change (`null` on sign-out).
   Stream<AuthUser?> get authStateChanges;
 
+  /// The current account's Firebase ID token, or `null` when signed out.
+  ///
+  /// Used to authenticate requests to backends expecting a Firebase-issued
+  /// bearer token.
+  Future<String?> getIdToken();
+
   /// Starts the interactive Google sign-in flow.
   ///
   /// Throws [AuthCancelledException] if the user aborts, [AuthException] on failure.

@@ -3,9 +3,11 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:meta/meta.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:poc_ai_quiz/data/db/deck_table.dart';
+import 'package:poc_ai_quiz/data/db/sync/sync_tombstone_table.dart';
 import 'package:poc_ai_quiz/data/db/user_table.dart';
 import 'package:poc_ai_quiz/data/db/user_settings_table.dart';
 import 'package:sqlite3/sqlite3.dart' show sqlite3;
@@ -13,12 +15,24 @@ import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [DeckTable, QuizCardTable, UserTable, UserSettingsTable])
+@DriftDatabase(tables: [
+  DeckTable,
+  QuizCardTable,
+  UserTable,
+  UserSettingsTable,
+  SyncTombstoneTable,
+])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  /// Opens the database against a caller-provided [executor] instead of the
+  /// on-device file. Used by migration tests to exercise [onUpgrade] against
+  /// an in-memory database seeded at an older schema version.
+  @visibleForTesting
+  AppDatabase.withExecutor(QueryExecutor executor) : super(executor);
+
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration {
@@ -78,8 +92,42 @@ class AppDatabase extends _$AppDatabase {
             'ON quiz_card_table (uid)',
           );
         }
+        if (from < 10) {
+          // Migration for two-way remote sync with the quizzy-ai-pro backend
+          // (quizzyPro flavor only): links a local row to its remote
+          // counterpart (remoteId) and tracks unpushed local changes
+          // (isDirty). isDirty defaults to true so pre-existing rows are
+          // picked up by the first push cycle; no manual backfill statement
+          // is needed since the column DEFAULT applies on ALTER TABLE. Also
+          // adds the tombstone table used to propagate local deletes.
+          await m.addColumn(deckTable, deckTable.remoteId);
+          await m.addColumn(deckTable, deckTable.isDirty);
+          await m.addColumn(quizCardTable, quizCardTable.remoteId);
+          await m.addColumn(quizCardTable, quizCardTable.isDirty);
+          await customStatement(
+            'CREATE UNIQUE INDEX IF NOT EXISTS deck_table_remote_id '
+            'ON deck_table (remote_id)',
+          );
+          await customStatement(
+            'CREATE UNIQUE INDEX IF NOT EXISTS quiz_card_table_remote_id '
+            'ON quiz_card_table (remote_id)',
+          );
+          await m.createTable(syncTombstoneTable);
+        }
       },
     );
+  }
+
+  /// Wipes every row from every table. Used on sign-out / account deletion so
+  /// the next user to sign in on this device starts from a clean local slate.
+  Future<void> clearAllTables() async {
+    await transaction(() async {
+      await delete(deckTable).go();
+      await delete(quizCardTable).go();
+      await delete(userTable).go();
+      await delete(userSettingsTable).go();
+      await delete(syncTombstoneTable).go();
+    });
   }
 }
 

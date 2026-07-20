@@ -1,17 +1,17 @@
-import 'package:poc_ai_quiz/data/api/quizzy/quizzy_api_service.dart';
 import 'package:poc_ai_quiz/data/user_quota/user_quota_pref_data_source.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/user_balance_repository.dart';
 import 'package:poc_ai_quiz/domain/user/model/quota_item.dart';
 
 class UserQuotaRepository {
-  final QuizzyApiService apiService;
+  final UserBalanceRepository userBalanceRepository;
   final UserQuotaPrefDataSource prefDataSource;
 
   UserQuotaRepository({
-    required this.apiService,
+    required this.userBalanceRepository,
     required this.prefDataSource,
   });
 
-  Stream<QuotaItem> fetchQuota(String appUserId) async* {
+  Stream<QuotaItem> fetchQuota() async* {
     // Emit cached data first if available
     if (prefDataSource.hasValidCache()) {
       final weeklyPercentUsage = prefDataSource.getWeeklyPercentUsage();
@@ -26,30 +26,22 @@ class UserQuotaRepository {
     }
 
     // Fetch fresh data from API
-    final response = await apiService.getQuota(
-      appUserId: appUserId,
+    final balance = await userBalanceRepository.getBalance();
+    final weeklyPercentUsage =
+        ((balance.weeklyLimitUsd - balance.weeklyBalanceUsd) /
+                balance.weeklyLimitUsd) *
+            100;
+    final questionsLeft = balance.weeklyBalanceReq.toInt();
+    // Cache the result
+    await prefDataSource.saveQuota(
+      weeklyPercentUsage: weeklyPercentUsage.toDouble(),
+      questionsLeft: questionsLeft,
     );
 
-    if (response.isSuccessful && response.body != null) {
-      final quotaResponse = QuotaResponse.fromJson(response.body);
-      final weeklyPercentUsage =
-          ((quotaResponse.weeklyLimitUsd - quotaResponse.weeklyBalanceUsd) /
-                  quotaResponse.weeklyLimitUsd) *
-              100;
-      final questionsLeft = quotaResponse.weeklyBalanceReq;
-      // Cache the result
-      await prefDataSource.saveQuota(
-        weeklyPercentUsage: weeklyPercentUsage,
-        questionsLeft: questionsLeft,
-      );
-
-      yield QuotaItem(
-        weeklyPercentUsage: weeklyPercentUsage,
-        questionsLeft: questionsLeft,
-      );
-    } else {
-      throw Exception('Failed to fetch quota: ${response.error}');
-    }
+    yield QuotaItem(
+      weeklyPercentUsage: weeklyPercentUsage.toDouble(),
+      questionsLeft: questionsLeft,
+    );
   }
 
   Future<void> clearCache() async {

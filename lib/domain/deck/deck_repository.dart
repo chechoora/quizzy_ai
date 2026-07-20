@@ -48,4 +48,49 @@ class DeckRepository {
   Future<int> saveDeckWithUid(String title, int uid) {
     return dataBaseRepository.saveDeckWithUid(title.trim(), uid);
   }
+
+  /// Local decks with unpushed changes, for the sync push cycle.
+  Future<List<DeckItem>> fetchDirtyDecks() async {
+    final databaseData = await dataBaseRepository.fetchDirtyDecks();
+    return deckDatBaseMapper.mapToDeckItemList(databaseData);
+  }
+
+  /// Local decks already linked to a remote deck.
+  Future<List<DeckItem>> fetchSyncedDecks() async {
+    final databaseData = await dataBaseRepository.fetchSyncedDecks();
+    return deckDatBaseMapper.mapToDeckItemList(databaseData);
+  }
+
+  /// Marks a local deck as pushed: links it to [remoteId] and clears dirty.
+  Future<void> markDeckSynced(int id, String remoteId) {
+    return dataBaseRepository.markDeckSynced(id, remoteId);
+  }
+
+  /// Upserts a local deck by [remoteId] (pull-side, remote wins). Returns
+  /// the local row id.
+  Future<int> upsertDeckFromRemote({
+    required String remoteId,
+    required String title,
+    required bool isArchive,
+  }) {
+    return dataBaseRepository.upsertDeckByRemoteId(
+      remoteId: remoteId,
+      title: title,
+      isArchive: isArchive,
+    );
+  }
+
+  /// Deletes the local deck linked to [remoteId], if any (pull-side
+  /// reconciliation of a remote-side deletion).
+  Future<bool> deleteDeckByRemoteId(
+    String remoteId, {
+    bool recordTombstone = false,
+  }) async {
+    final localId = await dataBaseRepository.findDeckIdByRemoteId(remoteId);
+    if (localId == null) return false;
+    return dataBaseRepository.deleteDeck(
+      localId,
+      recordTombstone: recordTombstone,
+    );
+  }
 }

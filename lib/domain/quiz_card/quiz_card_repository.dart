@@ -69,4 +69,54 @@ class QuizCardRepository {
   Future<bool> updateCardByUid(int deckId, PlainCardModel card) {
     return dataBaseRepository.updateCardByUid(deckId, card);
   }
+
+  /// Local cards with unpushed changes, for the sync push cycle.
+  Future<List<QuizCardItem>> fetchDirtyCards() async {
+    final databaseData = await dataBaseRepository.fetchDirtyCards();
+    return dataBaseMapper.mapToQuizCardItemList(databaseData);
+  }
+
+  /// Local cards in [deckId] already linked to a remote card.
+  Future<List<QuizCardItem>> fetchSyncedCardsForDeck(int deckId) async {
+    final databaseData =
+        await dataBaseRepository.fetchSyncedCardsForDeck(deckId);
+    return dataBaseMapper.mapToQuizCardItemList(databaseData);
+  }
+
+  /// Marks a local card as pushed: links it to [remoteId] and clears dirty.
+  Future<void> markCardSynced(int id, String remoteId) {
+    return dataBaseRepository.markCardSynced(id, remoteId);
+  }
+
+  /// Upserts a local card by [remoteId] (pull-side, remote wins). Returns
+  /// the local row id.
+  Future<int> upsertCardFromRemote({
+    required String remoteId,
+    required int deckId,
+    required String question,
+    required String answer,
+    required bool isArchive,
+  }) {
+    return dataBaseRepository.upsertCardByRemoteId(
+      remoteId: remoteId,
+      deckId: deckId,
+      question: question,
+      answer: answer,
+      isArchive: isArchive,
+    );
+  }
+
+  /// Deletes the local card linked to [remoteId], if any (pull-side
+  /// reconciliation of a remote-side deletion).
+  Future<bool> deleteCardByRemoteId(
+    String remoteId, {
+    bool recordTombstone = false,
+  }) async {
+    final localId = await dataBaseRepository.findCardIdByRemoteId(remoteId);
+    if (localId == null) return false;
+    return dataBaseRepository.deleteQuizCard(
+      localId,
+      recordTombstone: recordTombstone,
+    );
+  }
 }

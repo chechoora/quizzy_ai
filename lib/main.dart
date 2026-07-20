@@ -10,6 +10,7 @@ import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/logout/logout_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/util/app_theme.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
@@ -70,10 +71,12 @@ Future<void> mainCommon(AppConfig config) async {
     final router = buildAppRouter(initialLocation: initialLocation);
 
     if (config.requireAuth) {
-      authService.authStateChanges.listen((user) {
+      final logoutManager = getIt<LogoutManager>();
+      authService.authStateChanges.listen((user) async {
         if (user == null) {
           Fimber.i('Auth state changed: user signed out');
           router.go(AuthRoute().path);
+          await logoutManager.clearLocalData();
         } else {
           Fimber.i('Auth state changed: user signed in uid=${user.uid}');
         }

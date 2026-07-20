@@ -35,6 +35,11 @@ class ICloudRestoreService {
     return prefs.setBool(_promptShownKey, true);
   }
 
+  Future<void> clearPromptShownFlag() {
+    _logger.d('clearPromptShownFlag: clearing flag');
+    return prefs.remove(_promptShownKey);
+  }
+
   /// Whether to offer the clean-install restore prompt: iOS, not shown before,
   /// empty local DB, iCloud available, and a backup record exists.
   Future<bool> shouldOfferRestore() async {

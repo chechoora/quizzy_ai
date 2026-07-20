@@ -25,11 +25,12 @@ void main() {
     registerFallbackValue(const AiGenRequest(prompt: ''));
   });
 
-  DeckEditCubit buildCubit() => DeckEditCubit(
+  DeckEditCubit buildCubit({bool isSubscriptionOnly = false}) => DeckEditCubit(
         aiGenService: aiGenService,
         deckItem: deckItem,
         quizCardRepository: quizCardRepository,
         inAppPurchaseService: inAppPurchaseService,
+        isSubscriptionOnly: isSubscriptionOnly,
       );
 
   setUp(() {
@@ -114,7 +115,7 @@ void main() {
     when(() => quizCardRepository.fetchQuizCardItem(deckItem.id))
         .thenAnswer((_) async => []);
     when(() => inAppPurchaseService
-            .isFeaturePurchased(InAppPurchaseFeature.quizzyAi))
+            .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards))
         .thenAnswer((_) async => false);
 
     final freeCubit = buildCubit();
@@ -123,7 +124,7 @@ void main() {
     expect(freeCubit.isPremium, isFalse);
 
     when(() => inAppPurchaseService
-            .isFeaturePurchased(InAppPurchaseFeature.quizzyAi))
+            .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards))
         .thenAnswer((_) async => true);
 
     final premiumCubit = buildCubit();
@@ -131,11 +132,29 @@ void main() {
     expect((premiumCubit.state as AiGenerateContentState).isPremium, isTrue);
   });
 
-  test('onAiUnlocked flips the mode to premium', () async {
+  test(
+      'init checks the quizzyAi subscription when the flavor is '
+      'subscription-only', () async {
     when(() => quizCardRepository.fetchQuizCardItem(deckItem.id))
         .thenAnswer((_) async => []);
     when(() => inAppPurchaseService
             .isFeaturePurchased(InAppPurchaseFeature.quizzyAi))
+        .thenAnswer((_) async => true);
+
+    final cubit = buildCubit(isSubscriptionOnly: true);
+    expect(cubit.unlockFeature, InAppPurchaseFeature.quizzyAi);
+
+    await cubit.init();
+    expect(cubit.isPremium, isTrue);
+    verifyNever(() => inAppPurchaseService
+        .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards));
+  });
+
+  test('onAiUnlocked flips the mode to premium', () async {
+    when(() => quizCardRepository.fetchQuizCardItem(deckItem.id))
+        .thenAnswer((_) async => []);
+    when(() => inAppPurchaseService
+            .isFeaturePurchased(InAppPurchaseFeature.unlimitedDecksCards))
         .thenAnswer((_) async => false);
 
     final cubit = buildCubit();

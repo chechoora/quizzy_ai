@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
@@ -7,6 +8,8 @@ import 'package:poc_ai_quiz/util/uid_generator.dart';
 
 class QuizCardDataBaseRepository {
   final AppDatabase appDatabase;
+
+  static const _listEquality = ListEquality<QuizCardTableData>();
 
   QuizCardDataBaseRepository(this.appDatabase);
 
@@ -21,9 +24,14 @@ class QuizCardDataBaseRepository {
   }
 
   /// Watches all cards across every deck. Emits on any card insert/update/
-  /// delete, used to trigger the iCloud auto-backup.
+  /// delete, used to trigger the iCloud auto-backup and remote sync.
+  /// `distinct()` needs an explicit equality — see [DeckDataBaseRepository.
+  /// watchAllDecks] for why the default one is a no-op for lists.
   Stream<List<QuizCardTableData>> watchAllCards() {
-    return appDatabase.select(appDatabase.quizCardTable).watch();
+    return appDatabase
+        .select(appDatabase.quizCardTable)
+        .watch()
+        .distinct(_listEquality.equals);
   }
 
   Future<int> saveQuizCard({
@@ -43,15 +51,37 @@ class QuizCardDataBaseRepository {
     return result;
   }
 
-  Future<bool> deleteQuizCard(int id) async {
-    final result = await (appDatabase.delete(appDatabase.quizCardTable)
-          ..where(
-            (table) => table.id.isValue(
-              id,
-            ),
-          ))
-        .go();
-    return result >= 0;
+  /// Deletes the card. When [recordTombstone] is true (the default) and the
+  /// card already has a [remoteId], a [SyncTombstoneTable] entry is written
+  /// first so the delete can be propagated to the backend. Pull-side
+  /// reconciliation passes `recordTombstone: false` since the remote is
+  /// already the source of truth in that case.
+  Future<bool> deleteQuizCard(int id, {bool recordTombstone = true}) async {
+    return appDatabase.transaction(() async {
+      if (recordTombstone) {
+        final card = await (appDatabase.select(appDatabase.quizCardTable)
+              ..where((table) => table.id.isValue(id)))
+            .getSingleOrNull();
+        final cardRemoteId = card?.remoteId;
+        if (cardRemoteId != null) {
+          await appDatabase.into(appDatabase.syncTombstoneTable).insert(
+                SyncTombstoneTableCompanion.insert(
+                  entityType: 'card',
+                  remoteId: cardRemoteId,
+                ),
+                mode: InsertMode.insertOrIgnore,
+              );
+        }
+      }
+      final result = await (appDatabase.delete(appDatabase.quizCardTable)
+            ..where(
+              (table) => table.id.isValue(
+                id,
+              ),
+            ))
+          .go();
+      return result >= 0;
+    });
   }
 
   Future<bool> editQuizCard({
@@ -68,6 +98,7 @@ class QuizCardDataBaseRepository {
       QuizCardTableCompanion(
         questionText: Value(request.question),
         answerText: Value(request.answer),
+        isDirty: const Value(true),
       ),
     );
     return result >= 0;
@@ -100,10 +131,7 @@ class QuizCardDataBaseRepository {
     final rows = await (appDatabase.select(appDatabase.quizCardTable)
           ..where((table) => table.deckId.isValue(deckId)))
         .get();
-    return rows
-        .map((r) => r.uid)
-        .whereType<int>()
-        .toSet();
+    return rows.map((r) => r.uid).whereType<int>().toSet();
   }
 
   /// Inserts cards preserving their backup uid (used by iCloud restore).
@@ -146,5 +174,79 @@ class QuizCardDataBaseRepository {
       ),
     );
     return result > 0;
+  }
+
+  /// Local rows with unpushed changes (new inserts default to dirty).
+  Future<List<QuizCardTableData>> fetchDirtyCards() async {
+    return (appDatabase.select(appDatabase.quizCardTable)
+          ..where((table) => table.isDirty.equals(true)))
+        .get();
+  }
+
+  /// Local rows in [deckId] already linked to a remote card.
+  Future<List<QuizCardTableData>> fetchSyncedCardsForDeck(int deckId) async {
+    return (appDatabase.select(appDatabase.quizCardTable)
+          ..where((table) =>
+              table.deckId.isValue(deckId) & table.remoteId.isNotNull()))
+        .get();
+  }
+
+  /// Returns the local row id of the card with the given [remoteId], or null.
+  Future<int?> findCardIdByRemoteId(String remoteId) async {
+    final row = await (appDatabase.select(appDatabase.quizCardTable)
+          ..where((table) => table.remoteId.isValue(remoteId))
+          ..limit(1))
+        .getSingleOrNull();
+    return row?.id;
+  }
+
+  /// Marks a local card as pushed: links it to [remoteId] and clears the
+  /// dirty flag.
+  Future<void> markCardSynced(int id, String remoteId) async {
+    await (appDatabase.update(appDatabase.quizCardTable)
+          ..where((table) => table.id.isValue(id)))
+        .write(
+      QuizCardTableCompanion(
+        remoteId: Value(remoteId),
+        isDirty: const Value(false),
+      ),
+    );
+  }
+
+  /// Upserts a local card by [remoteId] (pull-side, remote wins): updates
+  /// the matching local row's fields if found, otherwise inserts a new one.
+  /// Returns the local row id.
+  Future<int> upsertCardByRemoteId({
+    required String remoteId,
+    required int deckId,
+    required String question,
+    required String answer,
+    required bool isArchive,
+  }) async {
+    final existingId = await findCardIdByRemoteId(remoteId);
+    if (existingId != null) {
+      await (appDatabase.update(appDatabase.quizCardTable)
+            ..where((table) => table.id.isValue(existingId)))
+          .write(
+        QuizCardTableCompanion(
+          questionText: Value(question),
+          answerText: Value(answer),
+          isArchive: Value(isArchive),
+          isDirty: const Value(false),
+        ),
+      );
+      return existingId;
+    }
+    return appDatabase.into(appDatabase.quizCardTable).insert(
+          QuizCardTableCompanion.insert(
+            deckId: deckId,
+            questionText: question,
+            answerText: answer,
+            isArchive: isArchive,
+            uid: Value(UidGenerator.next()),
+            remoteId: Value(remoteId),
+            isDirty: const Value(false),
+          ),
+        );
   }
 }

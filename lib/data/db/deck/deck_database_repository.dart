@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
@@ -6,10 +7,21 @@ import 'package:poc_ai_quiz/util/uid_generator.dart';
 class DeckDataBaseRepository {
   final AppDatabase appDatabase;
 
+  static const _listEquality = ListEquality<DeckTableData>();
+
   DeckDataBaseRepository(this.appDatabase);
 
+  /// `.watch()` re-emits on every write to the table, including no-op
+  /// updates that write back identical values (e.g. sync's remote-wins
+  /// upsert). `distinct()` needs an explicit equality here because
+  /// `List<DeckTableData>`'s default `==` is identity, not element-wise —
+  /// without it every emission is a new list instance and distinct() never
+  /// suppresses anything, defeating its purpose.
   Stream<List<DeckTableData>> watchAllDecks() {
-    return appDatabase.select(appDatabase.deckTable).watch();
+    return appDatabase
+        .select(appDatabase.deckTable)
+        .watch()
+        .distinct(_listEquality.equals);
   }
 
   Future<List<DeckTableData>> fetchAllDecks() {
@@ -74,20 +86,131 @@ class DeckDataBaseRepository {
         .write(
       DeckTableCompanion(
         title: Value(deckName),
+        isDirty: const Value(true),
       ),
     );
     return result >= 0;
   }
 
-  Future<bool> deleteDeck(int id) async {
-    final result = await (appDatabase.delete(appDatabase.deckTable)
-          ..where(
-            (table) => table.id.isValue(
-              id,
-            ),
-          ))
-        .go();
-    return result >= 0;
+  /// Deletes the deck and its child cards in one transaction. When
+  /// [recordTombstone] is true (the default), any child card and the deck
+  /// itself that already have a [remoteId] get a [SyncTombstoneTable] entry
+  /// so the delete can be propagated to the backend. Pull-side reconciliation
+  /// passes `recordTombstone: false` since the remote is already the source
+  /// of truth in that case (nothing to tell it).
+  Future<bool> deleteDeck(int id, {bool recordTombstone = true}) async {
+    return appDatabase.transaction(() async {
+      final deck = await (appDatabase.select(appDatabase.deckTable)
+            ..where((table) => table.id.isValue(id)))
+          .getSingleOrNull();
+      if (deck == null) return false;
+
+      final cards = await (appDatabase.select(appDatabase.quizCardTable)
+            ..where((table) => table.deckId.isValue(id)))
+          .get();
+
+      if (recordTombstone) {
+        for (final card in cards) {
+          final cardRemoteId = card.remoteId;
+          if (cardRemoteId != null) {
+            await appDatabase.into(appDatabase.syncTombstoneTable).insert(
+                  SyncTombstoneTableCompanion.insert(
+                    entityType: 'card',
+                    remoteId: cardRemoteId,
+                  ),
+                  mode: InsertMode.insertOrIgnore,
+                );
+          }
+        }
+      }
+
+      await (appDatabase.delete(appDatabase.quizCardTable)
+            ..where((table) => table.deckId.isValue(id)))
+          .go();
+
+      final deckRemoteId = deck.remoteId;
+      if (recordTombstone && deckRemoteId != null) {
+        await appDatabase.into(appDatabase.syncTombstoneTable).insert(
+              SyncTombstoneTableCompanion.insert(
+                entityType: 'deck',
+                remoteId: deckRemoteId,
+              ),
+              mode: InsertMode.insertOrIgnore,
+            );
+      }
+
+      final result = await (appDatabase.delete(appDatabase.deckTable)
+            ..where((table) => table.id.isValue(id)))
+          .go();
+      return result >= 0;
+    });
   }
 
+  /// Local rows with unpushed changes (new inserts default to dirty).
+  Future<List<DeckTableData>> fetchDirtyDecks() async {
+    return (appDatabase.select(appDatabase.deckTable)
+          ..where((table) => table.isDirty.equals(true)))
+        .get();
+  }
+
+  /// Local rows already linked to a remote deck.
+  Future<List<DeckTableData>> fetchSyncedDecks() async {
+    return (appDatabase.select(appDatabase.deckTable)
+          ..where((table) => table.remoteId.isNotNull()))
+        .get();
+  }
+
+  /// Returns the local row id of the deck with the given [remoteId], or null.
+  Future<int?> findDeckIdByRemoteId(String remoteId) async {
+    final row = await (appDatabase.select(appDatabase.deckTable)
+          ..where((table) => table.remoteId.isValue(remoteId))
+          ..limit(1))
+        .getSingleOrNull();
+    return row?.id;
+  }
+
+  /// Marks a local deck as pushed: links it to [remoteId] and clears the
+  /// dirty flag.
+  Future<void> markDeckSynced(int id, String remoteId) async {
+    await (appDatabase.update(appDatabase.deckTable)
+          ..where((table) => table.id.isValue(id)))
+        .write(
+      DeckTableCompanion(
+        remoteId: Value(remoteId),
+        isDirty: const Value(false),
+      ),
+    );
+  }
+
+  /// Upserts a local deck by [remoteId] (pull-side, remote wins): updates
+  /// the matching local row's fields if found, otherwise inserts a new one.
+  /// Returns the local row id.
+  Future<int> upsertDeckByRemoteId({
+    required String remoteId,
+    required String title,
+    required bool isArchive,
+  }) async {
+    final existingId = await findDeckIdByRemoteId(remoteId);
+    if (existingId != null) {
+      await (appDatabase.update(appDatabase.deckTable)
+            ..where((table) => table.id.isValue(existingId)))
+          .write(
+        DeckTableCompanion(
+          title: Value(title),
+          isArchive: Value(isArchive),
+          isDirty: const Value(false),
+        ),
+      );
+      return existingId;
+    }
+    return appDatabase.into(appDatabase.deckTable).insert(
+          DeckTableCompanion.insert(
+            title: title,
+            isArchive: isArchive,
+            uid: Value(UidGenerator.next()),
+            remoteId: Value(remoteId),
+            isDirty: const Value(false),
+          ),
+        );
+  }
 }

@@ -12,6 +12,8 @@ class QuizCardDataBaseMapper {
             questionText: e.questionText,
             answerText: e.answerText,
             isArchive: e.isArchive,
+            remoteId: e.remoteId,
+            isDirty: e.isDirty,
           ),
         )
         .toList();
