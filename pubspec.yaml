@@ -1,7 +1,9 @@
 name: poc_ai_quiz
 description: A new Flutter project.
 publish_to: 'none'
-version: 1.2.2
+
+# Should not be edited manually, use `flutter pub run build_runner build` instead.
+version: 6.6.6
 
 environment:
   sdk: '>=3.1.0 <4.0.0'
