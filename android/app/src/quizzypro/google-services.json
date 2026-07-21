@@ -12,7 +12,12 @@
           "package_name": "com.chechoora.quizzy"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "897552655477-defabfn8am4hfmhi3lds5frvik3btera.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAI5VFgJDZ8jDQve17iJkc1zAebKb2psXA"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "897552655477-defabfn8am4hfmhi3lds5frvik3btera.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "897552655477-1maggjcs1k7urpeujmj014as4vv696vh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pocAiQuiz"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +48,20 @@
           "package_name": "com.chechoora.quizzy.pro"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "897552655477-vl1libg5ug36t5ghogj9a38voa5v83ld.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chechoora.quizzy.pro",
+            "certificate_hash": "06b0a4768e96ea1616703da590d71e56f724f144"
+          }
+        },
+        {
+          "client_id": "897552655477-defabfn8am4hfmhi3lds5frvik3btera.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAI5VFgJDZ8jDQve17iJkc1zAebKb2psXA"
@@ -39,7 +69,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "897552655477-defabfn8am4hfmhi3lds5frvik3btera.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "897552655477-1maggjcs1k7urpeujmj014as4vv696vh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pocAiQuiz"
+              }
+            }
+          ]
         }
       }
     }

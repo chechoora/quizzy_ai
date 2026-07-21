@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="quizzypro (purchase cache)" type="FlutterRunConfigurationType" factoryName="Flutter">
+    <option name="buildFlavor" value="quizzypro" />
+    <option name="additionalArgs" value="--dart-define=PURCHASE_TYPE=mock_cache" />
+    <option name="filePath" value="$PROJECT_DIR$/lib/main_quizzypro.dart" />
+    <method v="2" />
+  </configuration>
+</component>
