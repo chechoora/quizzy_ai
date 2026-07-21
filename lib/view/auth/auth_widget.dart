@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -79,12 +81,13 @@ class AuthWidget extends HookWidget {
                         leadingIcon: const Icon(Icons.login, size: 20),
                         onPressed: isLoading ? null : cubit.signInWithGoogle,
                       ),
-                      // const SizedBox(height: 16),
-                      // AppButton.secondary(
-                      //   text: l10n.authSignInWithApple,
-                      //   leadingIcon: const Icon(Icons.apple, size: 22),
-                      //   onPressed: isLoading ? null : cubit.signInWithApple,
-                      // ),
+                      const SizedBox(height: 16),
+                      if (Platform.isIOS)
+                        AppButton.secondary(
+                          text: l10n.authSignInWithApple,
+                          leadingIcon: const Icon(Icons.apple, size: 22),
+                          onPressed: isLoading ? null : cubit.signInWithApple,
+                        ),
                     ],
                   ),
                 ),
