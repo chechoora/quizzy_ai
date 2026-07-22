@@ -86,9 +86,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inAppFeaturesQuizzyAiDescription => 'Use our AI-powered validator to check your quiz answers with high accuracy. Also includes unlimited decks & cards and AI deck generation.';
 
   @override
-  String get inAppFeaturesQuizzyAiSubtitle => 'Yearly subscription';
-
-  @override
   String get inAppFeaturesSubscribeButton => 'Subscribe';
 
   @override

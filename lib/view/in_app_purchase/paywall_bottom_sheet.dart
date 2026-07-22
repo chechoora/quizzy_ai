@@ -58,9 +58,6 @@ class _PaywallBottomSheet extends HookWidget {
     final description = isSubscription
         ? l10n.inAppFeaturesQuizzyAiDescription
         : l10n.inAppFeaturesUnlimitedDescription;
-    final subtitle = isSubscription
-        ? l10n.inAppFeaturesQuizzyAiSubtitle
-        : l10n.inAppFeaturesUnlimitedSubtitle;
     final actionTitle = isSubscription
         ? l10n.inAppFeaturesSubscribeButton
         : l10n.inAppFeaturesPurchaseButton;
@@ -159,14 +156,6 @@ class _PaywallBottomSheet extends HookWidget {
                         options: options,
                         selectedPackageIdentifier: selectedPackageIdentifier,
                         onSelected: cubit.selectOption,
-                      )
-                    else
-                      Text(
-                        subtitle,
-                        style: AppTypography.secondaryText.copyWith(
-                          color: AppColors.grayscale400,
-                        ),
-                        textAlign: TextAlign.center,
                       ),
                     const SizedBox(height: 20),
                     if (isLoading)
@@ -206,7 +195,6 @@ class _PaywallBottomSheet extends HookWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
                   ],
                 ),
               ),

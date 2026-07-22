@@ -12,7 +12,6 @@ class FeaturePurchaseCard extends StatelessWidget {
     required this.description,
     required this.actionTitle,
     required this.purchasedLabel,
-    required this.subtitle,
     required this.isPurchased,
     required this.onPurchase,
     this.purchaseOptions,
@@ -25,12 +24,10 @@ class FeaturePurchaseCard extends StatelessWidget {
   final String description;
   final String actionTitle;
   final String purchasedLabel;
-  final String subtitle;
   final bool isPurchased;
   final VoidCallback onPurchase;
 
-  /// When non-null and non-empty, renders a Monthly/Yearly picker in place of
-  /// [subtitle] (used by subscription features so the user can pick a plan).
+  /// When non-null and non-empty, renders a Monthly/Yearly picker
   final List<PurchaseOption>? purchaseOptions;
   final String? selectedPackageIdentifier;
   final ValueChanged<String>? onSelectOption;
@@ -129,15 +126,6 @@ class FeaturePurchaseCard extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-          const SizedBox(height: 12),
-          if (purchaseOptions == null || purchaseOptions!.isEmpty)
-            Text(
-              subtitle,
-              style: AppTypography.secondaryText.copyWith(
-                color: AppColors.grayscale400,
-              ),
-              textAlign: TextAlign.center,
             ),
         ],
       ),

@@ -159,7 +159,6 @@ class _PaywallContent extends StatelessWidget {
             description: l10n.inAppFeaturesUnlimitedDescription,
             actionTitle: l10n.inAppFeaturesPurchaseButton,
             purchasedLabel: l10n.inAppFeaturesPurchased,
-            subtitle: l10n.inAppFeaturesUnlimitedSubtitle,
             isPurchased: (state as InAppFeaturesFullUnlockState).isPurchased,
             onPurchase: onPurchase,
           )
@@ -170,7 +169,6 @@ class _PaywallContent extends StatelessWidget {
             description: l10n.inAppFeaturesQuizzyAiDescription,
             actionTitle: l10n.inAppFeaturesSubscribeButton,
             purchasedLabel: l10n.inAppFeaturesSubscribed,
-            subtitle: l10n.inAppFeaturesQuizzyAiSubtitle,
             isPurchased: (state as InAppFeaturesQuizzyAiState).isSubscribed,
             onPurchase: onPurchase,
             purchaseOptions: (state as InAppFeaturesQuizzyAiState).options,
@@ -200,7 +198,6 @@ class _PaywallContent extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 16),
       ],
     );
   }

@@ -243,12 +243,6 @@ abstract class AppLocalizations {
   /// **'Use our AI-powered validator to check your quiz answers with high accuracy. Also includes unlimited decks & cards and AI deck generation.'**
   String get inAppFeaturesQuizzyAiDescription;
 
-  /// No description provided for @inAppFeaturesQuizzyAiSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Yearly subscription'**
-  String get inAppFeaturesQuizzyAiSubtitle;
-
   /// No description provided for @inAppFeaturesSubscribeButton.
   ///
   /// In en, this message translates to:
