@@ -294,3 +294,151 @@ class AnswerResponseDto {
         usage: UsageInfoDto.fromJson(json['usage'] as Map<String, dynamic>),
       );
 }
+
+class PublicTagDto {
+  final String slug;
+  final String name;
+
+  PublicTagDto({
+    required this.slug,
+    required this.name,
+  });
+
+  factory PublicTagDto.fromJson(Map<String, dynamic> json) => PublicTagDto(
+        slug: json['slug'] as String,
+        name: json['name'] as String,
+      );
+}
+
+class PublicCategoryDto {
+  final String id;
+  final String slug;
+  final String name;
+  final String? description;
+  final num deckCount;
+
+  PublicCategoryDto({
+    required this.id,
+    required this.slug,
+    required this.name,
+    this.description,
+    required this.deckCount,
+  });
+
+  factory PublicCategoryDto.fromJson(Map<String, dynamic> json) =>
+      PublicCategoryDto(
+        id: json['id'] as String,
+        slug: json['slug'] as String,
+        name: json['name'] as String,
+        description: json['description'] as String?,
+        deckCount: json['deckCount'] as num,
+      );
+}
+
+class PublicDeckSummaryDto {
+  final String id;
+  final String categoryId;
+  final String title;
+  final String? description;
+  final List<PublicTagDto> tags;
+  final num cardCount;
+
+  PublicDeckSummaryDto({
+    required this.id,
+    required this.categoryId,
+    required this.title,
+    this.description,
+    required this.tags,
+    required this.cardCount,
+  });
+
+  factory PublicDeckSummaryDto.fromJson(Map<String, dynamic> json) =>
+      PublicDeckSummaryDto(
+        id: json['id'] as String,
+        categoryId: json['categoryId'] as String,
+        title: json['title'] as String,
+        description: json['description'] as String?,
+        tags: (json['tags'] as List)
+            .map((t) => PublicTagDto.fromJson(t as Map<String, dynamic>))
+            .toList(),
+        cardCount: json['cardCount'] as num,
+      );
+}
+
+class PublicDeckPageDto {
+  final List<PublicDeckSummaryDto> items;
+  final String? nextCursor;
+  final bool hasMore;
+
+  PublicDeckPageDto({
+    required this.items,
+    this.nextCursor,
+    required this.hasMore,
+  });
+
+  factory PublicDeckPageDto.fromJson(Map<String, dynamic> json) =>
+      PublicDeckPageDto(
+        items: (json['items'] as List)
+            .map((d) =>
+                PublicDeckSummaryDto.fromJson(d as Map<String, dynamic>))
+            .toList(),
+        nextCursor: json['nextCursor'] as String?,
+        hasMore: json['hasMore'] as bool,
+      );
+}
+
+class PublicCardDto {
+  final String id;
+  final String question;
+  final String answer;
+  final num position;
+
+  PublicCardDto({
+    required this.id,
+    required this.question,
+    required this.answer,
+    required this.position,
+  });
+
+  factory PublicCardDto.fromJson(Map<String, dynamic> json) => PublicCardDto(
+        id: json['id'] as String,
+        question: json['question'] as String,
+        answer: json['answer'] as String,
+        position: json['position'] as num,
+      );
+}
+
+class PublicDeckDetailDto {
+  final String id;
+  final String categoryId;
+  final String title;
+  final String? description;
+  final List<PublicTagDto> tags;
+  final num cardCount;
+  final List<PublicCardDto> cards;
+
+  PublicDeckDetailDto({
+    required this.id,
+    required this.categoryId,
+    required this.title,
+    this.description,
+    required this.tags,
+    required this.cardCount,
+    required this.cards,
+  });
+
+  factory PublicDeckDetailDto.fromJson(Map<String, dynamic> json) =>
+      PublicDeckDetailDto(
+        id: json['id'] as String,
+        categoryId: json['categoryId'] as String,
+        title: json['title'] as String,
+        description: json['description'] as String?,
+        tags: (json['tags'] as List)
+            .map((t) => PublicTagDto.fromJson(t as Map<String, dynamic>))
+            .toList(),
+        cardCount: json['cardCount'] as num,
+        cards: (json['cards'] as List)
+            .map((c) => PublicCardDto.fromJson(c as Map<String, dynamic>))
+            .toList(),
+      );
+}

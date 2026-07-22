@@ -21,6 +21,7 @@ import 'package:poc_ai_quiz/data/api/quizzy_backend/ai_tutor_api_service.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/cards_api_service.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/decks_api_service.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/decks_deck_generator.dart';
+import 'package:poc_ai_quiz/data/api/quizzy_backend/public_decks_api_service.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/quizzy_backend_auth_interceptor.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/user_api_service.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
@@ -69,6 +70,7 @@ import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/ai_tutor_repository.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/cards_repository.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/decks_repository.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/public_decks_repository.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/user_balance_repository.dart';
 import 'package:poc_ai_quiz/data/import_export/export_service.dart';
 import 'package:poc_ai_quiz/data/import_export/import_service.dart';
@@ -248,6 +250,7 @@ Future<void> _setupAPI() async {
       CardsApiService.create(),
       AiTutorApiService.create(),
       UserApiService.create(),
+      PublicDecksApiService.create(),
     ],
     interceptors: [
       QuizzyBackendAuthInterceptor(
@@ -342,6 +345,12 @@ Future<void> _setupServices() async {
     logger: Logger.withTag('UserBalanceRepository'),
   );
   getIt.registerSingleton<UserBalanceRepository>(userBalanceRepository);
+
+  final publicDecksRepository = PublicDecksRepository(
+    apiService: quizzyBackendClient.getService<PublicDecksApiService>(),
+    logger: Logger.withTag('PublicDecksRepository'),
+  );
+  getIt.registerSingleton<PublicDecksRepository>(publicDecksRepository);
 
   // AiTutor-backed answer validator & Decks-backed deck generator
   final aiTutorAnswerValidator = AiTutorAnswerValidator(aiTutorRepository);
