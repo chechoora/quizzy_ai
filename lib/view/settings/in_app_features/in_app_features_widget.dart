@@ -51,6 +51,7 @@ class SettingsInAppFeaturesWidget extends HookWidget {
                       state: state,
                       onPurchase: cubit.purchase,
                       onRestorePurchases: cubit.restorePurchases,
+                      onSelectOption: cubit.selectOption,
                     );
                   }
                   if (state is InAppFeaturesLoadingState ||
@@ -93,11 +94,13 @@ class _InAppFeaturesContent extends StatelessWidget {
     required this.state,
     required this.onPurchase,
     required this.onRestorePurchases,
+    required this.onSelectOption,
   });
 
   final InAppFeaturesDataState state;
   final VoidCallback onPurchase;
   final VoidCallback onRestorePurchases;
+  final ValueChanged<String> onSelectOption;
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +130,10 @@ class _InAppFeaturesContent extends StatelessWidget {
             subtitle: l10n.inAppFeaturesQuizzyAiSubtitle,
             isPurchased: (state as InAppFeaturesQuizzyAiState).isSubscribed,
             onPurchase: onPurchase,
+            purchaseOptions: (state as InAppFeaturesQuizzyAiState).options,
+            selectedPackageIdentifier:
+                (state as InAppFeaturesQuizzyAiState).selectedPackageIdentifier,
+            onSelectOption: onSelectOption,
           ),
         const SizedBox(height: 24),
         TextButton.icon(

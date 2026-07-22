@@ -1,5 +1,38 @@
 import 'package:poc_ai_quiz/data/in_app_purchase/revenue_cat_purchase_manager.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+List<Package> _mockOfferingPackages(String offeringIdentifier) {
+  final context = PresentedOfferingContext(offeringIdentifier, null, null);
+  return [
+    Package(
+      'mock_monthly',
+      PackageType.monthly,
+      const StoreProduct(
+        'mock_monthly_product',
+        'Mock monthly subscription',
+        'Mock Monthly',
+        4.99,
+        r'$4.99',
+        'USD',
+      ),
+      context,
+    ),
+    Package(
+      'mock_annual',
+      PackageType.annual,
+      const StoreProduct(
+        'mock_annual_product',
+        'Mock annual subscription',
+        'Mock Yearly',
+        39.99,
+        r'$39.99',
+        'USD',
+      ),
+      context,
+    ),
+  ];
+}
 
 class MockCacheRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   bool _isUnlocked = false;
@@ -17,10 +50,16 @@ class MockCacheRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   }
 
   @override
+  Future<List<Package>> getOfferingPackages(String offeringIdentifier) async {
+    return _mockOfferingPackages(offeringIdentifier);
+  }
+
+  @override
   Future<bool> purchaseOffering(
     String offeringIdentifier,
-    String entitlementIdentifier,
-  ) async {
+    String entitlementIdentifier, {
+    String? packageIdentifier,
+  }) async {
     if (entitlementIdentifier ==
         RevenueCatPurchaseManager.cardsAndDecksEntitlement) {
       _isUnlocked = true;
@@ -53,10 +92,16 @@ class MockPrefRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   }
 
   @override
+  Future<List<Package>> getOfferingPackages(String offeringIdentifier) async {
+    return _mockOfferingPackages(offeringIdentifier);
+  }
+
+  @override
   Future<bool> purchaseOffering(
     String offeringIdentifier,
-    String entitlementIdentifier,
-  ) async {
+    String entitlementIdentifier, {
+    String? packageIdentifier,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('$_prefKeyPrefix$entitlementIdentifier', true);
     return true;

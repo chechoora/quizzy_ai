@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/util/env_hide.dart';
@@ -62,11 +63,26 @@ class RevenueCatPurchaseManager {
     return isActive;
   }
 
+  Future<List<Package>> getOfferingPackages(String offeringIdentifier) async {
+    _logger.d('Fetching packages for offering: $offeringIdentifier');
+    final offerings = await Purchases.getOfferings();
+    final offering = offerings.all[offeringIdentifier];
+    if (offering == null) {
+      _logger.e('No current offering available');
+      throw Exception('No current offering available');
+    }
+    _logger.d(
+        'Found ${offering.availablePackages.length} packages for offering $offeringIdentifier');
+    return offering.availablePackages;
+  }
+
   Future<bool> purchaseOffering(
     String offeringIdentifier,
-    String entitlementIdentifier,
-  ) async {
-    _logger.d('Purchasing offering: $offeringIdentifier');
+    String entitlementIdentifier, {
+    String? packageIdentifier,
+  }) async {
+    _logger.d('Purchasing offering: $offeringIdentifier, package: '
+        '${packageIdentifier ?? '(default)'}');
     final offerings = await Purchases.getOfferings();
     final offering = offerings.all[offeringIdentifier];
     if (offering == null) {
@@ -74,7 +90,10 @@ class RevenueCatPurchaseManager {
       throw Exception('No current offering available');
     }
 
-    final package = offering.availablePackages.firstOrNull;
+    final package = packageIdentifier != null
+        ? offering.availablePackages
+            .firstWhereOrNull((p) => p.identifier == packageIdentifier)
+        : offering.availablePackages.firstOrNull;
     if (package == null) {
       _logger.e('No available packages for offering $offeringIdentifier');
       throw Exception(

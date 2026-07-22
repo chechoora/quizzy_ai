@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/purchase_option.dart';
+import 'package:poc_ai_quiz/view/widgets/purchase_options_row.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 
 class FeaturePurchaseCard extends StatelessWidget {
@@ -13,6 +15,9 @@ class FeaturePurchaseCard extends StatelessWidget {
     required this.subtitle,
     required this.isPurchased,
     required this.onPurchase,
+    this.purchaseOptions,
+    this.selectedPackageIdentifier,
+    this.onSelectOption,
   });
 
   final String iconAsset;
@@ -23,6 +28,12 @@ class FeaturePurchaseCard extends StatelessWidget {
   final String subtitle;
   final bool isPurchased;
   final VoidCallback onPurchase;
+
+  /// When non-null and non-empty, renders a Monthly/Yearly picker in place of
+  /// [subtitle] (used by subscription features so the user can pick a plan).
+  final List<PurchaseOption>? purchaseOptions;
+  final String? selectedPackageIdentifier;
+  final ValueChanged<String>? onSelectOption;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +72,16 @@ class FeaturePurchaseCard extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
+          if (!isPurchased &&
+              purchaseOptions != null &&
+              purchaseOptions!.isNotEmpty) ...[
+            PurchaseOptionsRow(
+              options: purchaseOptions!,
+              selectedPackageIdentifier: selectedPackageIdentifier,
+              onSelected: onSelectOption!,
+            ),
+            const SizedBox(height: 16),
+          ],
           if (isPurchased)
             Container(
               width: double.infinity,
@@ -110,13 +131,14 @@ class FeaturePurchaseCard extends StatelessWidget {
               ),
             ),
           const SizedBox(height: 12),
-          Text(
-            subtitle,
-            style: AppTypography.secondaryText.copyWith(
-              color: AppColors.grayscale400,
+          if (purchaseOptions == null || purchaseOptions!.isEmpty)
+            Text(
+              subtitle,
+              style: AppTypography.secondaryText.copyWith(
+                color: AppColors.grayscale400,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
         ],
       ),
     );

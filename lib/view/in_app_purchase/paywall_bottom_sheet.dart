@@ -4,9 +4,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/purchase_option.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/cubit/paywall_cubit.dart';
+import 'package:poc_ai_quiz/view/widgets/purchase_options_row.dart';
 
 Future<bool?> showPaywallBottomSheet(
   BuildContext context, {
@@ -77,6 +79,12 @@ class _PaywallBottomSheet extends HookWidget {
       },
       builder: (context, state) {
         final isLoading = state is PaywallLoadingState;
+        final options = state is PaywallOptionsState
+            ? state.options
+            : const <PurchaseOption>[];
+        final selectedPackageIdentifier = state is PaywallOptionsState
+            ? state.selectedPackageIdentifier
+            : null;
 
         return SafeArea(
           top: false,
@@ -146,13 +154,20 @@ class _PaywallBottomSheet extends HookWidget {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      subtitle,
-                      style: AppTypography.secondaryText.copyWith(
-                        color: AppColors.grayscale400,
+                    if (isSubscription && options.isNotEmpty)
+                      PurchaseOptionsRow(
+                        options: options,
+                        selectedPackageIdentifier: selectedPackageIdentifier,
+                        onSelected: cubit.selectOption,
+                      )
+                    else
+                      Text(
+                        subtitle,
+                        style: AppTypography.secondaryText.copyWith(
+                          color: AppColors.grayscale400,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
                     const SizedBox(height: 20),
                     if (isLoading)
                       const Center(child: CircularProgressIndicator())

@@ -1,7 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/exception/in_app_purchase_exception.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/purchase_option.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
@@ -26,6 +28,9 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
 
   late final Logger _logger;
 
+  List<PurchaseOption> _options = const [];
+  String? _selectedPackageIdentifier;
+
   Future<void> loadFeatures() async {
     emit(const InAppFeaturesLoadingState());
     try {
@@ -33,7 +38,14 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
         final isSubscribed = await inAppPurchaseService.isFeaturePurchased(
           InAppPurchaseFeature.quizzyAi,
         );
-        emit(InAppFeaturesQuizzyAiState(isSubscribed: isSubscribed));
+        if (!isSubscribed) {
+          await _loadPurchaseOptions();
+        }
+        emit(InAppFeaturesQuizzyAiState(
+          isSubscribed: isSubscribed,
+          options: _options,
+          selectedPackageIdentifier: _selectedPackageIdentifier,
+        ));
       } else {
         final isPurchased = await inAppPurchaseService.isFeaturePurchased(
           InAppPurchaseFeature.unlimitedDecksCards,
@@ -46,6 +58,35 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
     }
   }
 
+  Future<void> _loadPurchaseOptions() async {
+    _logger.d('Loading purchase options for quizzyAi');
+    try {
+      final options = await inAppPurchaseService
+          .getPurchaseOptions(InAppPurchaseFeature.quizzyAi);
+      _options = options;
+      _selectedPackageIdentifier = options
+              .firstWhereOrNull((o) => o.period == SubscriptionPeriod.yearly)
+              ?.packageIdentifier ??
+          options.firstOrNull?.packageIdentifier;
+      _logger.i('Loaded ${options.length} purchase options');
+    } catch (e, stackTrace) {
+      _logger.e('Failed to load purchase options',
+          ex: e, stacktrace: stackTrace);
+    }
+  }
+
+  void selectOption(String packageIdentifier) {
+    final currentState = state;
+    if (currentState is! InAppFeaturesQuizzyAiState) return;
+    _logger.d('Selected purchase option: $packageIdentifier');
+    _selectedPackageIdentifier = packageIdentifier;
+    emit(InAppFeaturesQuizzyAiState(
+      isSubscribed: currentState.isSubscribed,
+      options: _options,
+      selectedPackageIdentifier: _selectedPackageIdentifier,
+    ));
+  }
+
   Future<void> purchase() async {
     final currentState = state;
     if (currentState is! InAppFeaturesDataState) return;
@@ -55,7 +96,10 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
       final feature = isSubscriptionOnly
           ? InAppPurchaseFeature.quizzyAi
           : InAppPurchaseFeature.unlimitedDecksCards;
-      final result = await inAppPurchaseService.purchaseFeature(feature);
+      final result = await inAppPurchaseService.purchaseFeature(
+        feature,
+        packageIdentifier: isSubscriptionOnly ? _selectedPackageIdentifier : null,
+      );
       if (!result) {
         throw Exception('Purchase was not completed successfully');
       }
@@ -154,11 +198,17 @@ class InAppFeaturesFullUnlockState extends InAppFeaturesDataState {
 
 class InAppFeaturesQuizzyAiState extends InAppFeaturesDataState {
   final bool isSubscribed;
+  final List<PurchaseOption> options;
+  final String? selectedPackageIdentifier;
 
-  const InAppFeaturesQuizzyAiState({required this.isSubscribed});
+  const InAppFeaturesQuizzyAiState({
+    required this.isSubscribed,
+    this.options = const [],
+    this.selectedPackageIdentifier,
+  });
 
   @override
-  List<Object?> get props => [isSubscribed];
+  List<Object?> get props => [isSubscribed, options, selectedPackageIdentifier];
 }
 
 class InAppFeaturesPurchaseSuccessState extends ListenerState {

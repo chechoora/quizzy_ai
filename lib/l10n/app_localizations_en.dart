@@ -89,6 +89,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inAppFeaturesSubscribeButton => 'Subscribe';
 
   @override
+  String get inAppFeaturesMonthlyLabel => 'Monthly';
+
+  @override
+  String get inAppFeaturesYearlyLabel => 'Yearly';
+
+  @override
+  String get inAppFeaturesBestValueLabel => 'Best value';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override

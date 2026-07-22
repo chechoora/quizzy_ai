@@ -107,6 +107,7 @@ class _OnboardingPaywallBottomSheet extends HookWidget {
                           errorMessage.value = null;
                           cubit.restorePurchases();
                         },
+                        onSelectOption: cubit.selectOption,
                       )
                     : const Padding(
                         padding: EdgeInsets.symmetric(vertical: 48.0),
@@ -127,12 +128,14 @@ class _PaywallContent extends StatelessWidget {
     required this.errorMessage,
     required this.onPurchase,
     required this.onRestorePurchases,
+    required this.onSelectOption,
   });
 
   final InAppFeaturesDataState state;
   final String? errorMessage;
   final VoidCallback onPurchase;
   final VoidCallback onRestorePurchases;
+  final ValueChanged<String> onSelectOption;
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +173,10 @@ class _PaywallContent extends StatelessWidget {
             subtitle: l10n.inAppFeaturesQuizzyAiSubtitle,
             isPurchased: (state as InAppFeaturesQuizzyAiState).isSubscribed,
             onPurchase: onPurchase,
+            purchaseOptions: (state as InAppFeaturesQuizzyAiState).options,
+            selectedPackageIdentifier:
+                (state as InAppFeaturesQuizzyAiState).selectedPackageIdentifier,
+            onSelectOption: onSelectOption,
           ),
         if (errorMessage != null) ...[
           const SizedBox(height: 8),

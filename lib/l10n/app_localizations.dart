@@ -249,6 +249,24 @@ abstract class AppLocalizations {
   /// **'Subscribe'**
   String get inAppFeaturesSubscribeButton;
 
+  /// No description provided for @inAppFeaturesMonthlyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get inAppFeaturesMonthlyLabel;
+
+  /// No description provided for @inAppFeaturesYearlyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get inAppFeaturesYearlyLabel;
+
+  /// No description provided for @inAppFeaturesBestValueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Best value'**
+  String get inAppFeaturesBestValueLabel;
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:
