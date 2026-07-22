@@ -2,20 +2,31 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/auth/model/auth_user.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/view/auth/cubit/auth_cubit.dart';
 
 class MockAuthService extends Mock implements AuthService {}
 
+class MockInAppPurchaseService extends Mock implements InAppPurchaseService {}
+
 class FakeLogger extends Mock implements Logger {}
 
 void main() {
   late MockAuthService authService;
+  late MockInAppPurchaseService inAppPurchaseService;
   late AuthCubit cubit;
 
   setUp(() {
     authService = MockAuthService();
-    cubit = AuthCubit(authService: authService, logger: FakeLogger());
+    inAppPurchaseService = MockInAppPurchaseService();
+    when(() => inAppPurchaseService.logInUser(any()))
+        .thenAnswer((_) async {});
+    cubit = AuthCubit(
+      authService: authService,
+      inAppPurchaseService: inAppPurchaseService,
+      logger: FakeLogger(),
+    );
   });
 
   tearDown(() => cubit.close());

@@ -68,6 +68,14 @@ class InAppPurchaseService {
   Future<String> getAppUserId() async {
     return revenueCatPurchaseManager.getAppUserId();
   }
+
+  Future<void> logInUser(String firebaseUid) {
+    return revenueCatPurchaseManager.logIn(firebaseUid);
+  }
+
+  Future<void> logOutUser() {
+    return revenueCatPurchaseManager.logOut();
+  }
 }
 
 enum InAppPurchaseFeature {

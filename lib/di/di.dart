@@ -501,6 +501,7 @@ Future<void> _setupServices() async {
     appDatabase: getIt.get<AppDatabase>(),
     userQuotaRepository: userQuotaRepository,
     icloudRestoreService: icloudRestoreService,
+    inAppPurchaseService: getIt<InAppPurchaseService>(),
     logger: Logger.withTag('LogoutManager'),
   );
   getIt.registerSingleton<LogoutManager>(logoutManager);

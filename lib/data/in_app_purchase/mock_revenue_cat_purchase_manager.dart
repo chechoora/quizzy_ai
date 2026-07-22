@@ -77,6 +77,12 @@ class MockCacheRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   Future<String> getAppUserId() {
     return Future.value('mock_user_id');
   }
+
+  @override
+  Future<void> logIn(String appUserId) async {}
+
+  @override
+  Future<void> logOut() async {}
 }
 
 class MockPrefRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
@@ -119,4 +125,10 @@ class MockPrefRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   Future<String> getAppUserId() {
     return Future.value('mock_user_id');
   }
+
+  @override
+  Future<void> logIn(String appUserId) async {}
+
+  @override
+  Future<void> logOut() async {}
 }

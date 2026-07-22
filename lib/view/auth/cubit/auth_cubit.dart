@@ -2,15 +2,18 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/auth/model/auth_user.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit({
     required this.authService,
+    required this.inAppPurchaseService,
     required this.logger,
   }) : super(const AuthIdleState());
 
   final AuthService authService;
+  final InAppPurchaseService inAppPurchaseService;
   final Logger logger;
 
   Future<void> signInWithGoogle() =>
@@ -28,6 +31,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final user = await action();
       logger.i('signIn: success provider=$provider uid=${user.uid}');
+      await _linkPurchases(user.uid);
       emit(AuthSignedInState(user));
       emit(const AuthIdleState());
     } on AuthCancelledException {
@@ -38,6 +42,16 @@ class AuthCubit extends Cubit<AuthState> {
           ex: e, stacktrace: stackTrace);
       emit(AuthErrorState(e is AuthException ? e.message : e.toString()));
       emit(const AuthIdleState());
+    }
+  }
+
+  Future<void> _linkPurchases(String firebaseUid) async {
+    logger.d('linkPurchases: uid=$firebaseUid');
+    try {
+      await inAppPurchaseService.logInUser(firebaseUid);
+    } catch (e, stackTrace) {
+      logger.e('linkPurchases: failed uid=$firebaseUid',
+          ex: e, stacktrace: stackTrace);
     }
   }
 }

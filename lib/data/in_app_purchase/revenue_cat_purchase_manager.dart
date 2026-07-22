@@ -119,4 +119,16 @@ class RevenueCatPurchaseManager {
   Future<String> getAppUserId() async {
     return (await Purchases.getCustomerInfo()).originalAppUserId;
   }
+
+  Future<void> logIn(String appUserId) async {
+    _logger.d('Logging in RevenueCat user: $appUserId');
+    await Purchases.logIn(appUserId);
+    _logger.i('RevenueCat user logged in: $appUserId');
+  }
+
+  Future<void> logOut() async {
+    _logger.d('Logging out RevenueCat user');
+    await Purchases.logOut();
+    _logger.i('RevenueCat user logged out');
+  }
 }
