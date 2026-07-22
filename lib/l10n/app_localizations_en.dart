@@ -372,6 +372,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeDeleteDeckAction => 'Delete deck';
 
   @override
+  String get homePublicDecksButton => 'Public Decks';
+
+  @override
+  String get publicDecksTitle => 'Public Decks';
+
+  @override
+  String get publicDecksSearchHint => 'Search public decks';
+
+  @override
+  String get publicDecksAllCategoriesLabel => 'All';
+
+  @override
+  String get publicDecksEmptyState => 'No public decks found';
+
+  @override
+  String get publicDecksErrorMessage => 'Failed to load public decks, please try again';
+
+  @override
+  String get publicDeckDetailErrorMessage => 'Failed to load deck, please try again';
+
+  @override
   String get quizDisplayTypeAnswerLabel => 'Type your answer below';
 
   @override

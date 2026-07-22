@@ -45,41 +45,55 @@ class QuizCardListDisplayWidget extends StatelessWidget {
         }
         final item = quizCarList[index];
         final isSelected = selectedCardIds.contains(item.id);
-        return _QuizCardTile(
-          quizCardItem: item,
+        return QuizCardTile(
+          question: item.questionText,
+          answer: item.answerText,
           isSelected: isSelected,
           showCheckbox: isSelectionModeActive,
           onTap: isSelectionModeActive
               ? () => onCardSelectionToggle?.call(item.id)
               : null,
-          onEditPressed: () => onQuizCardEditRequest?.call(item),
-          onDeletePressed: () => onQuizCardRemoveRequest?.call(item),
+          trailing: AppMoreButton(
+            actions: [
+              AppMoreButtonAction(
+                label: l10n.quizCardListEditCardAction,
+                icon: 'assets/icons/edit.svg',
+                onPressed: () => onQuizCardEditRequest?.call(item),
+              ),
+              AppMoreButtonAction(
+                label: l10n.quizCardListDeleteCardAction,
+                icon: 'assets/icons/delete.svg',
+                textColor: AppColors.error500,
+                onPressed: () => onQuizCardRemoveRequest?.call(item),
+              ),
+            ],
+          ),
         );
       },
     );
   }
 }
 
-class _QuizCardTile extends StatelessWidget {
-  const _QuizCardTile({
-    required this.quizCardItem,
+class QuizCardTile extends StatelessWidget {
+  const QuizCardTile({
+    required this.question,
+    required this.answer,
     this.isSelected = false,
     this.showCheckbox = true,
     this.onTap,
-    this.onEditPressed,
-    this.onDeletePressed,
+    this.trailing,
+    super.key,
   });
 
-  final QuizCardItem quizCardItem;
+  final String question;
+  final String answer;
   final bool isSelected;
   final bool showCheckbox;
   final VoidCallback? onTap;
-  final VoidCallback? onEditPressed;
-  final VoidCallback? onDeletePressed;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = localize(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -114,7 +128,7 @@ class _QuizCardTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    quizCardItem.questionText,
+                    question,
                     style: AppTypography.h4.copyWith(
                       color: AppColors.grayscale600,
                     ),
@@ -123,7 +137,7 @@ class _QuizCardTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    quizCardItem.answerText,
+                    answer,
                     style: AppTypography.secondaryText.copyWith(
                       color: AppColors.grayscale500,
                     ),
@@ -133,21 +147,7 @@ class _QuizCardTile extends StatelessWidget {
                 ],
               ),
             ),
-            AppMoreButton(
-              actions: [
-                AppMoreButtonAction(
-                  label: l10n.quizCardListEditCardAction,
-                  icon: 'assets/icons/edit.svg',
-                  onPressed: () => onEditPressed?.call(),
-                ),
-                AppMoreButtonAction(
-                  label: l10n.quizCardListDeleteCardAction,
-                  icon: 'assets/icons/delete.svg',
-                  textColor: AppColors.error500,
-                  onPressed: () => onDeletePressed?.call(),
-                ),
-              ],
-            ),
+            if (trailing != null) trailing!,
           ],
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/home_widget/display/deck_list_item_widget.dart';
 
@@ -19,6 +20,7 @@ class DeckListDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = localize(context);
     return SafeArea(
       child: Column(
         children: [
@@ -39,10 +41,23 @@ class DeckListDisplayWidget extends StatelessWidget {
               itemBuilder: (context, index) {
                 final deck = deckList[index];
                 return DeckListItemWidget(
-                  deck: deck,
-                  onDeckRemoveRequest: onDeckRemoveRequest,
-                  onDeckEditRequest: onDeckEditRequest,
-                  onDeckClicked: onDeckClicked,
+                  title: deck.title,
+                  onTap: () => onDeckClicked?.call(deck),
+                  trailing: AppMoreButton(
+                    actions: [
+                      AppMoreButtonAction(
+                        label: l10n.homeEditDeckAction,
+                        icon: 'assets/icons/edit.svg',
+                        onPressed: () => onDeckEditRequest?.call(deck),
+                      ),
+                      AppMoreButtonAction(
+                        label: l10n.homeDeleteDeckAction,
+                        icon: 'assets/icons/delete.svg',
+                        textColor: AppColors.error500,
+                        onPressed: () => onDeckRemoveRequest?.call(deck),
+                      ),
+                    ],
+                  ),
                 );
               },
               separatorBuilder: (context, index) => const SizedBox(height: 16),

@@ -135,20 +135,33 @@ class HomeWidget extends HookWidget {
           if (state is DeckDataState) {
             if (selectedIndex.value == 0) {
               final deckList = state.deckList;
-              if (deckList.isEmpty) {
-                return const _EmptyListWidget();
-              }
-              return DeckListDisplayWidget(
-                deckList: state.deckList,
-                onDeckRemoveRequest: (deck) {
-                  launchConfirmDeleteRequest(deck);
-                },
-                onDeckEditRequest: (deck) {
-                  launchEditDeckTitleRequest(deck);
-                },
-                onDeckClicked: (deck) {
-                  openDeck(deck);
-                },
+              return Column(
+                children: [
+                  Expanded(
+                    child: deckList.isEmpty
+                        ? const _EmptyListWidget()
+                        : DeckListDisplayWidget(
+                            deckList: state.deckList,
+                            onDeckRemoveRequest: (deck) {
+                              launchConfirmDeleteRequest(deck);
+                            },
+                            onDeckEditRequest: (deck) {
+                              launchEditDeckTitleRequest(deck);
+                            },
+                            onDeckClicked: (deck) {
+                              openDeck(deck);
+                            },
+                          ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: AppButton.secondary(
+                      text: localize(context).homePublicDecksButton,
+                      onPressed: () =>
+                          context.push(PublicDecksRoute().path),
+                    ),
+                  ),
+                ],
               );
             } else if (selectedIndex.value == 1) {
               return const SettingsWidget();

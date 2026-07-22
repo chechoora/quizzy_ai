@@ -47,7 +47,8 @@
       "Bash(unzip -p app-quizzypro-release.aab META-INF/CHECHOOR.RSA)",
       "Bash(openssl pkcs7 *)",
       "Bash(openssl x509 *)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(awk 'NR>=95 && NR<=115' lib/view/home_widget/cubit/deck_cubit.dart)"
     ],
     "deny": [],
     "ask": []

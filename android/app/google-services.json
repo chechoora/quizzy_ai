@@ -12,7 +12,12 @@
           "package_name": "com.chechoora.quizzy"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "897552655477-defabfn8am4hfmhi3lds5frvik3btera.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAI5VFgJDZ8jDQve17iJkc1zAebKb2psXA"
@@ -20,7 +25,87 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "897552655477-defabfn8am4hfmhi3lds5frvik3btera.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "897552655477-1maggjcs1k7urpeujmj014as4vv696vh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pocAiQuiz"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:897552655477:android:a4ca41f0f8b636ea43043c",
+        "android_client_info": {
+          "package_name": "com.chechoora.quizzy.pro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "897552655477-4n9nntpqq9408ems3nb26ek4a59ialns.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chechoora.quizzy.pro",
+            "certificate_hash": "ce3a3cd1b361c8885a79423b4bc2755a50eadf17"
+          }
+        },
+        {
+          "client_id": "897552655477-9aqmjcl00pmdc8davr4450e14j0t61d2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chechoora.quizzy.pro",
+            "certificate_hash": "eef58f5b9ffb9c7db7096001d9cffa40ef5a0838"
+          }
+        },
+        {
+          "client_id": "897552655477-qgc4e102ct5gegasbubt0k5bj4chqc1b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chechoora.quizzy.pro",
+            "certificate_hash": "7908d70081518e29889a0e11c4ad22ab1a355c5d"
+          }
+        },
+        {
+          "client_id": "897552655477-vl1libg5ug36t5ghogj9a38voa5v83ld.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chechoora.quizzy.pro",
+            "certificate_hash": "06b0a4768e96ea1616703da590d71e56f724f144"
+          }
+        },
+        {
+          "client_id": "897552655477-defabfn8am4hfmhi3lds5frvik3btera.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI5VFgJDZ8jDQve17iJkc1zAebKb2psXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "897552655477-defabfn8am4hfmhi3lds5frvik3btera.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "897552655477-1maggjcs1k7urpeujmj014as4vv696vh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pocAiQuiz"
+              }
+            }
+          ]
         }
       }
     }

@@ -58,6 +58,14 @@
           }
         },
         {
+          "client_id": "897552655477-9aqmjcl00pmdc8davr4450e14j0t61d2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chechoora.quizzy.pro",
+            "certificate_hash": "eef58f5b9ffb9c7db7096001d9cffa40ef5a0838"
+          }
+        },
+        {
           "client_id": "897552655477-qgc4e102ct5gegasbubt0k5bj4chqc1b.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -71,6 +79,14 @@
           "android_info": {
             "package_name": "com.chechoora.quizzy.pro",
             "certificate_hash": "06b0a4768e96ea1616703da590d71e56f724f144"
+          }
+        },
+        {
+          "client_id": "897552655477-vuvug3g040vjetq7k5h5gfg33fb8fkj5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chechoora.quizzy.pro",
+            "certificate_hash": "3ff9e260a402b920a54b21a8812708c5c5b01e95"
           }
         },
         {

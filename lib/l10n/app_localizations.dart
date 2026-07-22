@@ -771,6 +771,48 @@ abstract class AppLocalizations {
   /// **'Delete deck'**
   String get homeDeleteDeckAction;
 
+  /// No description provided for @homePublicDecksButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Public Decks'**
+  String get homePublicDecksButton;
+
+  /// No description provided for @publicDecksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Public Decks'**
+  String get publicDecksTitle;
+
+  /// No description provided for @publicDecksSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search public decks'**
+  String get publicDecksSearchHint;
+
+  /// No description provided for @publicDecksAllCategoriesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get publicDecksAllCategoriesLabel;
+
+  /// No description provided for @publicDecksEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No public decks found'**
+  String get publicDecksEmptyState;
+
+  /// No description provided for @publicDecksErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load public decks, please try again'**
+  String get publicDecksErrorMessage;
+
+  /// No description provided for @publicDeckDetailErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load deck, please try again'**
+  String get publicDeckDetailErrorMessage;
+
   /// No description provided for @quizDisplayTypeAnswerLabel.
   ///
   /// In en, this message translates to:

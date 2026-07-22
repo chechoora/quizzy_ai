@@ -62,3 +62,12 @@ final class SettingsDeckGenerationRoute extends NavigationRoute {
 final class AppCreditsRoute extends NavigationRoute {
   AppCreditsRoute() : super(name: 'appCredits', path: '/appCredits');
 }
+
+final class PublicDecksRoute extends NavigationRoute {
+  PublicDecksRoute() : super(name: 'publicDecks', path: '/publicDecks');
+}
+
+final class PublicDeckDetailRoute extends NavigationRoute {
+  PublicDeckDetailRoute()
+      : super(name: 'publicDeckDetail', path: '/publicDeckDetail');
+}

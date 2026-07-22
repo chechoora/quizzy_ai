@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
-import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 
 class DeckListItemWidget extends StatelessWidget {
   const DeckListItemWidget({
-    required this.deck,
-    this.onDeckRemoveRequest,
-    this.onDeckEditRequest,
-    this.onDeckClicked,
+    required this.title,
+    this.onTap,
+    this.trailing,
     super.key,
   });
 
-  final DeckItem deck;
-  final ValueChanged<DeckItem>? onDeckRemoveRequest;
-  final ValueChanged<DeckItem>? onDeckEditRequest;
-  final ValueChanged<DeckItem>? onDeckClicked;
+  final String title;
+  final VoidCallback? onTap;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = localize(context);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       elevation: 0,
@@ -30,7 +25,7 @@ class DeckListItemWidget extends StatelessWidget {
       ),
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
-        onTap: () => onDeckClicked?.call(deck),
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
@@ -43,7 +38,7 @@ class DeckListItemWidget extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  deck.title,
+                  title,
                   style: AppTypography.h3.copyWith(
                     color: AppColors.grayscale600,
                   ),
@@ -51,21 +46,7 @@ class DeckListItemWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              AppMoreButton(
-                actions: [
-                  AppMoreButtonAction(
-                    label: l10n.homeEditDeckAction,
-                    icon: 'assets/icons/edit.svg',
-                    onPressed: () => onDeckEditRequest?.call(deck),
-                  ),
-                  AppMoreButtonAction(
-                    label: l10n.homeDeleteDeckAction,
-                    icon: 'assets/icons/delete.svg',
-                    textColor: AppColors.error500,
-                    onPressed: () => onDeckRemoveRequest?.call(deck),
-                  ),
-                ],
-              ),
+              if (trailing != null) trailing!,
             ],
           ),
         ),
