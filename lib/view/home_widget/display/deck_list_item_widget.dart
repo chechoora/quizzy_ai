@@ -29,6 +29,7 @@ class DeckListItemWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SvgPicture.asset(
                 'assets/icons/folder.svg',
@@ -42,7 +43,7 @@ class DeckListItemWidget extends StatelessWidget {
                   style: AppTypography.h3.copyWith(
                     color: AppColors.grayscale600,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
