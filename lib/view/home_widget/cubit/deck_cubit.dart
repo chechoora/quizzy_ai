@@ -7,6 +7,7 @@ import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
 import 'package:poc_ai_quiz/domain/icloud_backup/icloud_restore_service.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/onboarding/onboarding_service.dart';
 
 class HomeCubit extends Cubit<DeckState> {
@@ -15,14 +16,28 @@ class HomeCubit extends Cubit<DeckState> {
     required this.deckPremiumManager,
     required this.onboardingService,
     required this.iCloudRestoreService,
+    required this.isSubscriptionOnly,
   }) : super(const DeckLoadingState());
 
   final DeckRepository deckRepository;
   final DeckPremiumManager deckPremiumManager;
   final OnboardingService onboardingService;
   final ICloudRestoreService iCloudRestoreService;
+
+  /// When true (the `quizzypro` flavor) only the Quizzy AI subscription is
+  /// offered; when false (the `quizzy` flavor) only the one-time "unlimited
+  /// decks/cards" purchase is offered.
+  final bool isSubscriptionOnly;
+
   final List<DeckItem> decks = [];
   StreamSubscription<List<DeckItem>>? _decksSubscription;
+
+  /// The purchase feature to offer when the deck limit is hit, resolved from
+  /// the active flavor: `quizzyAi` subscription on `quizzypro`, the one-time
+  /// `unlimitedDecksCards` purchase on `quizzy`.
+  InAppPurchaseFeature get unlockFeature => isSubscriptionOnly
+      ? InAppPurchaseFeature.quizzyAi
+      : InAppPurchaseFeature.unlimitedDecksCards;
 
   void watchDecks() {
     _decksSubscription?.cancel();

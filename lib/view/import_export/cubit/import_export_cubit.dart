@@ -6,6 +6,7 @@ import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
 import 'package:poc_ai_quiz/domain/icloud_backup/icloud_backup_service.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/view/import_export/cubit/import_export_state.dart';
 
@@ -15,13 +16,26 @@ class ImportExportCubit extends Cubit<ImportExportState> {
   ImportExportCubit({
     required this.deckRepository,
     required this.importExportService,
+    required this.isSubscriptionOnly,
   }) : super(const ImportExportLoadingState());
 
   final DeckRepository deckRepository;
   final ImportExportService importExportService;
 
+  /// When true (the `quizzypro` flavor) only the Quizzy AI subscription is
+  /// offered; when false (the `quizzy` flavor) only the one-time "unlimited
+  /// decks/cards" purchase is offered.
+  final bool isSubscriptionOnly;
+
   final List<DeckItem> _decks = [];
   final Set<int> _selectedDeckIds = {};
+
+  /// The purchase feature to offer when an import/export limit is hit,
+  /// resolved from the active flavor: `quizzyAi` subscription on
+  /// `quizzypro`, the one-time `unlimitedDecksCards` purchase on `quizzy`.
+  InAppPurchaseFeature get unlockFeature => isSubscriptionOnly
+      ? InAppPurchaseFeature.quizzyAi
+      : InAppPurchaseFeature.unlimitedDecksCards;
 
   IcloudAccountStatus? _iCloudStatus;
   DateTime? _iCloudLastBackup;

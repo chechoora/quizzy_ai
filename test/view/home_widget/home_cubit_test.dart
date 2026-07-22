@@ -31,6 +31,7 @@ void main() {
       deckPremiumManager: deckPremiumManager,
       onboardingService: onboardingService,
       iCloudRestoreService: iCloudRestoreService,
+      isSubscriptionOnly: false,
     );
   });
 

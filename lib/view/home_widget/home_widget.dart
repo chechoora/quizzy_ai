@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
@@ -33,6 +34,7 @@ class HomeWidget extends HookWidget {
         deckPremiumManager: getIt<DeckPremiumManager>(),
         onboardingService: getIt<OnboardingService>(),
         iCloudRestoreService: getIt<ICloudRestoreService>(),
+        isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
       ),
     );
     final selectedIndex = useState(0);
@@ -111,12 +113,15 @@ class HomeWidget extends HookWidget {
       cubit.checkICloudRestore();
     }
 
-    void showCreateDeckPremiumError() {
-      showPaywallBottomSheet(
+    Future<void> showCreateDeckPremiumError() async {
+      final purchased = await showPaywallBottomSheet(
         context,
         limitMessage: localize(context).homePremiumDeckLimitMessage,
-        feature: InAppPurchaseFeature.unlimitedDecksCards,
+        feature: cubit.unlockFeature,
       );
+      if (purchased == true && context.mounted) {
+        cubit.addDockRequest();
+      }
     }
 
     return Scaffold(

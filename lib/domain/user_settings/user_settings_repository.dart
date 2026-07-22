@@ -17,10 +17,17 @@ class UserSettingsRepository {
     return userSettingsDataBaseMapper.mapToUserSettingsItem(dbUserSettings);
   }
 
+  // The row is skipped (not surfaced as null) when absent — e.g. right
+  // after `LogoutManager.clearLocalData` wipes it on sign-out — since
+  // subscribers only care about updates to existing settings.
   Stream<UserSettingsItem> watchUserSettings(int userId) {
-    return dataBaseRepository.watchUserSettings(userId).map(
-      (dbUserSettings) => userSettingsDataBaseMapper.mapToUserSettingsItem(dbUserSettings),
-    );
+    return dataBaseRepository
+        .watchUserSettings(userId)
+        .where((dbUserSettings) => dbUserSettings != null)
+        .map(
+          (dbUserSettings) => userSettingsDataBaseMapper
+              .mapToUserSettingsItem(dbUserSettings!),
+        );
   }
 
   Future<void> updateAnswerValidatorType(int userId, AnswerValidatorType validatorType) async {

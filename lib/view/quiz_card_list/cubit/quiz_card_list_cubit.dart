@@ -6,6 +6,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
+import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
 class QuizCardListCubit extends Cubit<QuizCardListState> {
@@ -14,14 +15,28 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     required this.quizCardRepository,
     required this.quizCardPremiumManager,
     required this.quizCardExeValidator,
+    required this.isSubscriptionOnly,
   }) : super(QuizCardListLoadingState());
 
   final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
   final QuizCardPremiumManager quizCardPremiumManager;
   final QuizCardExeValidator quizCardExeValidator;
+
+  /// When true (the `quizzypro` flavor) only the Quizzy AI subscription is
+  /// offered; when false (the `quizzy` flavor) only the one-time "unlimited
+  /// decks/cards" purchase is offered.
+  final bool isSubscriptionOnly;
+
   final items = <QuizCardItem>[];
   final _selectedCardIds = <int>{};
+
+  /// The purchase feature to offer when the card limit is hit, resolved from
+  /// the active flavor: `quizzyAi` subscription on `quizzypro`, the one-time
+  /// `unlimitedDecksCards` purchase on `quizzy`.
+  InAppPurchaseFeature get unlockFeature => isSubscriptionOnly
+      ? InAppPurchaseFeature.quizzyAi
+      : InAppPurchaseFeature.unlimitedDecksCards;
 
   void toggleCardSelection(int cardId) {
     if (_selectedCardIds.contains(cardId)) {

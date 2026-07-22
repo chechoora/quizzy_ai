@@ -8,16 +8,21 @@ class MockCacheRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   Future<void> initialize() async {}
 
   @override
-  Future<bool> isFeaturePurchased(String identifier) async {
-    if (identifier == RevenueCatPurchaseManager.cardsAndDecksOffering) {
+  Future<bool> isFeaturePurchased(String entitlementIdentifier) async {
+    if (entitlementIdentifier ==
+        RevenueCatPurchaseManager.cardsAndDecksEntitlement) {
       return _isUnlocked;
     }
     return false;
   }
 
   @override
-  Future<bool> purchaseOffering(String identifier) async {
-    if (identifier == RevenueCatPurchaseManager.cardsAndDecksOffering) {
+  Future<bool> purchaseOffering(
+    String offeringIdentifier,
+    String entitlementIdentifier,
+  ) async {
+    if (entitlementIdentifier ==
+        RevenueCatPurchaseManager.cardsAndDecksEntitlement) {
       _isUnlocked = true;
       return true;
     }
@@ -42,15 +47,18 @@ class MockPrefRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   Future<void> initialize() async {}
 
   @override
-  Future<bool> isFeaturePurchased(String identifier) async {
+  Future<bool> isFeaturePurchased(String entitlementIdentifier) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('$_prefKeyPrefix$identifier') ?? false;
+    return prefs.getBool('$_prefKeyPrefix$entitlementIdentifier') ?? false;
   }
 
   @override
-  Future<bool> purchaseOffering(String identifier) async {
+  Future<bool> purchaseOffering(
+    String offeringIdentifier,
+    String entitlementIdentifier,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('$_prefKeyPrefix$identifier', true);
+    await prefs.setBool('$_prefKeyPrefix$entitlementIdentifier', true);
     return true;
   }
 
@@ -58,7 +66,7 @@ class MockPrefRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
   Future<void> restorePurchases() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(
-        '$_prefKeyPrefix${RevenueCatPurchaseManager.cardsAndDecksOffering}',
+        '$_prefKeyPrefix${RevenueCatPurchaseManager.cardsAndDecksEntitlement}',
         true);
   }
 

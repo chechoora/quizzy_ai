@@ -34,10 +34,15 @@ class UserSettingsDataBaseRepository {
     throw Exception('Cannot fetch or create user settings for userId: $userId');
   }
 
-  Stream<UserSettingsTableData> watchUserSettings(int userId) {
+  /// Uses `watchSingleOrNull` (not `watchSingle`) because the row can
+  /// legitimately disappear mid-stream: `LogoutManager.clearLocalData`
+  /// wipes this table on sign-out / account deletion while a subscriber
+  /// (e.g. `ValidatorConfigProvider`) may still be watching it.
+  /// `watchSingle` would throw a fatal `StateError` at that point.
+  Stream<UserSettingsTableData?> watchUserSettings(int userId) {
     return (appDatabase.select(appDatabase.userSettingsTable)
           ..where((tbl) => tbl.userId.equals(userId)))
-        .watchSingle();
+        .watchSingleOrNull();
   }
 
   Future<void> updateAnswerValidatorType(

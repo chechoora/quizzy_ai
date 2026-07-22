@@ -14,7 +14,6 @@ import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
 import 'package:poc_ai_quiz/domain/icloud_backup/icloud_backup_service.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
-import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
@@ -30,6 +29,7 @@ class ImportExportScreen extends HookWidget {
       () => ImportExportCubit(
         deckRepository: getIt<DeckRepository>(),
         importExportService: getIt<ImportExportService>(),
+        isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
       ),
     );
 
@@ -68,7 +68,7 @@ class ImportExportScreen extends HookWidget {
                           limit,
                           typeName,
                         ),
-                        feature: InAppPurchaseFeature.unlimitedDecksCards,
+                        feature: cubit.unlockFeature,
                       );
                       if (purchased == true && context.mounted) {
                         if (type == ImportExportType.deck) {
