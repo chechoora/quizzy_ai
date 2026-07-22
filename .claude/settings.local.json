@@ -40,7 +40,14 @@
       "Bash(rg *)",
       "Bash(xargs -I{} basename {})",
       "Bash(keytool -list -v -keystore release_key.jks -storepass '180dude' -alias chechoora)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(jarsigner -verify -verbose -certs app-quizzypro-release.aab)",
+      "Bash(rm -rf /tmp/aab_check)",
+      "Bash(mkdir -p /tmp/aab_check)",
+      "Bash(unzip -p app-quizzypro-release.aab META-INF/CHECHOOR.RSA)",
+      "Bash(openssl pkcs7 *)",
+      "Bash(openssl x509 *)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
