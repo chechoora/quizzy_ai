@@ -43,7 +43,7 @@ class DeckListItemWidget extends StatelessWidget {
                   style: AppTypography.h3.copyWith(
                     color: AppColors.grayscale600,
                   ),
-                  maxLines: 2,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
