@@ -38,7 +38,9 @@
       "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; cat -n {}')",
       "Bash(xargs -I{} echo {})",
       "Bash(rg *)",
-      "Bash(xargs -I{} basename {})"
+      "Bash(xargs -I{} basename {})",
+      "Bash(keytool -list -v -keystore release_key.jks -storepass '180dude' -alias chechoora)",
+      "Bash(python3 -c ' *)"
     ],
     "deny": [],
     "ask": []

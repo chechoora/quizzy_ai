@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
+import 'package:poc_ai_quiz/data/api/api_logging_interceptor.dart';
 import 'package:poc_ai_quiz/data/auth/firebase_auth_service.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_answer_validator.dart';
@@ -202,6 +203,7 @@ Future<void> _setupAPI() async {
     ],
     interceptors: [
       GeminiHeaderInterceptor(apiKeysProvider),
+      ApiLoggingInterceptor(Logger.withTag('GeminiApiClient')),
     ],
     converter: const JsonConverter(),
   );
@@ -216,6 +218,7 @@ Future<void> _setupAPI() async {
     ],
     interceptors: [
       ClaudeHeaderInterceptor(apiKeysProvider),
+      ApiLoggingInterceptor(Logger.withTag('ClaudeApiClient')),
     ],
     converter: const JsonConverter(),
   );
@@ -230,6 +233,7 @@ Future<void> _setupAPI() async {
     ],
     interceptors: [
       OpenAIHeaderInterceptor(apiKeysProvider),
+      ApiLoggingInterceptor(Logger.withTag('OpenAIApiClient')),
     ],
     converter: const JsonConverter(),
   );
@@ -250,6 +254,7 @@ Future<void> _setupAPI() async {
         authService: getIt.get<AuthService>(),
         logger: Logger.withTag('QuizzyBackendAuthInterceptor'),
       ),
+      ApiLoggingInterceptor(Logger.withTag('QuizzyBackendApiClient')),
     ],
     converter: const JsonConverter(),
   );

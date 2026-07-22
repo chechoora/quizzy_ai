@@ -50,6 +50,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "897552655477-qgc4e102ct5gegasbubt0k5bj4chqc1b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chechoora.quizzy.pro",
+            "certificate_hash": "7908d70081518e29889a0e11c4ad22ab1a355c5d"
+          }
+        },
+        {
           "client_id": "897552655477-vl1libg5ug36t5ghogj9a38voa5v83ld.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
