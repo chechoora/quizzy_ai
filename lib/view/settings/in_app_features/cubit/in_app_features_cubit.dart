@@ -129,6 +129,24 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
     }
   }
 
+  Future<void> manageSubscription() async {
+    final currentState = state;
+    if (currentState is! InAppFeaturesDataState) return;
+
+    _logger.d('manageSubscription: fetching management URL');
+    try {
+      final url = await inAppPurchaseService.getManagementUrl();
+      _logger.i('manageSubscription: resolved url=$url');
+      emit(InAppFeaturesOpenUrlState(url));
+      emit(currentState);
+    } catch (e, stackTrace) {
+      _logger.e('Failed to get subscription management URL',
+          ex: e, stacktrace: stackTrace);
+      emit(const InAppFeaturesErrorState(exception: InAppPurchaseException()));
+      emit(currentState);
+    }
+  }
+
   Future<void> restorePurchases() async {
     final currentState = state;
     if (currentState is! InAppFeaturesDataState) return;
@@ -217,6 +235,12 @@ class InAppFeaturesPurchaseSuccessState extends ListenerState {
 
 class InAppFeaturesRestoreSuccessState extends ListenerState {
   const InAppFeaturesRestoreSuccessState();
+}
+
+class InAppFeaturesOpenUrlState extends ListenerState {
+  final String url;
+
+  const InAppFeaturesOpenUrlState(this.url);
 }
 
 class InAppFeaturesErrorState extends ListenerState {

@@ -19,6 +19,13 @@ class RevenueCatPurchaseManager {
   // dashboard — does NOT match the offering identifier, do not assume it does).
   static const quizzyAiEntitlement = 'Quizzy AI Pro Pro';
 
+  // Fallback subscription-management pages, used when RevenueCat's
+  // CustomerInfo.managementURL is null (e.g. no active subscription).
+  static const _iosSubscriptionsUrl =
+      'https://apps.apple.com/account/subscriptions';
+  static const _androidSubscriptionsUrl =
+      'https://play.google.com/store/account/subscriptions';
+
   final Logger _logger;
   final Flavor _flavor;
 
@@ -130,5 +137,14 @@ class RevenueCatPurchaseManager {
     _logger.d('Logging out RevenueCat user');
     await Purchases.logOut();
     _logger.i('RevenueCat user logged out');
+  }
+
+  Future<String> getManagementUrl() async {
+    _logger.d('Fetching subscription management URL');
+    final customerInfo = await Purchases.getCustomerInfo();
+    final url = customerInfo.managementURL ??
+        (Platform.isIOS ? _iosSubscriptionsUrl : _androidSubscriptionsUrl);
+    _logger.i('Resolved subscription management URL: $url');
+    return url;
   }
 }

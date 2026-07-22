@@ -10,6 +10,7 @@ import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/widgets/feature_purchase_card.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/cubit/in_app_features_cubit.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsInAppFeaturesWidget extends HookWidget {
   const SettingsInAppFeaturesWidget({super.key});
@@ -52,6 +53,7 @@ class SettingsInAppFeaturesWidget extends HookWidget {
                       onPurchase: cubit.purchase,
                       onRestorePurchases: cubit.restorePurchases,
                       onSelectOption: cubit.selectOption,
+                      onManageSubscription: cubit.manageSubscription,
                     );
                   }
                   if (state is InAppFeaturesLoadingState ||
@@ -71,6 +73,8 @@ class SettingsInAppFeaturesWidget extends HookWidget {
                   } else if (state is InAppFeaturesRestoreSuccessState) {
                     snackBar(context,
                         message: l10n.inAppFeaturesRestoreSuccess);
+                  } else if (state is InAppFeaturesOpenUrlState) {
+                    _launchUrl(context, state.url);
                   } else if (state is InAppFeaturesErrorState) {
                     snackBar(
                       context,
@@ -87,6 +91,22 @@ class SettingsInAppFeaturesWidget extends HookWidget {
       ),
     );
   }
+
+  Future<void> _launchUrl(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (context.mounted) {
+        final l10n = localize(context);
+        snackBar(
+          context,
+          message: l10n.settingsAiValidatorCouldNotOpenUrlError(url),
+          isError: true,
+        );
+      }
+    }
+  }
 }
 
 class _InAppFeaturesContent extends StatelessWidget {
@@ -95,12 +115,14 @@ class _InAppFeaturesContent extends StatelessWidget {
     required this.onPurchase,
     required this.onRestorePurchases,
     required this.onSelectOption,
+    required this.onManageSubscription,
   });
 
   final InAppFeaturesDataState state;
   final VoidCallback onPurchase;
   final VoidCallback onRestorePurchases;
   final ValueChanged<String> onSelectOption;
+  final VoidCallback onManageSubscription;
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +168,18 @@ class _InAppFeaturesContent extends StatelessWidget {
             ),
           ),
         ),
+        if (state is InAppFeaturesQuizzyAiState &&
+            (state as InAppFeaturesQuizzyAiState).isSubscribed)
+          TextButton.icon(
+            onPressed: onManageSubscription,
+            icon: const Icon(Icons.settings, color: AppColors.primary500),
+            label: Text(
+              l10n.inAppFeaturesManageSubscriptionButton,
+              style: AppTypography.buttonMain.copyWith(
+                color: AppColors.primary500,
+              ),
+            ),
+          ),
       ],
     );
   }

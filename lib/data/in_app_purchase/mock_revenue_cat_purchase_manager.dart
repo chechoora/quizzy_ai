@@ -83,6 +83,11 @@ class MockCacheRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
 
   @override
   Future<void> logOut() async {}
+
+  @override
+  Future<String> getManagementUrl() async {
+    return 'https://play.google.com/store/account/subscriptions';
+  }
 }
 
 class MockPrefRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
@@ -131,4 +136,9 @@ class MockPrefRevenueCatPurchaseManager implements RevenueCatPurchaseManager {
 
   @override
   Future<void> logOut() async {}
+
+  @override
+  Future<String> getManagementUrl() async {
+    return 'https://play.google.com/store/account/subscriptions';
+  }
 }

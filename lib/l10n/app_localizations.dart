@@ -225,6 +225,12 @@ abstract class AppLocalizations {
   /// **'Restore Purchases'**
   String get inAppFeaturesRestoreButton;
 
+  /// No description provided for @inAppFeaturesManageSubscriptionButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Subscription'**
+  String get inAppFeaturesManageSubscriptionButton;
+
   /// No description provided for @inAppFeaturesQuizzyAiTitle.
   ///
   /// In en, this message translates to:

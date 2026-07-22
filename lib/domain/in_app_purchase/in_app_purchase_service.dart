@@ -76,6 +76,10 @@ class InAppPurchaseService {
   Future<void> logOutUser() {
     return revenueCatPurchaseManager.logOut();
   }
+
+  Future<String> getManagementUrl() {
+    return revenueCatPurchaseManager.getManagementUrl();
+  }
 }
 
 enum InAppPurchaseFeature {

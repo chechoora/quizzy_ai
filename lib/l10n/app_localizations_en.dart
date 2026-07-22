@@ -77,6 +77,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inAppFeaturesRestoreButton => 'Restore Purchases';
 
   @override
+  String get inAppFeaturesManageSubscriptionButton => 'Manage Subscription';
+
+  @override
   String get inAppFeaturesQuizzyAiTitle => 'Quizzy validator';
 
   @override
