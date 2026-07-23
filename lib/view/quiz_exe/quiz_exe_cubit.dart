@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/initial_answer_validator.dart';
@@ -8,6 +10,7 @@ import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
+import 'package:poc_ai_quiz/domain/sync/deck_card_sync_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class QuizExeCubit extends Cubit<QuizExeState> {
@@ -18,6 +21,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     required this.settingsService,
     required this.validatorsManager,
     required this.initialAnswerValidator,
+    required this.deckCardSyncService,
     this.isQuickPlay = false,
   }) : super(QuizExeLoadingState());
 
@@ -27,6 +31,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   final QuizMatchBuilder quizMatchBuilder;
   final SettingsService settingsService;
   final ValidatorsManager validatorsManager;
+  final DeckCardSyncService deckCardSyncService;
   final bool isQuickPlay;
 
   final _logger = Logger.withTag('QuizExeCubit');
@@ -107,6 +112,27 @@ class QuizExeCubit extends Cubit<QuizExeState> {
       final results = quizMatchBuilder.getResults();
       _logger.i('Quiz completed. Results: $results');
       emit(QuizDoneState(quizResults: results));
+    }
+  }
+
+  /// Answer checks record stats server-side (via the `cardId` passed to the
+  /// validator), so the locally-cached deck/card stats are stale until the
+  /// next pull. Re-pull as the screen is torn down (rather than right after
+  /// the last answer) so it doesn't race the quiz-done UI, and still lands
+  /// before the user is back on the deck screen.
+  @override
+  Future<void> close() {
+    unawaited(_pullFreshStats());
+    return super.close();
+  }
+
+  Future<void> _pullFreshStats() async {
+    _logger.d('_pullFreshStats: pulling remote changes on cubit close');
+    try {
+      final result = await deckCardSyncService.pullRemoteChanges();
+      _logger.i('_pullFreshStats: complete, $result');
+    } catch (e, stackTrace) {
+      _logger.e('_pullFreshStats: failed', ex: e, stacktrace: stackTrace);
     }
   }
 }
