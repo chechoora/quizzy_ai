@@ -393,6 +393,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get publicDeckDetailErrorMessage => 'Failed to load deck, please try again';
 
   @override
+  String get publicDeckCopySuccessMessage => 'Deck added to your decks';
+
+  @override
+  String get publicDeckCopyErrorMessage => 'Failed to copy deck, please try again';
+
+  @override
   String get quizDisplayTypeAnswerLabel => 'Type your answer below';
 
   @override

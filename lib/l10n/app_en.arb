@@ -204,6 +204,8 @@
   "publicDecksEmptyState": "No public decks found",
   "publicDecksErrorMessage": "Failed to load public decks, please try again",
   "publicDeckDetailErrorMessage": "Failed to load deck, please try again",
+  "publicDeckCopySuccessMessage": "Deck added to your decks",
+  "publicDeckCopyErrorMessage": "Failed to copy deck, please try again",
   "quizDisplayTypeAnswerLabel": "Type your answer below",
   "quizDisplayTypeAnswerHint": "Type your answer",
   "quizDisplayAnswerButton": "Answer",

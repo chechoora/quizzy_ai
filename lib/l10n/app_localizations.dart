@@ -813,6 +813,18 @@ abstract class AppLocalizations {
   /// **'Failed to load deck, please try again'**
   String get publicDeckDetailErrorMessage;
 
+  /// No description provided for @publicDeckCopySuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Deck added to your decks'**
+  String get publicDeckCopySuccessMessage;
+
+  /// No description provided for @publicDeckCopyErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to copy deck, please try again'**
+  String get publicDeckCopyErrorMessage;
+
   /// No description provided for @quizDisplayTypeAnswerLabel.
   ///
   /// In en, this message translates to:
