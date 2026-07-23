@@ -29,6 +29,18 @@ class DeckDataBaseRepository {
     return appDatabase.select(appDatabase.deckTable).get();
   }
 
+  /// Watches the single deck [id] (its title, stats, etc.), so a screen
+  /// showing one deck can stay live as stats get synced in. Emits `null` if
+  /// the deck is deleted. Drift-generated row data classes already have
+  /// field-wise `==`, so `distinct()` needs no explicit equality here, unlike
+  /// the list-returning watch methods above.
+  Stream<DeckTableData?> watchDeck(int id) {
+    return (appDatabase.select(appDatabase.deckTable)
+          ..where((table) => table.id.isValue(id)))
+        .watchSingleOrNull()
+        .distinct();
+  }
+
   Future<int> saveDeck(String deckName) async {
     final result = await appDatabase.into(appDatabase.deckTable).insert(
           DeckTableCompanion.insert(

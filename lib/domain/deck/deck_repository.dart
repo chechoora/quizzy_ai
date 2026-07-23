@@ -18,6 +18,14 @@ class DeckRepository {
         .map(deckDatBaseMapper.mapToDeckItemList);
   }
 
+  /// Emits on any change to deck [id] (title, stats, ...), or `null` if it
+  /// gets deleted.
+  Stream<DeckItem?> watchDeck(int id) {
+    return dataBaseRepository.watchDeck(id).map(
+          (data) => data == null ? null : deckDatBaseMapper.mapToDeckItem(data),
+        );
+  }
+
   Future<List<DeckItem>> fetchDecks() async {
     final databaseData = await dataBaseRepository.fetchAllDecks();
     return deckDatBaseMapper.mapToDeckItemList(databaseData);

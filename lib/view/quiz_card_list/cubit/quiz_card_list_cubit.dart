@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
@@ -7,12 +10,14 @@ import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.d
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
 class QuizCardListCubit extends Cubit<QuizCardListState> {
   QuizCardListCubit({
     required this.deckItem,
     required this.quizCardRepository,
+    required this.deckRepository,
     required this.quizCardPremiumManager,
     required this.quizCardExeValidator,
     required this.isSubscriptionOnly,
@@ -20,6 +25,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
 
   final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
+  final DeckRepository deckRepository;
   final QuizCardPremiumManager quizCardPremiumManager;
   final QuizCardExeValidator quizCardExeValidator;
 
@@ -30,6 +36,13 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
 
   final items = <QuizCardItem>[];
   final _selectedCardIds = <int>{};
+  StreamSubscription<List<QuizCardItem>>? _cardsSubscription;
+  StreamSubscription<DeckItem?>? _deckSubscription;
+
+  /// Latest deck stats seen from [watchDeck]. Falls back to the stats the
+  /// screen was opened with until the deck's own watch stream emits.
+  ItemStats? _deckStatsOverride;
+  ItemStats? get _deckStats => _deckStatsOverride ?? deckItem.stats;
 
   /// The purchase feature to offer when the card limit is hit, resolved from
   /// the active flavor: `quizzyAi` subscription on `quizzypro`, the one-time
@@ -48,6 +61,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       QuizCardListDataState(
         quizCarList: List.from(items),
         selectedCardIds: Set.from(_selectedCardIds),
+        deckStats: _deckStats,
       ),
     );
   }
@@ -60,6 +74,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       QuizCardListDataState(
         quizCarList: List.from(items),
         selectedCardIds: Set.from(_selectedCardIds),
+        deckStats: _deckStats,
       ),
     );
   }
@@ -70,60 +85,72 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       QuizCardListDataState(
         quizCarList: List.from(items),
         selectedCardIds: const {},
+        deckStats: _deckStats,
       ),
     );
   }
 
-  Future<void> fetchQuizCardListRequest() async {
-    emit(
-      QuizCardListLoadingState(),
-    );
-    _selectedCardIds.clear();
-    emit(
-      QuizCardListDataState(
-        quizCarList: await _fetchCards(),
-        selectedCardIds: const {},
-      ),
+  void watchCards() {
+    _cardsSubscription?.cancel();
+    _cardsSubscription =
+        quizCardRepository.watchQuizCardList(deckItem.id).listen(
+      (data) {
+        items
+          ..clear()
+          ..addAll(data);
+        final validIds = data.map((card) => card.id).toSet();
+        _selectedCardIds.retainWhere(validIds.contains);
+        emit(
+          QuizCardListDataState(
+            quizCarList: List.from(items),
+            selectedCardIds: Set.from(_selectedCardIds),
+            deckStats: _deckStats,
+          ),
+        );
+      },
     );
   }
 
-  Future<List<QuizCardItem>> _fetchCards() async {
-    return items
-      ..clear()
-      ..addAll(await quizCardRepository.fetchQuizCardItem(deckItem.id));
+  /// Watches this deck's own stats so they stay live (e.g. right after sync
+  /// pushes updated play stats). Only re-emits once the cards have loaded at
+  /// least once, since [watchCards] and [watchDeck] fire independently and
+  /// deck data may arrive first.
+  void watchDeck() {
+    _deckSubscription?.cancel();
+    _deckSubscription = deckRepository.watchDeck(deckItem.id).listen(
+      (data) {
+        _deckStatsOverride = data?.stats;
+        if (state is QuizCardListDataState) {
+          emit(
+            QuizCardListDataState(
+              quizCarList: List.from(items),
+              selectedCardIds: Set.from(_selectedCardIds),
+              deckStats: _deckStats,
+            ),
+          );
+        }
+      },
+    );
   }
 
   void createQuizCardItem(QuizCardRequestItem requestItem) {
-    emit(
-      QuizCardListLoadingState(),
-    );
     quizCardRepository.saveQuizCard(
       question: requestItem.question,
       answer: requestItem.answer,
       deckId: deckItem.id,
     );
-    fetchQuizCardListRequest();
   }
 
   void deleteCard(QuizCardItem card) {
-    _selectedCardIds.remove(card.id);
-    emit(
-      QuizCardListLoadingState(),
-    );
     quizCardRepository.deleteQuizCard(card);
-    fetchQuizCardListRequest();
   }
 
   void editQuizCard(
       QuizCardItem card, QuizCardRequestItem quizCardRequestItem) {
-    emit(
-      QuizCardListLoadingState(),
-    );
     quizCardRepository.editQuizCard(
       currentCard: card,
       request: quizCardRequestItem,
     );
-    fetchQuizCardListRequest();
   }
 
   Future<void> launchQuizRequest({
@@ -183,6 +210,13 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       ),
     );
   }
+
+  @override
+  Future<void> close() {
+    _cardsSubscription?.cancel();
+    _deckSubscription?.cancel();
+    return super.close();
+  }
 }
 
 abstract class QuizCardListState extends Equatable {
@@ -209,10 +243,12 @@ class QuizCardListDataState extends BuilderState {
   const QuizCardListDataState({
     required this.quizCarList,
     this.selectedCardIds = const {},
+    this.deckStats,
   });
 
   final List<QuizCardItem> quizCarList;
   final Set<int> selectedCardIds;
+  final ItemStats? deckStats;
 
   bool get hasSelection => selectedCardIds.isNotEmpty;
 
@@ -229,7 +265,7 @@ class QuizCardListDataState extends BuilderState {
   }
 
   @override
-  List<Object?> get props => [quizCarList, selectedCardIds];
+  List<Object?> get props => [quizCarList, selectedCardIds, deckStats];
 }
 
 class QuizCardLaunchState extends ListenerState {

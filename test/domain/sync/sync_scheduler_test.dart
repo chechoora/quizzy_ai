@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
@@ -36,6 +37,7 @@ void main() {
   late StreamController<List<DeckItem>> deckController;
   late StreamController<List<QuizCardItem>> cardController;
   late StreamController<AuthUser?> authController;
+  late ValueNotifier<bool> isSyncingNotifier;
 
   setUp(() {
     deckRepository = MockDeckRepository();
@@ -45,6 +47,7 @@ void main() {
     deckController = StreamController<List<DeckItem>>.broadcast();
     cardController = StreamController<List<QuizCardItem>>.broadcast();
     authController = StreamController<AuthUser?>.broadcast();
+    isSyncingNotifier = ValueNotifier<bool>(false);
 
     when(() => deckRepository.watchDecks())
         .thenAnswer((_) => deckController.stream);
@@ -52,6 +55,7 @@ void main() {
         .thenAnswer((_) => cardController.stream);
     when(() => authService.authStateChanges)
         .thenAnswer((_) => authController.stream);
+    when(() => syncService.isSyncing).thenReturn(isSyncingNotifier);
     when(() => syncService.runFullSync()).thenAnswer((_) async =>
         const SyncRunResult(push: SyncPushResult(), pull: SyncPullResult()));
   });
@@ -60,6 +64,7 @@ void main() {
     await deckController.close();
     await cardController.close();
     await authController.close();
+    isSyncingNotifier.dispose();
   });
 
   SyncScheduler buildScheduler({required bool enabled}) {

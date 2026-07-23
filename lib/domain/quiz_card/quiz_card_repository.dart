@@ -26,6 +26,13 @@ class QuizCardRepository {
         .map(dataBaseMapper.mapToQuizCardItemList);
   }
 
+  /// Emits on any change to the cards of [deckId], for the card list screen.
+  Stream<List<QuizCardItem>> watchQuizCardList(int deckId) {
+    return dataBaseRepository
+        .watchQuizCardList(deckId)
+        .map(dataBaseMapper.mapToQuizCardItemList);
+  }
+
   Future<int> saveQuizCard({
     required String question,
     required String answer,

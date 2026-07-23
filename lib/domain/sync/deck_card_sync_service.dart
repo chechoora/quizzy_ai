@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
@@ -36,26 +37,48 @@ class DeckCardSyncService {
   final SyncTombstoneRepository tombstoneRepository;
   final Logger logger;
 
-  Future<SyncRunResult> runFullSync() async {
-    logger.d('runFullSync: starting');
-    final push = await pushLocalChanges();
-    final pull = await pullRemoteChanges();
-    logger.i('runFullSync: complete, push=$push, pull=$pull');
-    return SyncRunResult(push: push, pull: pull);
+  /// Whether any sync work (push, pull, or a full cycle) is in flight, from
+  /// any caller — [SyncScheduler]'s periodic/reactive runs as well as ad hoc
+  /// pulls like [QuizExeCubit]'s post-quiz stats refresh or
+  /// [PublicDeckDetailCubit]'s copy-then-pull. Reentrant: a full sync's
+  /// internal push/pull calls don't drop the flag until the outer call also
+  /// completes.
+  final ValueNotifier<bool> isSyncing = ValueNotifier<bool>(false);
+  int _activeCount = 0;
+
+  Future<T> _tracked<T>(Future<T> Function() work) async {
+    _activeCount++;
+    isSyncing.value = true;
+    try {
+      return await work();
+    } finally {
+      _activeCount--;
+      if (_activeCount == 0) {
+        isSyncing.value = false;
+      }
+    }
   }
 
-  Future<SyncPushResult> pushLocalChanges() async {
-    logger.d('pushLocalChanges: starting');
-    var result = const SyncPushResult();
+  Future<SyncRunResult> runFullSync() => _tracked(() async {
+        logger.d('runFullSync: starting');
+        final push = await pushLocalChanges();
+        final pull = await pullRemoteChanges();
+        logger.i('runFullSync: complete, push=$push, pull=$pull');
+        return SyncRunResult(push: push, pull: pull);
+      });
 
-    result = await _pushDeckTombstones(result);
-    result = await _pushCardTombstones(result);
-    result = await _pushDirtyDecks(result);
-    result = await _pushDirtyCards(result);
+  Future<SyncPushResult> pushLocalChanges() => _tracked(() async {
+        logger.d('pushLocalChanges: starting');
+        var result = const SyncPushResult();
 
-    logger.i('pushLocalChanges: complete, $result');
-    return result;
-  }
+        result = await _pushDeckTombstones(result);
+        result = await _pushCardTombstones(result);
+        result = await _pushDirtyDecks(result);
+        result = await _pushDirtyCards(result);
+
+        logger.i('pushLocalChanges: complete, $result');
+        return result;
+      });
 
   Future<SyncPushResult> _pushDeckTombstones(SyncPushResult result) async {
     final tombstones = await tombstoneRepository.fetchTombstones('deck');
@@ -188,56 +211,56 @@ class DeckCardSyncService {
     return result.copyWith(cardsPushed: pushed, failures: failures);
   }
 
-  Future<SyncPullResult> pullRemoteChanges() async {
-    logger.d('pullRemoteChanges: starting');
-    final List<RemoteDeck> remoteDecks;
-    try {
-      remoteDecks = await decksRepository.listDecks();
-    } catch (e, s) {
-      logger.e('pullRemoteChanges: listDecks failed, aborting pull',
-          ex: e, stacktrace: s);
-      return const SyncPullResult(failures: 1);
-    }
+  Future<SyncPullResult> pullRemoteChanges() => _tracked(() async {
+        logger.d('pullRemoteChanges: starting');
+        final List<RemoteDeck> remoteDecks;
+        try {
+          remoteDecks = await decksRepository.listDecks();
+        } catch (e, s) {
+          logger.e('pullRemoteChanges: listDecks failed, aborting pull',
+              ex: e, stacktrace: s);
+          return const SyncPullResult(failures: 1);
+        }
 
-    var result = const SyncPullResult();
-    final localIdByRemoteDeckId = <String, int>{};
+        var result = const SyncPullResult();
+        final localIdByRemoteDeckId = <String, int>{};
 
-    for (final remoteDeck in remoteDecks) {
-      try {
-        final localId = await deckRepository.upsertDeckFromRemote(
-          remoteId: remoteDeck.id,
-          title: remoteDeck.title,
-          isArchive: remoteDeck.isArchived,
-          stats: remoteDeck.stats,
+        for (final remoteDeck in remoteDecks) {
+          try {
+            final localId = await deckRepository.upsertDeckFromRemote(
+              remoteId: remoteDeck.id,
+              title: remoteDeck.title,
+              isArchive: remoteDeck.isArchived,
+              stats: remoteDeck.stats,
+            );
+            localIdByRemoteDeckId[remoteDeck.id] = localId;
+            result = result.copyWith(decksUpserted: result.decksUpserted + 1);
+          } catch (e, s) {
+            logger.e('pullRemoteChanges: failed to upsert deck '
+                'id=${remoteDeck.id}',
+                ex: e, stacktrace: s);
+            result = result.copyWith(failures: result.failures + 1);
+          }
+        }
+
+        result = await _reconcileDeletedDecks(
+          remoteDeckIds: localIdByRemoteDeckId.keys.toSet(),
+          result: result,
         );
-        localIdByRemoteDeckId[remoteDeck.id] = localId;
-        result = result.copyWith(decksUpserted: result.decksUpserted + 1);
-      } catch (e, s) {
-        logger.e('pullRemoteChanges: failed to upsert deck '
-            'id=${remoteDeck.id}',
-            ex: e, stacktrace: s);
-        result = result.copyWith(failures: result.failures + 1);
-      }
-    }
 
-    result = await _reconcileDeletedDecks(
-      remoteDeckIds: localIdByRemoteDeckId.keys.toSet(),
-      result: result,
-    );
+        for (final remoteDeck in remoteDecks) {
+          final localDeckId = localIdByRemoteDeckId[remoteDeck.id];
+          if (localDeckId == null) continue;
+          result = await _pullCardsForDeck(
+            remoteDeckId: remoteDeck.id,
+            localDeckId: localDeckId,
+            result: result,
+          );
+        }
 
-    for (final remoteDeck in remoteDecks) {
-      final localDeckId = localIdByRemoteDeckId[remoteDeck.id];
-      if (localDeckId == null) continue;
-      result = await _pullCardsForDeck(
-        remoteDeckId: remoteDeck.id,
-        localDeckId: localDeckId,
-        result: result,
-      );
-    }
-
-    logger.i('pullRemoteChanges: complete, $result');
-    return result;
-  }
+        logger.i('pullRemoteChanges: complete, $result');
+        return result;
+      });
 
   Future<SyncPullResult> _reconcileDeletedDecks({
     required Set<String> remoteDeckIds,

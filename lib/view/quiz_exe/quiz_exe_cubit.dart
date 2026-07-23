@@ -120,9 +120,17 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   /// next pull. Re-pull as the screen is torn down (rather than right after
   /// the last answer) so it doesn't race the quiz-done UI, and still lands
   /// before the user is back on the deck screen.
+  ///
+  /// `close()` runs synchronously inside Flutter's element-unmount phase
+  /// (`BuildOwner.finalizeTree`), while the widget tree is locked. Kicking off
+  /// the pull here directly would flip `DeckCardSyncService.isSyncing`
+  /// synchronously and crash any listening `ValueListenableBuilder` with
+  /// "setState() called when widget tree was locked". Deferring to a
+  /// microtask lets the current frame's unmount phase finish and the lock
+  /// release before the pull (and its `isSyncing` notification) starts.
   @override
   Future<void> close() {
-    unawaited(_pullFreshStats());
+    scheduleMicrotask(() => unawaited(_pullFreshStats()));
     return super.close();
   }
 

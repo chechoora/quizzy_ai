@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
@@ -40,17 +39,23 @@ class QuizCardListDisplayWidget extends StatelessWidget {
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         if (hasStats && index == 0) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: AppStatsCard(
-              rows: _buildStatsRows(stats, l10n),
-              accuracyLabel: l10n.quizCardListStatsAccuracy,
-              attemptsLabel: l10n.quizCardListStatsAttempts,
-              bestStreakLabel: l10n.quizCardListStatsBestStreak,
-              lastPlayedLabel: l10n.quizCardListStatsLastPlayed,
-              lastPlayedValue: _formatLastPlayed(stats.lastPlayedAt, l10n),
-            ),
-          );
+          return Builder(builder: (context) {
+            final rows = _buildStatsRows(stats, l10n);
+            if (rows.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: AppStatsCard(
+                rows: rows,
+                accuracyLabel: l10n.quizCardListStatsAccuracy,
+                attemptsLabel: l10n.quizCardListStatsAttempts,
+                bestStreakLabel: l10n.quizCardListStatsBestStreak,
+                lastPlayedLabel: l10n.quizCardListStatsLastPlayed,
+                lastPlayedValue: _formatLastPlayed(stats.lastPlayedAt, l10n),
+              ),
+            );
+          });
         }
         final cardIndex = hasStats ? index - 1 : index;
         if (cardIndex == quizCarList.length) {
@@ -96,7 +101,8 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   }
 }
 
-List<AppStatsPeriodRow> _buildStatsRows(ItemStats stats, LocalizedStrings l10n) {
+List<AppStatsPeriodRow> _buildStatsRows(
+    ItemStats stats, LocalizedStrings l10n) {
   final rows = <AppStatsPeriodRow>[];
   if (stats.accuracy.week != null) {
     rows.add(AppStatsPeriodRow(

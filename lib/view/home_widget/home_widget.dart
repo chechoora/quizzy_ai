@@ -22,6 +22,7 @@ import 'package:poc_ai_quiz/view/home_widget/display/deck_list_display_widget.da
 import 'package:poc_ai_quiz/view/onboarding/onboarding_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/onboarding/onboarding_paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/settings/settings_widget.dart';
+import 'package:poc_ai_quiz/view/widgets/sync_progress_bar.dart';
 
 class HomeWidget extends HookWidget {
   const HomeWidget({super.key});
@@ -212,65 +213,71 @@ class HomeWidget extends HookWidget {
           }
         },
       ),
-      bottomNavigationBar: Container(
-        height: 84 + MediaQuery.of(context).padding.bottom,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SyncProgressBar(),
+          Container(
+            height: 84 + MediaQuery.of(context).padding.bottom,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _NavItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/decks.svg',
-                      colorFilter: ColorFilter.mode(
-                        selectedIndex.value == 0
-                            ? AppColors.primary500
-                            : AppColors.grayscale500,
-                        BlendMode.srcIn,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _NavItem(
+                        icon: SvgPicture.asset(
+                          'assets/icons/decks.svg',
+                          colorFilter: ColorFilter.mode(
+                            selectedIndex.value == 0
+                                ? AppColors.primary500
+                                : AppColors.grayscale500,
+                            BlendMode.srcIn,
+                          ),
+                          semanticsLabel: localize(context).homeDecksLabel,
+                        ),
+                        label: localize(context).homeDecksLabel,
+                        isSelected: selectedIndex.value == 0,
+                        onTap: () => selectedIndex.value = 0,
                       ),
-                      semanticsLabel: localize(context).homeDecksLabel,
-                    ),
-                    label: localize(context).homeDecksLabel,
-                    isSelected: selectedIndex.value == 0,
-                    onTap: () => selectedIndex.value = 0,
-                  ),
-                  AppAddButton(
-                    onPressed: () => cubit.addDockRequest(),
-                  ),
-                  _NavItem(
-                    icon: SvgPicture.asset(
-                      'assets/icons/settings.svg',
-                      colorFilter: ColorFilter.mode(
-                        selectedIndex.value == 1
-                            ? AppColors.primary500
-                            : AppColors.grayscale500,
-                        BlendMode.srcIn,
+                      AppAddButton(
+                        onPressed: () => cubit.addDockRequest(),
                       ),
-                      semanticsLabel: localize(context).homeDecksLabel,
-                    ),
-                    label: localize(context).homeSettingsLabel,
-                    isSelected: selectedIndex.value == 1,
-                    onTap: () => selectedIndex.value = 1,
+                      _NavItem(
+                        icon: SvgPicture.asset(
+                          'assets/icons/settings.svg',
+                          colorFilter: ColorFilter.mode(
+                            selectedIndex.value == 1
+                                ? AppColors.primary500
+                                : AppColors.grayscale500,
+                            BlendMode.srcIn,
+                          ),
+                          semanticsLabel: localize(context).homeDecksLabel,
+                        ),
+                        label: localize(context).homeSettingsLabel,
+                        isSelected: selectedIndex.value == 1,
+                        onTap: () => selectedIndex.value = 1,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).padding.bottom,
+                ),
+              ],
             ),
-            SizedBox(
-              height: MediaQuery.of(context).padding.bottom,
-            )
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

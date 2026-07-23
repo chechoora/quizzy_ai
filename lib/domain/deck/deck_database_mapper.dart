@@ -4,19 +4,19 @@ import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 
 class DeckDatBaseMapper {
   List<DeckItem> mapToDeckItemList(List<DeckTableData> dataBaseDeckItems) {
-    return dataBaseDeckItems
-        .map(
-          (e) => DeckItem(
-            id: e.id,
-            uid: e.uid,
-            title: e.title,
-            isArchive: e.isArchive,
-            remoteId: e.remoteId,
-            isDirty: e.isDirty,
-            stats: _mapStats(e),
-          ),
-        )
-        .toList();
+    return dataBaseDeckItems.map(mapToDeckItem).toList();
+  }
+
+  DeckItem mapToDeckItem(DeckTableData e) {
+    return DeckItem(
+      id: e.id,
+      uid: e.uid,
+      title: e.title,
+      isArchive: e.isArchive,
+      remoteId: e.remoteId,
+      isDirty: e.isDirty,
+      stats: _mapStats(e),
+    );
   }
 
   /// [DeckTableData.statsAttemptsWeek] is always a concrete number whenever

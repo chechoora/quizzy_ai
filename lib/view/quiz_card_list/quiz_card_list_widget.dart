@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
@@ -17,6 +18,7 @@ import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
+import 'package:poc_ai_quiz/view/widgets/sync_progress_bar.dart';
 
 class QuizCardListWidget extends HookWidget {
   const QuizCardListWidget({
@@ -32,6 +34,7 @@ class QuizCardListWidget extends HookWidget {
       () => QuizCardListCubit(
         deckItem: deckItem,
         quizCardRepository: getIt<QuizCardRepository>(),
+        deckRepository: getIt<DeckRepository>(),
         quizCardPremiumManager: getIt<QuizCardPremiumManager>(),
         quizCardExeValidator: getIt<QuizCardExeValidator>(),
         isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
@@ -40,7 +43,8 @@ class QuizCardListWidget extends HookWidget {
 
     useEffect(
       () {
-        cubit.fetchQuizCardListRequest();
+        cubit.watchCards();
+        cubit.watchDeck();
         return cubit.close;
       },
       [cubit],
@@ -59,9 +63,7 @@ class QuizCardListWidget extends HookWidget {
     }
 
     void launchDeckEdit() {
-      context
-          .push(DeckEditRoute().path, extra: deckItem)
-          .then((_) => cubit.fetchQuizCardListRequest());
+      context.push(DeckEditRoute().path, extra: deckItem);
     }
 
     void launchConfirmDeleteRequest(QuizCardItem card) {
@@ -140,7 +142,7 @@ class QuizCardListWidget extends HookWidget {
                         Expanded(
                           child: QuizCardListDisplayWidget(
                             quizCarList: state.quizCarList,
-                            deckStats: deckItem.stats,
+                            deckStats: state.deckStats,
                             selectedCardIds: state.selectedCardIds,
                             isSelectionModeActive: isSelectionModeActive.value,
                             onCardSelectionToggle: (cardId) =>
@@ -150,6 +152,7 @@ class QuizCardListWidget extends HookWidget {
                             onAddCardRequest: () => cubit.addCardRequest(),
                           ),
                         ),
+                        const SyncProgressBar(),
                         if (state.quizCarList.isNotEmpty)
                           _BottomButtons(
                             hasSelection: state.hasSelection,

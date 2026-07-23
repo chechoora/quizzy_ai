@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
@@ -33,9 +34,14 @@ class SyncScheduler with WidgetsBindingObserver {
   final Duration debounce;
   final Duration pullInterval;
 
+  /// Whether a sync is currently running, for a UI progress indicator.
+  /// Forwarded from [syncService], since ad hoc callers like
+  /// [QuizExeCubit]/[PublicDeckDetailCubit] can also drive it in flight
+  /// outside of this scheduler.
+  ValueListenable<bool> get isSyncing => syncService.isSyncing;
+
   Timer? _debounceTimer;
   Timer? _periodicTimer;
-  bool _inFlight = false;
   bool _started = false;
   bool _signedIn = false;
   StreamSubscription<dynamic>? _deckSub;
@@ -103,7 +109,7 @@ class SyncScheduler with WidgetsBindingObserver {
   }
 
   Future<void> _runSync() async {
-    if (_inFlight) {
+    if (isSyncing.value) {
       logger.d('_runSync: already in flight, rescheduling');
       _scheduleDebounced();
       return;
@@ -112,15 +118,12 @@ class SyncScheduler with WidgetsBindingObserver {
       logger.w('_runSync: not signed in, skipping');
       return;
     }
-    _inFlight = true;
     logger.d('_runSync: starting');
     try {
       final result = await syncService.runFullSync();
       logger.i('_runSync: complete, $result');
     } catch (e, s) {
       logger.e('_runSync: sync failed', ex: e, stacktrace: s);
-    } finally {
-      _inFlight = false;
     }
   }
 

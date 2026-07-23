@@ -35,6 +35,18 @@ class QuizCardDataBaseRepository {
         .distinct(_listEquality.equals);
   }
 
+  /// Watches the cards of [deckId]. Emits on any insert/update/delete
+  /// affecting that deck's cards, so the card list screen stays in sync with
+  /// the database. `distinct()` needs an explicit equality — see
+  /// [DeckDataBaseRepository.watchAllDecks] for why the default one is a
+  /// no-op for lists.
+  Stream<List<QuizCardTableData>> watchQuizCardList(int deckId) {
+    return (appDatabase.select(appDatabase.quizCardTable)
+          ..where((table) => table.deckId.isValue(deckId)))
+        .watch()
+        .distinct(_listEquality.equals);
+  }
+
   Future<int> saveQuizCard({
     required String question,
     required String answer,
