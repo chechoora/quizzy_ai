@@ -44,6 +44,7 @@ class MlAnswerValidator extends IAnswerValidator {
     required String question,
     required String correctAnswer,
     required String userAnswer,
+    String? cardId,
   }) async {
     _logger.d('validateAnswer: correctAnswer="$correctAnswer"');
     if (_session == null) {

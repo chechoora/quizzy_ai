@@ -5,6 +5,7 @@ abstract class IAnswerValidator {
     required String question,
     required String correctAnswer,
     required String userAnswer,
+    String? cardId,
   });
 
   String buildValidationPrompt({

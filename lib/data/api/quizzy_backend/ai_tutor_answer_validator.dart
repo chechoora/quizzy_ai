@@ -11,11 +11,13 @@ class AiTutorAnswerValidator extends IAnswerValidator {
     required String question,
     required String correctAnswer,
     required String userAnswer,
+    String? cardId,
   }) async {
     final result = await _repository.checkAnswer(
       question: question,
       userAnswer: userAnswer,
       correctAnswer: correctAnswer,
+      cardId: cardId,
     );
     return AnswerResult(
       correctAnswer: correctAnswer,

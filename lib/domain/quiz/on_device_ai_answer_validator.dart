@@ -13,6 +13,7 @@ class OnDeviceAIAnswerValidator extends IAnswerValidator {
     required String question,
     required String correctAnswer,
     required String userAnswer,
+    String? cardId,
   }) async {
     _logger.d('Validating answer with on-device AI');
     _logger.v('Question: $question');

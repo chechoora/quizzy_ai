@@ -42,6 +42,7 @@ class QuizEngine {
       question: quizCard.questionText,
       initialText: quizCard.answerText,
       inputText: possibleAnswer,
+      cardId: quizCard.remoteId,
     );
   }
 }

@@ -252,12 +252,14 @@ class CheckAnswerDto {
   final String userAnswer;
   final String correctAnswer;
   final String? context;
+  final String? cardId;
 
   CheckAnswerDto({
     required this.question,
     required this.userAnswer,
     required this.correctAnswer,
     this.context,
+    this.cardId,
   });
 
   Map<String, dynamic> toJson() => {
@@ -265,6 +267,7 @@ class CheckAnswerDto {
         'userAnswer': userAnswer,
         'correctAnswer': correctAnswer,
         if (context != null) 'context': context,
+        if (cardId != null) 'cardId': cardId,
       };
 }
 

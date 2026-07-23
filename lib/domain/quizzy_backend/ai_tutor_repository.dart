@@ -19,6 +19,7 @@ class AiTutorRepository {
     required String userAnswer,
     required String correctAnswer,
     String? context,
+    String? cardId,
   }) async {
     logger.d('checkAnswer: question=$question');
     try {
@@ -28,6 +29,7 @@ class AiTutorRepository {
           userAnswer: userAnswer,
           correctAnswer: correctAnswer,
           context: context,
+          cardId: cardId,
         ),
       );
       if (!response.isSuccessful || response.body == null) {

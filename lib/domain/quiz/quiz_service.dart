@@ -10,12 +10,14 @@ class QuizService {
     required String question,
     required String initialText,
     required String inputText,
+    String? cardId,
   }) async {
     final validator = await settingsService.getAnswerValidator();
     return await validator.validateAnswer(
       question: question,
       correctAnswer: initialText,
       userAnswer: inputText,
+      cardId: cardId,
     );
   }
 }

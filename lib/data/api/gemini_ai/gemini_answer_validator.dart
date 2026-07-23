@@ -28,6 +28,7 @@ class GeminiAnswerValidator extends IAnswerValidator {
     required String question,
     required String correctAnswer,
     required String userAnswer,
+    String? cardId,
   }) async {
     try {
       _logger.d('Validating answer with Gemini AI');
