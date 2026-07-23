@@ -32,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration {
@@ -113,6 +113,33 @@ class AppDatabase extends _$AppDatabase {
             'ON quiz_card_table (remote_id)',
           );
           await m.createTable(syncTombstoneTable);
+        }
+        if (from < 11) {
+          // Migration for quizzy-ai-pro backend play stats (quizzyPro flavor
+          // only). All columns are nullable with no default, so pre-existing
+          // rows and every row on the local-only quizzy flavor simply read
+          // back null — no backfill needed.
+          await m.addColumn(deckTable, deckTable.statsAccuracyWeek);
+          await m.addColumn(deckTable, deckTable.statsAccuracyMonth);
+          await m.addColumn(deckTable, deckTable.statsAccuracyYear);
+          await m.addColumn(deckTable, deckTable.statsAttemptsWeek);
+          await m.addColumn(deckTable, deckTable.statsAttemptsMonth);
+          await m.addColumn(deckTable, deckTable.statsAttemptsYear);
+          await m.addColumn(deckTable, deckTable.statsBestStreakWeek);
+          await m.addColumn(deckTable, deckTable.statsBestStreakMonth);
+          await m.addColumn(deckTable, deckTable.statsBestStreakYear);
+          await m.addColumn(deckTable, deckTable.statsLastPlayedAt);
+          await m.addColumn(quizCardTable, quizCardTable.statsAccuracyWeek);
+          await m.addColumn(quizCardTable, quizCardTable.statsAccuracyMonth);
+          await m.addColumn(quizCardTable, quizCardTable.statsAccuracyYear);
+          await m.addColumn(quizCardTable, quizCardTable.statsAttemptsWeek);
+          await m.addColumn(quizCardTable, quizCardTable.statsAttemptsMonth);
+          await m.addColumn(quizCardTable, quizCardTable.statsAttemptsYear);
+          await m.addColumn(quizCardTable, quizCardTable.statsBestStreakWeek);
+          await m.addColumn(
+              quizCardTable, quizCardTable.statsBestStreakMonth);
+          await m.addColumn(quizCardTable, quizCardTable.statsBestStreakYear);
+          await m.addColumn(quizCardTable, quizCardTable.statsLastPlayedAt);
         }
       },
     );

@@ -28,6 +28,21 @@ class DeckTable extends Table {
   /// backfilled by the v10 migration) is picked up by the next push cycle.
   BoolColumn get isDirty => boolean().withDefault(const Constant(true))();
 
+  /// quizzy-ai-pro backend play stats (quizzyPro flavor only). Null for
+  /// local-only rows and for rows never synced. All ten columns are always
+  /// written together as one unit by the sync pull path, so [statsAttemptsWeek]
+  /// doubles as the "has stats" sentinel in [DeckDatBaseMapper].
+  RealColumn get statsAccuracyWeek => real().nullable()();
+  RealColumn get statsAccuracyMonth => real().nullable()();
+  RealColumn get statsAccuracyYear => real().nullable()();
+  IntColumn get statsAttemptsWeek => integer().nullable()();
+  IntColumn get statsAttemptsMonth => integer().nullable()();
+  IntColumn get statsAttemptsYear => integer().nullable()();
+  IntColumn get statsBestStreakWeek => integer().nullable()();
+  IntColumn get statsBestStreakMonth => integer().nullable()();
+  IntColumn get statsBestStreakYear => integer().nullable()();
+  DateTimeColumn get statsLastPlayedAt => dateTime().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -54,6 +69,19 @@ class QuizCardTable extends Table {
 
   /// True when this row has local changes not yet pushed to the backend.
   BoolColumn get isDirty => boolean().withDefault(const Constant(true))();
+
+  /// quizzy-ai-pro backend play stats (quizzyPro flavor only). See
+  /// [DeckTable.statsAccuracyWeek] for the write/sentinel convention.
+  RealColumn get statsAccuracyWeek => real().nullable()();
+  RealColumn get statsAccuracyMonth => real().nullable()();
+  RealColumn get statsAccuracyYear => real().nullable()();
+  IntColumn get statsAttemptsWeek => integer().nullable()();
+  IntColumn get statsAttemptsMonth => integer().nullable()();
+  IntColumn get statsAttemptsYear => integer().nullable()();
+  IntColumn get statsBestStreakWeek => integer().nullable()();
+  IntColumn get statsBestStreakMonth => integer().nullable()();
+  IntColumn get statsBestStreakYear => integer().nullable()();
+  DateTimeColumn get statsLastPlayedAt => dateTime().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

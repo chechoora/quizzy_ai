@@ -45,6 +45,70 @@ class UsageInfoDto {
       );
 }
 
+/// A week/month/year triple parsed generically from `{"week": ..., "month":
+/// ..., "year": ...}`. The backend sends its "no value yet" sentinel as an
+/// empty object (`{}`) instead of omitting the key or sending `null`, so
+/// [parse] must treat a `Map` value the same as an absent one.
+class PeriodValuesDto<T> {
+  final T week;
+  final T month;
+  final T year;
+
+  PeriodValuesDto({
+    required this.week,
+    required this.month,
+    required this.year,
+  });
+
+  factory PeriodValuesDto.fromJson(
+    Map<String, dynamic> json,
+    T Function(dynamic) parse,
+  ) =>
+      PeriodValuesDto(
+        week: parse(json['week']),
+        month: parse(json['month']),
+        year: parse(json['year']),
+      );
+}
+
+double? _statsAccuracyValue(dynamic value) =>
+    value is num ? value.toDouble() : null;
+
+int _statsCountValue(dynamic value) => value is num ? value.toInt() : 0;
+
+DateTime? _statsTimestampValue(dynamic value) =>
+    value is String ? DateTime.parse(value) : null;
+
+class StatsDto {
+  final PeriodValuesDto<double?> accuracy;
+  final PeriodValuesDto<int> attempts;
+  final PeriodValuesDto<int> bestStreak;
+  final DateTime? lastPlayedAt;
+
+  StatsDto({
+    required this.accuracy,
+    required this.attempts,
+    required this.bestStreak,
+    this.lastPlayedAt,
+  });
+
+  factory StatsDto.fromJson(Map<String, dynamic> json) => StatsDto(
+        accuracy: PeriodValuesDto.fromJson(
+          (json['accuracy'] as Map<String, dynamic>?) ?? const {},
+          _statsAccuracyValue,
+        ),
+        attempts: PeriodValuesDto.fromJson(
+          (json['attempts'] as Map<String, dynamic>?) ?? const {},
+          _statsCountValue,
+        ),
+        bestStreak: PeriodValuesDto.fromJson(
+          (json['bestStreak'] as Map<String, dynamic>?) ?? const {},
+          _statsCountValue,
+        ),
+        lastPlayedAt: _statsTimestampValue(json['lastPlayedAt']),
+      );
+}
+
 class DeckResponseDto {
   final String id;
   final String userId;
@@ -52,6 +116,7 @@ class DeckResponseDto {
   final bool isArchived;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final StatsDto? stats;
 
   DeckResponseDto({
     required this.id,
@@ -60,6 +125,7 @@ class DeckResponseDto {
     required this.isArchived,
     required this.createdAt,
     required this.updatedAt,
+    this.stats,
   });
 
   factory DeckResponseDto.fromJson(Map<String, dynamic> json) =>
@@ -70,6 +136,9 @@ class DeckResponseDto {
         isArchived: json['isArchived'] as bool,
         createdAt: DateTime.parse(json['createdAt'] as String),
         updatedAt: DateTime.parse(json['updatedAt'] as String),
+        stats: json['stats'] == null
+            ? null
+            : StatsDto.fromJson(json['stats'] as Map<String, dynamic>),
       );
 }
 
@@ -81,6 +150,7 @@ class CardResponseDto {
   final bool isArchived;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final StatsDto? stats;
 
   CardResponseDto({
     required this.id,
@@ -90,6 +160,7 @@ class CardResponseDto {
     required this.isArchived,
     required this.createdAt,
     required this.updatedAt,
+    this.stats,
   });
 
   factory CardResponseDto.fromJson(Map<String, dynamic> json) =>
@@ -101,6 +172,9 @@ class CardResponseDto {
         isArchived: json['isArchived'] as bool,
         createdAt: DateTime.parse(json['createdAt'] as String),
         updatedAt: DateTime.parse(json['updatedAt'] as String),
+        stats: json['stats'] == null
+            ? null
+            : StatsDto.fromJson(json['stats'] as Map<String, dynamic>),
       );
 }
 
@@ -112,6 +186,7 @@ class DeckWithCardsResponseDto {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<CardResponseDto> cards;
+  final StatsDto? stats;
 
   DeckWithCardsResponseDto({
     required this.id,
@@ -121,6 +196,7 @@ class DeckWithCardsResponseDto {
     required this.createdAt,
     required this.updatedAt,
     required this.cards,
+    this.stats,
   });
 
   factory DeckWithCardsResponseDto.fromJson(Map<String, dynamic> json) =>
@@ -134,6 +210,9 @@ class DeckWithCardsResponseDto {
         cards: (json['cards'] as List)
             .map((c) => CardResponseDto.fromJson(c as Map<String, dynamic>))
             .toList(),
+        stats: json['stats'] == null
+            ? null
+            : StatsDto.fromJson(json['stats'] as Map<String, dynamic>),
       );
 }
 

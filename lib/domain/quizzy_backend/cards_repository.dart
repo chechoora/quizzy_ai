@@ -2,6 +2,7 @@ import 'package:poc_ai_quiz/data/api/quizzy_backend/cards_api_service.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/quizzy_backend_models.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/quizzy_backend_exception.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 /// Remote card editing/deletion against the quizzy-ai-pro-be backend.
@@ -70,5 +71,28 @@ class CardsRepository {
         isArchived: dto.isArchived,
         createdAt: dto.createdAt,
         updatedAt: dto.updatedAt,
+        stats: _toItemStats(dto.stats),
       );
+
+  ItemStats? _toItemStats(StatsDto? dto) {
+    if (dto == null) return null;
+    return ItemStats(
+      accuracy: PeriodStats(
+        week: dto.accuracy.week,
+        month: dto.accuracy.month,
+        year: dto.accuracy.year,
+      ),
+      attempts: PeriodStats(
+        week: dto.attempts.week,
+        month: dto.attempts.month,
+        year: dto.attempts.year,
+      ),
+      bestStreak: PeriodStats(
+        week: dto.bestStreak.week,
+        month: dto.bestStreak.month,
+        year: dto.bestStreak.year,
+      ),
+      lastPlayedAt: dto.lastPlayedAt,
+    );
+  }
 }

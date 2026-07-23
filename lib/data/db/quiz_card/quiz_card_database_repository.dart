@@ -4,6 +4,7 @@ import 'package:poc_ai_quiz/data/db/database.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 import 'package:poc_ai_quiz/util/uid_generator.dart';
 
 class QuizCardDataBaseRepository {
@@ -222,8 +223,10 @@ class QuizCardDataBaseRepository {
     required String question,
     required String answer,
     required bool isArchive,
+    ItemStats? stats,
   }) async {
     final existingId = await findCardIdByRemoteId(remoteId);
+    final statsCompanion = _statsCompanion(stats);
     if (existingId != null) {
       await (appDatabase.update(appDatabase.quizCardTable)
             ..where((table) => table.id.isValue(existingId)))
@@ -233,6 +236,16 @@ class QuizCardDataBaseRepository {
           answerText: Value(answer),
           isArchive: Value(isArchive),
           isDirty: const Value(false),
+          statsAccuracyWeek: statsCompanion.statsAccuracyWeek,
+          statsAccuracyMonth: statsCompanion.statsAccuracyMonth,
+          statsAccuracyYear: statsCompanion.statsAccuracyYear,
+          statsAttemptsWeek: statsCompanion.statsAttemptsWeek,
+          statsAttemptsMonth: statsCompanion.statsAttemptsMonth,
+          statsAttemptsYear: statsCompanion.statsAttemptsYear,
+          statsBestStreakWeek: statsCompanion.statsBestStreakWeek,
+          statsBestStreakMonth: statsCompanion.statsBestStreakMonth,
+          statsBestStreakYear: statsCompanion.statsBestStreakYear,
+          statsLastPlayedAt: statsCompanion.statsLastPlayedAt,
         ),
       );
       return existingId;
@@ -246,7 +259,35 @@ class QuizCardDataBaseRepository {
             uid: Value(UidGenerator.next()),
             remoteId: Value(remoteId),
             isDirty: const Value(false),
+            statsAccuracyWeek: statsCompanion.statsAccuracyWeek,
+            statsAccuracyMonth: statsCompanion.statsAccuracyMonth,
+            statsAccuracyYear: statsCompanion.statsAccuracyYear,
+            statsAttemptsWeek: statsCompanion.statsAttemptsWeek,
+            statsAttemptsMonth: statsCompanion.statsAttemptsMonth,
+            statsAttemptsYear: statsCompanion.statsAttemptsYear,
+            statsBestStreakWeek: statsCompanion.statsBestStreakWeek,
+            statsBestStreakMonth: statsCompanion.statsBestStreakMonth,
+            statsBestStreakYear: statsCompanion.statsBestStreakYear,
+            statsLastPlayedAt: statsCompanion.statsLastPlayedAt,
           ),
         );
+  }
+
+  /// Builds the ten stats columns of a [QuizCardTableCompanion] from
+  /// [stats], writing explicit nulls when absent so a stats-less pull result
+  /// clears any stale value from a previous sync.
+  QuizCardTableCompanion _statsCompanion(ItemStats? stats) {
+    return QuizCardTableCompanion(
+      statsAccuracyWeek: Value(stats?.accuracy.week),
+      statsAccuracyMonth: Value(stats?.accuracy.month),
+      statsAccuracyYear: Value(stats?.accuracy.year),
+      statsAttemptsWeek: Value(stats?.attempts.week),
+      statsAttemptsMonth: Value(stats?.attempts.month),
+      statsAttemptsYear: Value(stats?.attempts.year),
+      statsBestStreakWeek: Value(stats?.bestStreak.week),
+      statsBestStreakMonth: Value(stats?.bestStreak.month),
+      statsBestStreakYear: Value(stats?.bestStreak.year),
+      statsLastPlayedAt: Value(stats?.lastPlayedAt),
+    );
   }
 }

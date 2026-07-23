@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 
 class QuizCardItem extends Equatable {
   final int id;
@@ -14,6 +15,10 @@ class QuizCardItem extends Equatable {
   /// True when this card has local changes not yet pushed to the backend.
   final bool isDirty;
 
+  /// quizzy-ai-pro backend play stats, or null on the local-only quizzy
+  /// flavor and for cards never synced.
+  final ItemStats? stats;
+
   const QuizCardItem({
     required this.id,
     required this.deckId,
@@ -23,6 +28,7 @@ class QuizCardItem extends Equatable {
     this.uid,
     this.remoteId,
     this.isDirty = false,
+    this.stats,
   });
 
   @override
@@ -35,5 +41,6 @@ class QuizCardItem extends Equatable {
         isArchive,
         remoteId,
         isDirty,
+        stats,
       ];
 }

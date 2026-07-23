@@ -57,9 +57,85 @@ class $DeckTableTable extends DeckTable
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_dirty" IN (0, 1))'),
       defaultValue: const Constant(true));
+  static const VerificationMeta _statsAccuracyWeekMeta =
+      const VerificationMeta('statsAccuracyWeek');
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, uid, title, isArchive, remoteId, isDirty];
+  late final GeneratedColumn<double> statsAccuracyWeek =
+      GeneratedColumn<double>('stats_accuracy_week', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _statsAccuracyMonthMeta =
+      const VerificationMeta('statsAccuracyMonth');
+  @override
+  late final GeneratedColumn<double> statsAccuracyMonth =
+      GeneratedColumn<double>('stats_accuracy_month', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _statsAccuracyYearMeta =
+      const VerificationMeta('statsAccuracyYear');
+  @override
+  late final GeneratedColumn<double> statsAccuracyYear =
+      GeneratedColumn<double>('stats_accuracy_year', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _statsAttemptsWeekMeta =
+      const VerificationMeta('statsAttemptsWeek');
+  @override
+  late final GeneratedColumn<int> statsAttemptsWeek = GeneratedColumn<int>(
+      'stats_attempts_week', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsAttemptsMonthMeta =
+      const VerificationMeta('statsAttemptsMonth');
+  @override
+  late final GeneratedColumn<int> statsAttemptsMonth = GeneratedColumn<int>(
+      'stats_attempts_month', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsAttemptsYearMeta =
+      const VerificationMeta('statsAttemptsYear');
+  @override
+  late final GeneratedColumn<int> statsAttemptsYear = GeneratedColumn<int>(
+      'stats_attempts_year', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsBestStreakWeekMeta =
+      const VerificationMeta('statsBestStreakWeek');
+  @override
+  late final GeneratedColumn<int> statsBestStreakWeek = GeneratedColumn<int>(
+      'stats_best_streak_week', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsBestStreakMonthMeta =
+      const VerificationMeta('statsBestStreakMonth');
+  @override
+  late final GeneratedColumn<int> statsBestStreakMonth = GeneratedColumn<int>(
+      'stats_best_streak_month', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsBestStreakYearMeta =
+      const VerificationMeta('statsBestStreakYear');
+  @override
+  late final GeneratedColumn<int> statsBestStreakYear = GeneratedColumn<int>(
+      'stats_best_streak_year', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsLastPlayedAtMeta =
+      const VerificationMeta('statsLastPlayedAt');
+  @override
+  late final GeneratedColumn<DateTime> statsLastPlayedAt =
+      GeneratedColumn<DateTime>('stats_last_played_at', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        uid,
+        title,
+        isArchive,
+        remoteId,
+        isDirty,
+        statsAccuracyWeek,
+        statsAccuracyMonth,
+        statsAccuracyYear,
+        statsAttemptsWeek,
+        statsAttemptsMonth,
+        statsAttemptsYear,
+        statsBestStreakWeek,
+        statsBestStreakMonth,
+        statsBestStreakYear,
+        statsLastPlayedAt
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -97,6 +173,66 @@ class $DeckTableTable extends DeckTable
       context.handle(_isDirtyMeta,
           isDirty.isAcceptableOrUnknown(data['is_dirty']!, _isDirtyMeta));
     }
+    if (data.containsKey('stats_accuracy_week')) {
+      context.handle(
+          _statsAccuracyWeekMeta,
+          statsAccuracyWeek.isAcceptableOrUnknown(
+              data['stats_accuracy_week']!, _statsAccuracyWeekMeta));
+    }
+    if (data.containsKey('stats_accuracy_month')) {
+      context.handle(
+          _statsAccuracyMonthMeta,
+          statsAccuracyMonth.isAcceptableOrUnknown(
+              data['stats_accuracy_month']!, _statsAccuracyMonthMeta));
+    }
+    if (data.containsKey('stats_accuracy_year')) {
+      context.handle(
+          _statsAccuracyYearMeta,
+          statsAccuracyYear.isAcceptableOrUnknown(
+              data['stats_accuracy_year']!, _statsAccuracyYearMeta));
+    }
+    if (data.containsKey('stats_attempts_week')) {
+      context.handle(
+          _statsAttemptsWeekMeta,
+          statsAttemptsWeek.isAcceptableOrUnknown(
+              data['stats_attempts_week']!, _statsAttemptsWeekMeta));
+    }
+    if (data.containsKey('stats_attempts_month')) {
+      context.handle(
+          _statsAttemptsMonthMeta,
+          statsAttemptsMonth.isAcceptableOrUnknown(
+              data['stats_attempts_month']!, _statsAttemptsMonthMeta));
+    }
+    if (data.containsKey('stats_attempts_year')) {
+      context.handle(
+          _statsAttemptsYearMeta,
+          statsAttemptsYear.isAcceptableOrUnknown(
+              data['stats_attempts_year']!, _statsAttemptsYearMeta));
+    }
+    if (data.containsKey('stats_best_streak_week')) {
+      context.handle(
+          _statsBestStreakWeekMeta,
+          statsBestStreakWeek.isAcceptableOrUnknown(
+              data['stats_best_streak_week']!, _statsBestStreakWeekMeta));
+    }
+    if (data.containsKey('stats_best_streak_month')) {
+      context.handle(
+          _statsBestStreakMonthMeta,
+          statsBestStreakMonth.isAcceptableOrUnknown(
+              data['stats_best_streak_month']!, _statsBestStreakMonthMeta));
+    }
+    if (data.containsKey('stats_best_streak_year')) {
+      context.handle(
+          _statsBestStreakYearMeta,
+          statsBestStreakYear.isAcceptableOrUnknown(
+              data['stats_best_streak_year']!, _statsBestStreakYearMeta));
+    }
+    if (data.containsKey('stats_last_played_at')) {
+      context.handle(
+          _statsLastPlayedAtMeta,
+          statsLastPlayedAt.isAcceptableOrUnknown(
+              data['stats_last_played_at']!, _statsLastPlayedAtMeta));
+    }
     return context;
   }
 
@@ -118,6 +254,27 @@ class $DeckTableTable extends DeckTable
           .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
       isDirty: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_dirty'])!,
+      statsAccuracyWeek: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}stats_accuracy_week']),
+      statsAccuracyMonth: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}stats_accuracy_month']),
+      statsAccuracyYear: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}stats_accuracy_year']),
+      statsAttemptsWeek: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_attempts_week']),
+      statsAttemptsMonth: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_attempts_month']),
+      statsAttemptsYear: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_attempts_year']),
+      statsBestStreakWeek: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_best_streak_week']),
+      statsBestStreakMonth: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_best_streak_month']),
+      statsBestStreakYear: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_best_streak_year']),
+      statsLastPlayedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime,
+          data['${effectivePrefix}stats_last_played_at']),
     );
   }
 
@@ -145,13 +302,38 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
   /// Defaults to true so every new insert (and every pre-existing row,
   /// backfilled by the v10 migration) is picked up by the next push cycle.
   final bool isDirty;
+
+  /// quizzy-ai-pro backend play stats (quizzyPro flavor only). Null for
+  /// local-only rows and for rows never synced. All ten columns are always
+  /// written together as one unit by the sync pull path, so [statsAttemptsWeek]
+  /// doubles as the "has stats" sentinel in [DeckDatBaseMapper].
+  final double? statsAccuracyWeek;
+  final double? statsAccuracyMonth;
+  final double? statsAccuracyYear;
+  final int? statsAttemptsWeek;
+  final int? statsAttemptsMonth;
+  final int? statsAttemptsYear;
+  final int? statsBestStreakWeek;
+  final int? statsBestStreakMonth;
+  final int? statsBestStreakYear;
+  final DateTime? statsLastPlayedAt;
   const DeckTableData(
       {required this.id,
       this.uid,
       required this.title,
       required this.isArchive,
       this.remoteId,
-      required this.isDirty});
+      required this.isDirty,
+      this.statsAccuracyWeek,
+      this.statsAccuracyMonth,
+      this.statsAccuracyYear,
+      this.statsAttemptsWeek,
+      this.statsAttemptsMonth,
+      this.statsAttemptsYear,
+      this.statsBestStreakWeek,
+      this.statsBestStreakMonth,
+      this.statsBestStreakYear,
+      this.statsLastPlayedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -165,6 +347,36 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       map['remote_id'] = Variable<String>(remoteId);
     }
     map['is_dirty'] = Variable<bool>(isDirty);
+    if (!nullToAbsent || statsAccuracyWeek != null) {
+      map['stats_accuracy_week'] = Variable<double>(statsAccuracyWeek);
+    }
+    if (!nullToAbsent || statsAccuracyMonth != null) {
+      map['stats_accuracy_month'] = Variable<double>(statsAccuracyMonth);
+    }
+    if (!nullToAbsent || statsAccuracyYear != null) {
+      map['stats_accuracy_year'] = Variable<double>(statsAccuracyYear);
+    }
+    if (!nullToAbsent || statsAttemptsWeek != null) {
+      map['stats_attempts_week'] = Variable<int>(statsAttemptsWeek);
+    }
+    if (!nullToAbsent || statsAttemptsMonth != null) {
+      map['stats_attempts_month'] = Variable<int>(statsAttemptsMonth);
+    }
+    if (!nullToAbsent || statsAttemptsYear != null) {
+      map['stats_attempts_year'] = Variable<int>(statsAttemptsYear);
+    }
+    if (!nullToAbsent || statsBestStreakWeek != null) {
+      map['stats_best_streak_week'] = Variable<int>(statsBestStreakWeek);
+    }
+    if (!nullToAbsent || statsBestStreakMonth != null) {
+      map['stats_best_streak_month'] = Variable<int>(statsBestStreakMonth);
+    }
+    if (!nullToAbsent || statsBestStreakYear != null) {
+      map['stats_best_streak_year'] = Variable<int>(statsBestStreakYear);
+    }
+    if (!nullToAbsent || statsLastPlayedAt != null) {
+      map['stats_last_played_at'] = Variable<DateTime>(statsLastPlayedAt);
+    }
     return map;
   }
 
@@ -178,6 +390,36 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           ? const Value.absent()
           : Value(remoteId),
       isDirty: Value(isDirty),
+      statsAccuracyWeek: statsAccuracyWeek == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAccuracyWeek),
+      statsAccuracyMonth: statsAccuracyMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAccuracyMonth),
+      statsAccuracyYear: statsAccuracyYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAccuracyYear),
+      statsAttemptsWeek: statsAttemptsWeek == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAttemptsWeek),
+      statsAttemptsMonth: statsAttemptsMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAttemptsMonth),
+      statsAttemptsYear: statsAttemptsYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAttemptsYear),
+      statsBestStreakWeek: statsBestStreakWeek == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsBestStreakWeek),
+      statsBestStreakMonth: statsBestStreakMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsBestStreakMonth),
+      statsBestStreakYear: statsBestStreakYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsBestStreakYear),
+      statsLastPlayedAt: statsLastPlayedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsLastPlayedAt),
     );
   }
 
@@ -191,6 +433,23 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       isArchive: serializer.fromJson<bool>(json['isArchive']),
       remoteId: serializer.fromJson<String?>(json['remoteId']),
       isDirty: serializer.fromJson<bool>(json['isDirty']),
+      statsAccuracyWeek:
+          serializer.fromJson<double?>(json['statsAccuracyWeek']),
+      statsAccuracyMonth:
+          serializer.fromJson<double?>(json['statsAccuracyMonth']),
+      statsAccuracyYear:
+          serializer.fromJson<double?>(json['statsAccuracyYear']),
+      statsAttemptsWeek: serializer.fromJson<int?>(json['statsAttemptsWeek']),
+      statsAttemptsMonth: serializer.fromJson<int?>(json['statsAttemptsMonth']),
+      statsAttemptsYear: serializer.fromJson<int?>(json['statsAttemptsYear']),
+      statsBestStreakWeek:
+          serializer.fromJson<int?>(json['statsBestStreakWeek']),
+      statsBestStreakMonth:
+          serializer.fromJson<int?>(json['statsBestStreakMonth']),
+      statsBestStreakYear:
+          serializer.fromJson<int?>(json['statsBestStreakYear']),
+      statsLastPlayedAt:
+          serializer.fromJson<DateTime?>(json['statsLastPlayedAt']),
     );
   }
   @override
@@ -203,6 +462,16 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       'isArchive': serializer.toJson<bool>(isArchive),
       'remoteId': serializer.toJson<String?>(remoteId),
       'isDirty': serializer.toJson<bool>(isDirty),
+      'statsAccuracyWeek': serializer.toJson<double?>(statsAccuracyWeek),
+      'statsAccuracyMonth': serializer.toJson<double?>(statsAccuracyMonth),
+      'statsAccuracyYear': serializer.toJson<double?>(statsAccuracyYear),
+      'statsAttemptsWeek': serializer.toJson<int?>(statsAttemptsWeek),
+      'statsAttemptsMonth': serializer.toJson<int?>(statsAttemptsMonth),
+      'statsAttemptsYear': serializer.toJson<int?>(statsAttemptsYear),
+      'statsBestStreakWeek': serializer.toJson<int?>(statsBestStreakWeek),
+      'statsBestStreakMonth': serializer.toJson<int?>(statsBestStreakMonth),
+      'statsBestStreakYear': serializer.toJson<int?>(statsBestStreakYear),
+      'statsLastPlayedAt': serializer.toJson<DateTime?>(statsLastPlayedAt),
     };
   }
 
@@ -212,7 +481,17 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           String? title,
           bool? isArchive,
           Value<String?> remoteId = const Value.absent(),
-          bool? isDirty}) =>
+          bool? isDirty,
+          Value<double?> statsAccuracyWeek = const Value.absent(),
+          Value<double?> statsAccuracyMonth = const Value.absent(),
+          Value<double?> statsAccuracyYear = const Value.absent(),
+          Value<int?> statsAttemptsWeek = const Value.absent(),
+          Value<int?> statsAttemptsMonth = const Value.absent(),
+          Value<int?> statsAttemptsYear = const Value.absent(),
+          Value<int?> statsBestStreakWeek = const Value.absent(),
+          Value<int?> statsBestStreakMonth = const Value.absent(),
+          Value<int?> statsBestStreakYear = const Value.absent(),
+          Value<DateTime?> statsLastPlayedAt = const Value.absent()}) =>
       DeckTableData(
         id: id ?? this.id,
         uid: uid.present ? uid.value : this.uid,
@@ -220,6 +499,36 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
         isArchive: isArchive ?? this.isArchive,
         remoteId: remoteId.present ? remoteId.value : this.remoteId,
         isDirty: isDirty ?? this.isDirty,
+        statsAccuracyWeek: statsAccuracyWeek.present
+            ? statsAccuracyWeek.value
+            : this.statsAccuracyWeek,
+        statsAccuracyMonth: statsAccuracyMonth.present
+            ? statsAccuracyMonth.value
+            : this.statsAccuracyMonth,
+        statsAccuracyYear: statsAccuracyYear.present
+            ? statsAccuracyYear.value
+            : this.statsAccuracyYear,
+        statsAttemptsWeek: statsAttemptsWeek.present
+            ? statsAttemptsWeek.value
+            : this.statsAttemptsWeek,
+        statsAttemptsMonth: statsAttemptsMonth.present
+            ? statsAttemptsMonth.value
+            : this.statsAttemptsMonth,
+        statsAttemptsYear: statsAttemptsYear.present
+            ? statsAttemptsYear.value
+            : this.statsAttemptsYear,
+        statsBestStreakWeek: statsBestStreakWeek.present
+            ? statsBestStreakWeek.value
+            : this.statsBestStreakWeek,
+        statsBestStreakMonth: statsBestStreakMonth.present
+            ? statsBestStreakMonth.value
+            : this.statsBestStreakMonth,
+        statsBestStreakYear: statsBestStreakYear.present
+            ? statsBestStreakYear.value
+            : this.statsBestStreakYear,
+        statsLastPlayedAt: statsLastPlayedAt.present
+            ? statsLastPlayedAt.value
+            : this.statsLastPlayedAt,
       );
   DeckTableData copyWithCompanion(DeckTableCompanion data) {
     return DeckTableData(
@@ -229,6 +538,36 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       isArchive: data.isArchive.present ? data.isArchive.value : this.isArchive,
       remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
       isDirty: data.isDirty.present ? data.isDirty.value : this.isDirty,
+      statsAccuracyWeek: data.statsAccuracyWeek.present
+          ? data.statsAccuracyWeek.value
+          : this.statsAccuracyWeek,
+      statsAccuracyMonth: data.statsAccuracyMonth.present
+          ? data.statsAccuracyMonth.value
+          : this.statsAccuracyMonth,
+      statsAccuracyYear: data.statsAccuracyYear.present
+          ? data.statsAccuracyYear.value
+          : this.statsAccuracyYear,
+      statsAttemptsWeek: data.statsAttemptsWeek.present
+          ? data.statsAttemptsWeek.value
+          : this.statsAttemptsWeek,
+      statsAttemptsMonth: data.statsAttemptsMonth.present
+          ? data.statsAttemptsMonth.value
+          : this.statsAttemptsMonth,
+      statsAttemptsYear: data.statsAttemptsYear.present
+          ? data.statsAttemptsYear.value
+          : this.statsAttemptsYear,
+      statsBestStreakWeek: data.statsBestStreakWeek.present
+          ? data.statsBestStreakWeek.value
+          : this.statsBestStreakWeek,
+      statsBestStreakMonth: data.statsBestStreakMonth.present
+          ? data.statsBestStreakMonth.value
+          : this.statsBestStreakMonth,
+      statsBestStreakYear: data.statsBestStreakYear.present
+          ? data.statsBestStreakYear.value
+          : this.statsBestStreakYear,
+      statsLastPlayedAt: data.statsLastPlayedAt.present
+          ? data.statsLastPlayedAt.value
+          : this.statsLastPlayedAt,
     );
   }
 
@@ -240,13 +579,39 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           ..write('title: $title, ')
           ..write('isArchive: $isArchive, ')
           ..write('remoteId: $remoteId, ')
-          ..write('isDirty: $isDirty')
+          ..write('isDirty: $isDirty, ')
+          ..write('statsAccuracyWeek: $statsAccuracyWeek, ')
+          ..write('statsAccuracyMonth: $statsAccuracyMonth, ')
+          ..write('statsAccuracyYear: $statsAccuracyYear, ')
+          ..write('statsAttemptsWeek: $statsAttemptsWeek, ')
+          ..write('statsAttemptsMonth: $statsAttemptsMonth, ')
+          ..write('statsAttemptsYear: $statsAttemptsYear, ')
+          ..write('statsBestStreakWeek: $statsBestStreakWeek, ')
+          ..write('statsBestStreakMonth: $statsBestStreakMonth, ')
+          ..write('statsBestStreakYear: $statsBestStreakYear, ')
+          ..write('statsLastPlayedAt: $statsLastPlayedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, uid, title, isArchive, remoteId, isDirty);
+  int get hashCode => Object.hash(
+      id,
+      uid,
+      title,
+      isArchive,
+      remoteId,
+      isDirty,
+      statsAccuracyWeek,
+      statsAccuracyMonth,
+      statsAccuracyYear,
+      statsAttemptsWeek,
+      statsAttemptsMonth,
+      statsAttemptsYear,
+      statsBestStreakWeek,
+      statsBestStreakMonth,
+      statsBestStreakYear,
+      statsLastPlayedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -256,7 +621,17 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           other.title == this.title &&
           other.isArchive == this.isArchive &&
           other.remoteId == this.remoteId &&
-          other.isDirty == this.isDirty);
+          other.isDirty == this.isDirty &&
+          other.statsAccuracyWeek == this.statsAccuracyWeek &&
+          other.statsAccuracyMonth == this.statsAccuracyMonth &&
+          other.statsAccuracyYear == this.statsAccuracyYear &&
+          other.statsAttemptsWeek == this.statsAttemptsWeek &&
+          other.statsAttemptsMonth == this.statsAttemptsMonth &&
+          other.statsAttemptsYear == this.statsAttemptsYear &&
+          other.statsBestStreakWeek == this.statsBestStreakWeek &&
+          other.statsBestStreakMonth == this.statsBestStreakMonth &&
+          other.statsBestStreakYear == this.statsBestStreakYear &&
+          other.statsLastPlayedAt == this.statsLastPlayedAt);
 }
 
 class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
@@ -266,6 +641,16 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
   final Value<bool> isArchive;
   final Value<String?> remoteId;
   final Value<bool> isDirty;
+  final Value<double?> statsAccuracyWeek;
+  final Value<double?> statsAccuracyMonth;
+  final Value<double?> statsAccuracyYear;
+  final Value<int?> statsAttemptsWeek;
+  final Value<int?> statsAttemptsMonth;
+  final Value<int?> statsAttemptsYear;
+  final Value<int?> statsBestStreakWeek;
+  final Value<int?> statsBestStreakMonth;
+  final Value<int?> statsBestStreakYear;
+  final Value<DateTime?> statsLastPlayedAt;
   const DeckTableCompanion({
     this.id = const Value.absent(),
     this.uid = const Value.absent(),
@@ -273,6 +658,16 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     this.isArchive = const Value.absent(),
     this.remoteId = const Value.absent(),
     this.isDirty = const Value.absent(),
+    this.statsAccuracyWeek = const Value.absent(),
+    this.statsAccuracyMonth = const Value.absent(),
+    this.statsAccuracyYear = const Value.absent(),
+    this.statsAttemptsWeek = const Value.absent(),
+    this.statsAttemptsMonth = const Value.absent(),
+    this.statsAttemptsYear = const Value.absent(),
+    this.statsBestStreakWeek = const Value.absent(),
+    this.statsBestStreakMonth = const Value.absent(),
+    this.statsBestStreakYear = const Value.absent(),
+    this.statsLastPlayedAt = const Value.absent(),
   });
   DeckTableCompanion.insert({
     this.id = const Value.absent(),
@@ -281,6 +676,16 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     required bool isArchive,
     this.remoteId = const Value.absent(),
     this.isDirty = const Value.absent(),
+    this.statsAccuracyWeek = const Value.absent(),
+    this.statsAccuracyMonth = const Value.absent(),
+    this.statsAccuracyYear = const Value.absent(),
+    this.statsAttemptsWeek = const Value.absent(),
+    this.statsAttemptsMonth = const Value.absent(),
+    this.statsAttemptsYear = const Value.absent(),
+    this.statsBestStreakWeek = const Value.absent(),
+    this.statsBestStreakMonth = const Value.absent(),
+    this.statsBestStreakYear = const Value.absent(),
+    this.statsLastPlayedAt = const Value.absent(),
   })  : title = Value(title),
         isArchive = Value(isArchive);
   static Insertable<DeckTableData> custom({
@@ -290,6 +695,16 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     Expression<bool>? isArchive,
     Expression<String>? remoteId,
     Expression<bool>? isDirty,
+    Expression<double>? statsAccuracyWeek,
+    Expression<double>? statsAccuracyMonth,
+    Expression<double>? statsAccuracyYear,
+    Expression<int>? statsAttemptsWeek,
+    Expression<int>? statsAttemptsMonth,
+    Expression<int>? statsAttemptsYear,
+    Expression<int>? statsBestStreakWeek,
+    Expression<int>? statsBestStreakMonth,
+    Expression<int>? statsBestStreakYear,
+    Expression<DateTime>? statsLastPlayedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -298,6 +713,21 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       if (isArchive != null) 'is_archive': isArchive,
       if (remoteId != null) 'remote_id': remoteId,
       if (isDirty != null) 'is_dirty': isDirty,
+      if (statsAccuracyWeek != null) 'stats_accuracy_week': statsAccuracyWeek,
+      if (statsAccuracyMonth != null)
+        'stats_accuracy_month': statsAccuracyMonth,
+      if (statsAccuracyYear != null) 'stats_accuracy_year': statsAccuracyYear,
+      if (statsAttemptsWeek != null) 'stats_attempts_week': statsAttemptsWeek,
+      if (statsAttemptsMonth != null)
+        'stats_attempts_month': statsAttemptsMonth,
+      if (statsAttemptsYear != null) 'stats_attempts_year': statsAttemptsYear,
+      if (statsBestStreakWeek != null)
+        'stats_best_streak_week': statsBestStreakWeek,
+      if (statsBestStreakMonth != null)
+        'stats_best_streak_month': statsBestStreakMonth,
+      if (statsBestStreakYear != null)
+        'stats_best_streak_year': statsBestStreakYear,
+      if (statsLastPlayedAt != null) 'stats_last_played_at': statsLastPlayedAt,
     });
   }
 
@@ -307,7 +737,17 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       Value<String>? title,
       Value<bool>? isArchive,
       Value<String?>? remoteId,
-      Value<bool>? isDirty}) {
+      Value<bool>? isDirty,
+      Value<double?>? statsAccuracyWeek,
+      Value<double?>? statsAccuracyMonth,
+      Value<double?>? statsAccuracyYear,
+      Value<int?>? statsAttemptsWeek,
+      Value<int?>? statsAttemptsMonth,
+      Value<int?>? statsAttemptsYear,
+      Value<int?>? statsBestStreakWeek,
+      Value<int?>? statsBestStreakMonth,
+      Value<int?>? statsBestStreakYear,
+      Value<DateTime?>? statsLastPlayedAt}) {
     return DeckTableCompanion(
       id: id ?? this.id,
       uid: uid ?? this.uid,
@@ -315,6 +755,16 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       isArchive: isArchive ?? this.isArchive,
       remoteId: remoteId ?? this.remoteId,
       isDirty: isDirty ?? this.isDirty,
+      statsAccuracyWeek: statsAccuracyWeek ?? this.statsAccuracyWeek,
+      statsAccuracyMonth: statsAccuracyMonth ?? this.statsAccuracyMonth,
+      statsAccuracyYear: statsAccuracyYear ?? this.statsAccuracyYear,
+      statsAttemptsWeek: statsAttemptsWeek ?? this.statsAttemptsWeek,
+      statsAttemptsMonth: statsAttemptsMonth ?? this.statsAttemptsMonth,
+      statsAttemptsYear: statsAttemptsYear ?? this.statsAttemptsYear,
+      statsBestStreakWeek: statsBestStreakWeek ?? this.statsBestStreakWeek,
+      statsBestStreakMonth: statsBestStreakMonth ?? this.statsBestStreakMonth,
+      statsBestStreakYear: statsBestStreakYear ?? this.statsBestStreakYear,
+      statsLastPlayedAt: statsLastPlayedAt ?? this.statsLastPlayedAt,
     );
   }
 
@@ -339,6 +789,37 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     if (isDirty.present) {
       map['is_dirty'] = Variable<bool>(isDirty.value);
     }
+    if (statsAccuracyWeek.present) {
+      map['stats_accuracy_week'] = Variable<double>(statsAccuracyWeek.value);
+    }
+    if (statsAccuracyMonth.present) {
+      map['stats_accuracy_month'] = Variable<double>(statsAccuracyMonth.value);
+    }
+    if (statsAccuracyYear.present) {
+      map['stats_accuracy_year'] = Variable<double>(statsAccuracyYear.value);
+    }
+    if (statsAttemptsWeek.present) {
+      map['stats_attempts_week'] = Variable<int>(statsAttemptsWeek.value);
+    }
+    if (statsAttemptsMonth.present) {
+      map['stats_attempts_month'] = Variable<int>(statsAttemptsMonth.value);
+    }
+    if (statsAttemptsYear.present) {
+      map['stats_attempts_year'] = Variable<int>(statsAttemptsYear.value);
+    }
+    if (statsBestStreakWeek.present) {
+      map['stats_best_streak_week'] = Variable<int>(statsBestStreakWeek.value);
+    }
+    if (statsBestStreakMonth.present) {
+      map['stats_best_streak_month'] =
+          Variable<int>(statsBestStreakMonth.value);
+    }
+    if (statsBestStreakYear.present) {
+      map['stats_best_streak_year'] = Variable<int>(statsBestStreakYear.value);
+    }
+    if (statsLastPlayedAt.present) {
+      map['stats_last_played_at'] = Variable<DateTime>(statsLastPlayedAt.value);
+    }
     return map;
   }
 
@@ -350,7 +831,17 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
           ..write('title: $title, ')
           ..write('isArchive: $isArchive, ')
           ..write('remoteId: $remoteId, ')
-          ..write('isDirty: $isDirty')
+          ..write('isDirty: $isDirty, ')
+          ..write('statsAccuracyWeek: $statsAccuracyWeek, ')
+          ..write('statsAccuracyMonth: $statsAccuracyMonth, ')
+          ..write('statsAccuracyYear: $statsAccuracyYear, ')
+          ..write('statsAttemptsWeek: $statsAttemptsWeek, ')
+          ..write('statsAttemptsMonth: $statsAttemptsMonth, ')
+          ..write('statsAttemptsYear: $statsAttemptsYear, ')
+          ..write('statsBestStreakWeek: $statsBestStreakWeek, ')
+          ..write('statsBestStreakMonth: $statsBestStreakMonth, ')
+          ..write('statsBestStreakYear: $statsBestStreakYear, ')
+          ..write('statsLastPlayedAt: $statsLastPlayedAt')
           ..write(')'))
         .toString();
   }
@@ -429,9 +920,87 @@ class $QuizCardTableTable extends QuizCardTable
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_dirty" IN (0, 1))'),
       defaultValue: const Constant(true));
+  static const VerificationMeta _statsAccuracyWeekMeta =
+      const VerificationMeta('statsAccuracyWeek');
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, uid, deckId, questionText, answerText, isArchive, remoteId, isDirty];
+  late final GeneratedColumn<double> statsAccuracyWeek =
+      GeneratedColumn<double>('stats_accuracy_week', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _statsAccuracyMonthMeta =
+      const VerificationMeta('statsAccuracyMonth');
+  @override
+  late final GeneratedColumn<double> statsAccuracyMonth =
+      GeneratedColumn<double>('stats_accuracy_month', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _statsAccuracyYearMeta =
+      const VerificationMeta('statsAccuracyYear');
+  @override
+  late final GeneratedColumn<double> statsAccuracyYear =
+      GeneratedColumn<double>('stats_accuracy_year', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _statsAttemptsWeekMeta =
+      const VerificationMeta('statsAttemptsWeek');
+  @override
+  late final GeneratedColumn<int> statsAttemptsWeek = GeneratedColumn<int>(
+      'stats_attempts_week', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsAttemptsMonthMeta =
+      const VerificationMeta('statsAttemptsMonth');
+  @override
+  late final GeneratedColumn<int> statsAttemptsMonth = GeneratedColumn<int>(
+      'stats_attempts_month', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsAttemptsYearMeta =
+      const VerificationMeta('statsAttemptsYear');
+  @override
+  late final GeneratedColumn<int> statsAttemptsYear = GeneratedColumn<int>(
+      'stats_attempts_year', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsBestStreakWeekMeta =
+      const VerificationMeta('statsBestStreakWeek');
+  @override
+  late final GeneratedColumn<int> statsBestStreakWeek = GeneratedColumn<int>(
+      'stats_best_streak_week', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsBestStreakMonthMeta =
+      const VerificationMeta('statsBestStreakMonth');
+  @override
+  late final GeneratedColumn<int> statsBestStreakMonth = GeneratedColumn<int>(
+      'stats_best_streak_month', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsBestStreakYearMeta =
+      const VerificationMeta('statsBestStreakYear');
+  @override
+  late final GeneratedColumn<int> statsBestStreakYear = GeneratedColumn<int>(
+      'stats_best_streak_year', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _statsLastPlayedAtMeta =
+      const VerificationMeta('statsLastPlayedAt');
+  @override
+  late final GeneratedColumn<DateTime> statsLastPlayedAt =
+      GeneratedColumn<DateTime>('stats_last_played_at', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        uid,
+        deckId,
+        questionText,
+        answerText,
+        isArchive,
+        remoteId,
+        isDirty,
+        statsAccuracyWeek,
+        statsAccuracyMonth,
+        statsAccuracyYear,
+        statsAttemptsWeek,
+        statsAttemptsMonth,
+        statsAttemptsYear,
+        statsBestStreakWeek,
+        statsBestStreakMonth,
+        statsBestStreakYear,
+        statsLastPlayedAt
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -485,6 +1054,66 @@ class $QuizCardTableTable extends QuizCardTable
       context.handle(_isDirtyMeta,
           isDirty.isAcceptableOrUnknown(data['is_dirty']!, _isDirtyMeta));
     }
+    if (data.containsKey('stats_accuracy_week')) {
+      context.handle(
+          _statsAccuracyWeekMeta,
+          statsAccuracyWeek.isAcceptableOrUnknown(
+              data['stats_accuracy_week']!, _statsAccuracyWeekMeta));
+    }
+    if (data.containsKey('stats_accuracy_month')) {
+      context.handle(
+          _statsAccuracyMonthMeta,
+          statsAccuracyMonth.isAcceptableOrUnknown(
+              data['stats_accuracy_month']!, _statsAccuracyMonthMeta));
+    }
+    if (data.containsKey('stats_accuracy_year')) {
+      context.handle(
+          _statsAccuracyYearMeta,
+          statsAccuracyYear.isAcceptableOrUnknown(
+              data['stats_accuracy_year']!, _statsAccuracyYearMeta));
+    }
+    if (data.containsKey('stats_attempts_week')) {
+      context.handle(
+          _statsAttemptsWeekMeta,
+          statsAttemptsWeek.isAcceptableOrUnknown(
+              data['stats_attempts_week']!, _statsAttemptsWeekMeta));
+    }
+    if (data.containsKey('stats_attempts_month')) {
+      context.handle(
+          _statsAttemptsMonthMeta,
+          statsAttemptsMonth.isAcceptableOrUnknown(
+              data['stats_attempts_month']!, _statsAttemptsMonthMeta));
+    }
+    if (data.containsKey('stats_attempts_year')) {
+      context.handle(
+          _statsAttemptsYearMeta,
+          statsAttemptsYear.isAcceptableOrUnknown(
+              data['stats_attempts_year']!, _statsAttemptsYearMeta));
+    }
+    if (data.containsKey('stats_best_streak_week')) {
+      context.handle(
+          _statsBestStreakWeekMeta,
+          statsBestStreakWeek.isAcceptableOrUnknown(
+              data['stats_best_streak_week']!, _statsBestStreakWeekMeta));
+    }
+    if (data.containsKey('stats_best_streak_month')) {
+      context.handle(
+          _statsBestStreakMonthMeta,
+          statsBestStreakMonth.isAcceptableOrUnknown(
+              data['stats_best_streak_month']!, _statsBestStreakMonthMeta));
+    }
+    if (data.containsKey('stats_best_streak_year')) {
+      context.handle(
+          _statsBestStreakYearMeta,
+          statsBestStreakYear.isAcceptableOrUnknown(
+              data['stats_best_streak_year']!, _statsBestStreakYearMeta));
+    }
+    if (data.containsKey('stats_last_played_at')) {
+      context.handle(
+          _statsLastPlayedAtMeta,
+          statsLastPlayedAt.isAcceptableOrUnknown(
+              data['stats_last_played_at']!, _statsLastPlayedAtMeta));
+    }
     return context;
   }
 
@@ -510,6 +1139,27 @@ class $QuizCardTableTable extends QuizCardTable
           .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
       isDirty: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_dirty'])!,
+      statsAccuracyWeek: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}stats_accuracy_week']),
+      statsAccuracyMonth: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}stats_accuracy_month']),
+      statsAccuracyYear: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}stats_accuracy_year']),
+      statsAttemptsWeek: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_attempts_week']),
+      statsAttemptsMonth: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_attempts_month']),
+      statsAttemptsYear: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_attempts_year']),
+      statsBestStreakWeek: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_best_streak_week']),
+      statsBestStreakMonth: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_best_streak_month']),
+      statsBestStreakYear: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}stats_best_streak_year']),
+      statsLastPlayedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime,
+          data['${effectivePrefix}stats_last_played_at']),
     );
   }
 
@@ -536,6 +1186,19 @@ class QuizCardTableData extends DataClass
 
   /// True when this row has local changes not yet pushed to the backend.
   final bool isDirty;
+
+  /// quizzy-ai-pro backend play stats (quizzyPro flavor only). See
+  /// [DeckTable.statsAccuracyWeek] for the write/sentinel convention.
+  final double? statsAccuracyWeek;
+  final double? statsAccuracyMonth;
+  final double? statsAccuracyYear;
+  final int? statsAttemptsWeek;
+  final int? statsAttemptsMonth;
+  final int? statsAttemptsYear;
+  final int? statsBestStreakWeek;
+  final int? statsBestStreakMonth;
+  final int? statsBestStreakYear;
+  final DateTime? statsLastPlayedAt;
   const QuizCardTableData(
       {required this.id,
       this.uid,
@@ -544,7 +1207,17 @@ class QuizCardTableData extends DataClass
       required this.answerText,
       required this.isArchive,
       this.remoteId,
-      required this.isDirty});
+      required this.isDirty,
+      this.statsAccuracyWeek,
+      this.statsAccuracyMonth,
+      this.statsAccuracyYear,
+      this.statsAttemptsWeek,
+      this.statsAttemptsMonth,
+      this.statsAttemptsYear,
+      this.statsBestStreakWeek,
+      this.statsBestStreakMonth,
+      this.statsBestStreakYear,
+      this.statsLastPlayedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -560,6 +1233,36 @@ class QuizCardTableData extends DataClass
       map['remote_id'] = Variable<String>(remoteId);
     }
     map['is_dirty'] = Variable<bool>(isDirty);
+    if (!nullToAbsent || statsAccuracyWeek != null) {
+      map['stats_accuracy_week'] = Variable<double>(statsAccuracyWeek);
+    }
+    if (!nullToAbsent || statsAccuracyMonth != null) {
+      map['stats_accuracy_month'] = Variable<double>(statsAccuracyMonth);
+    }
+    if (!nullToAbsent || statsAccuracyYear != null) {
+      map['stats_accuracy_year'] = Variable<double>(statsAccuracyYear);
+    }
+    if (!nullToAbsent || statsAttemptsWeek != null) {
+      map['stats_attempts_week'] = Variable<int>(statsAttemptsWeek);
+    }
+    if (!nullToAbsent || statsAttemptsMonth != null) {
+      map['stats_attempts_month'] = Variable<int>(statsAttemptsMonth);
+    }
+    if (!nullToAbsent || statsAttemptsYear != null) {
+      map['stats_attempts_year'] = Variable<int>(statsAttemptsYear);
+    }
+    if (!nullToAbsent || statsBestStreakWeek != null) {
+      map['stats_best_streak_week'] = Variable<int>(statsBestStreakWeek);
+    }
+    if (!nullToAbsent || statsBestStreakMonth != null) {
+      map['stats_best_streak_month'] = Variable<int>(statsBestStreakMonth);
+    }
+    if (!nullToAbsent || statsBestStreakYear != null) {
+      map['stats_best_streak_year'] = Variable<int>(statsBestStreakYear);
+    }
+    if (!nullToAbsent || statsLastPlayedAt != null) {
+      map['stats_last_played_at'] = Variable<DateTime>(statsLastPlayedAt);
+    }
     return map;
   }
 
@@ -575,6 +1278,36 @@ class QuizCardTableData extends DataClass
           ? const Value.absent()
           : Value(remoteId),
       isDirty: Value(isDirty),
+      statsAccuracyWeek: statsAccuracyWeek == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAccuracyWeek),
+      statsAccuracyMonth: statsAccuracyMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAccuracyMonth),
+      statsAccuracyYear: statsAccuracyYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAccuracyYear),
+      statsAttemptsWeek: statsAttemptsWeek == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAttemptsWeek),
+      statsAttemptsMonth: statsAttemptsMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAttemptsMonth),
+      statsAttemptsYear: statsAttemptsYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsAttemptsYear),
+      statsBestStreakWeek: statsBestStreakWeek == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsBestStreakWeek),
+      statsBestStreakMonth: statsBestStreakMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsBestStreakMonth),
+      statsBestStreakYear: statsBestStreakYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsBestStreakYear),
+      statsLastPlayedAt: statsLastPlayedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statsLastPlayedAt),
     );
   }
 
@@ -590,6 +1323,23 @@ class QuizCardTableData extends DataClass
       isArchive: serializer.fromJson<bool>(json['isArchive']),
       remoteId: serializer.fromJson<String?>(json['remoteId']),
       isDirty: serializer.fromJson<bool>(json['isDirty']),
+      statsAccuracyWeek:
+          serializer.fromJson<double?>(json['statsAccuracyWeek']),
+      statsAccuracyMonth:
+          serializer.fromJson<double?>(json['statsAccuracyMonth']),
+      statsAccuracyYear:
+          serializer.fromJson<double?>(json['statsAccuracyYear']),
+      statsAttemptsWeek: serializer.fromJson<int?>(json['statsAttemptsWeek']),
+      statsAttemptsMonth: serializer.fromJson<int?>(json['statsAttemptsMonth']),
+      statsAttemptsYear: serializer.fromJson<int?>(json['statsAttemptsYear']),
+      statsBestStreakWeek:
+          serializer.fromJson<int?>(json['statsBestStreakWeek']),
+      statsBestStreakMonth:
+          serializer.fromJson<int?>(json['statsBestStreakMonth']),
+      statsBestStreakYear:
+          serializer.fromJson<int?>(json['statsBestStreakYear']),
+      statsLastPlayedAt:
+          serializer.fromJson<DateTime?>(json['statsLastPlayedAt']),
     );
   }
   @override
@@ -604,6 +1354,16 @@ class QuizCardTableData extends DataClass
       'isArchive': serializer.toJson<bool>(isArchive),
       'remoteId': serializer.toJson<String?>(remoteId),
       'isDirty': serializer.toJson<bool>(isDirty),
+      'statsAccuracyWeek': serializer.toJson<double?>(statsAccuracyWeek),
+      'statsAccuracyMonth': serializer.toJson<double?>(statsAccuracyMonth),
+      'statsAccuracyYear': serializer.toJson<double?>(statsAccuracyYear),
+      'statsAttemptsWeek': serializer.toJson<int?>(statsAttemptsWeek),
+      'statsAttemptsMonth': serializer.toJson<int?>(statsAttemptsMonth),
+      'statsAttemptsYear': serializer.toJson<int?>(statsAttemptsYear),
+      'statsBestStreakWeek': serializer.toJson<int?>(statsBestStreakWeek),
+      'statsBestStreakMonth': serializer.toJson<int?>(statsBestStreakMonth),
+      'statsBestStreakYear': serializer.toJson<int?>(statsBestStreakYear),
+      'statsLastPlayedAt': serializer.toJson<DateTime?>(statsLastPlayedAt),
     };
   }
 
@@ -615,7 +1375,17 @@ class QuizCardTableData extends DataClass
           String? answerText,
           bool? isArchive,
           Value<String?> remoteId = const Value.absent(),
-          bool? isDirty}) =>
+          bool? isDirty,
+          Value<double?> statsAccuracyWeek = const Value.absent(),
+          Value<double?> statsAccuracyMonth = const Value.absent(),
+          Value<double?> statsAccuracyYear = const Value.absent(),
+          Value<int?> statsAttemptsWeek = const Value.absent(),
+          Value<int?> statsAttemptsMonth = const Value.absent(),
+          Value<int?> statsAttemptsYear = const Value.absent(),
+          Value<int?> statsBestStreakWeek = const Value.absent(),
+          Value<int?> statsBestStreakMonth = const Value.absent(),
+          Value<int?> statsBestStreakYear = const Value.absent(),
+          Value<DateTime?> statsLastPlayedAt = const Value.absent()}) =>
       QuizCardTableData(
         id: id ?? this.id,
         uid: uid.present ? uid.value : this.uid,
@@ -625,6 +1395,36 @@ class QuizCardTableData extends DataClass
         isArchive: isArchive ?? this.isArchive,
         remoteId: remoteId.present ? remoteId.value : this.remoteId,
         isDirty: isDirty ?? this.isDirty,
+        statsAccuracyWeek: statsAccuracyWeek.present
+            ? statsAccuracyWeek.value
+            : this.statsAccuracyWeek,
+        statsAccuracyMonth: statsAccuracyMonth.present
+            ? statsAccuracyMonth.value
+            : this.statsAccuracyMonth,
+        statsAccuracyYear: statsAccuracyYear.present
+            ? statsAccuracyYear.value
+            : this.statsAccuracyYear,
+        statsAttemptsWeek: statsAttemptsWeek.present
+            ? statsAttemptsWeek.value
+            : this.statsAttemptsWeek,
+        statsAttemptsMonth: statsAttemptsMonth.present
+            ? statsAttemptsMonth.value
+            : this.statsAttemptsMonth,
+        statsAttemptsYear: statsAttemptsYear.present
+            ? statsAttemptsYear.value
+            : this.statsAttemptsYear,
+        statsBestStreakWeek: statsBestStreakWeek.present
+            ? statsBestStreakWeek.value
+            : this.statsBestStreakWeek,
+        statsBestStreakMonth: statsBestStreakMonth.present
+            ? statsBestStreakMonth.value
+            : this.statsBestStreakMonth,
+        statsBestStreakYear: statsBestStreakYear.present
+            ? statsBestStreakYear.value
+            : this.statsBestStreakYear,
+        statsLastPlayedAt: statsLastPlayedAt.present
+            ? statsLastPlayedAt.value
+            : this.statsLastPlayedAt,
       );
   QuizCardTableData copyWithCompanion(QuizCardTableCompanion data) {
     return QuizCardTableData(
@@ -639,6 +1439,36 @@ class QuizCardTableData extends DataClass
       isArchive: data.isArchive.present ? data.isArchive.value : this.isArchive,
       remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
       isDirty: data.isDirty.present ? data.isDirty.value : this.isDirty,
+      statsAccuracyWeek: data.statsAccuracyWeek.present
+          ? data.statsAccuracyWeek.value
+          : this.statsAccuracyWeek,
+      statsAccuracyMonth: data.statsAccuracyMonth.present
+          ? data.statsAccuracyMonth.value
+          : this.statsAccuracyMonth,
+      statsAccuracyYear: data.statsAccuracyYear.present
+          ? data.statsAccuracyYear.value
+          : this.statsAccuracyYear,
+      statsAttemptsWeek: data.statsAttemptsWeek.present
+          ? data.statsAttemptsWeek.value
+          : this.statsAttemptsWeek,
+      statsAttemptsMonth: data.statsAttemptsMonth.present
+          ? data.statsAttemptsMonth.value
+          : this.statsAttemptsMonth,
+      statsAttemptsYear: data.statsAttemptsYear.present
+          ? data.statsAttemptsYear.value
+          : this.statsAttemptsYear,
+      statsBestStreakWeek: data.statsBestStreakWeek.present
+          ? data.statsBestStreakWeek.value
+          : this.statsBestStreakWeek,
+      statsBestStreakMonth: data.statsBestStreakMonth.present
+          ? data.statsBestStreakMonth.value
+          : this.statsBestStreakMonth,
+      statsBestStreakYear: data.statsBestStreakYear.present
+          ? data.statsBestStreakYear.value
+          : this.statsBestStreakYear,
+      statsLastPlayedAt: data.statsLastPlayedAt.present
+          ? data.statsLastPlayedAt.value
+          : this.statsLastPlayedAt,
     );
   }
 
@@ -652,14 +1482,41 @@ class QuizCardTableData extends DataClass
           ..write('answerText: $answerText, ')
           ..write('isArchive: $isArchive, ')
           ..write('remoteId: $remoteId, ')
-          ..write('isDirty: $isDirty')
+          ..write('isDirty: $isDirty, ')
+          ..write('statsAccuracyWeek: $statsAccuracyWeek, ')
+          ..write('statsAccuracyMonth: $statsAccuracyMonth, ')
+          ..write('statsAccuracyYear: $statsAccuracyYear, ')
+          ..write('statsAttemptsWeek: $statsAttemptsWeek, ')
+          ..write('statsAttemptsMonth: $statsAttemptsMonth, ')
+          ..write('statsAttemptsYear: $statsAttemptsYear, ')
+          ..write('statsBestStreakWeek: $statsBestStreakWeek, ')
+          ..write('statsBestStreakMonth: $statsBestStreakMonth, ')
+          ..write('statsBestStreakYear: $statsBestStreakYear, ')
+          ..write('statsLastPlayedAt: $statsLastPlayedAt')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(
-      id, uid, deckId, questionText, answerText, isArchive, remoteId, isDirty);
+      id,
+      uid,
+      deckId,
+      questionText,
+      answerText,
+      isArchive,
+      remoteId,
+      isDirty,
+      statsAccuracyWeek,
+      statsAccuracyMonth,
+      statsAccuracyYear,
+      statsAttemptsWeek,
+      statsAttemptsMonth,
+      statsAttemptsYear,
+      statsBestStreakWeek,
+      statsBestStreakMonth,
+      statsBestStreakYear,
+      statsLastPlayedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -671,7 +1528,17 @@ class QuizCardTableData extends DataClass
           other.answerText == this.answerText &&
           other.isArchive == this.isArchive &&
           other.remoteId == this.remoteId &&
-          other.isDirty == this.isDirty);
+          other.isDirty == this.isDirty &&
+          other.statsAccuracyWeek == this.statsAccuracyWeek &&
+          other.statsAccuracyMonth == this.statsAccuracyMonth &&
+          other.statsAccuracyYear == this.statsAccuracyYear &&
+          other.statsAttemptsWeek == this.statsAttemptsWeek &&
+          other.statsAttemptsMonth == this.statsAttemptsMonth &&
+          other.statsAttemptsYear == this.statsAttemptsYear &&
+          other.statsBestStreakWeek == this.statsBestStreakWeek &&
+          other.statsBestStreakMonth == this.statsBestStreakMonth &&
+          other.statsBestStreakYear == this.statsBestStreakYear &&
+          other.statsLastPlayedAt == this.statsLastPlayedAt);
 }
 
 class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
@@ -683,6 +1550,16 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
   final Value<bool> isArchive;
   final Value<String?> remoteId;
   final Value<bool> isDirty;
+  final Value<double?> statsAccuracyWeek;
+  final Value<double?> statsAccuracyMonth;
+  final Value<double?> statsAccuracyYear;
+  final Value<int?> statsAttemptsWeek;
+  final Value<int?> statsAttemptsMonth;
+  final Value<int?> statsAttemptsYear;
+  final Value<int?> statsBestStreakWeek;
+  final Value<int?> statsBestStreakMonth;
+  final Value<int?> statsBestStreakYear;
+  final Value<DateTime?> statsLastPlayedAt;
   const QuizCardTableCompanion({
     this.id = const Value.absent(),
     this.uid = const Value.absent(),
@@ -692,6 +1569,16 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
     this.isArchive = const Value.absent(),
     this.remoteId = const Value.absent(),
     this.isDirty = const Value.absent(),
+    this.statsAccuracyWeek = const Value.absent(),
+    this.statsAccuracyMonth = const Value.absent(),
+    this.statsAccuracyYear = const Value.absent(),
+    this.statsAttemptsWeek = const Value.absent(),
+    this.statsAttemptsMonth = const Value.absent(),
+    this.statsAttemptsYear = const Value.absent(),
+    this.statsBestStreakWeek = const Value.absent(),
+    this.statsBestStreakMonth = const Value.absent(),
+    this.statsBestStreakYear = const Value.absent(),
+    this.statsLastPlayedAt = const Value.absent(),
   });
   QuizCardTableCompanion.insert({
     this.id = const Value.absent(),
@@ -702,6 +1589,16 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
     required bool isArchive,
     this.remoteId = const Value.absent(),
     this.isDirty = const Value.absent(),
+    this.statsAccuracyWeek = const Value.absent(),
+    this.statsAccuracyMonth = const Value.absent(),
+    this.statsAccuracyYear = const Value.absent(),
+    this.statsAttemptsWeek = const Value.absent(),
+    this.statsAttemptsMonth = const Value.absent(),
+    this.statsAttemptsYear = const Value.absent(),
+    this.statsBestStreakWeek = const Value.absent(),
+    this.statsBestStreakMonth = const Value.absent(),
+    this.statsBestStreakYear = const Value.absent(),
+    this.statsLastPlayedAt = const Value.absent(),
   })  : deckId = Value(deckId),
         questionText = Value(questionText),
         answerText = Value(answerText),
@@ -715,6 +1612,16 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
     Expression<bool>? isArchive,
     Expression<String>? remoteId,
     Expression<bool>? isDirty,
+    Expression<double>? statsAccuracyWeek,
+    Expression<double>? statsAccuracyMonth,
+    Expression<double>? statsAccuracyYear,
+    Expression<int>? statsAttemptsWeek,
+    Expression<int>? statsAttemptsMonth,
+    Expression<int>? statsAttemptsYear,
+    Expression<int>? statsBestStreakWeek,
+    Expression<int>? statsBestStreakMonth,
+    Expression<int>? statsBestStreakYear,
+    Expression<DateTime>? statsLastPlayedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -725,6 +1632,21 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
       if (isArchive != null) 'is_archive': isArchive,
       if (remoteId != null) 'remote_id': remoteId,
       if (isDirty != null) 'is_dirty': isDirty,
+      if (statsAccuracyWeek != null) 'stats_accuracy_week': statsAccuracyWeek,
+      if (statsAccuracyMonth != null)
+        'stats_accuracy_month': statsAccuracyMonth,
+      if (statsAccuracyYear != null) 'stats_accuracy_year': statsAccuracyYear,
+      if (statsAttemptsWeek != null) 'stats_attempts_week': statsAttemptsWeek,
+      if (statsAttemptsMonth != null)
+        'stats_attempts_month': statsAttemptsMonth,
+      if (statsAttemptsYear != null) 'stats_attempts_year': statsAttemptsYear,
+      if (statsBestStreakWeek != null)
+        'stats_best_streak_week': statsBestStreakWeek,
+      if (statsBestStreakMonth != null)
+        'stats_best_streak_month': statsBestStreakMonth,
+      if (statsBestStreakYear != null)
+        'stats_best_streak_year': statsBestStreakYear,
+      if (statsLastPlayedAt != null) 'stats_last_played_at': statsLastPlayedAt,
     });
   }
 
@@ -736,7 +1658,17 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
       Value<String>? answerText,
       Value<bool>? isArchive,
       Value<String?>? remoteId,
-      Value<bool>? isDirty}) {
+      Value<bool>? isDirty,
+      Value<double?>? statsAccuracyWeek,
+      Value<double?>? statsAccuracyMonth,
+      Value<double?>? statsAccuracyYear,
+      Value<int?>? statsAttemptsWeek,
+      Value<int?>? statsAttemptsMonth,
+      Value<int?>? statsAttemptsYear,
+      Value<int?>? statsBestStreakWeek,
+      Value<int?>? statsBestStreakMonth,
+      Value<int?>? statsBestStreakYear,
+      Value<DateTime?>? statsLastPlayedAt}) {
     return QuizCardTableCompanion(
       id: id ?? this.id,
       uid: uid ?? this.uid,
@@ -746,6 +1678,16 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
       isArchive: isArchive ?? this.isArchive,
       remoteId: remoteId ?? this.remoteId,
       isDirty: isDirty ?? this.isDirty,
+      statsAccuracyWeek: statsAccuracyWeek ?? this.statsAccuracyWeek,
+      statsAccuracyMonth: statsAccuracyMonth ?? this.statsAccuracyMonth,
+      statsAccuracyYear: statsAccuracyYear ?? this.statsAccuracyYear,
+      statsAttemptsWeek: statsAttemptsWeek ?? this.statsAttemptsWeek,
+      statsAttemptsMonth: statsAttemptsMonth ?? this.statsAttemptsMonth,
+      statsAttemptsYear: statsAttemptsYear ?? this.statsAttemptsYear,
+      statsBestStreakWeek: statsBestStreakWeek ?? this.statsBestStreakWeek,
+      statsBestStreakMonth: statsBestStreakMonth ?? this.statsBestStreakMonth,
+      statsBestStreakYear: statsBestStreakYear ?? this.statsBestStreakYear,
+      statsLastPlayedAt: statsLastPlayedAt ?? this.statsLastPlayedAt,
     );
   }
 
@@ -776,6 +1718,37 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
     if (isDirty.present) {
       map['is_dirty'] = Variable<bool>(isDirty.value);
     }
+    if (statsAccuracyWeek.present) {
+      map['stats_accuracy_week'] = Variable<double>(statsAccuracyWeek.value);
+    }
+    if (statsAccuracyMonth.present) {
+      map['stats_accuracy_month'] = Variable<double>(statsAccuracyMonth.value);
+    }
+    if (statsAccuracyYear.present) {
+      map['stats_accuracy_year'] = Variable<double>(statsAccuracyYear.value);
+    }
+    if (statsAttemptsWeek.present) {
+      map['stats_attempts_week'] = Variable<int>(statsAttemptsWeek.value);
+    }
+    if (statsAttemptsMonth.present) {
+      map['stats_attempts_month'] = Variable<int>(statsAttemptsMonth.value);
+    }
+    if (statsAttemptsYear.present) {
+      map['stats_attempts_year'] = Variable<int>(statsAttemptsYear.value);
+    }
+    if (statsBestStreakWeek.present) {
+      map['stats_best_streak_week'] = Variable<int>(statsBestStreakWeek.value);
+    }
+    if (statsBestStreakMonth.present) {
+      map['stats_best_streak_month'] =
+          Variable<int>(statsBestStreakMonth.value);
+    }
+    if (statsBestStreakYear.present) {
+      map['stats_best_streak_year'] = Variable<int>(statsBestStreakYear.value);
+    }
+    if (statsLastPlayedAt.present) {
+      map['stats_last_played_at'] = Variable<DateTime>(statsLastPlayedAt.value);
+    }
     return map;
   }
 
@@ -789,7 +1762,17 @@ class QuizCardTableCompanion extends UpdateCompanion<QuizCardTableData> {
           ..write('answerText: $answerText, ')
           ..write('isArchive: $isArchive, ')
           ..write('remoteId: $remoteId, ')
-          ..write('isDirty: $isDirty')
+          ..write('isDirty: $isDirty, ')
+          ..write('statsAccuracyWeek: $statsAccuracyWeek, ')
+          ..write('statsAccuracyMonth: $statsAccuracyMonth, ')
+          ..write('statsAccuracyYear: $statsAccuracyYear, ')
+          ..write('statsAttemptsWeek: $statsAttemptsWeek, ')
+          ..write('statsAttemptsMonth: $statsAttemptsMonth, ')
+          ..write('statsAttemptsYear: $statsAttemptsYear, ')
+          ..write('statsBestStreakWeek: $statsBestStreakWeek, ')
+          ..write('statsBestStreakMonth: $statsBestStreakMonth, ')
+          ..write('statsBestStreakYear: $statsBestStreakYear, ')
+          ..write('statsLastPlayedAt: $statsLastPlayedAt')
           ..write(')'))
         .toString();
   }
@@ -1955,6 +2938,16 @@ typedef $$DeckTableTableCreateCompanionBuilder = DeckTableCompanion Function({
   required bool isArchive,
   Value<String?> remoteId,
   Value<bool> isDirty,
+  Value<double?> statsAccuracyWeek,
+  Value<double?> statsAccuracyMonth,
+  Value<double?> statsAccuracyYear,
+  Value<int?> statsAttemptsWeek,
+  Value<int?> statsAttemptsMonth,
+  Value<int?> statsAttemptsYear,
+  Value<int?> statsBestStreakWeek,
+  Value<int?> statsBestStreakMonth,
+  Value<int?> statsBestStreakYear,
+  Value<DateTime?> statsLastPlayedAt,
 });
 typedef $$DeckTableTableUpdateCompanionBuilder = DeckTableCompanion Function({
   Value<int> id,
@@ -1963,6 +2956,16 @@ typedef $$DeckTableTableUpdateCompanionBuilder = DeckTableCompanion Function({
   Value<bool> isArchive,
   Value<String?> remoteId,
   Value<bool> isDirty,
+  Value<double?> statsAccuracyWeek,
+  Value<double?> statsAccuracyMonth,
+  Value<double?> statsAccuracyYear,
+  Value<int?> statsAttemptsWeek,
+  Value<int?> statsAttemptsMonth,
+  Value<int?> statsAttemptsYear,
+  Value<int?> statsBestStreakWeek,
+  Value<int?> statsBestStreakMonth,
+  Value<int?> statsBestStreakYear,
+  Value<DateTime?> statsLastPlayedAt,
 });
 
 final class $$DeckTableTableReferences
@@ -2012,6 +3015,46 @@ class $$DeckTableTableFilterComposer
   ColumnFilters<bool> get isDirty => $composableBuilder(
       column: $table.isDirty, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<double> get statsAccuracyWeek => $composableBuilder(
+      column: $table.statsAccuracyWeek,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get statsAccuracyMonth => $composableBuilder(
+      column: $table.statsAccuracyMonth,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get statsAccuracyYear => $composableBuilder(
+      column: $table.statsAccuracyYear,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsAttemptsWeek => $composableBuilder(
+      column: $table.statsAttemptsWeek,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsAttemptsMonth => $composableBuilder(
+      column: $table.statsAttemptsMonth,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsAttemptsYear => $composableBuilder(
+      column: $table.statsAttemptsYear,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsBestStreakWeek => $composableBuilder(
+      column: $table.statsBestStreakWeek,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsBestStreakMonth => $composableBuilder(
+      column: $table.statsBestStreakMonth,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsBestStreakYear => $composableBuilder(
+      column: $table.statsBestStreakYear,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get statsLastPlayedAt => $composableBuilder(
+      column: $table.statsLastPlayedAt,
+      builder: (column) => ColumnFilters(column));
+
   Expression<bool> quizCardTableRefs(
       Expression<bool> Function($$QuizCardTableTableFilterComposer f) f) {
     final $$QuizCardTableTableFilterComposer composer = $composerBuilder(
@@ -2060,6 +3103,46 @@ class $$DeckTableTableOrderingComposer
 
   ColumnOrderings<bool> get isDirty => $composableBuilder(
       column: $table.isDirty, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get statsAccuracyWeek => $composableBuilder(
+      column: $table.statsAccuracyWeek,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get statsAccuracyMonth => $composableBuilder(
+      column: $table.statsAccuracyMonth,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get statsAccuracyYear => $composableBuilder(
+      column: $table.statsAccuracyYear,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsAttemptsWeek => $composableBuilder(
+      column: $table.statsAttemptsWeek,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsAttemptsMonth => $composableBuilder(
+      column: $table.statsAttemptsMonth,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsAttemptsYear => $composableBuilder(
+      column: $table.statsAttemptsYear,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsBestStreakWeek => $composableBuilder(
+      column: $table.statsBestStreakWeek,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsBestStreakMonth => $composableBuilder(
+      column: $table.statsBestStreakMonth,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsBestStreakYear => $composableBuilder(
+      column: $table.statsBestStreakYear,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get statsLastPlayedAt => $composableBuilder(
+      column: $table.statsLastPlayedAt,
+      builder: (column) => ColumnOrderings(column));
 }
 
 class $$DeckTableTableAnnotationComposer
@@ -2088,6 +3171,36 @@ class $$DeckTableTableAnnotationComposer
 
   GeneratedColumn<bool> get isDirty =>
       $composableBuilder(column: $table.isDirty, builder: (column) => column);
+
+  GeneratedColumn<double> get statsAccuracyWeek => $composableBuilder(
+      column: $table.statsAccuracyWeek, builder: (column) => column);
+
+  GeneratedColumn<double> get statsAccuracyMonth => $composableBuilder(
+      column: $table.statsAccuracyMonth, builder: (column) => column);
+
+  GeneratedColumn<double> get statsAccuracyYear => $composableBuilder(
+      column: $table.statsAccuracyYear, builder: (column) => column);
+
+  GeneratedColumn<int> get statsAttemptsWeek => $composableBuilder(
+      column: $table.statsAttemptsWeek, builder: (column) => column);
+
+  GeneratedColumn<int> get statsAttemptsMonth => $composableBuilder(
+      column: $table.statsAttemptsMonth, builder: (column) => column);
+
+  GeneratedColumn<int> get statsAttemptsYear => $composableBuilder(
+      column: $table.statsAttemptsYear, builder: (column) => column);
+
+  GeneratedColumn<int> get statsBestStreakWeek => $composableBuilder(
+      column: $table.statsBestStreakWeek, builder: (column) => column);
+
+  GeneratedColumn<int> get statsBestStreakMonth => $composableBuilder(
+      column: $table.statsBestStreakMonth, builder: (column) => column);
+
+  GeneratedColumn<int> get statsBestStreakYear => $composableBuilder(
+      column: $table.statsBestStreakYear, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get statsLastPlayedAt => $composableBuilder(
+      column: $table.statsLastPlayedAt, builder: (column) => column);
 
   Expression<T> quizCardTableRefs<T extends Object>(
       Expression<T> Function($$QuizCardTableTableAnnotationComposer a) f) {
@@ -2140,6 +3253,16 @@ class $$DeckTableTableTableManager extends RootTableManager<
             Value<bool> isArchive = const Value.absent(),
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDirty = const Value.absent(),
+            Value<double?> statsAccuracyWeek = const Value.absent(),
+            Value<double?> statsAccuracyMonth = const Value.absent(),
+            Value<double?> statsAccuracyYear = const Value.absent(),
+            Value<int?> statsAttemptsWeek = const Value.absent(),
+            Value<int?> statsAttemptsMonth = const Value.absent(),
+            Value<int?> statsAttemptsYear = const Value.absent(),
+            Value<int?> statsBestStreakWeek = const Value.absent(),
+            Value<int?> statsBestStreakMonth = const Value.absent(),
+            Value<int?> statsBestStreakYear = const Value.absent(),
+            Value<DateTime?> statsLastPlayedAt = const Value.absent(),
           }) =>
               DeckTableCompanion(
             id: id,
@@ -2148,6 +3271,16 @@ class $$DeckTableTableTableManager extends RootTableManager<
             isArchive: isArchive,
             remoteId: remoteId,
             isDirty: isDirty,
+            statsAccuracyWeek: statsAccuracyWeek,
+            statsAccuracyMonth: statsAccuracyMonth,
+            statsAccuracyYear: statsAccuracyYear,
+            statsAttemptsWeek: statsAttemptsWeek,
+            statsAttemptsMonth: statsAttemptsMonth,
+            statsAttemptsYear: statsAttemptsYear,
+            statsBestStreakWeek: statsBestStreakWeek,
+            statsBestStreakMonth: statsBestStreakMonth,
+            statsBestStreakYear: statsBestStreakYear,
+            statsLastPlayedAt: statsLastPlayedAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -2156,6 +3289,16 @@ class $$DeckTableTableTableManager extends RootTableManager<
             required bool isArchive,
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDirty = const Value.absent(),
+            Value<double?> statsAccuracyWeek = const Value.absent(),
+            Value<double?> statsAccuracyMonth = const Value.absent(),
+            Value<double?> statsAccuracyYear = const Value.absent(),
+            Value<int?> statsAttemptsWeek = const Value.absent(),
+            Value<int?> statsAttemptsMonth = const Value.absent(),
+            Value<int?> statsAttemptsYear = const Value.absent(),
+            Value<int?> statsBestStreakWeek = const Value.absent(),
+            Value<int?> statsBestStreakMonth = const Value.absent(),
+            Value<int?> statsBestStreakYear = const Value.absent(),
+            Value<DateTime?> statsLastPlayedAt = const Value.absent(),
           }) =>
               DeckTableCompanion.insert(
             id: id,
@@ -2164,6 +3307,16 @@ class $$DeckTableTableTableManager extends RootTableManager<
             isArchive: isArchive,
             remoteId: remoteId,
             isDirty: isDirty,
+            statsAccuracyWeek: statsAccuracyWeek,
+            statsAccuracyMonth: statsAccuracyMonth,
+            statsAccuracyYear: statsAccuracyYear,
+            statsAttemptsWeek: statsAttemptsWeek,
+            statsAttemptsMonth: statsAttemptsMonth,
+            statsAttemptsYear: statsAttemptsYear,
+            statsBestStreakWeek: statsBestStreakWeek,
+            statsBestStreakMonth: statsBestStreakMonth,
+            statsBestStreakYear: statsBestStreakYear,
+            statsLastPlayedAt: statsLastPlayedAt,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
@@ -2221,6 +3374,16 @@ typedef $$QuizCardTableTableCreateCompanionBuilder = QuizCardTableCompanion
   required bool isArchive,
   Value<String?> remoteId,
   Value<bool> isDirty,
+  Value<double?> statsAccuracyWeek,
+  Value<double?> statsAccuracyMonth,
+  Value<double?> statsAccuracyYear,
+  Value<int?> statsAttemptsWeek,
+  Value<int?> statsAttemptsMonth,
+  Value<int?> statsAttemptsYear,
+  Value<int?> statsBestStreakWeek,
+  Value<int?> statsBestStreakMonth,
+  Value<int?> statsBestStreakYear,
+  Value<DateTime?> statsLastPlayedAt,
 });
 typedef $$QuizCardTableTableUpdateCompanionBuilder = QuizCardTableCompanion
     Function({
@@ -2232,6 +3395,16 @@ typedef $$QuizCardTableTableUpdateCompanionBuilder = QuizCardTableCompanion
   Value<bool> isArchive,
   Value<String?> remoteId,
   Value<bool> isDirty,
+  Value<double?> statsAccuracyWeek,
+  Value<double?> statsAccuracyMonth,
+  Value<double?> statsAccuracyYear,
+  Value<int?> statsAttemptsWeek,
+  Value<int?> statsAttemptsMonth,
+  Value<int?> statsAttemptsYear,
+  Value<int?> statsBestStreakWeek,
+  Value<int?> statsBestStreakMonth,
+  Value<int?> statsBestStreakYear,
+  Value<DateTime?> statsLastPlayedAt,
 });
 
 final class $$QuizCardTableTableReferences extends BaseReferences<_$AppDatabase,
@@ -2283,6 +3456,46 @@ class $$QuizCardTableTableFilterComposer
 
   ColumnFilters<bool> get isDirty => $composableBuilder(
       column: $table.isDirty, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get statsAccuracyWeek => $composableBuilder(
+      column: $table.statsAccuracyWeek,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get statsAccuracyMonth => $composableBuilder(
+      column: $table.statsAccuracyMonth,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get statsAccuracyYear => $composableBuilder(
+      column: $table.statsAccuracyYear,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsAttemptsWeek => $composableBuilder(
+      column: $table.statsAttemptsWeek,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsAttemptsMonth => $composableBuilder(
+      column: $table.statsAttemptsMonth,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsAttemptsYear => $composableBuilder(
+      column: $table.statsAttemptsYear,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsBestStreakWeek => $composableBuilder(
+      column: $table.statsBestStreakWeek,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsBestStreakMonth => $composableBuilder(
+      column: $table.statsBestStreakMonth,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get statsBestStreakYear => $composableBuilder(
+      column: $table.statsBestStreakYear,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get statsLastPlayedAt => $composableBuilder(
+      column: $table.statsLastPlayedAt,
+      builder: (column) => ColumnFilters(column));
 
   $$DeckTableTableFilterComposer get deckId {
     final $$DeckTableTableFilterComposer composer = $composerBuilder(
@@ -2336,6 +3549,46 @@ class $$QuizCardTableTableOrderingComposer
   ColumnOrderings<bool> get isDirty => $composableBuilder(
       column: $table.isDirty, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<double> get statsAccuracyWeek => $composableBuilder(
+      column: $table.statsAccuracyWeek,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get statsAccuracyMonth => $composableBuilder(
+      column: $table.statsAccuracyMonth,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get statsAccuracyYear => $composableBuilder(
+      column: $table.statsAccuracyYear,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsAttemptsWeek => $composableBuilder(
+      column: $table.statsAttemptsWeek,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsAttemptsMonth => $composableBuilder(
+      column: $table.statsAttemptsMonth,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsAttemptsYear => $composableBuilder(
+      column: $table.statsAttemptsYear,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsBestStreakWeek => $composableBuilder(
+      column: $table.statsBestStreakWeek,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsBestStreakMonth => $composableBuilder(
+      column: $table.statsBestStreakMonth,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get statsBestStreakYear => $composableBuilder(
+      column: $table.statsBestStreakYear,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get statsLastPlayedAt => $composableBuilder(
+      column: $table.statsLastPlayedAt,
+      builder: (column) => ColumnOrderings(column));
+
   $$DeckTableTableOrderingComposer get deckId {
     final $$DeckTableTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -2386,6 +3639,36 @@ class $$QuizCardTableTableAnnotationComposer
 
   GeneratedColumn<bool> get isDirty =>
       $composableBuilder(column: $table.isDirty, builder: (column) => column);
+
+  GeneratedColumn<double> get statsAccuracyWeek => $composableBuilder(
+      column: $table.statsAccuracyWeek, builder: (column) => column);
+
+  GeneratedColumn<double> get statsAccuracyMonth => $composableBuilder(
+      column: $table.statsAccuracyMonth, builder: (column) => column);
+
+  GeneratedColumn<double> get statsAccuracyYear => $composableBuilder(
+      column: $table.statsAccuracyYear, builder: (column) => column);
+
+  GeneratedColumn<int> get statsAttemptsWeek => $composableBuilder(
+      column: $table.statsAttemptsWeek, builder: (column) => column);
+
+  GeneratedColumn<int> get statsAttemptsMonth => $composableBuilder(
+      column: $table.statsAttemptsMonth, builder: (column) => column);
+
+  GeneratedColumn<int> get statsAttemptsYear => $composableBuilder(
+      column: $table.statsAttemptsYear, builder: (column) => column);
+
+  GeneratedColumn<int> get statsBestStreakWeek => $composableBuilder(
+      column: $table.statsBestStreakWeek, builder: (column) => column);
+
+  GeneratedColumn<int> get statsBestStreakMonth => $composableBuilder(
+      column: $table.statsBestStreakMonth, builder: (column) => column);
+
+  GeneratedColumn<int> get statsBestStreakYear => $composableBuilder(
+      column: $table.statsBestStreakYear, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get statsLastPlayedAt => $composableBuilder(
+      column: $table.statsLastPlayedAt, builder: (column) => column);
 
   $$DeckTableTableAnnotationComposer get deckId {
     final $$DeckTableTableAnnotationComposer composer = $composerBuilder(
@@ -2439,6 +3722,16 @@ class $$QuizCardTableTableTableManager extends RootTableManager<
             Value<bool> isArchive = const Value.absent(),
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDirty = const Value.absent(),
+            Value<double?> statsAccuracyWeek = const Value.absent(),
+            Value<double?> statsAccuracyMonth = const Value.absent(),
+            Value<double?> statsAccuracyYear = const Value.absent(),
+            Value<int?> statsAttemptsWeek = const Value.absent(),
+            Value<int?> statsAttemptsMonth = const Value.absent(),
+            Value<int?> statsAttemptsYear = const Value.absent(),
+            Value<int?> statsBestStreakWeek = const Value.absent(),
+            Value<int?> statsBestStreakMonth = const Value.absent(),
+            Value<int?> statsBestStreakYear = const Value.absent(),
+            Value<DateTime?> statsLastPlayedAt = const Value.absent(),
           }) =>
               QuizCardTableCompanion(
             id: id,
@@ -2449,6 +3742,16 @@ class $$QuizCardTableTableTableManager extends RootTableManager<
             isArchive: isArchive,
             remoteId: remoteId,
             isDirty: isDirty,
+            statsAccuracyWeek: statsAccuracyWeek,
+            statsAccuracyMonth: statsAccuracyMonth,
+            statsAccuracyYear: statsAccuracyYear,
+            statsAttemptsWeek: statsAttemptsWeek,
+            statsAttemptsMonth: statsAttemptsMonth,
+            statsAttemptsYear: statsAttemptsYear,
+            statsBestStreakWeek: statsBestStreakWeek,
+            statsBestStreakMonth: statsBestStreakMonth,
+            statsBestStreakYear: statsBestStreakYear,
+            statsLastPlayedAt: statsLastPlayedAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -2459,6 +3762,16 @@ class $$QuizCardTableTableTableManager extends RootTableManager<
             required bool isArchive,
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDirty = const Value.absent(),
+            Value<double?> statsAccuracyWeek = const Value.absent(),
+            Value<double?> statsAccuracyMonth = const Value.absent(),
+            Value<double?> statsAccuracyYear = const Value.absent(),
+            Value<int?> statsAttemptsWeek = const Value.absent(),
+            Value<int?> statsAttemptsMonth = const Value.absent(),
+            Value<int?> statsAttemptsYear = const Value.absent(),
+            Value<int?> statsBestStreakWeek = const Value.absent(),
+            Value<int?> statsBestStreakMonth = const Value.absent(),
+            Value<int?> statsBestStreakYear = const Value.absent(),
+            Value<DateTime?> statsLastPlayedAt = const Value.absent(),
           }) =>
               QuizCardTableCompanion.insert(
             id: id,
@@ -2469,6 +3782,16 @@ class $$QuizCardTableTableTableManager extends RootTableManager<
             isArchive: isArchive,
             remoteId: remoteId,
             isDirty: isDirty,
+            statsAccuracyWeek: statsAccuracyWeek,
+            statsAccuracyMonth: statsAccuracyMonth,
+            statsAccuracyYear: statsAccuracyYear,
+            statsAttemptsWeek: statsAttemptsWeek,
+            statsAttemptsMonth: statsAttemptsMonth,
+            statsAttemptsYear: statsAttemptsYear,
+            statsBestStreakWeek: statsBestStreakWeek,
+            statsBestStreakMonth: statsBestStreakMonth,
+            statsBestStreakYear: statsBestStreakYear,
+            statsLastPlayedAt: statsLastPlayedAt,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

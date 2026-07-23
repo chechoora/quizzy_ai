@@ -1,6 +1,7 @@
 import 'package:poc_ai_quiz/data/db/deck/deck_database_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_database_mapper.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 
 class DeckRepository {
   DeckRepository({
@@ -72,11 +73,13 @@ class DeckRepository {
     required String remoteId,
     required String title,
     required bool isArchive,
+    ItemStats? stats,
   }) {
     return dataBaseRepository.upsertDeckByRemoteId(
       remoteId: remoteId,
       title: title,
       isArchive: isArchive,
+      stats: stats,
     );
   }
 

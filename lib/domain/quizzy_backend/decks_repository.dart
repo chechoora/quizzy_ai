@@ -8,6 +8,7 @@ import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card_draft.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_deck.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_deck_with_cards.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/quizzy_backend_exception.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 /// Remote deck/card CRUD against the quizzy-ai-pro-be backend.
@@ -249,6 +250,7 @@ class DecksRepository {
         isArchived: dto.isArchived,
         createdAt: dto.createdAt,
         updatedAt: dto.updatedAt,
+        stats: _toItemStats(dto.stats),
       );
 
   RemoteCard _toRemoteCard(CardResponseDto dto) => RemoteCard(
@@ -259,6 +261,7 @@ class DecksRepository {
         isArchived: dto.isArchived,
         createdAt: dto.createdAt,
         updatedAt: dto.updatedAt,
+        stats: _toItemStats(dto.stats),
       );
 
   RemoteDeckWithCards _toRemoteDeckWithCards(DeckWithCardsResponseDto dto) =>
@@ -270,5 +273,28 @@ class DecksRepository {
         createdAt: dto.createdAt,
         updatedAt: dto.updatedAt,
         cards: dto.cards.map(_toRemoteCard).toList(),
+        stats: _toItemStats(dto.stats),
       );
+
+  ItemStats? _toItemStats(StatsDto? dto) {
+    if (dto == null) return null;
+    return ItemStats(
+      accuracy: PeriodStats(
+        week: dto.accuracy.week,
+        month: dto.accuracy.month,
+        year: dto.accuracy.year,
+      ),
+      attempts: PeriodStats(
+        week: dto.attempts.week,
+        month: dto.attempts.month,
+        year: dto.attempts.year,
+      ),
+      bestStreak: PeriodStats(
+        week: dto.bestStreak.week,
+        month: dto.bestStreak.month,
+        year: dto.bestStreak.year,
+      ),
+      lastPlayedAt: dto.lastPlayedAt,
+    );
+  }
 }

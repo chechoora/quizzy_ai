@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 
 class RemoteCard extends Equatable {
   final String id;
@@ -8,6 +9,7 @@ class RemoteCard extends Equatable {
   final bool isArchived;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final ItemStats? stats;
 
   const RemoteCard({
     required this.id,
@@ -17,6 +19,7 @@ class RemoteCard extends Equatable {
     required this.isArchived,
     required this.createdAt,
     required this.updatedAt,
+    this.stats,
   });
 
   @override
@@ -28,5 +31,6 @@ class RemoteCard extends Equatable {
         isArchived,
         createdAt,
         updatedAt,
+        stats,
       ];
 }

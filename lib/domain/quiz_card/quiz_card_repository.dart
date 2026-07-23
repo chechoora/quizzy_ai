@@ -3,6 +3,7 @@ import 'package:poc_ai_quiz/domain/import_export/model.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_database_mapper.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 
 class QuizCardRepository {
   QuizCardRepository({
@@ -96,6 +97,7 @@ class QuizCardRepository {
     required String question,
     required String answer,
     required bool isArchive,
+    ItemStats? stats,
   }) {
     return dataBaseRepository.upsertCardByRemoteId(
       remoteId: remoteId,
@@ -103,6 +105,7 @@ class QuizCardRepository {
       question: question,
       answer: answer,
       isArchive: isArchive,
+      stats: stats,
     );
   }
 

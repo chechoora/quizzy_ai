@@ -13,6 +13,7 @@ import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_deck.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_deck_with_cards.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/quizzy_backend_exception.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 import 'package:poc_ai_quiz/domain/sync/deck_card_sync_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
@@ -29,7 +30,14 @@ class MockSyncTombstoneRepository extends Mock
 
 DateTime _now() => DateTime(2026, 1, 1);
 
-RemoteDeck _remoteDeck(String id, {String title = 'Deck', bool archived = false}) {
+const _testStats = ItemStats(
+  accuracy: PeriodStats(week: 0.5, month: null, year: null),
+  attempts: PeriodStats(week: 2, month: 2, year: 2),
+  bestStreak: PeriodStats(week: 1, month: 1, year: 1),
+);
+
+RemoteDeck _remoteDeck(String id,
+    {String title = 'Deck', bool archived = false, ItemStats? stats}) {
   return RemoteDeck(
     id: id,
     userId: 'user-1',
@@ -37,6 +45,7 @@ RemoteDeck _remoteDeck(String id, {String title = 'Deck', bool archived = false}
     isArchived: archived,
     createdAt: _now(),
     updatedAt: _now(),
+    stats: stats,
   );
 }
 
@@ -53,7 +62,7 @@ RemoteDeckWithCards _remoteDeckWithCards(String id, {String title = 'Deck'}) {
 }
 
 RemoteCard _remoteCard(String id, String deckId,
-    {String question = 'Q', String answer = 'A'}) {
+    {String question = 'Q', String answer = 'A', ItemStats? stats}) {
   return RemoteCard(
     id: id,
     deckId: deckId,
@@ -62,6 +71,7 @@ RemoteCard _remoteCard(String id, String deckId,
     isArchived: false,
     createdAt: _now(),
     updatedAt: _now(),
+    stats: stats,
   );
 }
 
@@ -251,6 +261,50 @@ void main() {
       expect(result.decksUpserted, 1);
       expect(result.cardsUpserted, 1);
       expect(result.failures, 0);
+    });
+
+    test('forwards remote deck/card stats through to the upsert calls',
+        () async {
+      when(() => decksRepository.listDecks())
+          .thenAnswer((_) async => [_remoteDeck('d1', stats: _testStats)]);
+      when(() => deckRepository.upsertDeckFromRemote(
+            remoteId: 'd1',
+            title: 'Deck',
+            isArchive: false,
+            stats: _testStats,
+          )).thenAnswer((_) async => 10);
+      when(() => decksRepository.listCards('d1')).thenAnswer(
+          (_) async => [_remoteCard('c1', 'd1', stats: _testStats)]);
+      when(() => quizCardRepository.upsertCardFromRemote(
+            remoteId: 'c1',
+            deckId: 10,
+            question: 'Q',
+            answer: 'A',
+            isArchive: false,
+            stats: _testStats,
+          )).thenAnswer((_) async => 100);
+      when(() => quizCardRepository.fetchSyncedCardsForDeck(10))
+          .thenAnswer((_) async => const []);
+
+      final result = await service.pullRemoteChanges();
+
+      expect(result.decksUpserted, 1);
+      expect(result.cardsUpserted, 1);
+      expect(result.failures, 0);
+      verify(() => deckRepository.upsertDeckFromRemote(
+            remoteId: 'd1',
+            title: 'Deck',
+            isArchive: false,
+            stats: _testStats,
+          )).called(1);
+      verify(() => quizCardRepository.upsertCardFromRemote(
+            remoteId: 'c1',
+            deckId: 10,
+            question: 'Q',
+            answer: 'A',
+            isArchive: false,
+            stats: _testStats,
+          )).called(1);
     });
 
     test('deletes a local synced deck missing from listDecks (remote-wins)',

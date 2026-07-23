@@ -208,6 +208,7 @@ class DeckCardSyncService {
           remoteId: remoteDeck.id,
           title: remoteDeck.title,
           isArchive: remoteDeck.isArchived,
+          stats: remoteDeck.stats,
         );
         localIdByRemoteDeckId[remoteDeck.id] = localId;
         result = result.copyWith(decksUpserted: result.decksUpserted + 1);
@@ -283,6 +284,7 @@ class DeckCardSyncService {
           question: remoteCard.question,
           answer: remoteCard.answer,
           isArchive: remoteCard.isArchived,
+          stats: remoteCard.stats,
         );
         upserted++;
       } catch (e, s) {
