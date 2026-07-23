@@ -85,24 +85,6 @@ class QuotaDisplayWidget extends HookWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              l10n.settingsAiValidatorQuestionsLeftLabel,
-                              style: AppTypography.mainText.copyWith(
-                                color: AppColors.grayscale500,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            '${state.quota.questionsLeft}',
-                            style: AppTypography.h4.copyWith(
-                              color: AppColors.grayscale600,
-                            ),
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 QuotaErrorState() => Column(
