@@ -633,6 +633,54 @@ abstract class AppLocalizations {
   /// **'Delete card'**
   String get quizCardListDeleteCardAction;
 
+  /// No description provided for @quizCardListStatsAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Accuracy'**
+  String get quizCardListStatsAccuracy;
+
+  /// No description provided for @quizCardListStatsAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Attempts'**
+  String get quizCardListStatsAttempts;
+
+  /// No description provided for @quizCardListStatsBestStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Streak'**
+  String get quizCardListStatsBestStreak;
+
+  /// No description provided for @quizCardListStatsLastPlayed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Played'**
+  String get quizCardListStatsLastPlayed;
+
+  /// No description provided for @quizCardListStatsNeverPlayed.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get quizCardListStatsNeverPlayed;
+
+  /// No description provided for @quizCardListStatsWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get quizCardListStatsWeek;
+
+  /// No description provided for @quizCardListStatsMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get quizCardListStatsMonth;
+
+  /// No description provided for @quizCardListStatsYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get quizCardListStatsYear;
+
   /// No description provided for @quizCardListSelect.
   ///
   /// In en, this message translates to:

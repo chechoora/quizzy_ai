@@ -140,6 +140,7 @@ class QuizCardListWidget extends HookWidget {
                         Expanded(
                           child: QuizCardListDisplayWidget(
                             quizCarList: state.quizCarList,
+                            deckStats: deckItem.stats,
                             selectedCardIds: state.selectedCardIds,
                             isSelectionModeActive: isSelectionModeActive.value,
                             onCardSelectionToggle: (cardId) =>

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
+import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 
 class QuizCardListDisplayWidget extends StatelessWidget {
   const QuizCardListDisplayWidget({
     required this.quizCarList,
+    this.deckStats,
     this.selectedCardIds = const {},
     this.isSelectionModeActive = false,
     this.onCardSelectionToggle,
@@ -17,6 +20,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   });
 
   final List<QuizCardItem> quizCarList;
+  final ItemStats? deckStats;
   final Set<int> selectedCardIds;
   final bool isSelectionModeActive;
   final ValueChanged<int>? onCardSelectionToggle;
@@ -27,12 +31,29 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
+    final stats = deckStats;
+    final hasStats = stats != null;
+    final itemCount = quizCarList.length + 1 + (hasStats ? 1 : 0);
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: quizCarList.length + 1,
+      itemCount: itemCount,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
-        if (index == quizCarList.length) {
+        if (hasStats && index == 0) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: AppStatsCard(
+              rows: _buildStatsRows(stats, l10n),
+              accuracyLabel: l10n.quizCardListStatsAccuracy,
+              attemptsLabel: l10n.quizCardListStatsAttempts,
+              bestStreakLabel: l10n.quizCardListStatsBestStreak,
+              lastPlayedLabel: l10n.quizCardListStatsLastPlayed,
+              lastPlayedValue: _formatLastPlayed(stats.lastPlayedAt, l10n),
+            ),
+          );
+        }
+        final cardIndex = hasStats ? index - 1 : index;
+        if (cardIndex == quizCarList.length) {
           return _AddCardTile(
             title: l10n.quizCardListAddCardTooltip,
             icon: const Icon(
@@ -43,11 +64,12 @@ class QuizCardListDisplayWidget extends StatelessWidget {
             onPressed: onAddCardRequest,
           );
         }
-        final item = quizCarList[index];
+        final item = quizCarList[cardIndex];
         final isSelected = selectedCardIds.contains(item.id);
         return QuizCardTile(
           question: item.questionText,
           answer: item.answerText,
+          stats: item.stats,
           isSelected: isSelected,
           showCheckbox: isSelectionModeActive,
           onTap: isSelectionModeActive
@@ -74,10 +96,45 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   }
 }
 
+List<AppStatsPeriodRow> _buildStatsRows(ItemStats stats, LocalizedStrings l10n) {
+  final rows = <AppStatsPeriodRow>[];
+  if (stats.accuracy.week != null) {
+    rows.add(AppStatsPeriodRow(
+      label: l10n.quizCardListStatsWeek,
+      accuracyRatio: stats.accuracy.week,
+      attempts: stats.attempts.week,
+      bestStreak: stats.bestStreak.week,
+    ));
+  }
+  if (stats.accuracy.month != null) {
+    rows.add(AppStatsPeriodRow(
+      label: l10n.quizCardListStatsMonth,
+      accuracyRatio: stats.accuracy.month,
+      attempts: stats.attempts.month,
+      bestStreak: stats.bestStreak.month,
+    ));
+  }
+  if (stats.accuracy.year != null) {
+    rows.add(AppStatsPeriodRow(
+      label: l10n.quizCardListStatsYear,
+      accuracyRatio: stats.accuracy.year,
+      attempts: stats.attempts.year,
+      bestStreak: stats.bestStreak.year,
+    ));
+  }
+  return rows;
+}
+
+String _formatLastPlayed(DateTime? lastPlayedAt, LocalizedStrings l10n) {
+  if (lastPlayedAt == null) return l10n.quizCardListStatsNeverPlayed;
+  return DateFormat.yMMMd().format(lastPlayedAt);
+}
+
 class QuizCardTile extends StatelessWidget {
   const QuizCardTile({
     required this.question,
     required this.answer,
+    this.stats,
     this.isSelected = false,
     this.showCheckbox = true,
     this.onTap,
@@ -87,6 +144,7 @@ class QuizCardTile extends StatelessWidget {
 
   final String question;
   final String answer;
+  final ItemStats? stats;
   final bool isSelected;
   final bool showCheckbox;
   final VoidCallback? onTap;
@@ -94,6 +152,7 @@ class QuizCardTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = localize(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -144,6 +203,22 @@ class QuizCardTile extends StatelessWidget {
                     maxLines: 10,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (stats != null) ...[
+                    const SizedBox(height: 8),
+                    AppStatsSummaryRow(
+                      accuracyLabel: l10n.quizCardListStatsAccuracy,
+                      accuracyRatio: stats!.accuracy.week,
+                      attemptsLabel: l10n.quizCardListStatsAttempts,
+                      attempts: stats!.attempts.week,
+                      bestStreakLabel: l10n.quizCardListStatsBestStreak,
+                      bestStreak: stats!.bestStreak.week,
+                      lastPlayedLabel: l10n.quizCardListStatsLastPlayed,
+                      lastPlayedValue: _formatLastPlayed(
+                        stats!.lastPlayedAt,
+                        l10n,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

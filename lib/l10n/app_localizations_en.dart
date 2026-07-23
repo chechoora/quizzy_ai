@@ -295,6 +295,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quizCardListDeleteCardAction => 'Delete card';
 
   @override
+  String get quizCardListStatsAccuracy => 'Accuracy';
+
+  @override
+  String get quizCardListStatsAttempts => 'Attempts';
+
+  @override
+  String get quizCardListStatsBestStreak => 'Best Streak';
+
+  @override
+  String get quizCardListStatsLastPlayed => 'Last Played';
+
+  @override
+  String get quizCardListStatsNeverPlayed => 'Never';
+
+  @override
+  String get quizCardListStatsWeek => 'Week';
+
+  @override
+  String get quizCardListStatsMonth => 'Month';
+
+  @override
+  String get quizCardListStatsYear => 'Year';
+
+  @override
   String get quizCardListSelect => 'Select';
 
   @override
