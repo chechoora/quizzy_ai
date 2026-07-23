@@ -74,6 +74,14 @@
           }
         },
         {
+          "client_id": "897552655477-v6oorinej34c6kb292t5bu8p9sure2tc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chechoora.quizzy.pro",
+            "certificate_hash": "c3adfc612f5f15b067cd1de16e89e9ddb5292fe3"
+          }
+        },
+        {
           "client_id": "897552655477-vl1libg5ug36t5ghogj9a38voa5v83ld.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
