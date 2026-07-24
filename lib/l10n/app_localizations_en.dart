@@ -581,6 +581,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authErrorGeneric => 'Something went wrong. Please try again.';
 
   @override
+  String get authPrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get authTermsAndConditions => 'Terms and Conditions';
+
+  @override
+  String authCouldNotOpenLinkError(String url) {
+    return 'Could not open link: $url';
+  }
+
+  @override
   String get appCreditsRoleFlutterDeveloper => 'Creator / Flutter Developer';
 
   @override

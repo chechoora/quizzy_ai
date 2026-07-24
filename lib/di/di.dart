@@ -1,5 +1,6 @@
 import 'package:chopper/chopper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
@@ -77,6 +78,7 @@ import 'package:poc_ai_quiz/data/import_export/import_service.dart';
 import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/logout/logout_manager.dart';
+import 'package:poc_ai_quiz/domain/remote_config/remote_config_service.dart';
 
 final getIt = GetIt.instance;
 
@@ -87,6 +89,7 @@ Future<void> setupDi() async {
   await _setupApiKeysProvider();
   await _setupInAppPurchase();
   await _setupAuth();
+  await _setupRemoteConfig();
   await _setupAPI();
   await _setupServices();
 }
@@ -97,6 +100,15 @@ Future<void> _setupAuth() async {
     logger: Logger.withTag('FirebaseAuthService'),
   );
   getIt.registerSingleton<AuthService>(authService);
+}
+
+Future<void> _setupRemoteConfig() async {
+  final remoteConfigService = RemoteConfigService(
+    remoteConfig: FirebaseRemoteConfig.instance,
+    logger: Logger.withTag('RemoteConfigService'),
+  );
+  await remoteConfigService.initialize();
+  getIt.registerSingleton<RemoteConfigService>(remoteConfigService);
 }
 
 Future<void> _setupSharedPreferences() async {

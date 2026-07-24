@@ -295,6 +295,16 @@
   "authSignInWithGoogle": "Sign in with Google",
   "authSignInWithApple": "Sign in with Apple",
   "authErrorGeneric": "Something went wrong. Please try again.",
+  "authPrivacyPolicy": "Privacy Policy",
+  "authTermsAndConditions": "Terms and Conditions",
+  "authCouldNotOpenLinkError": "Could not open link: {url}",
+  "@authCouldNotOpenLinkError": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
   "appCreditsRoleFlutterDeveloper": "Creator / Flutter Developer",
   "appCreditsRoleDesigner": "Designer",
   "appCreditsRoleBackendDeveloper": "Backend Developer",

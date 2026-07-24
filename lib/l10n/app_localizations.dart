@@ -1173,6 +1173,24 @@ abstract class AppLocalizations {
   /// **'Something went wrong. Please try again.'**
   String get authErrorGeneric;
 
+  /// No description provided for @authPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get authPrivacyPolicy;
+
+  /// No description provided for @authTermsAndConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms and Conditions'**
+  String get authTermsAndConditions;
+
+  /// No description provided for @authCouldNotOpenLinkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open link: {url}'**
+  String authCouldNotOpenLinkError(String url);
+
   /// No description provided for @appCreditsRoleFlutterDeveloper.
   ///
   /// In en, this message translates to:

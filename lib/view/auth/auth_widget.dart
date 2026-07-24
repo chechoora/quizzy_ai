@@ -8,12 +8,14 @@ import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/remote_config/remote_config_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/view/auth/cubit/auth_cubit.dart';
 import 'package:quizzy_design/quizzy_design.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AuthWidget extends HookWidget {
   const AuthWidget({super.key});
@@ -100,11 +102,77 @@ class AuthWidget extends HookWidget {
                       child: Center(child: SimpleLoadingWidget()),
                     ),
                   ),
+                Positioned(
+                  left: 24,
+                  right: 24,
+                  bottom: 16,
+                  child: _LegalLinksRow(
+                    privacyPolicyUrl:
+                        getIt<RemoteConfigService>().privacyPolicyUrl,
+                    termsAndConditionsUrl:
+                        getIt<RemoteConfigService>().termsAndConditionsUrl,
+                  ),
+                ),
               ],
             );
           },
         ),
       ),
+    );
+  }
+}
+
+class _LegalLinksRow extends StatelessWidget {
+  const _LegalLinksRow({
+    required this.privacyPolicyUrl,
+    required this.termsAndConditionsUrl,
+  });
+
+  final String privacyPolicyUrl;
+  final String termsAndConditionsUrl;
+
+  Future<void> _launchUrl(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (context.mounted) {
+      snackBar(
+        context,
+        message: localize(context).authCouldNotOpenLinkError(url),
+        isError: true,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = localize(context);
+    final linkStyle = AppTypography.smallText.copyWith(
+      color: AppColors.primary500,
+      decoration: TextDecoration.underline,
+      decorationColor: AppColors.primary500,
+    );
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: () => _launchUrl(context, privacyPolicyUrl),
+          child: Text(l10n.authPrivacyPolicy, style: linkStyle),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(
+            '•',
+            style: AppTypography.smallText.copyWith(
+              color: AppColors.grayscale500,
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () => _launchUrl(context, termsAndConditionsUrl),
+          child: Text(l10n.authTermsAndConditions, style: linkStyle),
+        ),
+      ],
     );
   }
 }

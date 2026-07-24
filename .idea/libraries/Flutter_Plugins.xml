@@ -34,6 +34,8 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider-2.1.5" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_onnxruntime-1.8.2" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_remote_config_web-1.8.9" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_remote_config-5.5.0" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
