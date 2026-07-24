@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 
@@ -13,10 +14,26 @@ class OnboardingProWidget extends HookWidget {
     final currentPage = useState(0);
 
     final pages = [
-      (title: l10n.onboardingProPage1Title, description: l10n.onboardingProPage1Description),
-      (title: l10n.onboardingProPage2Title, description: l10n.onboardingProPage2Description),
-      (title: l10n.onboardingProPage3Title, description: l10n.onboardingProPage3Description),
-      (title: l10n.onboardingProPage4Title, description: l10n.onboardingProPage4Description),
+      (
+        illustrationAsset: 'assets/images/quizzy-01-generate.svg',
+        title: l10n.onboardingProPage1Title,
+        description: l10n.onboardingProPage1Description,
+      ),
+      (
+        illustrationAsset: 'assets/images/quizzy-02-validate.svg',
+        title: l10n.onboardingProPage2Title,
+        description: l10n.onboardingProPage2Description,
+      ),
+      (
+        illustrationAsset: 'assets/images/quizzy-03-sync.svg',
+        title: l10n.onboardingProPage3Title,
+        description: l10n.onboardingProPage3Description,
+      ),
+      (
+        illustrationAsset: 'assets/images/quizzy-04-stats.svg',
+        title: l10n.onboardingProPage4Title,
+        description: l10n.onboardingProPage4Description,
+      ),
     ];
 
     final isLastPage = currentPage.value == pages.length - 1;
@@ -47,6 +64,7 @@ class OnboardingProWidget extends HookWidget {
                 itemBuilder: (context, index) {
                   final page = pages[index];
                   return _OnboardingProPage(
+                    illustrationAsset: page.illustrationAsset,
                     title: page.title,
                     description: page.description,
                   );
@@ -77,10 +95,12 @@ class OnboardingProWidget extends HookWidget {
 
 class _OnboardingProPage extends StatelessWidget {
   const _OnboardingProPage({
+    required this.illustrationAsset,
     required this.title,
     required this.description,
   });
 
+  final String illustrationAsset;
   final String title;
   final String description;
 
@@ -92,15 +112,9 @@ class _OnboardingProPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // TODO: illustration
           SizedBox(
             height: 240,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.backgroundSecondary,
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
+            child: SvgPicture.asset(illustrationAsset),
           ),
           const SizedBox(height: 32),
           Text(

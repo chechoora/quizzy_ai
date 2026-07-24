@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
@@ -64,6 +65,12 @@ class AuthWidget extends HookWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        height: 240,
+                        child: SvgPicture.asset('assets/images/quizzy-00-login.svg'),
+                      ),
                       Text(
                         appName,
                         textAlign: TextAlign.center,
