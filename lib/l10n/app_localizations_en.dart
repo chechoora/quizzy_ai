@@ -295,6 +295,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quizCardListDeleteCardAction => 'Delete card';
 
   @override
+  String get quizCardListShowStatsAction => 'Show stats';
+
+  @override
+  String get quizCardListCardStatsTitle => 'Card stats';
+
+  @override
   String get quizCardListStatsAccuracy => 'Accuracy';
 
   @override

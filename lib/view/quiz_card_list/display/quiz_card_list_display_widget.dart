@@ -71,6 +71,9 @@ class QuizCardListDisplayWidget extends StatelessWidget {
         }
         final item = quizCarList[cardIndex];
         final isSelected = selectedCardIds.contains(item.id);
+        final itemStats = item.stats;
+        final hasCardStats =
+            itemStats != null && _buildStatsRows(itemStats, l10n).isNotEmpty;
         return QuizCardTile(
           question: item.questionText,
           answer: item.answerText,
@@ -82,6 +85,13 @@ class QuizCardListDisplayWidget extends StatelessWidget {
               : null,
           trailing: AppMoreButton(
             actions: [
+              if (hasCardStats)
+                AppMoreButtonAction(
+                  label: l10n.quizCardListShowStatsAction,
+                  icon: 'assets/icons/stats.svg',
+                  onPressed: () =>
+                      _showCardStatsBottomSheet(context, itemStats, l10n),
+                ),
               AppMoreButtonAction(
                 label: l10n.quizCardListEditCardAction,
                 icon: 'assets/icons/edit.svg',
@@ -134,6 +144,28 @@ List<AppStatsPeriodRow> _buildStatsRows(
 String _formatLastPlayed(DateTime? lastPlayedAt, LocalizedStrings l10n) {
   if (lastPlayedAt == null) return l10n.quizCardListStatsNeverPlayed;
   return DateFormat.yMMMd().format(lastPlayedAt);
+}
+
+void _showCardStatsBottomSheet(
+  BuildContext context,
+  ItemStats stats,
+  LocalizedStrings l10n,
+) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    barrierColor: Colors.black.withValues(alpha: 0.4),
+    builder: (context) => AppStatsBottomSheet(
+      title: l10n.quizCardListCardStatsTitle,
+      rows: _buildStatsRows(stats, l10n),
+      accuracyLabel: l10n.quizCardListStatsAccuracy,
+      attemptsLabel: l10n.quizCardListStatsAttempts,
+      bestStreakLabel: l10n.quizCardListStatsBestStreak,
+      lastPlayedLabel: l10n.quizCardListStatsLastPlayed,
+      lastPlayedValue: _formatLastPlayed(stats.lastPlayedAt, l10n),
+    ),
+  );
 }
 
 class QuizCardTile extends StatelessWidget {

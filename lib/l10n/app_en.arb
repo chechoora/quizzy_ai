@@ -146,6 +146,8 @@
   "quizCardListCardsInOrder": "Cards in Order",
   "quizCardListEditCardAction": "Edit card",
   "quizCardListDeleteCardAction": "Delete card",
+  "quizCardListShowStatsAction": "Show stats",
+  "quizCardListCardStatsTitle": "Card stats",
   "quizCardListStatsAccuracy": "Accuracy",
   "quizCardListStatsAttempts": "Attempts",
   "quizCardListStatsBestStreak": "Best Streak",

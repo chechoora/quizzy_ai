@@ -633,6 +633,18 @@ abstract class AppLocalizations {
   /// **'Delete card'**
   String get quizCardListDeleteCardAction;
 
+  /// No description provided for @quizCardListShowStatsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Show stats'**
+  String get quizCardListShowStatsAction;
+
+  /// No description provided for @quizCardListCardStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Card stats'**
+  String get quizCardListCardStatsTitle;
+
   /// No description provided for @quizCardListStatsAccuracy.
   ///
   /// In en, this message translates to:

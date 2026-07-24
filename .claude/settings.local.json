@@ -48,7 +48,8 @@
       "Bash(openssl pkcs7 *)",
       "Bash(openssl x509 *)",
       "WebSearch",
-      "Bash(awk 'NR>=95 && NR<=115' lib/view/home_widget/cubit/deck_cubit.dart)"
+      "Bash(awk 'NR>=95 && NR<=115' lib/view/home_widget/cubit/deck_cubit.dart)",
+      "Bash(git *)"
     ],
     "deny": [],
     "ask": []
