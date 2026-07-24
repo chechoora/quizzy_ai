@@ -50,7 +50,8 @@
       "WebSearch",
       "Bash(awk 'NR>=95 && NR<=115' lib/view/home_widget/cubit/deck_cubit.dart)",
       "Bash(git *)",
-      "Bash(find *)"
+      "Bash(find *)",
+      "Bash(python3 *)"
     ],
     "deny": [],
     "ask": []

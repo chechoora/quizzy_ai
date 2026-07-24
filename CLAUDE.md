@@ -2,6 +2,12 @@
 
 Development guidance for Claude Code when working with this repository.
 
+## Verification
+
+Building the app (e.g. `flutter build apk`/`flutter build ios`) to confirm changes
+compile is expected. Do **not** run or launch the app on a device/simulator to verify
+behavior — the user checks results themselves.
+
 ## Commands
 
 ```bash
