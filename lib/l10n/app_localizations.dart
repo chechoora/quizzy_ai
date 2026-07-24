@@ -1407,6 +1407,72 @@ abstract class AppLocalizations {
   /// **'Get the most out of Quizzy AI with our premium features:'**
   String get onboardingPaywallIntro;
 
+  /// No description provided for @onboardingProPage1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate decks by prompt'**
+  String get onboardingProPage1Title;
+
+  /// No description provided for @onboardingProPage1Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe any topic and let AI build a full deck of quiz cards for you.'**
+  String get onboardingProPage1Description;
+
+  /// No description provided for @onboardingProPage2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Validate answers with AI'**
+  String get onboardingProPage2Title;
+
+  /// No description provided for @onboardingProPage2Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Get instant, accurate feedback on every answer you give.'**
+  String get onboardingProPage2Description;
+
+  /// No description provided for @onboardingProPage3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync across devices'**
+  String get onboardingProPage3Title;
+
+  /// No description provided for @onboardingProPage3Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Your decks and progress stay up to date on all your devices.'**
+  String get onboardingProPage3Description;
+
+  /// No description provided for @onboardingProPage4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats for cards'**
+  String get onboardingProPage4Title;
+
+  /// No description provided for @onboardingProPage4Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Track how well you know each card and watch your progress grow.'**
+  String get onboardingProPage4Description;
+
+  /// No description provided for @onboardingProNextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingProNextButton;
+
+  /// No description provided for @onboardingProGetStartedButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get onboardingProGetStartedButton;
+
+  /// No description provided for @onboardingProSkipButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingProSkipButton;
+
   /// No description provided for @importExportICloudTitle.
   ///
   /// In en, this message translates to:

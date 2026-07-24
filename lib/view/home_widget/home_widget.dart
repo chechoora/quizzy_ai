@@ -107,7 +107,11 @@ class HomeWidget extends HookWidget {
     }
 
     void startOnboardingFlow() async {
-      await showOnboardingBottomSheet(context);
+      if (getIt<AppConfig>().flavor == Flavor.quizzyPro) {
+        await context.push(OnboardingProRoute().path);
+      } else {
+        await showOnboardingBottomSheet(context);
+      }
       if (!context.mounted) return;
       await showOnboardingPaywallBottomSheet(context);
       await cubit.completeOnboarding();

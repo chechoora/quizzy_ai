@@ -71,3 +71,7 @@ final class PublicDeckDetailRoute extends NavigationRoute {
   PublicDeckDetailRoute()
       : super(name: 'publicDeckDetail', path: '/publicDeckDetail');
 }
+
+final class OnboardingProRoute extends NavigationRoute {
+  OnboardingProRoute() : super(name: 'onboardingPro', path: '/onboardingPro');
+}

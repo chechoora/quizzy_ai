@@ -700,6 +700,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingPaywallIntro => 'Get the most out of Quizzy AI with our premium features:';
 
   @override
+  String get onboardingProPage1Title => 'Generate decks by prompt';
+
+  @override
+  String get onboardingProPage1Description => 'Describe any topic and let AI build a full deck of quiz cards for you.';
+
+  @override
+  String get onboardingProPage2Title => 'Validate answers with AI';
+
+  @override
+  String get onboardingProPage2Description => 'Get instant, accurate feedback on every answer you give.';
+
+  @override
+  String get onboardingProPage3Title => 'Sync across devices';
+
+  @override
+  String get onboardingProPage3Description => 'Your decks and progress stay up to date on all your devices.';
+
+  @override
+  String get onboardingProPage4Title => 'Stats for cards';
+
+  @override
+  String get onboardingProPage4Description => 'Track how well you know each card and watch your progress grow.';
+
+  @override
+  String get onboardingProNextButton => 'Next';
+
+  @override
+  String get onboardingProGetStartedButton => 'Get Started';
+
+  @override
+  String get onboardingProSkipButton => 'Skip';
+
+  @override
   String get importExportICloudTitle => 'iCloud Backup';
 
   @override

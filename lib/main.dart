@@ -19,6 +19,7 @@ import 'package:poc_ai_quiz/view/create_card/create_card_widget.dart';
 import 'package:poc_ai_quiz/view/deck_edit/deck_edit_widget.dart';
 import 'package:poc_ai_quiz/view/home_widget/home_widget.dart';
 import 'package:poc_ai_quiz/view/import_export/screen.dart';
+import 'package:poc_ai_quiz/view/onboarding/pro/onboarding_pro_widget.dart';
 import 'package:poc_ai_quiz/view/public_deck_detail/public_deck_detail_widget.dart';
 import 'package:poc_ai_quiz/view/public_decks/public_decks_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
@@ -256,6 +257,13 @@ GoRouter buildAppRouter({required String initialLocation}) {
         builder: (context, state) {
           final deckSummary = state.extra as PublicDeckSummary;
           return PublicDeckDetailWidget(deckSummary: deckSummary);
+        },
+      ),
+      GoRoute(
+        name: OnboardingProRoute().name,
+        path: OnboardingProRoute().path,
+        builder: (context, state) {
+          return const OnboardingProWidget();
         },
       ),
     ],
