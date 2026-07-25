@@ -3,17 +3,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/auth/model/auth_user.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit({
     required this.authService,
     required this.inAppPurchaseService,
+    required this.settingsService,
+    required this.isSubscriptionOnly,
     required this.logger,
   }) : super(const AuthIdleState());
 
   final AuthService authService;
   final InAppPurchaseService inAppPurchaseService;
+  final SettingsService settingsService;
+
+  /// When true (the `quizzypro` flavor) a resumed/linked Quizzy AI
+  /// subscription should be set as the default validator right after login.
+  final bool isSubscriptionOnly;
   final Logger logger;
 
   Future<void> signInWithGoogle() =>
@@ -49,10 +58,32 @@ class AuthCubit extends Cubit<AuthState> {
     logger.d('linkPurchases: uid=$firebaseUid');
     try {
       await inAppPurchaseService.logInUser(firebaseUid);
+      if (isSubscriptionOnly) {
+        await _applyQuizzyAiEntitlement();
+      }
     } catch (e, stackTrace) {
       logger.e('linkPurchases: failed uid=$firebaseUid',
           ex: e, stacktrace: stackTrace);
     }
+  }
+
+  /// If the account being linked already holds an active Quizzy AI
+  /// subscription (e.g. a clean install where the user logs in and their
+  /// prior purchase resumes), set it as the default validator and deck
+  /// generator right away instead of leaving the `ml` default in place.
+  Future<void> _applyQuizzyAiEntitlement() async {
+    logger.d('applyQuizzyAiEntitlement: checking subscription');
+    final isSubscribed = await inAppPurchaseService
+        .isFeaturePurchased(InAppPurchaseFeature.quizzyAi);
+    if (!isSubscribed) {
+      logger.d('applyQuizzyAiEntitlement: not subscribed, skipping');
+      return;
+    }
+    await settingsService.updateValidatorType(AnswerValidatorType.quizzyAI);
+    await settingsService
+        .updateDeckGenerationAiType(AnswerValidatorType.quizzyAI);
+    logger.i('applyQuizzyAiEntitlement: Quizzy AI set as default validator '
+        'and deck generator');
   }
 }
 
