@@ -4,7 +4,6 @@ import 'package:poc_ai_quiz/data/api/quizzy_backend/quizzy_backend_models.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_card.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_category.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_deck_detail.dart';
-import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_deck_page.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_deck_summary.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_tag.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card.dart';
@@ -40,29 +39,25 @@ class PublicDecksRepository {
     }
   }
 
-  Future<PublicDeckPage> listPublicDecks({
+  Future<List<PublicDeckSummary>> listPublicDecks({
     String? category,
     String? tag,
     String? q,
-    String? cursor,
-    int? limit,
   }) async {
-    logger.d(
-        'listPublicDecks: category=$category, tag=$tag, q=$q, cursor=$cursor, limit=$limit');
+    logger.d('listPublicDecks: category=$category, tag=$tag, q=$q');
     try {
       final response = await apiService.listDecks(
         category: category,
         tag: tag,
         q: q,
-        cursor: cursor,
-        limit: limit,
       );
       final body = _requireBody(response, 'listPublicDecks');
-      final page = _toPublicDeckPage(
-          PublicDeckPageDto.fromJson(body as Map<String, dynamic>));
-      logger.i(
-          'listPublicDecks: success, ${page.items.length} decks, hasMore=${page.hasMore}');
-      return page;
+      final decks = (body as List)
+          .map((d) => _toPublicDeckSummary(
+              PublicDeckSummaryDto.fromJson(d as Map<String, dynamic>)))
+          .toList();
+      logger.i('listPublicDecks: success, ${decks.length} decks');
+      return decks;
     } catch (e, stackTrace) {
       logger.e('listPublicDecks: failed', ex: e, stacktrace: stackTrace);
       rethrow;
@@ -129,12 +124,6 @@ class PublicDecksRepository {
         description: dto.description,
         tags: dto.tags.map(_toPublicTag).toList(),
         cardCount: dto.cardCount,
-      );
-
-  PublicDeckPage _toPublicDeckPage(PublicDeckPageDto dto) => PublicDeckPage(
-        items: dto.items.map(_toPublicDeckSummary).toList(),
-        nextCursor: dto.nextCursor,
-        hasMore: dto.hasMore,
       );
 
   PublicCard _toPublicCard(PublicCardDto dto) => PublicCard(

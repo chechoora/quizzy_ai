@@ -33,16 +33,12 @@ final class _$PublicDecksApiService extends PublicDecksApiService {
     String? category,
     String? tag,
     String? q,
-    String? cursor,
-    int? limit,
   }) {
     final Uri $url = Uri.parse('/api/public/decks');
     final Map<String, dynamic> $params = <String, dynamic>{
       'category': category,
       'tag': tag,
       'q': q,
-      'cursor': cursor,
-      'limit': limit,
     };
     final Request $request = Request(
       'GET',

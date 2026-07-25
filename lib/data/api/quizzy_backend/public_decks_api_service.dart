@@ -20,8 +20,6 @@ abstract class PublicDecksApiService extends ChopperService {
     @Query('category') String? category,
     @Query('tag') String? tag,
     @Query('q') String? q,
-    @Query('cursor') String? cursor,
-    @Query('limit') int? limit,
   });
 
   @Get(path: '/public/decks/{id}')

@@ -494,28 +494,6 @@ class PublicDeckSummaryDto {
       );
 }
 
-class PublicDeckPageDto {
-  final List<PublicDeckSummaryDto> items;
-  final String? nextCursor;
-  final bool hasMore;
-
-  PublicDeckPageDto({
-    required this.items,
-    this.nextCursor,
-    required this.hasMore,
-  });
-
-  factory PublicDeckPageDto.fromJson(Map<String, dynamic> json) =>
-      PublicDeckPageDto(
-        items: (json['items'] as List)
-            .map((d) =>
-                PublicDeckSummaryDto.fromJson(d as Map<String, dynamic>))
-            .toList(),
-        nextCursor: json['nextCursor'] as String?,
-        hasMore: json['hasMore'] as bool,
-      );
-}
-
 class PublicCardDto {
   final String id;
   final String question;

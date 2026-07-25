@@ -25,25 +25,12 @@ class PublicDecksWidget extends HookWidget {
         logger: Logger.withTag('PublicDecksCubit'),
       ),
     );
-    final scrollController = useScrollController();
     final searchController = useTextEditingController();
 
     useEffect(() {
       cubit.loadInitial();
       return cubit.close;
     }, [cubit]);
-
-    useEffect(() {
-      void onScroll() {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
-          cubit.loadMore();
-        }
-      }
-
-      scrollController.addListener(onScroll);
-      return () => scrollController.removeListener(onScroll);
-    }, [scrollController]);
 
     void openDeck(PublicDeckSummary deck) {
       context.push(PublicDeckDetailRoute().path, extra: deck);
@@ -86,21 +73,14 @@ class PublicDecksWidget extends HookWidget {
                           child: state.decks.isEmpty
                               ? _EmptyPublicDecksWidget(message: l10n.publicDecksEmptyState)
                               : ListView.separated(
-                                  controller: scrollController,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 16,
                                   ),
-                                  itemCount: state.decks.length +
-                                      (state.isLoadingMore ? 1 : 0),
+                                  itemCount: state.decks.length,
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(height: 16),
                                   itemBuilder: (context, index) {
-                                    if (index == state.decks.length) {
-                                      return const Center(
-                                        child: SimpleLoadingWidget(),
-                                      );
-                                    }
                                     final deck = state.decks[index];
                                     return DeckListItemWidget(
                                       title: deck.title,

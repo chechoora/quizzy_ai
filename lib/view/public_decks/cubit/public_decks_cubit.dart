@@ -17,7 +17,6 @@ class PublicDecksCubit extends Cubit<PublicDecksState> {
   final PublicDecksRepository publicDecksRepository;
   final Logger logger;
 
-  static const _pageLimit = 20;
   static const _searchDebounce = Duration(milliseconds: 400);
 
   List<PublicCategory> _categories = [];
@@ -25,9 +24,6 @@ class PublicDecksCubit extends Cubit<PublicDecksState> {
   String? _searchQuery;
   Timer? _searchDebounceTimer;
   final List<PublicDeckSummary> _decks = [];
-  String? _nextCursor;
-  bool _hasMore = false;
-  bool _isLoadingMore = false;
 
   Future<void> loadInitial() async {
     logger.d('loadInitial: starting');
@@ -61,48 +57,16 @@ class PublicDecksCubit extends Cubit<PublicDecksState> {
     });
   }
 
-  Future<void> loadMore() async {
-    if (!_hasMore || _isLoadingMore) {
-      logger.d(
-          'loadMore: skipped, hasMore=$_hasMore, isLoadingMore=$_isLoadingMore');
-      return;
-    }
-    logger.d('loadMore: cursor=$_nextCursor');
-    _isLoadingMore = true;
-    _emitData();
-    try {
-      final page = await publicDecksRepository.listPublicDecks(
-        category: _selectedCategory?.slug,
-        q: _searchQuery,
-        cursor: _nextCursor,
-        limit: _pageLimit,
-      );
-      _decks.addAll(page.items);
-      _nextCursor = page.nextCursor;
-      _hasMore = page.hasMore;
-      logger.i('loadMore: success, ${_decks.length} total decks');
-    } catch (e, stackTrace) {
-      logger.e('loadMore: failed', ex: e, stacktrace: stackTrace);
-      emit(PublicDecksErrorState());
-    } finally {
-      _isLoadingMore = false;
-      _emitData();
-    }
-  }
-
   Future<void> _fetchDecks() async {
     emit(PublicDecksLoadingState());
     try {
-      final page = await publicDecksRepository.listPublicDecks(
+      final decks = await publicDecksRepository.listPublicDecks(
         category: _selectedCategory?.slug,
         q: _searchQuery,
-        limit: _pageLimit,
       );
       _decks
         ..clear()
-        ..addAll(page.items);
-      _nextCursor = page.nextCursor;
-      _hasMore = page.hasMore;
+        ..addAll(decks);
       logger.i('_fetchDecks: success, ${_decks.length} decks '
           '(category=${_selectedCategory?.slug}, q=$_searchQuery)');
       _emitData();
@@ -125,8 +89,6 @@ class PublicDecksCubit extends Cubit<PublicDecksState> {
         categories: List.unmodifiable(_categories),
         selectedCategory: _selectedCategory,
         decks: List.unmodifiable(_decks),
-        hasMore: _hasMore,
-        isLoadingMore: _isLoadingMore,
       ),
     );
   }
@@ -157,19 +119,14 @@ class PublicDecksDataState extends BuilderState {
     required this.categories,
     required this.selectedCategory,
     required this.decks,
-    required this.hasMore,
-    required this.isLoadingMore,
   });
 
   final List<PublicCategory> categories;
   final PublicCategory? selectedCategory;
   final List<PublicDeckSummary> decks;
-  final bool hasMore;
-  final bool isLoadingMore;
 
   @override
-  List<Object?> get props =>
-      [categories, selectedCategory, decks, hasMore, isLoadingMore];
+  List<Object?> get props => [categories, selectedCategory, decks];
 }
 
 class PublicDecksErrorState extends ListenerState {}
