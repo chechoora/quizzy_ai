@@ -6,10 +6,13 @@ import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
-import 'package:poc_ai_quiz/domain/quizzy_backend/cards_repository.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/decks_repository.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/model/batch_delete_cards_result.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/model/batch_update_cards_result.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/new_remote_deck.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card_draft.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card_update.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_deck.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_deck_with_cards.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/quizzy_backend_exception.dart';
@@ -22,8 +25,6 @@ class MockDeckRepository extends Mock implements DeckRepository {}
 class MockQuizCardRepository extends Mock implements QuizCardRepository {}
 
 class MockDecksRepository extends Mock implements DecksRepository {}
-
-class MockCardsRepository extends Mock implements CardsRepository {}
 
 class MockSyncTombstoneRepository extends Mock
     implements SyncTombstoneRepository {}
@@ -75,15 +76,50 @@ RemoteCard _remoteCard(String id, String deckId,
   );
 }
 
+QuizCardItem _newCard(int id, int deckId, {String question = 'Q', String answer = 'A'}) {
+  return QuizCardItem(
+    id: id,
+    deckId: deckId,
+    questionText: question,
+    answerText: answer,
+    isArchive: false,
+  );
+}
+
+QuizCardItem _editedCard(int id, int deckId, String remoteId,
+    {String question = 'Q2', String answer = 'A2'}) {
+  return QuizCardItem(
+    id: id,
+    deckId: deckId,
+    questionText: question,
+    answerText: answer,
+    isArchive: false,
+    remoteId: remoteId,
+    isDirty: true,
+  );
+}
+
+SyncTombstoneTableData _cardTombstone(int id, String remoteId, String parentRemoteId) {
+  return SyncTombstoneTableData(
+    id: id,
+    entityType: 'card',
+    remoteId: remoteId,
+    parentRemoteId: parentRemoteId,
+    createdAt: _now(),
+  );
+}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(const NewRemoteDeck(title: ''));
+    registerFallbackValue(<RemoteCardDraft>[]);
+    registerFallbackValue(<RemoteCardUpdate>[]);
+    registerFallbackValue(<String>[]);
   });
 
   late MockDeckRepository deckRepository;
   late MockQuizCardRepository quizCardRepository;
   late MockDecksRepository decksRepository;
-  late MockCardsRepository cardsRepository;
   late MockSyncTombstoneRepository tombstoneRepository;
   late DeckCardSyncService service;
 
@@ -91,13 +127,11 @@ void main() {
     deckRepository = MockDeckRepository();
     quizCardRepository = MockQuizCardRepository();
     decksRepository = MockDecksRepository();
-    cardsRepository = MockCardsRepository();
     tombstoneRepository = MockSyncTombstoneRepository();
     service = DeckCardSyncService(
       deckRepository: deckRepository,
       quizCardRepository: quizCardRepository,
       decksRepository: decksRepository,
-      cardsRepository: cardsRepository,
       tombstoneRepository: tombstoneRepository,
       logger: Logger.withTag('test'),
     );
@@ -114,71 +148,7 @@ void main() {
         .thenAnswer((_) async => const []);
   });
 
-  group('pushLocalChanges', () {
-    test('creates a deck before pushing its cards', () async {
-      const deck = DeckItem(id: 1, title: 'Deck', isArchive: false);
-      const card = QuizCardItem(
-        id: 1,
-        deckId: 1,
-        questionText: 'Q',
-        answerText: 'A',
-        isArchive: false,
-      );
-
-      when(() => deckRepository.fetchDirtyDecks())
-          .thenAnswer((_) async => const [deck]);
-      when(() => decksRepository.createDeck(any()))
-          .thenAnswer((_) async => _remoteDeckWithCards('rd1'));
-      when(() => deckRepository.markDeckSynced(1, 'rd1'))
-          .thenAnswer((_) async {});
-      when(() => deckRepository.fetchDecks()).thenAnswer((_) async => const [
-            DeckItem(
-                id: 1,
-                title: 'Deck',
-                isArchive: false,
-                remoteId: 'rd1',
-                isDirty: false),
-          ]);
-      when(() => quizCardRepository.fetchDirtyCards())
-          .thenAnswer((_) async => const [card]);
-      when(() => decksRepository.addCard('rd1', question: 'Q', answer: 'A'))
-          .thenAnswer((_) async => _remoteCard('rc1', 'rd1'));
-      when(() => quizCardRepository.markCardSynced(1, 'rc1'))
-          .thenAnswer((_) async {});
-
-      final result = await service.pushLocalChanges();
-
-      expect(result.decksPushed, 1);
-      expect(result.cardsPushed, 1);
-      expect(result.failures, 0);
-      verifyInOrder([
-        () => decksRepository.createDeck(any()),
-        () => decksRepository.addCard('rd1', question: 'Q', answer: 'A'),
-      ]);
-    });
-
-    test('skips a card whose deck is not yet synced', () async {
-      const card = QuizCardItem(
-        id: 2,
-        deckId: 5,
-        questionText: 'Q',
-        answerText: 'A',
-        isArchive: false,
-      );
-      when(() => deckRepository.fetchDecks()).thenAnswer((_) async => const [
-            DeckItem(id: 5, title: 'Deck', isArchive: false),
-          ]);
-      when(() => quizCardRepository.fetchDirtyCards())
-          .thenAnswer((_) async => const [card]);
-
-      final result = await service.pushLocalChanges();
-
-      expect(result.cardsPushed, 0);
-      expect(result.failures, 0);
-      verifyNever(() => decksRepository.addCard(any(), question: any(named: 'question'), answer: any(named: 'answer')));
-      verifyNever(() => quizCardRepository.markCardSynced(any(), any()));
-    });
-
+  group('pushLocalChanges - decks', () {
     test('a failing deck does not stop the next deck from being pushed',
         () async {
       const deckA = DeckItem(id: 1, title: 'A', isArchive: false);
@@ -204,7 +174,7 @@ void main() {
     });
 
     test(
-        'tombstone push purges on success and on 404, retries on other errors',
+        'deck tombstone push purges on success and on 404, retries on other errors',
         () async {
       final t1 = SyncTombstoneTableData(
           id: 1, entityType: 'deck', remoteId: 'd1', createdAt: _now());
@@ -232,6 +202,173 @@ void main() {
       verify(() => tombstoneRepository.deleteTombstone(1)).called(1);
       verify(() => tombstoneRepository.deleteTombstone(2)).called(1);
       verifyNever(() => tombstoneRepository.deleteTombstone(3));
+    });
+  });
+
+  group('pushLocalChanges - cards', () {
+    test('new cards are pushed via addCards and marked synced by array order',
+        () async {
+      const deck =
+          DeckItem(id: 1, title: 'Deck', isArchive: false, remoteId: 'rd1');
+      final card1 = _newCard(1, 1, question: 'Q1');
+      final card2 = _newCard(2, 1, question: 'Q2');
+      when(() => deckRepository.fetchDecks())
+          .thenAnswer((_) async => const [deck]);
+      when(() => quizCardRepository.fetchDirtyCards())
+          .thenAnswer((_) async => [card1, card2]);
+      when(() => decksRepository.addCards('rd1', any())).thenAnswer(
+          (_) async => [_remoteCard('rc1', 'rd1'), _remoteCard('rc2', 'rd1')]);
+      when(() => quizCardRepository.markCardSynced(any(), any()))
+          .thenAnswer((_) async {});
+
+      final result = await service.pushLocalChanges();
+
+      expect(result.cardsPushed, 2);
+      expect(result.failures, 0);
+      verify(() => quizCardRepository.markCardSynced(1, 'rc1')).called(1);
+      verify(() => quizCardRepository.markCardSynced(2, 'rc2')).called(1);
+    });
+
+    test('skips a card whose deck is not yet synced', () async {
+      final card = _newCard(2, 5);
+      when(() => deckRepository.fetchDecks()).thenAnswer((_) async => const [
+            DeckItem(id: 5, title: 'Deck', isArchive: false),
+          ]);
+      when(() => quizCardRepository.fetchDirtyCards())
+          .thenAnswer((_) async => [card]);
+
+      final result = await service.pushLocalChanges();
+
+      expect(result.cardsPushed, 0);
+      expect(result.failures, 0);
+      verifyNever(() => decksRepository.addCards(any(), any()));
+      verifyNever(() => quizCardRepository.markCardSynced(any(), any()));
+    });
+
+    test('new cards for the same deck are chunked at 100 per addCards call',
+        () async {
+      const deck =
+          DeckItem(id: 1, title: 'Deck', isArchive: false, remoteId: 'rd1');
+      final cards = List.generate(150, (i) => _newCard(i, 1, question: 'Q$i'));
+      when(() => deckRepository.fetchDecks())
+          .thenAnswer((_) async => const [deck]);
+      when(() => quizCardRepository.fetchDirtyCards())
+          .thenAnswer((_) async => cards);
+      when(() => decksRepository.addCards('rd1', any())).thenAnswer((invocation) async {
+        final body = invocation.positionalArguments[1] as List<RemoteCardDraft>;
+        return body
+            .map((c) => _remoteCard('remote-${c.question}', 'rd1'))
+            .toList();
+      });
+      when(() => quizCardRepository.markCardSynced(any(), any()))
+          .thenAnswer((_) async {});
+
+      final result = await service.pushLocalChanges();
+
+      expect(result.cardsPushed, 150);
+      final captured = verify(() => decksRepository.addCards('rd1', captureAny()))
+          .captured
+          .cast<List<RemoteCardDraft>>();
+      expect(captured, hasLength(2));
+      expect(captured[0], hasLength(100));
+      expect(captured[1], hasLength(50));
+    });
+
+    test(
+        'edited cards are pushed via updateCards; updated cards are marked '
+        'synced, notFound cards count as failures and stay dirty', () async {
+      const deck =
+          DeckItem(id: 1, title: 'Deck', isArchive: false, remoteId: 'rd1');
+      final cardA = _editedCard(1, 1, 'rcA');
+      final cardB = _editedCard(2, 1, 'rcB');
+      when(() => deckRepository.fetchDecks())
+          .thenAnswer((_) async => const [deck]);
+      when(() => quizCardRepository.fetchDirtyCards())
+          .thenAnswer((_) async => [cardA, cardB]);
+      when(() => decksRepository.updateCards('rd1', any())).thenAnswer(
+          (_) async => BatchUpdateCardsResult(
+                updated: [_remoteCard('rcA', 'rd1')],
+                notFound: const ['rcB'],
+              ));
+      when(() => quizCardRepository.markCardSynced(any(), any()))
+          .thenAnswer((_) async {});
+
+      final result = await service.pushLocalChanges();
+
+      expect(result.cardsPushed, 1);
+      expect(result.failures, 1);
+      verify(() => quizCardRepository.markCardSynced(1, 'rcA')).called(1);
+      verifyNever(() => quizCardRepository.markCardSynced(2, any()));
+    });
+  });
+
+  group('pushLocalChanges - card tombstones', () {
+    test(
+        'card tombstones are grouped by parent deck and purged on deleted or notFound',
+        () async {
+      final t1 = _cardTombstone(1, 'rc1', 'rd1');
+      final t2 = _cardTombstone(2, 'rc2', 'rd1');
+      final t3 = _cardTombstone(3, 'rc3', 'rd2');
+      when(() => tombstoneRepository.fetchTombstones('card'))
+          .thenAnswer((_) async => [t1, t2, t3]);
+      when(() => decksRepository.deleteCards('rd1', any())).thenAnswer(
+          (_) async => const BatchDeleteCardsResult(
+                deleted: ['rc1'],
+                notFound: ['rc2'],
+              ));
+      when(() => decksRepository.deleteCards('rd2', any())).thenAnswer(
+          (_) async => const BatchDeleteCardsResult(deleted: [], notFound: []));
+      when(() => tombstoneRepository.deleteTombstone(any()))
+          .thenAnswer((_) async {});
+
+      final result = await service.pushLocalChanges();
+
+      expect(result.cardTombstonesPurged, 2);
+      expect(result.failures, 1);
+      verify(() => tombstoneRepository.deleteTombstone(1)).called(1);
+      verify(() => tombstoneRepository.deleteTombstone(2)).called(1);
+      verifyNever(() => tombstoneRepository.deleteTombstone(3));
+      verify(() => decksRepository.deleteCards('rd1', ['rc1', 'rc2'])).called(1);
+      verify(() => decksRepository.deleteCards('rd2', ['rc3'])).called(1);
+    });
+
+    test('card tombstones with no parent deck id are counted as failures',
+        () async {
+      final orphan = SyncTombstoneTableData(
+          id: 1, entityType: 'card', remoteId: 'rc1', createdAt: _now());
+      when(() => tombstoneRepository.fetchTombstones('card'))
+          .thenAnswer((_) async => [orphan]);
+
+      final result = await service.pushLocalChanges();
+
+      expect(result.failures, 1);
+      expect(result.cardTombstonesPurged, 0);
+      verifyNever(() => decksRepository.deleteCards(any(), any()));
+    });
+
+    test('card tombstones for the same deck are chunked at 100 per delete call',
+        () async {
+      final tombstones =
+          List.generate(150, (i) => _cardTombstone(i, 'rc$i', 'rd1'));
+      when(() => tombstoneRepository.fetchTombstones('card'))
+          .thenAnswer((_) async => tombstones);
+      when(() => decksRepository.deleteCards('rd1', any())).thenAnswer(
+          (invocation) async {
+        final ids = invocation.positionalArguments[1] as List<String>;
+        return BatchDeleteCardsResult(deleted: ids, notFound: const []);
+      });
+      when(() => tombstoneRepository.deleteTombstone(any()))
+          .thenAnswer((_) async {});
+
+      final result = await service.pushLocalChanges();
+
+      expect(result.cardTombstonesPurged, 150);
+      final captured = verify(() => decksRepository.deleteCards('rd1', captureAny()))
+          .captured
+          .cast<List<String>>();
+      expect(captured, hasLength(2));
+      expect(captured[0], hasLength(100));
+      expect(captured[1], hasLength(50));
     });
   });
 
@@ -350,6 +487,71 @@ void main() {
 
       expect(result.decksUpserted, 2);
       expect(result.failures, 1);
+    });
+
+    test('a dirty local deck is not clobbered by a conflicting remote pull',
+        () async {
+      const dirtyDeck = DeckItem(
+          id: 10,
+          title: 'Local edit',
+          isArchive: false,
+          remoteId: 'd1',
+          isDirty: true);
+      when(() => deckRepository.fetchDirtyDecks())
+          .thenAnswer((_) async => const [dirtyDeck]);
+      when(() => decksRepository.listDecks())
+          .thenAnswer((_) async => [_remoteDeck('d1', title: 'Remote title')]);
+      when(() => deckRepository.findLocalIdByRemoteId('d1'))
+          .thenAnswer((_) async => 10);
+      when(() => decksRepository.listCards('d1'))
+          .thenAnswer((_) async => const []);
+      when(() => quizCardRepository.fetchSyncedCardsForDeck(10))
+          .thenAnswer((_) async => const []);
+
+      final result = await service.pullRemoteChanges();
+
+      expect(result.decksUpserted, 0);
+      verifyNever(() => deckRepository.upsertDeckFromRemote(
+            remoteId: any(named: 'remoteId'),
+            title: any(named: 'title'),
+            isArchive: any(named: 'isArchive'),
+            stats: any(named: 'stats'),
+          ));
+      // Cards still get pulled for a dirty-but-known deck.
+      verify(() => decksRepository.listCards('d1')).called(1);
+    });
+
+    test('a dirty local card is not clobbered by a conflicting remote pull',
+        () async {
+      final dirtyCard = _editedCard(1, 10, 'c1');
+      when(() => quizCardRepository.fetchDirtyCards())
+          .thenAnswer((_) async => [dirtyCard]);
+      when(() => decksRepository.listDecks())
+          .thenAnswer((_) async => [_remoteDeck('d1')]);
+      when(() => deckRepository.upsertDeckFromRemote(
+            remoteId: 'd1',
+            title: 'Deck',
+            isArchive: false,
+          )).thenAnswer((_) async => 10);
+      when(() => decksRepository.listCards('d1')).thenAnswer(
+          (_) async => [_remoteCard('c1', 'd1', question: 'Remote Q')]);
+      when(() => quizCardRepository.fetchSyncedCardsForDeck(10))
+          .thenAnswer((_) async => const []);
+
+      final result = await service.pullRemoteChanges();
+
+      expect(result.cardsUpserted, 0);
+      verifyNever(() => quizCardRepository.upsertCardFromRemote(
+            remoteId: any(named: 'remoteId'),
+            deckId: any(named: 'deckId'),
+            question: any(named: 'question'),
+            answer: any(named: 'answer'),
+            isArchive: any(named: 'isArchive'),
+            stats: any(named: 'stats'),
+          ));
+      // The remote still lists the card, so it must not be treated as
+      // remotely-deleted either.
+      verifyNever(() => quizCardRepository.deleteCardByRemoteId(any()));
     });
   });
 }

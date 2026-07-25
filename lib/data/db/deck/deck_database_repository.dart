@@ -130,6 +130,7 @@ class DeckDataBaseRepository {
                   SyncTombstoneTableCompanion.insert(
                     entityType: 'card',
                     remoteId: cardRemoteId,
+                    parentRemoteId: Value(deck.remoteId),
                   ),
                   mode: InsertMode.insertOrIgnore,
                 );
@@ -164,6 +165,18 @@ class DeckDataBaseRepository {
     return (appDatabase.select(appDatabase.deckTable)
           ..where((table) => table.isDirty.equals(true)))
         .get();
+  }
+
+  /// Emits the count of local rows with unpushed changes. Unlike
+  /// [watchAllDecks], this only moves when the *number* of dirty rows
+  /// changes — a remote-wins pull writes `isDirty: false`, so it never
+  /// re-triggers this stream, breaking the sync feedback loop.
+  Stream<int> watchDirtyDeckCount() {
+    final countExp = appDatabase.deckTable.id.count();
+    final query = appDatabase.selectOnly(appDatabase.deckTable)
+      ..addColumns([countExp])
+      ..where(appDatabase.deckTable.isDirty.equals(true));
+    return query.map((row) => row.read(countExp) ?? 0).watchSingle();
   }
 
   /// Local rows already linked to a remote deck.

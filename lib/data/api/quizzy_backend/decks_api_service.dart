@@ -52,15 +52,21 @@ abstract class DecksApiService extends ChopperService {
     @Path('id') required String id,
   });
 
-  @Post(path: '/decks/{id}/cards')
-  Future<Response> addCard({
-    @Path('id') required String id,
-    @Body() required CardDto body,
-  });
-
   @Post(path: '/decks/{id}/cards/batch')
   Future<Response> addCards({
     @Path('id') required String id,
     @Body() required List<CardDto> body,
+  });
+
+  @Patch(path: '/decks/{id}/cards/batch')
+  Future<Response> updateCards({
+    @Path('id') required String id,
+    @Body() required List<UpdateCardBatchItemDto> body,
+  });
+
+  @Delete(path: '/decks/{id}/cards/batch')
+  Future<Response> deleteCards({
+    @Path('id') required String id,
+    @Body() required BatchDeleteCardsDto body,
   });
 }

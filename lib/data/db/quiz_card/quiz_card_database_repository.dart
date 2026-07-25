@@ -77,10 +77,14 @@ class QuizCardDataBaseRepository {
             .getSingleOrNull();
         final cardRemoteId = card?.remoteId;
         if (cardRemoteId != null) {
+          final deck = await (appDatabase.select(appDatabase.deckTable)
+                ..where((table) => table.id.isValue(card!.deckId)))
+              .getSingleOrNull();
           await appDatabase.into(appDatabase.syncTombstoneTable).insert(
                 SyncTombstoneTableCompanion.insert(
                   entityType: 'card',
                   remoteId: cardRemoteId,
+                  parentRemoteId: Value(deck?.remoteId),
                 ),
                 mode: InsertMode.insertOrIgnore,
               );
@@ -194,6 +198,17 @@ class QuizCardDataBaseRepository {
     return (appDatabase.select(appDatabase.quizCardTable)
           ..where((table) => table.isDirty.equals(true)))
         .get();
+  }
+
+  /// Emits the count of local rows with unpushed changes. See
+  /// [DeckDataBaseRepository.watchDirtyDeckCount] for why this (rather than
+  /// [watchAllCards]) is what the sync trigger watches.
+  Stream<int> watchDirtyCardCount() {
+    final countExp = appDatabase.quizCardTable.id.count();
+    final query = appDatabase.selectOnly(appDatabase.quizCardTable)
+      ..addColumns([countExp])
+      ..where(appDatabase.quizCardTable.isDirty.equals(true));
+    return query.map((row) => row.read(countExp) ?? 0).watchSingle();
   }
 
   /// Local rows in [deckId] already linked to a remote card.

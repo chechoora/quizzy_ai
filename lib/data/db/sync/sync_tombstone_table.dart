@@ -18,6 +18,12 @@ class SyncTombstoneTable extends Table {
   /// The backend id to DELETE remotely.
   TextColumn get remoteId => text()();
 
+  /// The owning deck's backend id, for `'card'` tombstones — needed to group
+  /// them per deck for `DELETE /decks/{id}/cards/batch`. Always null for
+  /// `'deck'` tombstones and always non-null for `'card'` tombstones (a card
+  /// can only have a [remoteId] once its parent deck already has one).
+  TextColumn get parentRemoteId => text().nullable()();
+
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
   @override

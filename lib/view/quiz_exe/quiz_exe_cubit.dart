@@ -10,7 +10,7 @@ import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
-import 'package:poc_ai_quiz/domain/sync/deck_card_sync_service.dart';
+import 'package:poc_ai_quiz/domain/sync/sync_scheduler.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
 class QuizExeCubit extends Cubit<QuizExeState> {
@@ -21,7 +21,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     required this.settingsService,
     required this.validatorsManager,
     required this.initialAnswerValidator,
-    required this.deckCardSyncService,
+    required this.syncScheduler,
     this.isQuickPlay = false,
   }) : super(QuizExeLoadingState());
 
@@ -31,7 +31,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   final QuizMatchBuilder quizMatchBuilder;
   final SettingsService settingsService;
   final ValidatorsManager validatorsManager;
-  final DeckCardSyncService deckCardSyncService;
+  final SyncScheduler syncScheduler;
   final bool isQuickPlay;
 
   final _logger = Logger.withTag('QuizExeCubit');
@@ -123,11 +123,11 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   ///
   /// `close()` runs synchronously inside Flutter's element-unmount phase
   /// (`BuildOwner.finalizeTree`), while the widget tree is locked. Kicking off
-  /// the pull here directly would flip `DeckCardSyncService.isSyncing`
+  /// the sync here directly would flip `SyncScheduler.isSyncing`
   /// synchronously and crash any listening `ValueListenableBuilder` with
   /// "setState() called when widget tree was locked". Deferring to a
   /// microtask lets the current frame's unmount phase finish and the lock
-  /// release before the pull (and its `isSyncing` notification) starts.
+  /// release before the sync (and its `isSyncing` notification) starts.
   @override
   Future<void> close() {
     scheduleMicrotask(() => unawaited(_pullFreshStats()));
@@ -135,10 +135,10 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   }
 
   Future<void> _pullFreshStats() async {
-    _logger.d('_pullFreshStats: pulling remote changes on cubit close');
+    _logger.d('_pullFreshStats: syncing on cubit close');
     try {
-      final result = await deckCardSyncService.pullRemoteChanges();
-      _logger.i('_pullFreshStats: complete, $result');
+      await syncScheduler.syncNow();
+      _logger.i('_pullFreshStats: complete');
     } catch (e, stackTrace) {
       _logger.e('_pullFreshStats: failed', ex: e, stacktrace: stackTrace);
     }

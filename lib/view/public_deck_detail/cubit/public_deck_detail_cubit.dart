@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_deck_detail.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/public_decks_repository.dart';
-import 'package:poc_ai_quiz/domain/sync/deck_card_sync_service.dart';
+import 'package:poc_ai_quiz/domain/sync/sync_scheduler.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
@@ -10,13 +10,13 @@ class PublicDeckDetailCubit extends Cubit<PublicDeckDetailState> {
   PublicDeckDetailCubit({
     required this.deckId,
     required this.publicDecksRepository,
-    required this.deckCardSyncService,
+    required this.syncScheduler,
     required this.logger,
   }) : super(PublicDeckDetailLoadingState());
 
   final String deckId;
   final PublicDecksRepository publicDecksRepository;
-  final DeckCardSyncService deckCardSyncService;
+  final SyncScheduler syncScheduler;
   final Logger logger;
 
   Future<void> loadDeck() async {
@@ -43,7 +43,7 @@ class PublicDeckDetailCubit extends Cubit<PublicDeckDetailState> {
     emit(PublicDeckDetailDataState(deckDetail: deckDetail, isCopying: true));
     try {
       await publicDecksRepository.copyPublicDeck(deckId);
-      await deckCardSyncService.pullRemoteChanges();
+      await syncScheduler.syncNow();
       logger.i('copyDeck: success, deckId=$deckId');
       emit(PublicDeckDetailCopySuccessState());
       emit(PublicDeckDetailDataState(deckDetail: deckDetail, isCopying: false));

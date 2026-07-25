@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_deck_summary.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/public_decks_repository.dart';
-import 'package:poc_ai_quiz/domain/sync/deck_card_sync_service.dart';
+import 'package:poc_ai_quiz/domain/sync/sync_scheduler.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
@@ -29,7 +29,7 @@ class PublicDeckDetailWidget extends HookWidget {
       () => PublicDeckDetailCubit(
         deckId: deckSummary.id,
         publicDecksRepository: getIt<PublicDecksRepository>(),
-        deckCardSyncService: getIt<DeckCardSyncService>(),
+        syncScheduler: getIt<SyncScheduler>(),
         logger: Logger.withTag('PublicDeckDetailCubit'),
       ),
     );

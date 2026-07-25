@@ -246,22 +246,69 @@ class UpdateDeckDto {
       };
 }
 
-class UpdateCardDto {
+class UpdateCardBatchItemDto {
+  final String id;
   final String? question;
   final String? answer;
   final bool? isArchived;
 
-  UpdateCardDto({
+  UpdateCardBatchItemDto({
+    required this.id,
     this.question,
     this.answer,
     this.isArchived,
   });
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         if (question != null) 'question': question,
         if (answer != null) 'answer': answer,
         if (isArchived != null) 'isArchived': isArchived,
       };
+}
+
+class BatchUpdateCardsResponseDto {
+  final List<CardResponseDto> updated;
+  final List<String> notFound;
+
+  BatchUpdateCardsResponseDto({
+    required this.updated,
+    required this.notFound,
+  });
+
+  factory BatchUpdateCardsResponseDto.fromJson(Map<String, dynamic> json) =>
+      BatchUpdateCardsResponseDto(
+        updated: (json['updated'] as List)
+            .map((c) => CardResponseDto.fromJson(c as Map<String, dynamic>))
+            .toList(),
+        notFound:
+            (json['notFound'] as List).map((e) => e as String).toList(),
+      );
+}
+
+class BatchDeleteCardsDto {
+  final List<String> ids;
+
+  BatchDeleteCardsDto({required this.ids});
+
+  Map<String, dynamic> toJson() => {'ids': ids};
+}
+
+class BatchDeleteCardsResponseDto {
+  final List<String> deleted;
+  final List<String> notFound;
+
+  BatchDeleteCardsResponseDto({
+    required this.deleted,
+    required this.notFound,
+  });
+
+  factory BatchDeleteCardsResponseDto.fromJson(Map<String, dynamic> json) =>
+      BatchDeleteCardsResponseDto(
+        deleted: (json['deleted'] as List).map((e) => e as String).toList(),
+        notFound:
+            (json['notFound'] as List).map((e) => e as String).toList(),
+      );
 }
 
 class GenerateDeckDto {

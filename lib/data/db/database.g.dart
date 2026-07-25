@@ -2649,6 +2649,12 @@ class $SyncTombstoneTableTable extends SyncTombstoneTable
   late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
       'remote_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _parentRemoteIdMeta =
+      const VerificationMeta('parentRemoteId');
+  @override
+  late final GeneratedColumn<String> parentRemoteId = GeneratedColumn<String>(
+      'parent_remote_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -2658,7 +2664,8 @@ class $SyncTombstoneTableTable extends SyncTombstoneTable
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
   @override
-  List<GeneratedColumn> get $columns => [id, entityType, remoteId, createdAt];
+  List<GeneratedColumn> get $columns =>
+      [id, entityType, remoteId, parentRemoteId, createdAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2687,6 +2694,12 @@ class $SyncTombstoneTableTable extends SyncTombstoneTable
     } else if (isInserting) {
       context.missing(_remoteIdMeta);
     }
+    if (data.containsKey('parent_remote_id')) {
+      context.handle(
+          _parentRemoteIdMeta,
+          parentRemoteId.isAcceptableOrUnknown(
+              data['parent_remote_id']!, _parentRemoteIdMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -2706,6 +2719,8 @@ class $SyncTombstoneTableTable extends SyncTombstoneTable
           .read(DriftSqlType.string, data['${effectivePrefix}entity_type'])!,
       remoteId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}remote_id'])!,
+      parentRemoteId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}parent_remote_id']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
@@ -2726,11 +2741,18 @@ class SyncTombstoneTableData extends DataClass
 
   /// The backend id to DELETE remotely.
   final String remoteId;
+
+  /// The owning deck's backend id, for `'card'` tombstones — needed to group
+  /// them per deck for `DELETE /decks/{id}/cards/batch`. Always null for
+  /// `'deck'` tombstones and always non-null for `'card'` tombstones (a card
+  /// can only have a [remoteId] once its parent deck already has one).
+  final String? parentRemoteId;
   final DateTime createdAt;
   const SyncTombstoneTableData(
       {required this.id,
       required this.entityType,
       required this.remoteId,
+      this.parentRemoteId,
       required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2738,6 +2760,9 @@ class SyncTombstoneTableData extends DataClass
     map['id'] = Variable<int>(id);
     map['entity_type'] = Variable<String>(entityType);
     map['remote_id'] = Variable<String>(remoteId);
+    if (!nullToAbsent || parentRemoteId != null) {
+      map['parent_remote_id'] = Variable<String>(parentRemoteId);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -2747,6 +2772,9 @@ class SyncTombstoneTableData extends DataClass
       id: Value(id),
       entityType: Value(entityType),
       remoteId: Value(remoteId),
+      parentRemoteId: parentRemoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentRemoteId),
       createdAt: Value(createdAt),
     );
   }
@@ -2758,6 +2786,7 @@ class SyncTombstoneTableData extends DataClass
       id: serializer.fromJson<int>(json['id']),
       entityType: serializer.fromJson<String>(json['entityType']),
       remoteId: serializer.fromJson<String>(json['remoteId']),
+      parentRemoteId: serializer.fromJson<String?>(json['parentRemoteId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -2768,6 +2797,7 @@ class SyncTombstoneTableData extends DataClass
       'id': serializer.toJson<int>(id),
       'entityType': serializer.toJson<String>(entityType),
       'remoteId': serializer.toJson<String>(remoteId),
+      'parentRemoteId': serializer.toJson<String?>(parentRemoteId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -2776,11 +2806,14 @@ class SyncTombstoneTableData extends DataClass
           {int? id,
           String? entityType,
           String? remoteId,
+          Value<String?> parentRemoteId = const Value.absent(),
           DateTime? createdAt}) =>
       SyncTombstoneTableData(
         id: id ?? this.id,
         entityType: entityType ?? this.entityType,
         remoteId: remoteId ?? this.remoteId,
+        parentRemoteId:
+            parentRemoteId.present ? parentRemoteId.value : this.parentRemoteId,
         createdAt: createdAt ?? this.createdAt,
       );
   SyncTombstoneTableData copyWithCompanion(SyncTombstoneTableCompanion data) {
@@ -2789,6 +2822,9 @@ class SyncTombstoneTableData extends DataClass
       entityType:
           data.entityType.present ? data.entityType.value : this.entityType,
       remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      parentRemoteId: data.parentRemoteId.present
+          ? data.parentRemoteId.value
+          : this.parentRemoteId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -2799,13 +2835,15 @@ class SyncTombstoneTableData extends DataClass
           ..write('id: $id, ')
           ..write('entityType: $entityType, ')
           ..write('remoteId: $remoteId, ')
+          ..write('parentRemoteId: $parentRemoteId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, entityType, remoteId, createdAt);
+  int get hashCode =>
+      Object.hash(id, entityType, remoteId, parentRemoteId, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2813,6 +2851,7 @@ class SyncTombstoneTableData extends DataClass
           other.id == this.id &&
           other.entityType == this.entityType &&
           other.remoteId == this.remoteId &&
+          other.parentRemoteId == this.parentRemoteId &&
           other.createdAt == this.createdAt);
 }
 
@@ -2821,17 +2860,20 @@ class SyncTombstoneTableCompanion
   final Value<int> id;
   final Value<String> entityType;
   final Value<String> remoteId;
+  final Value<String?> parentRemoteId;
   final Value<DateTime> createdAt;
   const SyncTombstoneTableCompanion({
     this.id = const Value.absent(),
     this.entityType = const Value.absent(),
     this.remoteId = const Value.absent(),
+    this.parentRemoteId = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   SyncTombstoneTableCompanion.insert({
     this.id = const Value.absent(),
     required String entityType,
     required String remoteId,
+    this.parentRemoteId = const Value.absent(),
     this.createdAt = const Value.absent(),
   })  : entityType = Value(entityType),
         remoteId = Value(remoteId);
@@ -2839,12 +2881,14 @@ class SyncTombstoneTableCompanion
     Expression<int>? id,
     Expression<String>? entityType,
     Expression<String>? remoteId,
+    Expression<String>? parentRemoteId,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (entityType != null) 'entity_type': entityType,
       if (remoteId != null) 'remote_id': remoteId,
+      if (parentRemoteId != null) 'parent_remote_id': parentRemoteId,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -2853,11 +2897,13 @@ class SyncTombstoneTableCompanion
       {Value<int>? id,
       Value<String>? entityType,
       Value<String>? remoteId,
+      Value<String?>? parentRemoteId,
       Value<DateTime>? createdAt}) {
     return SyncTombstoneTableCompanion(
       id: id ?? this.id,
       entityType: entityType ?? this.entityType,
       remoteId: remoteId ?? this.remoteId,
+      parentRemoteId: parentRemoteId ?? this.parentRemoteId,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -2874,6 +2920,9 @@ class SyncTombstoneTableCompanion
     if (remoteId.present) {
       map['remote_id'] = Variable<String>(remoteId.value);
     }
+    if (parentRemoteId.present) {
+      map['parent_remote_id'] = Variable<String>(parentRemoteId.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -2886,6 +2935,7 @@ class SyncTombstoneTableCompanion
           ..write('id: $id, ')
           ..write('entityType: $entityType, ')
           ..write('remoteId: $remoteId, ')
+          ..write('parentRemoteId: $parentRemoteId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -4456,6 +4506,7 @@ typedef $$SyncTombstoneTableTableCreateCompanionBuilder
   Value<int> id,
   required String entityType,
   required String remoteId,
+  Value<String?> parentRemoteId,
   Value<DateTime> createdAt,
 });
 typedef $$SyncTombstoneTableTableUpdateCompanionBuilder
@@ -4463,6 +4514,7 @@ typedef $$SyncTombstoneTableTableUpdateCompanionBuilder
   Value<int> id,
   Value<String> entityType,
   Value<String> remoteId,
+  Value<String?> parentRemoteId,
   Value<DateTime> createdAt,
 });
 
@@ -4483,6 +4535,10 @@ class $$SyncTombstoneTableTableFilterComposer
 
   ColumnFilters<String> get remoteId => $composableBuilder(
       column: $table.remoteId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get parentRemoteId => $composableBuilder(
+      column: $table.parentRemoteId,
+      builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -4506,6 +4562,10 @@ class $$SyncTombstoneTableTableOrderingComposer
   ColumnOrderings<String> get remoteId => $composableBuilder(
       column: $table.remoteId, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get parentRemoteId => $composableBuilder(
+      column: $table.parentRemoteId,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 }
@@ -4527,6 +4587,9 @@ class $$SyncTombstoneTableTableAnnotationComposer
 
   GeneratedColumn<String> get remoteId =>
       $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<String> get parentRemoteId => $composableBuilder(
+      column: $table.parentRemoteId, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -4564,24 +4627,28 @@ class $$SyncTombstoneTableTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<String> entityType = const Value.absent(),
             Value<String> remoteId = const Value.absent(),
+            Value<String?> parentRemoteId = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               SyncTombstoneTableCompanion(
             id: id,
             entityType: entityType,
             remoteId: remoteId,
+            parentRemoteId: parentRemoteId,
             createdAt: createdAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String entityType,
             required String remoteId,
+            Value<String?> parentRemoteId = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               SyncTombstoneTableCompanion.insert(
             id: id,
             entityType: entityType,
             remoteId: remoteId,
+            parentRemoteId: parentRemoteId,
             createdAt: createdAt,
           ),
           withReferenceMapper: (p0) => p0

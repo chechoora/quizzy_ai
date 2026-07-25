@@ -8,7 +8,7 @@ import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
-import 'package:poc_ai_quiz/domain/sync/deck_card_sync_service.dart';
+import 'package:poc_ai_quiz/domain/sync/sync_scheduler.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:quizzy_design/quizzy_design.dart';
@@ -36,7 +36,7 @@ class QuizExeWidget extends HookWidget {
         settingsService: getIt<SettingsService>(),
         validatorsManager: getIt<ValidatorsManager>(),
         initialAnswerValidator: InitialAnswerValidator(),
-        deckCardSyncService: getIt<DeckCardSyncService>(),
+        syncScheduler: getIt<SyncScheduler>(),
         isQuickPlay: isQuickPlay,
       ),
     );

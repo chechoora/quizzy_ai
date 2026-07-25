@@ -1,10 +1,13 @@
 import 'package:chopper/chopper.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/decks_api_service.dart';
 import 'package:poc_ai_quiz/data/api/quizzy_backend/quizzy_backend_models.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/model/batch_delete_cards_result.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/model/batch_update_cards_result.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/generated_remote_deck.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/new_remote_deck.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card_draft.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card_update.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_deck.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_deck_with_cards.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/quizzy_backend_exception.dart';
@@ -164,7 +167,8 @@ class DecksRepository {
         logger.e('deleteDeck: failed with status ${response.statusCode}');
         throw QuizzyBackendException(
             'Failed to delete deck: ${response.statusCode}, ${response.error}',
-            statusCode: response.statusCode);
+            statusCode: response.statusCode,
+            retryAfter: _retryAfterFrom(response));
       }
       logger.i('deleteDeck: success, id=$id');
     } catch (e, stackTrace) {
@@ -186,28 +190,6 @@ class DecksRepository {
       return cards;
     } catch (e, stackTrace) {
       logger.e('listCards: failed', ex: e, stacktrace: stackTrace);
-      rethrow;
-    }
-  }
-
-  Future<RemoteCard> addCard(
-    String deckId, {
-    required String question,
-    required String answer,
-  }) async {
-    logger.d('addCard: deckId=$deckId');
-    try {
-      final response = await apiService.addCard(
-        id: deckId,
-        body: CardDto(question: question, answer: answer),
-      );
-      final body = _requireBody(response, 'addCard');
-      final result = _toRemoteCard(
-          CardResponseDto.fromJson(body as Map<String, dynamic>));
-      logger.i('addCard: success, id=${result.id}');
-      return result;
-    } catch (e, stackTrace) {
-      logger.e('addCard: failed', ex: e, stacktrace: stackTrace);
       rethrow;
     }
   }
@@ -235,12 +217,90 @@ class DecksRepository {
     }
   }
 
+  Future<BatchUpdateCardsResult> updateCards(
+    String deckId,
+    List<RemoteCardUpdate> items,
+  ) async {
+    logger.d('updateCards: deckId=$deckId, count=${items.length}');
+    try {
+      final response = await apiService.updateCards(
+        id: deckId,
+        body: items
+            .map((i) => UpdateCardBatchItemDto(
+                  id: i.remoteId,
+                  question: i.question,
+                  answer: i.answer,
+                  isArchived: i.isArchived,
+                ))
+            .toList(),
+      );
+      final body = _requireBody(response, 'updateCards');
+      final parsed =
+          BatchUpdateCardsResponseDto.fromJson(body as Map<String, dynamic>);
+      final result = BatchUpdateCardsResult(
+        updated: parsed.updated.map(_toRemoteCard).toList(),
+        notFound: parsed.notFound,
+      );
+      logger.i('updateCards: success, ${result.updated.length} updated, '
+          '${result.notFound.length} notFound');
+      return result;
+    } catch (e, stackTrace) {
+      logger.e('updateCards: failed', ex: e, stacktrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<BatchDeleteCardsResult> deleteCards(
+    String deckId,
+    List<String> ids,
+  ) async {
+    logger.d('deleteCards: deckId=$deckId, count=${ids.length}');
+    try {
+      final response = await apiService.deleteCards(
+        id: deckId,
+        body: BatchDeleteCardsDto(ids: ids),
+      );
+      final body = _requireBody(response, 'deleteCards');
+      final parsed =
+          BatchDeleteCardsResponseDto.fromJson(body as Map<String, dynamic>);
+      final result = BatchDeleteCardsResult(
+        deleted: parsed.deleted,
+        notFound: parsed.notFound,
+      );
+      logger.i('deleteCards: success, ${result.deleted.length} deleted, '
+          '${result.notFound.length} notFound');
+      return result;
+    } catch (e, stackTrace) {
+      logger.e('deleteCards: failed', ex: e, stacktrace: stackTrace);
+      rethrow;
+    }
+  }
+
   dynamic _requireBody(Response response, String operation) {
     if (!response.isSuccessful || response.body == null) {
       throw QuizzyBackendException(
-          'Failed to $operation: ${response.statusCode}, ${response.error}');
+        'Failed to $operation: ${response.statusCode}, ${response.error}',
+        statusCode: response.statusCode,
+        retryAfter: _retryAfterFrom(response),
+      );
     }
     return response.body;
+  }
+
+  /// Parses the `Retry-After` response header (seconds form only) so
+  /// [SyncScheduler] can size its 429 backoff window. Header lookup is
+  /// case-insensitive since the underlying `http` client doesn't guarantee
+  /// casing is preserved.
+  Duration? _retryAfterFrom(Response response) {
+    String? raw;
+    for (final entry in response.base.headers.entries) {
+      if (entry.key.toLowerCase() == 'retry-after') {
+        raw = entry.value;
+        break;
+      }
+    }
+    final seconds = raw == null ? null : int.tryParse(raw);
+    return seconds == null ? null : Duration(seconds: seconds);
   }
 
   RemoteDeck _toRemoteDeck(DeckResponseDto dto) => RemoteDeck(

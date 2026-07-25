@@ -32,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration {
@@ -140,6 +140,19 @@ class AppDatabase extends _$AppDatabase {
               quizCardTable, quizCardTable.statsBestStreakMonth);
           await m.addColumn(quizCardTable, quizCardTable.statsBestStreakYear);
           await m.addColumn(quizCardTable, quizCardTable.statsLastPlayedAt);
+        }
+        if (from >= 10 && from < 12) {
+          // Migration for grouping card tombstones by parent deck when
+          // pushing DELETE /decks/{id}/cards/batch: links each 'card'
+          // tombstone to its owning deck's remote id. Guarded on `from >=
+          // 10` because a device jumping straight from <10 to >=12 already
+          // gets this column for free: the `from < 10` branch above creates
+          // sync_tombstone_table via `m.createTable`, which builds the table
+          // from the table's *current* Dart definition (already including
+          // parentRemoteId), so adding the column again here would fail with
+          // "duplicate column".
+          await m.addColumn(
+              syncTombstoneTable, syncTombstoneTable.parentRemoteId);
         }
       },
     );

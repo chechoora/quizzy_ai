@@ -91,6 +91,13 @@ class QuizCardRepository {
     return dataBaseMapper.mapToQuizCardItemList(databaseData);
   }
 
+  /// Emits the count of local cards with unpushed changes, for the sync
+  /// trigger. See [DeckRepository.watchDirtyDeckCount] for why this (rather
+  /// than [watchCards]) is what breaks the sync feedback loop.
+  Stream<int> watchDirtyCardCount() {
+    return dataBaseRepository.watchDirtyCardCount();
+  }
+
   /// Marks a local card as pushed: links it to [remoteId] and clears dirty.
   Future<void> markCardSynced(int id, String remoteId) {
     return dataBaseRepository.markCardSynced(id, remoteId);

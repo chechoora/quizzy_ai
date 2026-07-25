@@ -70,6 +70,19 @@ class DeckRepository {
     return deckDatBaseMapper.mapToDeckItemList(databaseData);
   }
 
+  /// Returns the local row id of the deck linked to [remoteId], or null.
+  Future<int?> findLocalIdByRemoteId(String remoteId) {
+    return dataBaseRepository.findDeckIdByRemoteId(remoteId);
+  }
+
+  /// Emits the count of local decks with unpushed changes, for the sync
+  /// trigger — only moves when there's new outbound work, unlike
+  /// [watchDecks] which re-emits on every write including the sync's own
+  /// remote-wins pull writes.
+  Stream<int> watchDirtyDeckCount() {
+    return dataBaseRepository.watchDirtyDeckCount();
+  }
+
   /// Marks a local deck as pushed: links it to [remoteId] and clears dirty.
   Future<void> markDeckSynced(int id, String remoteId) {
     return dataBaseRepository.markDeckSynced(id, remoteId);

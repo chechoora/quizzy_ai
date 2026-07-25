@@ -117,11 +117,11 @@ final class _$DecksApiService extends DecksApiService {
   }
 
   @override
-  Future<Response<dynamic>> addCard({
+  Future<Response<dynamic>> addCards({
     required String id,
-    required CardDto body,
+    required List<CardDto> body,
   }) {
-    final Uri $url = Uri.parse('/api/decks/${id}/cards');
+    final Uri $url = Uri.parse('/api/decks/${id}/cards/batch');
     final $body = body;
     final Request $request = Request(
       'POST',
@@ -133,14 +133,30 @@ final class _$DecksApiService extends DecksApiService {
   }
 
   @override
-  Future<Response<dynamic>> addCards({
+  Future<Response<dynamic>> updateCards({
     required String id,
-    required List<CardDto> body,
+    required List<UpdateCardBatchItemDto> body,
   }) {
     final Uri $url = Uri.parse('/api/decks/${id}/cards/batch');
     final $body = body;
     final Request $request = Request(
-      'POST',
+      'PATCH',
+      $url,
+      client.baseUrl,
+      body: $body,
+    );
+    return client.send<dynamic, dynamic>($request);
+  }
+
+  @override
+  Future<Response<dynamic>> deleteCards({
+    required String id,
+    required BatchDeleteCardsDto body,
+  }) {
+    final Uri $url = Uri.parse('/api/decks/${id}/cards/batch');
+    final $body = body;
+    final Request $request = Request(
+      'DELETE',
       $url,
       client.baseUrl,
       body: $body,

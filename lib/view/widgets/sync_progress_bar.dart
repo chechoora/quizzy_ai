@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:poc_ai_quiz/di/di.dart';
-import 'package:poc_ai_quiz/domain/sync/deck_card_sync_service.dart';
 import 'package:poc_ai_quiz/domain/sync/sync_scheduler.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 
@@ -13,7 +12,7 @@ class SyncProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
-      valueListenable: getIt<DeckCardSyncService>().isSyncing,
+      valueListenable: getIt<SyncScheduler>().isSyncing,
       builder: (context, isSyncing, _) {
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),

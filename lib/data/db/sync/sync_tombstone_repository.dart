@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:poc_ai_quiz/data/db/database.dart';
 
 /// Read/purge access to pending delete tombstones. Tombstones are inserted
@@ -23,5 +24,14 @@ class SyncTombstoneRepository {
     await (appDatabase.delete(appDatabase.syncTombstoneTable)
           ..where((table) => table.id.isValue(id)))
         .go();
+  }
+
+  /// Emits the count of pending tombstones (deck + card combined), for the
+  /// sync trigger — only moves when a delete is recorded/purged.
+  Stream<int> watchTombstoneCount() {
+    final countExp = appDatabase.syncTombstoneTable.id.count();
+    final query = appDatabase.selectOnly(appDatabase.syncTombstoneTable)
+      ..addColumns([countExp]);
+    return query.map((row) => row.read(countExp) ?? 0).watchSingle();
   }
 }

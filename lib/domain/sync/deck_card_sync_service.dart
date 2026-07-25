@@ -1,31 +1,42 @@
-import 'package:flutter/foundation.dart';
+import 'package:poc_ai_quiz/data/db/database.dart';
+import 'package:poc_ai_quiz/data/db/sync/sync_tombstone_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
-import 'package:poc_ai_quiz/domain/quizzy_backend/cards_repository.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/decks_repository.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/new_remote_deck.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card_draft.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_card_update.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/remote_deck.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/quizzy_backend_exception.dart';
-import 'package:poc_ai_quiz/data/db/sync/sync_tombstone_repository.dart';
 import 'package:poc_ai_quiz/domain/sync/model/sync_result.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 
+/// Max items per call to the batch card endpoints
+/// (`POST`/`PATCH`/`DELETE /decks/{id}/cards/batch`), enforced server-side.
+const _maxBatchSize = 100;
+
 /// Orchestrates two-way sync between the local Drift-backed deck/card
 /// repositories and the quizzy-ai-pro backend. Conflict resolution is
-/// remote-wins: [pullRemoteChanges] simply overwrites local fields with
-/// remote values for anything already linked to a remote id. Push and pull
-/// each continue past a single failing deck/card (logged, counted in
-/// [SyncPushResult.failures]/[SyncPullResult.failures]) rather than aborting
-/// the whole cycle, except that a failing [DecksRepository.listDecks] call
-/// aborts the pull entirely since nothing else can proceed safely without it.
+/// remote-wins: [pullRemoteChanges] overwrites local fields with remote
+/// values for anything already linked to a remote id, *except* rows that are
+/// still locally dirty (an unpushed local edit is never clobbered by a
+/// concurrent pull). Push and pull each continue past a single failing
+/// deck/card/batch (logged, counted in [SyncPushResult.failures]/
+/// [SyncPullResult.failures]) rather than aborting the whole cycle, except
+/// that a failing [DecksRepository.listDecks] call aborts the pull entirely
+/// since nothing else can proceed safely without it.
+///
+/// Only [SyncScheduler] should hold a reference to this class — it owns
+/// `isSyncing` and all reentrancy/coalescing behavior; this service exposes
+/// plain, unguarded async methods.
 class DeckCardSyncService {
   DeckCardSyncService({
     required this.deckRepository,
     required this.quizCardRepository,
     required this.decksRepository,
-    required this.cardsRepository,
     required this.tombstoneRepository,
     required this.logger,
   });
@@ -33,52 +44,29 @@ class DeckCardSyncService {
   final DeckRepository deckRepository;
   final QuizCardRepository quizCardRepository;
   final DecksRepository decksRepository;
-  final CardsRepository cardsRepository;
   final SyncTombstoneRepository tombstoneRepository;
   final Logger logger;
 
-  /// Whether any sync work (push, pull, or a full cycle) is in flight, from
-  /// any caller — [SyncScheduler]'s periodic/reactive runs as well as ad hoc
-  /// pulls like [QuizExeCubit]'s post-quiz stats refresh or
-  /// [PublicDeckDetailCubit]'s copy-then-pull. Reentrant: a full sync's
-  /// internal push/pull calls don't drop the flag until the outer call also
-  /// completes.
-  final ValueNotifier<bool> isSyncing = ValueNotifier<bool>(false);
-  int _activeCount = 0;
-
-  Future<T> _tracked<T>(Future<T> Function() work) async {
-    _activeCount++;
-    isSyncing.value = true;
-    try {
-      return await work();
-    } finally {
-      _activeCount--;
-      if (_activeCount == 0) {
-        isSyncing.value = false;
-      }
-    }
+  Future<SyncRunResult> runFullSync() async {
+    logger.d('runFullSync: starting');
+    final push = await pushLocalChanges();
+    final pull = await pullRemoteChanges();
+    logger.i('runFullSync: complete, push=$push, pull=$pull');
+    return SyncRunResult(push: push, pull: pull);
   }
 
-  Future<SyncRunResult> runFullSync() => _tracked(() async {
-        logger.d('runFullSync: starting');
-        final push = await pushLocalChanges();
-        final pull = await pullRemoteChanges();
-        logger.i('runFullSync: complete, push=$push, pull=$pull');
-        return SyncRunResult(push: push, pull: pull);
-      });
+  Future<SyncPushResult> pushLocalChanges() async {
+    logger.d('pushLocalChanges: starting');
+    var result = const SyncPushResult();
 
-  Future<SyncPushResult> pushLocalChanges() => _tracked(() async {
-        logger.d('pushLocalChanges: starting');
-        var result = const SyncPushResult();
+    result = await _pushDeckTombstones(result);
+    result = await _pushCardTombstones(result);
+    result = await _pushDirtyDecks(result);
+    result = await _pushDirtyCards(result);
 
-        result = await _pushDeckTombstones(result);
-        result = await _pushCardTombstones(result);
-        result = await _pushDirtyDecks(result);
-        result = await _pushDirtyCards(result);
-
-        logger.i('pushLocalChanges: complete, $result');
-        return result;
-      });
+    logger.i('pushLocalChanges: complete, $result');
+    return result;
+  }
 
   Future<SyncPushResult> _pushDeckTombstones(SyncPushResult result) async {
     final tombstones = await tombstoneRepository.fetchTombstones('deck');
@@ -107,27 +95,54 @@ class DeckCardSyncService {
     return result.copyWith(deckTombstonesPurged: purged, failures: failures);
   }
 
+  /// Groups pending card tombstones by their parent deck's remote id
+  /// ([SyncTombstoneTableData.parentRemoteId]) and pushes one
+  /// `DELETE /decks/{id}/cards/batch` call per deck (chunked at
+  /// [_maxBatchSize]). A remote id coming back in either `deleted` or
+  /// `notFound` purges its tombstone — `notFound` means the remote is
+  /// already gone, same semantics the old per-item 404 handling had.
   Future<SyncPushResult> _pushCardTombstones(SyncPushResult result) async {
     final tombstones = await tombstoneRepository.fetchTombstones('card');
     logger.d('_pushCardTombstones: ${tombstones.length} pending');
     var purged = result.cardTombstonesPurged;
     var failures = result.failures;
+
+    final byDeck = <String, List<SyncTombstoneTableData>>{};
     for (final tombstone in tombstones) {
-      try {
-        await cardsRepository.deleteCard(tombstone.remoteId);
-        await tombstoneRepository.deleteTombstone(tombstone.id);
-        purged++;
-      } catch (e, s) {
-        if (e is QuizzyBackendException && e.statusCode == 404) {
-          logger.w('_pushCardTombstones: remote already gone, purging '
-              'tombstone id=${tombstone.id}');
-          await tombstoneRepository.deleteTombstone(tombstone.id);
-          purged++;
-        } else {
-          logger.e('_pushCardTombstones: failed to delete remote card '
-              'id=${tombstone.remoteId}, leaving for retry',
+      final parentRemoteId = tombstone.parentRemoteId;
+      if (parentRemoteId == null) {
+        logger.w('_pushCardTombstones: tombstone id=${tombstone.id} has no '
+            'parent deck remoteId, skipping');
+        failures++;
+        continue;
+      }
+      byDeck.putIfAbsent(parentRemoteId, () => []).add(tombstone);
+    }
+
+    for (final entry in byDeck.entries) {
+      final deckRemoteId = entry.key;
+      for (final chunk in _chunk(entry.value, _maxBatchSize)) {
+        final tombstoneByRemoteId = {
+          for (final t in chunk) t.remoteId: t,
+        };
+        try {
+          final response = await decksRepository.deleteCards(
+            deckRemoteId,
+            chunk.map((t) => t.remoteId).toList(),
+          );
+          final resolvedIds = {...response.deleted, ...response.notFound};
+          for (final remoteId in resolvedIds) {
+            final tombstone = tombstoneByRemoteId[remoteId];
+            if (tombstone == null) continue;
+            await tombstoneRepository.deleteTombstone(tombstone.id);
+            purged++;
+          }
+          failures += chunk.length - resolvedIds.length.clamp(0, chunk.length);
+        } catch (e, s) {
+          logger.e('_pushCardTombstones: batch delete failed for deck '
+              'remoteId=$deckRemoteId',
               ex: e, stacktrace: s);
-          failures++;
+          failures += chunk.length;
         }
       }
     }
@@ -164,6 +179,9 @@ class DeckCardSyncService {
     return result.copyWith(decksPushed: pushed, failures: failures);
   }
 
+  /// Splits dirty cards into new (`remoteId == null`) vs edited
+  /// (`remoteId != null`), groups each by parent deck, and pushes them via
+  /// the batch endpoints (chunked at [_maxBatchSize]).
   Future<SyncPushResult> _pushDirtyCards(SyncPushResult result) async {
     final dirtyCards = await quizCardRepository.fetchDirtyCards();
     logger.d('_pushDirtyCards: ${dirtyCards.length} dirty');
@@ -176,6 +194,9 @@ class DeckCardSyncService {
 
     var pushed = result.cardsPushed;
     var failures = result.failures;
+
+    final newByDeck = <int, List<QuizCardItem>>{};
+    final editedByDeck = <int, List<QuizCardItem>>{};
     for (final card in dirtyCards) {
       final parentRemoteId = remoteIdByLocalDeckId[card.deckId];
       if (parentRemoteId == null) {
@@ -183,84 +204,157 @@ class DeckCardSyncService {
             'synced, deferring card id=${card.id}');
         continue;
       }
-      try {
-        final cardRemoteId = card.remoteId;
-        if (cardRemoteId == null) {
-          final created = await decksRepository.addCard(
+      final byDeck = card.remoteId == null ? newByDeck : editedByDeck;
+      byDeck.putIfAbsent(card.deckId, () => []).add(card);
+    }
+
+    for (final entry in newByDeck.entries) {
+      final parentRemoteId = remoteIdByLocalDeckId[entry.key]!;
+      for (final chunk in _chunk(entry.value, _maxBatchSize)) {
+        try {
+          final created = await decksRepository.addCards(
             parentRemoteId,
-            question: card.questionText,
-            answer: card.answerText,
+            chunk
+                .map((c) => RemoteCardDraft(
+                      question: c.questionText,
+                      answer: c.answerText,
+                    ))
+                .toList(),
           );
-          await quizCardRepository.markCardSynced(card.id, created.id);
-        } else {
-          await cardsRepository.updateCard(
-            cardRemoteId,
-            question: card.questionText,
-            answer: card.answerText,
-            isArchived: card.isArchive,
-          );
-          await quizCardRepository.markCardSynced(card.id, cardRemoteId);
+          if (created.length != chunk.length) {
+            logger.w('_pushDirtyCards: addCards returned '
+                '${created.length} results for ${chunk.length} cards');
+          }
+          for (var i = 0; i < chunk.length && i < created.length; i++) {
+            await quizCardRepository.markCardSynced(
+                chunk[i].id, created[i].id);
+            pushed++;
+          }
+          failures += chunk.length - created.length.clamp(0, chunk.length);
+        } catch (e, s) {
+          logger.e('_pushDirtyCards: addCards batch failed for deck '
+              'remoteId=$parentRemoteId',
+              ex: e, stacktrace: s);
+          failures += chunk.length;
         }
-        pushed++;
-      } catch (e, s) {
-        logger.e('_pushDirtyCards: failed to push card id=${card.id}',
-            ex: e, stacktrace: s);
-        failures++;
       }
     }
+
+    for (final entry in editedByDeck.entries) {
+      final parentRemoteId = remoteIdByLocalDeckId[entry.key]!;
+      for (final chunk in _chunk(entry.value, _maxBatchSize)) {
+        try {
+          final response = await decksRepository.updateCards(
+            parentRemoteId,
+            chunk
+                .map((c) => RemoteCardUpdate(
+                      remoteId: c.remoteId!,
+                      question: c.questionText,
+                      answer: c.answerText,
+                      isArchived: c.isArchive,
+                    ))
+                .toList(),
+          );
+          final updatedIds = {for (final rc in response.updated) rc.id};
+          for (final card in chunk) {
+            if (updatedIds.contains(card.remoteId)) {
+              await quizCardRepository.markCardSynced(
+                  card.id, card.remoteId!);
+              pushed++;
+            }
+          }
+          // notFound cards stay dirty (retried next cycle) and count as
+          // failures; anything else unaccounted for is a defensive
+          // safety-net for a response that doesn't add up.
+          failures += response.notFound.length;
+          final accountedFor = updatedIds.length + response.notFound.length;
+          if (accountedFor < chunk.length) {
+            failures += chunk.length - accountedFor;
+          }
+        } catch (e, s) {
+          logger.e('_pushDirtyCards: updateCards batch failed for deck '
+              'remoteId=$parentRemoteId',
+              ex: e, stacktrace: s);
+          failures += chunk.length;
+        }
+      }
+    }
+
     return result.copyWith(cardsPushed: pushed, failures: failures);
   }
 
-  Future<SyncPullResult> pullRemoteChanges() => _tracked(() async {
-        logger.d('pullRemoteChanges: starting');
-        final List<RemoteDeck> remoteDecks;
-        try {
-          remoteDecks = await decksRepository.listDecks();
-        } catch (e, s) {
-          logger.e('pullRemoteChanges: listDecks failed, aborting pull',
-              ex: e, stacktrace: s);
-          return const SyncPullResult(failures: 1);
+  Future<SyncPullResult> pullRemoteChanges() async {
+    logger.d('pullRemoteChanges: starting');
+    final List<RemoteDeck> remoteDecks;
+    try {
+      remoteDecks = await decksRepository.listDecks();
+    } catch (e, s) {
+      logger.e('pullRemoteChanges: listDecks failed, aborting pull',
+          ex: e, stacktrace: s);
+      return const SyncPullResult(failures: 1);
+    }
+
+    var result = const SyncPullResult();
+    final localIdByRemoteDeckId = <String, int>{};
+
+    // A dirty local row has unpushed edits — the pull must not clobber it
+    // with the (now-stale) remote value it's trying to replace.
+    final dirtyDecks = await deckRepository.fetchDirtyDecks();
+    final dirtyDeckRemoteIds = {
+      for (final d in dirtyDecks)
+        if (d.remoteId != null) d.remoteId!,
+    };
+    final dirtyCards = await quizCardRepository.fetchDirtyCards();
+    final dirtyCardRemoteIds = {
+      for (final c in dirtyCards)
+        if (c.remoteId != null) c.remoteId!,
+    };
+
+    for (final remoteDeck in remoteDecks) {
+      try {
+        int? localId;
+        if (dirtyDeckRemoteIds.contains(remoteDeck.id)) {
+          logger.d('pullRemoteChanges: deck remoteId=${remoteDeck.id} is '
+              'dirty locally, skipping overwrite');
+          localId = await deckRepository.findLocalIdByRemoteId(remoteDeck.id);
         }
-
-        var result = const SyncPullResult();
-        final localIdByRemoteDeckId = <String, int>{};
-
-        for (final remoteDeck in remoteDecks) {
-          try {
-            final localId = await deckRepository.upsertDeckFromRemote(
-              remoteId: remoteDeck.id,
-              title: remoteDeck.title,
-              isArchive: remoteDeck.isArchived,
-              stats: remoteDeck.stats,
-            );
-            localIdByRemoteDeckId[remoteDeck.id] = localId;
-            result = result.copyWith(decksUpserted: result.decksUpserted + 1);
-          } catch (e, s) {
-            logger.e('pullRemoteChanges: failed to upsert deck '
-                'id=${remoteDeck.id}',
-                ex: e, stacktrace: s);
-            result = result.copyWith(failures: result.failures + 1);
-          }
-        }
-
-        result = await _reconcileDeletedDecks(
-          remoteDeckIds: localIdByRemoteDeckId.keys.toSet(),
-          result: result,
-        );
-
-        for (final remoteDeck in remoteDecks) {
-          final localDeckId = localIdByRemoteDeckId[remoteDeck.id];
-          if (localDeckId == null) continue;
-          result = await _pullCardsForDeck(
-            remoteDeckId: remoteDeck.id,
-            localDeckId: localDeckId,
-            result: result,
+        if (localId == null) {
+          localId = await deckRepository.upsertDeckFromRemote(
+            remoteId: remoteDeck.id,
+            title: remoteDeck.title,
+            isArchive: remoteDeck.isArchived,
+            stats: remoteDeck.stats,
           );
+          result = result.copyWith(decksUpserted: result.decksUpserted + 1);
         }
+        localIdByRemoteDeckId[remoteDeck.id] = localId;
+      } catch (e, s) {
+        logger.e('pullRemoteChanges: failed to upsert deck '
+            'id=${remoteDeck.id}',
+            ex: e, stacktrace: s);
+        result = result.copyWith(failures: result.failures + 1);
+      }
+    }
 
-        logger.i('pullRemoteChanges: complete, $result');
-        return result;
-      });
+    result = await _reconcileDeletedDecks(
+      remoteDeckIds: localIdByRemoteDeckId.keys.toSet(),
+      result: result,
+    );
+
+    for (final remoteDeck in remoteDecks) {
+      final localDeckId = localIdByRemoteDeckId[remoteDeck.id];
+      if (localDeckId == null) continue;
+      result = await _pullCardsForDeck(
+        remoteDeckId: remoteDeck.id,
+        localDeckId: localDeckId,
+        dirtyCardRemoteIds: dirtyCardRemoteIds,
+        result: result,
+      );
+    }
+
+    logger.i('pullRemoteChanges: complete, $result');
+    return result;
+  }
 
   Future<SyncPullResult> _reconcileDeletedDecks({
     required Set<String> remoteDeckIds,
@@ -283,6 +377,7 @@ class DeckCardSyncService {
   Future<SyncPullResult> _pullCardsForDeck({
     required String remoteDeckId,
     required int localDeckId,
+    required Set<String> dirtyCardRemoteIds,
     required SyncPullResult result,
   }) async {
     final List<RemoteCard> remoteCards;
@@ -300,6 +395,11 @@ class DeckCardSyncService {
     final remoteCardIds = <String>{};
     for (final remoteCard in remoteCards) {
       remoteCardIds.add(remoteCard.id);
+      if (dirtyCardRemoteIds.contains(remoteCard.id)) {
+        logger.d('_pullCardsForDeck: card remoteId=${remoteCard.id} is '
+            'dirty locally, skipping overwrite');
+        continue;
+      }
       try {
         await quizCardRepository.upsertCardFromRemote(
           remoteId: remoteCard.id,
@@ -336,5 +436,11 @@ class DeckCardSyncService {
       cardsDeletedLocally: deleted,
       failures: failures,
     );
+  }
+
+  Iterable<List<T>> _chunk<T>(List<T> items, int size) sync* {
+    for (var i = 0; i < items.length; i += size) {
+      yield items.sublist(i, i + size > items.length ? items.length : i + size);
+    }
   }
 }
