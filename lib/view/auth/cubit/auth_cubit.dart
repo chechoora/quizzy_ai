@@ -40,6 +40,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final user = await action();
       logger.i('signIn: success provider=$provider uid=${user.uid}');
+      await _initUserRecords();
       await _linkPurchases(user.uid);
       emit(AuthSignedInState(user));
       emit(const AuthIdleState());
@@ -51,6 +52,18 @@ class AuthCubit extends Cubit<AuthState> {
           ex: e, stacktrace: stackTrace);
       emit(AuthErrorState(e is AuthException ? e.message : e.toString()));
       emit(const AuthIdleState());
+    }
+  }
+
+  /// Ensures the local user row and its settings row exist before anything
+  /// else in the login flow (e.g. [_applyQuizzyAiEntitlement]) writes into
+  /// user settings. See [SettingsService.initUserRecords].
+  Future<void> _initUserRecords() async {
+    logger.d('initUserRecords: ensuring user and settings rows exist');
+    try {
+      await settingsService.initUserRecords();
+    } catch (e, stackTrace) {
+      logger.e('initUserRecords: failed', ex: e, stacktrace: stackTrace);
     }
   }
 

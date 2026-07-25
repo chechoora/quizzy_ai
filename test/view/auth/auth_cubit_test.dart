@@ -39,6 +39,7 @@ void main() {
     settingsService = MockSettingsService();
     when(() => inAppPurchaseService.logInUser(any()))
         .thenAnswer((_) async {});
+    when(() => settingsService.initUserRecords()).thenAnswer((_) async {});
     when(() => settingsService.updateValidatorType(any()))
         .thenAnswer((_) async {});
     when(() => settingsService.updateDeckGenerationAiType(any()))
@@ -70,6 +71,7 @@ void main() {
       await cubit.signInWithGoogle();
       await states;
       verify(() => authService.signInWithGoogle()).called(1);
+      verify(() => settingsService.initUserRecords()).called(1);
     });
 
     test('signInWithApple emits loading -> error -> idle on failure',

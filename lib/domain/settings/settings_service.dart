@@ -22,6 +22,16 @@ class SettingsService {
     required this.enableByok,
   });
 
+  /// Ensures the local user row and its settings row both exist. Meant to be
+  /// called right after login, before anything else (e.g. applying a resumed
+  /// subscription entitlement) writes into user settings — the `update*`
+  /// repository methods are bare `UPDATE`s with no insert fallback, so a
+  /// write against a not-yet-created row would otherwise silently no-op.
+  Future<void> initUserRecords() async {
+    final user = await userRepository.fetchCurrentUser();
+    await userSettingsRepository.fetchUserSettings(user.id);
+  }
+
   Future<AnswerValidatorType> getCurrentValidatorType() async {
     final user = await userRepository.fetchCurrentUser();
     final userSettings =
