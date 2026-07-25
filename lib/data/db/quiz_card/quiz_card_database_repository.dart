@@ -202,13 +202,14 @@ class QuizCardDataBaseRepository {
 
   /// Emits the count of local rows with unpushed changes. See
   /// [DeckDataBaseRepository.watchDirtyDeckCount] for why this (rather than
-  /// [watchAllCards]) is what the sync trigger watches.
+  /// [watchAllCards]) is what the sync trigger watches, and for why
+  /// `distinct()` is required on top of the count query itself.
   Stream<int> watchDirtyCardCount() {
     final countExp = appDatabase.quizCardTable.id.count();
     final query = appDatabase.selectOnly(appDatabase.quizCardTable)
       ..addColumns([countExp])
       ..where(appDatabase.quizCardTable.isDirty.equals(true));
-    return query.map((row) => row.read(countExp) ?? 0).watchSingle();
+    return query.map((row) => row.read(countExp) ?? 0).watchSingle().distinct();
   }
 
   /// Local rows in [deckId] already linked to a remote card.
@@ -243,7 +244,9 @@ class QuizCardDataBaseRepository {
 
   /// Upserts a local card by [remoteId] (pull-side, remote wins): updates
   /// the matching local row's fields if found, otherwise inserts a new one.
-  /// Returns the local row id.
+  /// Returns the local row id. Skips the write entirely (no-op) when an
+  /// existing, non-dirty row's content already matches incoming values —
+  /// see [DeckDataBaseRepository.upsertDeckByRemoteId] for why.
   Future<int> upsertCardByRemoteId({
     required String remoteId,
     required int deckId,
@@ -252,11 +255,21 @@ class QuizCardDataBaseRepository {
     required bool isArchive,
     ItemStats? stats,
   }) async {
-    final existingId = await findCardIdByRemoteId(remoteId);
+    final existing = await (appDatabase.select(appDatabase.quizCardTable)
+          ..where((table) => table.remoteId.isValue(remoteId))
+          ..limit(1))
+        .getSingleOrNull();
     final statsCompanion = _statsCompanion(stats);
-    if (existingId != null) {
+    if (existing != null) {
+      if (!existing.isDirty &&
+          existing.questionText == question &&
+          existing.answerText == answer &&
+          existing.isArchive == isArchive &&
+          _statsUnchanged(existing, stats)) {
+        return existing.id;
+      }
       await (appDatabase.update(appDatabase.quizCardTable)
-            ..where((table) => table.id.isValue(existingId)))
+            ..where((table) => table.id.isValue(existing.id)))
           .write(
         QuizCardTableCompanion(
           questionText: Value(question),
@@ -275,7 +288,7 @@ class QuizCardDataBaseRepository {
           statsLastPlayedAt: statsCompanion.statsLastPlayedAt,
         ),
       );
-      return existingId;
+      return existing.id;
     }
     return appDatabase.into(appDatabase.quizCardTable).insert(
           QuizCardTableCompanion.insert(
@@ -298,6 +311,21 @@ class QuizCardDataBaseRepository {
             statsLastPlayedAt: statsCompanion.statsLastPlayedAt,
           ),
         );
+  }
+
+  /// Whether [existing]'s ten stats columns already match incoming [stats]
+  /// (a `null` [stats] means every column should already be null).
+  bool _statsUnchanged(QuizCardTableData existing, ItemStats? stats) {
+    return existing.statsAccuracyWeek == stats?.accuracy.week &&
+        existing.statsAccuracyMonth == stats?.accuracy.month &&
+        existing.statsAccuracyYear == stats?.accuracy.year &&
+        existing.statsAttemptsWeek == stats?.attempts.week &&
+        existing.statsAttemptsMonth == stats?.attempts.month &&
+        existing.statsAttemptsYear == stats?.attempts.year &&
+        existing.statsBestStreakWeek == stats?.bestStreak.week &&
+        existing.statsBestStreakMonth == stats?.bestStreak.month &&
+        existing.statsBestStreakYear == stats?.bestStreak.year &&
+        existing.statsLastPlayedAt == stats?.lastPlayedAt;
   }
 
   /// Builds the ten stats columns of a [QuizCardTableCompanion] from

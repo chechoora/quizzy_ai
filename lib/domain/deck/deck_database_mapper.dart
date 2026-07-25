@@ -15,6 +15,7 @@ class DeckDatBaseMapper {
       isArchive: e.isArchive,
       remoteId: e.remoteId,
       isDirty: e.isDirty,
+      remoteUpdatedAt: e.remoteUpdatedAt,
       stats: _mapStats(e),
     );
   }

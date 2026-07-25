@@ -64,6 +64,15 @@ void main() {
     when(() => authService.authStateChanges)
         .thenAnswer((_) => authController.stream);
     when(() => syncService.runFullSync()).thenAnswer((_) async => _okResult);
+
+    // Post-cycle pending-work check defaults to "nothing left to do" so
+    // existing tests don't need to know about it; tests that care about the
+    // follow-up behavior override these.
+    when(() => deckRepository.fetchDirtyDecks()).thenAnswer((_) async => []);
+    when(() => quizCardRepository.fetchDirtyCards())
+        .thenAnswer((_) async => []);
+    when(() => tombstoneRepository.fetchTombstones(any()))
+        .thenAnswer((_) async => []);
   });
 
   tearDown(() async {

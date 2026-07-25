@@ -27,7 +27,12 @@ const _maxBatchSize = 100;
 /// deck/card/batch (logged, counted in [SyncPushResult.failures]/
 /// [SyncPullResult.failures]) rather than aborting the whole cycle, except
 /// that a failing [DecksRepository.listDecks] call aborts the pull entirely
-/// since nothing else can proceed safely without it.
+/// since nothing else can proceed safely without it, and that ANY
+/// [QuizzyBackendException] with `statusCode == 429` aborts the *entire*
+/// cycle immediately (see [_rethrowIfRateLimited]) — rate-limit responses
+/// are never treated as a per-item failure to log-and-continue past, since
+/// continuing would just draw more 429s. The exception propagates all the
+/// way out of [runFullSync] for [SyncScheduler] to catch and back off on.
 ///
 /// Only [SyncScheduler] should hold a reference to this class — it owns
 /// `isSyncing` and all reentrancy/coalescing behavior; this service exposes
@@ -79,6 +84,7 @@ class DeckCardSyncService {
         await tombstoneRepository.deleteTombstone(tombstone.id);
         purged++;
       } catch (e, s) {
+        _rethrowIfRateLimited(e);
         if (e is QuizzyBackendException && e.statusCode == 404) {
           logger.w('_pushDeckTombstones: remote already gone, purging '
               'tombstone id=${tombstone.id}');
@@ -139,6 +145,7 @@ class DeckCardSyncService {
           }
           failures += chunk.length - resolvedIds.length.clamp(0, chunk.length);
         } catch (e, s) {
+          _rethrowIfRateLimited(e);
           logger.e('_pushCardTombstones: batch delete failed for deck '
               'remoteId=$deckRemoteId',
               ex: e, stacktrace: s);
@@ -171,6 +178,7 @@ class DeckCardSyncService {
         }
         pushed++;
       } catch (e, s) {
+        _rethrowIfRateLimited(e);
         logger.e('_pushDirtyDecks: failed to push deck id=${deck.id}',
             ex: e, stacktrace: s);
         failures++;
@@ -232,6 +240,7 @@ class DeckCardSyncService {
           }
           failures += chunk.length - created.length.clamp(0, chunk.length);
         } catch (e, s) {
+          _rethrowIfRateLimited(e);
           logger.e('_pushDirtyCards: addCards batch failed for deck '
               'remoteId=$parentRemoteId',
               ex: e, stacktrace: s);
@@ -272,6 +281,7 @@ class DeckCardSyncService {
             failures += chunk.length - accountedFor;
           }
         } catch (e, s) {
+          _rethrowIfRateLimited(e);
           logger.e('_pushDirtyCards: updateCards batch failed for deck '
               'remoteId=$parentRemoteId',
               ex: e, stacktrace: s);
@@ -289,6 +299,7 @@ class DeckCardSyncService {
     try {
       remoteDecks = await decksRepository.listDecks();
     } catch (e, s) {
+      _rethrowIfRateLimited(e);
       logger.e('pullRemoteChanges: listDecks failed, aborting pull',
           ex: e, stacktrace: s);
       return const SyncPullResult(failures: 1);
@@ -296,6 +307,7 @@ class DeckCardSyncService {
 
     var result = const SyncPullResult();
     final localIdByRemoteDeckId = <String, int>{};
+    final unchangedRemoteDeckIds = <String>{};
 
     // A dirty local row has unpushed edits — the pull must not clobber it
     // with the (now-stale) remote value it's trying to replace.
@@ -310,8 +322,40 @@ class DeckCardSyncService {
         if (c.remoteId != null) c.remoteId!,
     };
 
+    // Fetched once and reused both for the unchanged-deck gate below and for
+    // _reconcileDeletedDecks further down.
+    final syncedLocalDecks = await deckRepository.fetchSyncedDecks();
+    final remoteUpdatedAtByRemoteId = {
+      for (final d in syncedLocalDecks)
+        if (d.remoteId != null) d.remoteId!: d.remoteUpdatedAt,
+    };
+
     for (final remoteDeck in remoteDecks) {
       try {
+        // NOTE (unverified backend assumption): this gate assumes the
+        // backend bumps a deck's `updatedAt` whenever one of its cards is
+        // added/updated/deleted, not just on deck-field edits — the swagger
+        // schema doesn't document this either way. If that assumption is
+        // wrong, a card-only change on an otherwise-untouched deck would be
+        // silently skipped here. TODO(backend): confirm this behavior with
+        // the quizzy-ai-pro-be team; until then this is deck-fields-only in
+        // effect, since deck.updatedAt is the only signal being trusted.
+        final storedUpdatedAt = remoteUpdatedAtByRemoteId[remoteDeck.id];
+        if (storedUpdatedAt != null &&
+            storedUpdatedAt.isAtSameMomentAs(remoteDeck.updatedAt)) {
+          final localId =
+              await deckRepository.findLocalIdByRemoteId(remoteDeck.id);
+          if (localId != null) {
+            logger.d('pullRemoteChanges: deck remoteId=${remoteDeck.id} '
+                'unchanged since last pull, skipping listCards + upsert');
+            localIdByRemoteDeckId[remoteDeck.id] = localId;
+            unchangedRemoteDeckIds.add(remoteDeck.id);
+            continue;
+          }
+          // Stored updatedAt but no local row (shouldn't normally happen) —
+          // fall through to a normal upsert below.
+        }
+
         int? localId;
         if (dirtyDeckRemoteIds.contains(remoteDeck.id)) {
           logger.d('pullRemoteChanges: deck remoteId=${remoteDeck.id} is '
@@ -329,6 +373,7 @@ class DeckCardSyncService {
         }
         localIdByRemoteDeckId[remoteDeck.id] = localId;
       } catch (e, s) {
+        _rethrowIfRateLimited(e);
         logger.e('pullRemoteChanges: failed to upsert deck '
             'id=${remoteDeck.id}',
             ex: e, stacktrace: s);
@@ -338,15 +383,18 @@ class DeckCardSyncService {
 
     result = await _reconcileDeletedDecks(
       remoteDeckIds: localIdByRemoteDeckId.keys.toSet(),
+      syncedLocalDecks: syncedLocalDecks,
       result: result,
     );
 
     for (final remoteDeck in remoteDecks) {
       final localDeckId = localIdByRemoteDeckId[remoteDeck.id];
       if (localDeckId == null) continue;
+      if (unchangedRemoteDeckIds.contains(remoteDeck.id)) continue;
       result = await _pullCardsForDeck(
         remoteDeckId: remoteDeck.id,
         localDeckId: localDeckId,
+        remoteDeckUpdatedAt: remoteDeck.updatedAt,
         dirtyCardRemoteIds: dirtyCardRemoteIds,
         result: result,
       );
@@ -358,9 +406,9 @@ class DeckCardSyncService {
 
   Future<SyncPullResult> _reconcileDeletedDecks({
     required Set<String> remoteDeckIds,
+    required List<DeckItem> syncedLocalDecks,
     required SyncPullResult result,
   }) async {
-    final syncedLocalDecks = await deckRepository.fetchSyncedDecks();
     var deleted = result.decksDeletedLocally;
     for (final DeckItem deck in syncedLocalDecks) {
       final remoteId = deck.remoteId;
@@ -377,6 +425,7 @@ class DeckCardSyncService {
   Future<SyncPullResult> _pullCardsForDeck({
     required String remoteDeckId,
     required int localDeckId,
+    required DateTime remoteDeckUpdatedAt,
     required Set<String> dirtyCardRemoteIds,
     required SyncPullResult result,
   }) async {
@@ -384,11 +433,19 @@ class DeckCardSyncService {
     try {
       remoteCards = await decksRepository.listCards(remoteDeckId);
     } catch (e, s) {
+      _rethrowIfRateLimited(e);
       logger.e('_pullCardsForDeck: listCards failed for deck '
           'remoteId=$remoteDeckId',
           ex: e, stacktrace: s);
       return result.copyWith(failures: result.failures + 1);
     }
+
+    // The card list was fetched successfully, so this deck's cards are now
+    // known to be in sync as of remoteDeckUpdatedAt — record that so the
+    // next pull can skip listCards for this deck entirely if it hasn't
+    // changed remotely. Recorded even if individual card upserts below fail,
+    // since it's the listCards call (not the upserts) that this is gating.
+    await deckRepository.updateRemoteUpdatedAt(localDeckId, remoteDeckUpdatedAt);
 
     var upserted = result.cardsUpserted;
     var failures = result.failures;
@@ -411,6 +468,7 @@ class DeckCardSyncService {
         );
         upserted++;
       } catch (e, s) {
+        _rethrowIfRateLimited(e);
         logger.e('_pullCardsForDeck: failed to upsert card '
             'id=${remoteCard.id}',
             ex: e, stacktrace: s);
@@ -436,6 +494,18 @@ class DeckCardSyncService {
       cardsDeletedLocally: deleted,
       failures: failures,
     );
+  }
+
+  /// Rethrows [e] unchanged if it's a 429 [QuizzyBackendException], so it
+  /// propagates out of the per-item loop (and everything above it) to abort
+  /// the whole sync cycle instead of being logged-and-continued like other
+  /// per-item failures. Call as the first line of every push/pull catch
+  /// block.
+  void _rethrowIfRateLimited(Object e) {
+    if (e is QuizzyBackendException && e.statusCode == 429) {
+      logger.w('rate limited (429), aborting sync cycle');
+      throw e;
+    }
   }
 
   Iterable<List<T>> _chunk<T>(List<T> items, int size) sync* {

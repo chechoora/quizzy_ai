@@ -13,6 +13,10 @@ class DeckItem extends Equatable {
   /// True when this deck has local changes not yet pushed to the backend.
   final bool isDirty;
 
+  /// The remote deck's `updatedAt` as of the last successful card pull for
+  /// it. Null for local-only rows and for synced rows never card-pulled yet.
+  final DateTime? remoteUpdatedAt;
+
   /// quizzy-ai-pro backend play stats, or null on the local-only quizzy
   /// flavor and for decks never synced.
   final ItemStats? stats;
@@ -24,6 +28,7 @@ class DeckItem extends Equatable {
     this.uid,
     this.remoteId,
     this.isDirty = false,
+    this.remoteUpdatedAt,
     this.stats,
   });
 
@@ -35,6 +40,7 @@ class DeckItem extends Equatable {
         isArchive,
         remoteId,
         isDirty,
+        remoteUpdatedAt,
         stats,
       ];
 }

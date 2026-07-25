@@ -170,13 +170,18 @@ class DeckDataBaseRepository {
   /// Emits the count of local rows with unpushed changes. Unlike
   /// [watchAllDecks], this only moves when the *number* of dirty rows
   /// changes — a remote-wins pull writes `isDirty: false`, so it never
-  /// re-triggers this stream, breaking the sync feedback loop.
+  /// re-triggers this stream, breaking the sync feedback loop. `distinct()`
+  /// is required on top of the count query itself: Drift's `.watchSingle()`
+  /// re-runs and re-emits on *every* write to the underlying table (e.g. a
+  /// pull writing new stats onto an already-non-dirty row), even when the
+  /// computed count value comes out identical — `distinct()` is what
+  /// actually suppresses the no-op re-emissions.
   Stream<int> watchDirtyDeckCount() {
     final countExp = appDatabase.deckTable.id.count();
     final query = appDatabase.selectOnly(appDatabase.deckTable)
       ..addColumns([countExp])
       ..where(appDatabase.deckTable.isDirty.equals(true));
-    return query.map((row) => row.read(countExp) ?? 0).watchSingle();
+    return query.map((row) => row.read(countExp) ?? 0).watchSingle().distinct();
   }
 
   /// Local rows already linked to a remote deck.
@@ -195,6 +200,19 @@ class DeckDataBaseRepository {
     return row?.id;
   }
 
+  /// Records the remote deck's `updatedAt` as of a successful card pull, so
+  /// the next pull can skip `listCards` for this deck entirely if it hasn't
+  /// changed remotely.
+  Future<void> updateRemoteUpdatedAt(int id, DateTime remoteUpdatedAt) async {
+    await (appDatabase.update(appDatabase.deckTable)
+          ..where((table) => table.id.isValue(id)))
+        .write(
+      DeckTableCompanion(
+        remoteUpdatedAt: Value(remoteUpdatedAt),
+      ),
+    );
+  }
+
   /// Marks a local deck as pushed: links it to [remoteId] and clears the
   /// dirty flag.
   Future<void> markDeckSynced(int id, String remoteId) async {
@@ -210,18 +228,31 @@ class DeckDataBaseRepository {
 
   /// Upserts a local deck by [remoteId] (pull-side, remote wins): updates
   /// the matching local row's fields if found, otherwise inserts a new one.
-  /// Returns the local row id.
+  /// Returns the local row id. Skips the write entirely (no-op) when an
+  /// existing, non-dirty row's content already matches incoming values —
+  /// this both avoids a pointless write and keeps [watchDirtyDeckCount] (and
+  /// every other table watcher) from re-emitting for a pull that changed
+  /// nothing.
   Future<int> upsertDeckByRemoteId({
     required String remoteId,
     required String title,
     required bool isArchive,
     ItemStats? stats,
   }) async {
-    final existingId = await findDeckIdByRemoteId(remoteId);
+    final existing = await (appDatabase.select(appDatabase.deckTable)
+          ..where((table) => table.remoteId.isValue(remoteId))
+          ..limit(1))
+        .getSingleOrNull();
     final statsCompanion = _statsCompanion(stats);
-    if (existingId != null) {
+    if (existing != null) {
+      if (!existing.isDirty &&
+          existing.title == title &&
+          existing.isArchive == isArchive &&
+          _statsUnchanged(existing, stats)) {
+        return existing.id;
+      }
       await (appDatabase.update(appDatabase.deckTable)
-            ..where((table) => table.id.isValue(existingId)))
+            ..where((table) => table.id.isValue(existing.id)))
           .write(
         DeckTableCompanion(
           title: Value(title),
@@ -239,7 +270,7 @@ class DeckDataBaseRepository {
           statsLastPlayedAt: statsCompanion.statsLastPlayedAt,
         ),
       );
-      return existingId;
+      return existing.id;
     }
     return appDatabase.into(appDatabase.deckTable).insert(
           DeckTableCompanion.insert(
@@ -260,6 +291,21 @@ class DeckDataBaseRepository {
             statsLastPlayedAt: statsCompanion.statsLastPlayedAt,
           ),
         );
+  }
+
+  /// Whether [existing]'s ten stats columns already match incoming [stats]
+  /// (a `null` [stats] means every column should already be null).
+  bool _statsUnchanged(DeckTableData existing, ItemStats? stats) {
+    return existing.statsAccuracyWeek == stats?.accuracy.week &&
+        existing.statsAccuracyMonth == stats?.accuracy.month &&
+        existing.statsAccuracyYear == stats?.accuracy.year &&
+        existing.statsAttemptsWeek == stats?.attempts.week &&
+        existing.statsAttemptsMonth == stats?.attempts.month &&
+        existing.statsAttemptsYear == stats?.attempts.year &&
+        existing.statsBestStreakWeek == stats?.bestStreak.week &&
+        existing.statsBestStreakMonth == stats?.bestStreak.month &&
+        existing.statsBestStreakYear == stats?.bestStreak.year &&
+        existing.statsLastPlayedAt == stats?.lastPlayedAt;
   }
 
   /// Builds the ten stats columns of a [DeckTableCompanion] from [stats],

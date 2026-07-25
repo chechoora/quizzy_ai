@@ -146,6 +146,8 @@ void main() {
     when(() => deckRepository.fetchDecks()).thenAnswer((_) async => const []);
     when(() => deckRepository.fetchSyncedDecks())
         .thenAnswer((_) async => const []);
+    when(() => deckRepository.updateRemoteUpdatedAt(any(), any()))
+        .thenAnswer((_) async {});
   });
 
   group('pushLocalChanges - decks', () {
@@ -552,6 +554,129 @@ void main() {
       // The remote still lists the card, so it must not be treated as
       // remotely-deleted either.
       verifyNever(() => quizCardRepository.deleteCardByRemoteId(any()));
+    });
+
+    test(
+        'a second consecutive pull with no remote changes performs no '
+        'listCards calls at all', () async {
+      final deck = _remoteDeck('d1');
+      when(() => decksRepository.listDecks())
+          .thenAnswer((_) async => [deck]);
+      when(() => deckRepository.upsertDeckFromRemote(
+            remoteId: 'd1',
+            title: 'Deck',
+            isArchive: false,
+          )).thenAnswer((_) async => 10);
+      when(() => decksRepository.listCards('d1'))
+          .thenAnswer((_) async => const []);
+      when(() => quizCardRepository.fetchSyncedCardsForDeck(10))
+          .thenAnswer((_) async => const []);
+
+      // First cycle: deck is new locally, so it's upserted and its cards
+      // fetched once, recording remoteUpdatedAt == deck.updatedAt.
+      final first = await service.pullRemoteChanges();
+      expect(first.decksUpserted, 1);
+      verify(() => decksRepository.listCards('d1')).called(1);
+      verify(() => deckRepository.updateRemoteUpdatedAt(10, deck.updatedAt))
+          .called(1);
+
+      // Second cycle: the remote deck is unchanged (same updatedAt) — the
+      // now-synced local deck (with a matching stored remoteUpdatedAt) must
+      // make listCards entirely skippable.
+      when(() => deckRepository.fetchSyncedDecks()).thenAnswer((_) async => [
+            DeckItem(
+              id: 10,
+              title: 'Deck',
+              isArchive: false,
+              remoteId: 'd1',
+              remoteUpdatedAt: deck.updatedAt,
+            ),
+          ]);
+      when(() => deckRepository.findLocalIdByRemoteId('d1'))
+          .thenAnswer((_) async => 10);
+      clearInteractions(decksRepository);
+      clearInteractions(deckRepository);
+      when(() => decksRepository.listDecks())
+          .thenAnswer((_) async => [deck]);
+      when(() => deckRepository.findLocalIdByRemoteId('d1'))
+          .thenAnswer((_) async => 10);
+      when(() => deckRepository.fetchSyncedDecks()).thenAnswer((_) async => [
+            DeckItem(
+              id: 10,
+              title: 'Deck',
+              isArchive: false,
+              remoteId: 'd1',
+              remoteUpdatedAt: deck.updatedAt,
+            ),
+          ]);
+
+      final second = await service.pullRemoteChanges();
+
+      expect(second.decksUpserted, 0);
+      expect(second.cardsUpserted, 0);
+      // Exactly one HTTP request this cycle: listDecks. listCards is never
+      // called since the deck is unchanged.
+      verify(() => decksRepository.listDecks()).called(1);
+      verifyNever(() => decksRepository.listCards(any()));
+      verifyNever(() => deckRepository.upsertDeckFromRemote(
+            remoteId: any(named: 'remoteId'),
+            title: any(named: 'title'),
+            isArchive: any(named: 'isArchive'),
+            stats: any(named: 'stats'),
+          ));
+      verifyNever(() => quizCardRepository.upsertCardFromRemote(
+            remoteId: any(named: 'remoteId'),
+            deckId: any(named: 'deckId'),
+            question: any(named: 'question'),
+            answer: any(named: 'answer'),
+            isArchive: any(named: 'isArchive'),
+            stats: any(named: 'stats'),
+          ));
+    });
+  });
+
+  group('429 aborts the entire cycle', () {
+    test('a 429 during push aborts before pull ever starts', () async {
+      final tombstone = SyncTombstoneTableData(
+          id: 1, entityType: 'deck', remoteId: 'd1', createdAt: _now());
+      when(() => tombstoneRepository.fetchTombstones('deck'))
+          .thenAnswer((_) async => [tombstone]);
+      when(() => decksRepository.deleteDeck('d1')).thenThrow(
+          QuizzyBackendException('rate limited', statusCode: 429));
+
+      await expectLater(
+        () => service.runFullSync(),
+        throwsA(isA<QuizzyBackendException>()),
+      );
+
+      // pull never starts once push aborts on the 429.
+      verifyNever(() => decksRepository.listDecks());
+    });
+
+    test(
+        'a 429 on one deck\'s listCards aborts before the next deck is '
+        'checked', () async {
+      when(() => decksRepository.listDecks())
+          .thenAnswer((_) async => [_remoteDeck('d1'), _remoteDeck('d2')]);
+      when(() => deckRepository.upsertDeckFromRemote(
+            remoteId: 'd1',
+            title: 'Deck',
+            isArchive: false,
+          )).thenAnswer((_) async => 1);
+      when(() => deckRepository.upsertDeckFromRemote(
+            remoteId: 'd2',
+            title: 'Deck',
+            isArchive: false,
+          )).thenAnswer((_) async => 2);
+      when(() => decksRepository.listCards('d1')).thenThrow(
+          QuizzyBackendException('rate limited', statusCode: 429));
+
+      await expectLater(
+        () => service.pullRemoteChanges(),
+        throwsA(isA<QuizzyBackendException>()),
+      );
+
+      verifyNever(() => decksRepository.listCards('d2'));
     });
   });
 }

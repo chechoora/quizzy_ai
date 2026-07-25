@@ -32,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration {
@@ -153,6 +153,12 @@ class AppDatabase extends _$AppDatabase {
           // "duplicate column".
           await m.addColumn(
               syncTombstoneTable, syncTombstoneTable.parentRemoteId);
+        }
+        if (from < 13) {
+          // Migration for skipping listCards + upserts on pull for a deck
+          // whose remote copy hasn't changed since last seen: tracks the
+          // remote deck's updatedAt as of the last successful card pull.
+          await m.addColumn(deckTable, deckTable.remoteUpdatedAt);
         }
       },
     );

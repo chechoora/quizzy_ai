@@ -57,6 +57,12 @@ class $DeckTableTable extends DeckTable
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_dirty" IN (0, 1))'),
       defaultValue: const Constant(true));
+  static const VerificationMeta _remoteUpdatedAtMeta =
+      const VerificationMeta('remoteUpdatedAt');
+  @override
+  late final GeneratedColumn<DateTime> remoteUpdatedAt =
+      GeneratedColumn<DateTime>('remote_updated_at', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _statsAccuracyWeekMeta =
       const VerificationMeta('statsAccuracyWeek');
   @override
@@ -125,6 +131,7 @@ class $DeckTableTable extends DeckTable
         isArchive,
         remoteId,
         isDirty,
+        remoteUpdatedAt,
         statsAccuracyWeek,
         statsAccuracyMonth,
         statsAccuracyYear,
@@ -172,6 +179,12 @@ class $DeckTableTable extends DeckTable
     if (data.containsKey('is_dirty')) {
       context.handle(_isDirtyMeta,
           isDirty.isAcceptableOrUnknown(data['is_dirty']!, _isDirtyMeta));
+    }
+    if (data.containsKey('remote_updated_at')) {
+      context.handle(
+          _remoteUpdatedAtMeta,
+          remoteUpdatedAt.isAcceptableOrUnknown(
+              data['remote_updated_at']!, _remoteUpdatedAtMeta));
     }
     if (data.containsKey('stats_accuracy_week')) {
       context.handle(
@@ -254,6 +267,8 @@ class $DeckTableTable extends DeckTable
           .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
       isDirty: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_dirty'])!,
+      remoteUpdatedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}remote_updated_at']),
       statsAccuracyWeek: attachedDatabase.typeMapping.read(
           DriftSqlType.double, data['${effectivePrefix}stats_accuracy_week']),
       statsAccuracyMonth: attachedDatabase.typeMapping.read(
@@ -303,6 +318,13 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
   /// backfilled by the v10 migration) is picked up by the next push cycle.
   final bool isDirty;
 
+  /// The `updatedAt` of the remote deck as of the last successful card pull
+  /// for it (not the last deck-field upsert — see [DeckCardSyncService.
+  /// _pullCardsForDeck]). Used to skip `listCards` + upserts entirely for a
+  /// deck whose remote copy hasn't changed since last seen. Null for
+  /// local-only rows and for synced rows never card-pulled yet.
+  final DateTime? remoteUpdatedAt;
+
   /// quizzy-ai-pro backend play stats (quizzyPro flavor only). Null for
   /// local-only rows and for rows never synced. All ten columns are always
   /// written together as one unit by the sync pull path, so [statsAttemptsWeek]
@@ -324,6 +346,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       required this.isArchive,
       this.remoteId,
       required this.isDirty,
+      this.remoteUpdatedAt,
       this.statsAccuracyWeek,
       this.statsAccuracyMonth,
       this.statsAccuracyYear,
@@ -347,6 +370,9 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       map['remote_id'] = Variable<String>(remoteId);
     }
     map['is_dirty'] = Variable<bool>(isDirty);
+    if (!nullToAbsent || remoteUpdatedAt != null) {
+      map['remote_updated_at'] = Variable<DateTime>(remoteUpdatedAt);
+    }
     if (!nullToAbsent || statsAccuracyWeek != null) {
       map['stats_accuracy_week'] = Variable<double>(statsAccuracyWeek);
     }
@@ -390,6 +416,9 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           ? const Value.absent()
           : Value(remoteId),
       isDirty: Value(isDirty),
+      remoteUpdatedAt: remoteUpdatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteUpdatedAt),
       statsAccuracyWeek: statsAccuracyWeek == null && nullToAbsent
           ? const Value.absent()
           : Value(statsAccuracyWeek),
@@ -433,6 +462,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       isArchive: serializer.fromJson<bool>(json['isArchive']),
       remoteId: serializer.fromJson<String?>(json['remoteId']),
       isDirty: serializer.fromJson<bool>(json['isDirty']),
+      remoteUpdatedAt: serializer.fromJson<DateTime?>(json['remoteUpdatedAt']),
       statsAccuracyWeek:
           serializer.fromJson<double?>(json['statsAccuracyWeek']),
       statsAccuracyMonth:
@@ -462,6 +492,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       'isArchive': serializer.toJson<bool>(isArchive),
       'remoteId': serializer.toJson<String?>(remoteId),
       'isDirty': serializer.toJson<bool>(isDirty),
+      'remoteUpdatedAt': serializer.toJson<DateTime?>(remoteUpdatedAt),
       'statsAccuracyWeek': serializer.toJson<double?>(statsAccuracyWeek),
       'statsAccuracyMonth': serializer.toJson<double?>(statsAccuracyMonth),
       'statsAccuracyYear': serializer.toJson<double?>(statsAccuracyYear),
@@ -482,6 +513,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           bool? isArchive,
           Value<String?> remoteId = const Value.absent(),
           bool? isDirty,
+          Value<DateTime?> remoteUpdatedAt = const Value.absent(),
           Value<double?> statsAccuracyWeek = const Value.absent(),
           Value<double?> statsAccuracyMonth = const Value.absent(),
           Value<double?> statsAccuracyYear = const Value.absent(),
@@ -499,6 +531,9 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
         isArchive: isArchive ?? this.isArchive,
         remoteId: remoteId.present ? remoteId.value : this.remoteId,
         isDirty: isDirty ?? this.isDirty,
+        remoteUpdatedAt: remoteUpdatedAt.present
+            ? remoteUpdatedAt.value
+            : this.remoteUpdatedAt,
         statsAccuracyWeek: statsAccuracyWeek.present
             ? statsAccuracyWeek.value
             : this.statsAccuracyWeek,
@@ -538,6 +573,9 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       isArchive: data.isArchive.present ? data.isArchive.value : this.isArchive,
       remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
       isDirty: data.isDirty.present ? data.isDirty.value : this.isDirty,
+      remoteUpdatedAt: data.remoteUpdatedAt.present
+          ? data.remoteUpdatedAt.value
+          : this.remoteUpdatedAt,
       statsAccuracyWeek: data.statsAccuracyWeek.present
           ? data.statsAccuracyWeek.value
           : this.statsAccuracyWeek,
@@ -580,6 +618,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           ..write('isArchive: $isArchive, ')
           ..write('remoteId: $remoteId, ')
           ..write('isDirty: $isDirty, ')
+          ..write('remoteUpdatedAt: $remoteUpdatedAt, ')
           ..write('statsAccuracyWeek: $statsAccuracyWeek, ')
           ..write('statsAccuracyMonth: $statsAccuracyMonth, ')
           ..write('statsAccuracyYear: $statsAccuracyYear, ')
@@ -602,6 +641,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       isArchive,
       remoteId,
       isDirty,
+      remoteUpdatedAt,
       statsAccuracyWeek,
       statsAccuracyMonth,
       statsAccuracyYear,
@@ -622,6 +662,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           other.isArchive == this.isArchive &&
           other.remoteId == this.remoteId &&
           other.isDirty == this.isDirty &&
+          other.remoteUpdatedAt == this.remoteUpdatedAt &&
           other.statsAccuracyWeek == this.statsAccuracyWeek &&
           other.statsAccuracyMonth == this.statsAccuracyMonth &&
           other.statsAccuracyYear == this.statsAccuracyYear &&
@@ -641,6 +682,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
   final Value<bool> isArchive;
   final Value<String?> remoteId;
   final Value<bool> isDirty;
+  final Value<DateTime?> remoteUpdatedAt;
   final Value<double?> statsAccuracyWeek;
   final Value<double?> statsAccuracyMonth;
   final Value<double?> statsAccuracyYear;
@@ -658,6 +700,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     this.isArchive = const Value.absent(),
     this.remoteId = const Value.absent(),
     this.isDirty = const Value.absent(),
+    this.remoteUpdatedAt = const Value.absent(),
     this.statsAccuracyWeek = const Value.absent(),
     this.statsAccuracyMonth = const Value.absent(),
     this.statsAccuracyYear = const Value.absent(),
@@ -676,6 +719,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     required bool isArchive,
     this.remoteId = const Value.absent(),
     this.isDirty = const Value.absent(),
+    this.remoteUpdatedAt = const Value.absent(),
     this.statsAccuracyWeek = const Value.absent(),
     this.statsAccuracyMonth = const Value.absent(),
     this.statsAccuracyYear = const Value.absent(),
@@ -695,6 +739,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     Expression<bool>? isArchive,
     Expression<String>? remoteId,
     Expression<bool>? isDirty,
+    Expression<DateTime>? remoteUpdatedAt,
     Expression<double>? statsAccuracyWeek,
     Expression<double>? statsAccuracyMonth,
     Expression<double>? statsAccuracyYear,
@@ -713,6 +758,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       if (isArchive != null) 'is_archive': isArchive,
       if (remoteId != null) 'remote_id': remoteId,
       if (isDirty != null) 'is_dirty': isDirty,
+      if (remoteUpdatedAt != null) 'remote_updated_at': remoteUpdatedAt,
       if (statsAccuracyWeek != null) 'stats_accuracy_week': statsAccuracyWeek,
       if (statsAccuracyMonth != null)
         'stats_accuracy_month': statsAccuracyMonth,
@@ -738,6 +784,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       Value<bool>? isArchive,
       Value<String?>? remoteId,
       Value<bool>? isDirty,
+      Value<DateTime?>? remoteUpdatedAt,
       Value<double?>? statsAccuracyWeek,
       Value<double?>? statsAccuracyMonth,
       Value<double?>? statsAccuracyYear,
@@ -755,6 +802,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       isArchive: isArchive ?? this.isArchive,
       remoteId: remoteId ?? this.remoteId,
       isDirty: isDirty ?? this.isDirty,
+      remoteUpdatedAt: remoteUpdatedAt ?? this.remoteUpdatedAt,
       statsAccuracyWeek: statsAccuracyWeek ?? this.statsAccuracyWeek,
       statsAccuracyMonth: statsAccuracyMonth ?? this.statsAccuracyMonth,
       statsAccuracyYear: statsAccuracyYear ?? this.statsAccuracyYear,
@@ -788,6 +836,9 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     }
     if (isDirty.present) {
       map['is_dirty'] = Variable<bool>(isDirty.value);
+    }
+    if (remoteUpdatedAt.present) {
+      map['remote_updated_at'] = Variable<DateTime>(remoteUpdatedAt.value);
     }
     if (statsAccuracyWeek.present) {
       map['stats_accuracy_week'] = Variable<double>(statsAccuracyWeek.value);
@@ -832,6 +883,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
           ..write('isArchive: $isArchive, ')
           ..write('remoteId: $remoteId, ')
           ..write('isDirty: $isDirty, ')
+          ..write('remoteUpdatedAt: $remoteUpdatedAt, ')
           ..write('statsAccuracyWeek: $statsAccuracyWeek, ')
           ..write('statsAccuracyMonth: $statsAccuracyMonth, ')
           ..write('statsAccuracyYear: $statsAccuracyYear, ')
@@ -2988,6 +3040,7 @@ typedef $$DeckTableTableCreateCompanionBuilder = DeckTableCompanion Function({
   required bool isArchive,
   Value<String?> remoteId,
   Value<bool> isDirty,
+  Value<DateTime?> remoteUpdatedAt,
   Value<double?> statsAccuracyWeek,
   Value<double?> statsAccuracyMonth,
   Value<double?> statsAccuracyYear,
@@ -3006,6 +3059,7 @@ typedef $$DeckTableTableUpdateCompanionBuilder = DeckTableCompanion Function({
   Value<bool> isArchive,
   Value<String?> remoteId,
   Value<bool> isDirty,
+  Value<DateTime?> remoteUpdatedAt,
   Value<double?> statsAccuracyWeek,
   Value<double?> statsAccuracyMonth,
   Value<double?> statsAccuracyYear,
@@ -3064,6 +3118,10 @@ class $$DeckTableTableFilterComposer
 
   ColumnFilters<bool> get isDirty => $composableBuilder(
       column: $table.isDirty, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get remoteUpdatedAt => $composableBuilder(
+      column: $table.remoteUpdatedAt,
+      builder: (column) => ColumnFilters(column));
 
   ColumnFilters<double> get statsAccuracyWeek => $composableBuilder(
       column: $table.statsAccuracyWeek,
@@ -3154,6 +3212,10 @@ class $$DeckTableTableOrderingComposer
   ColumnOrderings<bool> get isDirty => $composableBuilder(
       column: $table.isDirty, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<DateTime> get remoteUpdatedAt => $composableBuilder(
+      column: $table.remoteUpdatedAt,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<double> get statsAccuracyWeek => $composableBuilder(
       column: $table.statsAccuracyWeek,
       builder: (column) => ColumnOrderings(column));
@@ -3221,6 +3283,9 @@ class $$DeckTableTableAnnotationComposer
 
   GeneratedColumn<bool> get isDirty =>
       $composableBuilder(column: $table.isDirty, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get remoteUpdatedAt => $composableBuilder(
+      column: $table.remoteUpdatedAt, builder: (column) => column);
 
   GeneratedColumn<double> get statsAccuracyWeek => $composableBuilder(
       column: $table.statsAccuracyWeek, builder: (column) => column);
@@ -3303,6 +3368,7 @@ class $$DeckTableTableTableManager extends RootTableManager<
             Value<bool> isArchive = const Value.absent(),
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDirty = const Value.absent(),
+            Value<DateTime?> remoteUpdatedAt = const Value.absent(),
             Value<double?> statsAccuracyWeek = const Value.absent(),
             Value<double?> statsAccuracyMonth = const Value.absent(),
             Value<double?> statsAccuracyYear = const Value.absent(),
@@ -3321,6 +3387,7 @@ class $$DeckTableTableTableManager extends RootTableManager<
             isArchive: isArchive,
             remoteId: remoteId,
             isDirty: isDirty,
+            remoteUpdatedAt: remoteUpdatedAt,
             statsAccuracyWeek: statsAccuracyWeek,
             statsAccuracyMonth: statsAccuracyMonth,
             statsAccuracyYear: statsAccuracyYear,
@@ -3339,6 +3406,7 @@ class $$DeckTableTableTableManager extends RootTableManager<
             required bool isArchive,
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDirty = const Value.absent(),
+            Value<DateTime?> remoteUpdatedAt = const Value.absent(),
             Value<double?> statsAccuracyWeek = const Value.absent(),
             Value<double?> statsAccuracyMonth = const Value.absent(),
             Value<double?> statsAccuracyYear = const Value.absent(),
@@ -3357,6 +3425,7 @@ class $$DeckTableTableTableManager extends RootTableManager<
             isArchive: isArchive,
             remoteId: remoteId,
             isDirty: isDirty,
+            remoteUpdatedAt: remoteUpdatedAt,
             statsAccuracyWeek: statsAccuracyWeek,
             statsAccuracyMonth: statsAccuracyMonth,
             statsAccuracyYear: statsAccuracyYear,

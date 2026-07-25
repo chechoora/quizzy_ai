@@ -28,6 +28,13 @@ class DeckTable extends Table {
   /// backfilled by the v10 migration) is picked up by the next push cycle.
   BoolColumn get isDirty => boolean().withDefault(const Constant(true))();
 
+  /// The `updatedAt` of the remote deck as of the last successful card pull
+  /// for it (not the last deck-field upsert — see [DeckCardSyncService.
+  /// _pullCardsForDeck]). Used to skip `listCards` + upserts entirely for a
+  /// deck whose remote copy hasn't changed since last seen. Null for
+  /// local-only rows and for synced rows never card-pulled yet.
+  DateTimeColumn get remoteUpdatedAt => dateTime().nullable()();
+
   /// quizzy-ai-pro backend play stats (quizzyPro flavor only). Null for
   /// local-only rows and for rows never synced. All ten columns are always
   /// written together as one unit by the sync pull path, so [statsAttemptsWeek]

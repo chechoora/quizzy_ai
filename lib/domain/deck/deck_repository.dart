@@ -88,6 +88,12 @@ class DeckRepository {
     return dataBaseRepository.markDeckSynced(id, remoteId);
   }
 
+  /// Records the remote deck's `updatedAt` as of a successful card pull —
+  /// see [DeckDataBaseRepository.updateRemoteUpdatedAt].
+  Future<void> updateRemoteUpdatedAt(int id, DateTime remoteUpdatedAt) {
+    return dataBaseRepository.updateRemoteUpdatedAt(id, remoteUpdatedAt);
+  }
+
   /// Upserts a local deck by [remoteId] (pull-side, remote wins). Returns
   /// the local row id.
   Future<int> upsertDeckFromRemote({

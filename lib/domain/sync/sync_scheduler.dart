@@ -22,6 +22,9 @@ import 'package:poc_ai_quiz/util/logger.dart';
 /// [syncNow] is single-flight: concurrent callers share the one in-flight
 /// cycle's [Future]. A trigger arriving mid-cycle is coalesced into exactly
 /// one extra cycle immediately after, rather than queuing indefinitely.
+/// Reactive dirty-count triggers are suppressed entirely while a cycle is in
+/// flight; once it finishes, real leftover work (if any) triggers exactly
+/// one follow-up cycle rather than one per trigger signal received.
 class SyncScheduler with WidgetsBindingObserver {
   SyncScheduler({
     required this.deckRepository,
@@ -103,18 +106,15 @@ class SyncScheduler with WidgetsBindingObserver {
     // tables) so the sync's own writes (markSynced, upsertFromRemote — both
     // write isDirty: false) never re-trigger a sync themselves.
     _dirtyDeckSub ??= deckRepository.watchDirtyDeckCount().skip(1).listen((_) {
-      logger.d('dirty deck count changed, scheduling sync');
-      _scheduleDebounced();
+      _onDirtyTrigger('dirty deck count');
     });
     _dirtyCardSub ??=
         quizCardRepository.watchDirtyCardCount().skip(1).listen((_) {
-      logger.d('dirty card count changed, scheduling sync');
-      _scheduleDebounced();
+      _onDirtyTrigger('dirty card count');
     });
     _tombstoneSub ??=
         tombstoneRepository.watchTombstoneCount().skip(1).listen((_) {
-      logger.d('tombstone count changed, scheduling sync');
-      _scheduleDebounced();
+      _onDirtyTrigger('tombstone count');
     });
 
     _periodicTimer = Timer.periodic(pullInterval, (_) => _triggerAutomatic());
@@ -135,6 +135,23 @@ class SyncScheduler with WidgetsBindingObserver {
       logger.d('didChangeAppLifecycleState: resumed, triggering sync');
       _triggerAutomatic();
     }
+  }
+
+  /// Handles a dirty-deck/dirty-card/tombstone count emission. Suppressed
+  /// entirely while a cycle is in flight — that cycle's own upserts
+  /// (isDirty: false) don't move these counts, but *other* concurrent
+  /// writers (e.g. the user editing a card mid-cycle) legitimately can, and
+  /// reacting to every one of those mid-cycle would just re-debounce
+  /// pointlessly. Instead, [_runCycle] checks for real leftover work once
+  /// the cycle finishes and schedules exactly one follow-up if needed.
+  void _onDirtyTrigger(String source) {
+    if (_inFlight != null) {
+      logger.d('$source changed while a cycle is in flight, suppressing '
+          'trigger');
+      return;
+    }
+    logger.d('$source changed, scheduling sync');
+    _scheduleDebounced();
   }
 
   void _scheduleDebounced() {
@@ -199,6 +216,9 @@ class SyncScheduler with WidgetsBindingObserver {
         } catch (e, s) {
           if (e is QuizzyBackendException && e.statusCode == 429) {
             _enterBackoff(e.retryAfter);
+            // Don't let a coalesced rerun immediately retry into the backoff
+            // window it was just told to respect.
+            break;
           } else {
             logger.e('_runCycle: sync failed', ex: e, stacktrace: s);
           }
@@ -209,6 +229,27 @@ class SyncScheduler with WidgetsBindingObserver {
       _isSyncing.value = false;
       completer.complete();
     }
+
+    // Reactive dirty-count triggers were suppressed for the whole cycle
+    // above (see _onDirtyTrigger) — check for real leftover work now that
+    // the in-flight slot is free, and schedule exactly one follow-up if any
+    // remains, instead of relying on however many trigger signals arrived.
+    if (_signedIn && !_inBackoff && await _hasPendingWork()) {
+      logger.d('_runCycle: pending work remains, scheduling follow-up');
+      _scheduleDebounced();
+    }
+  }
+
+  /// Whether there's real unpushed work (dirty decks/cards, or pending
+  /// tombstones) still sitting locally, checked right after a cycle so a
+  /// follow-up is only scheduled when there's something to actually do.
+  Future<bool> _hasPendingWork() async {
+    if ((await deckRepository.fetchDirtyDecks()).isNotEmpty) return true;
+    if ((await quizCardRepository.fetchDirtyCards()).isNotEmpty) return true;
+    if ((await tombstoneRepository.fetchTombstones('deck')).isNotEmpty) {
+      return true;
+    }
+    return (await tombstoneRepository.fetchTombstones('card')).isNotEmpty;
   }
 
   void _enterBackoff(Duration? retryAfter) {

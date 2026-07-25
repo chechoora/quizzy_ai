@@ -27,11 +27,13 @@ class SyncTombstoneRepository {
   }
 
   /// Emits the count of pending tombstones (deck + card combined), for the
-  /// sync trigger — only moves when a delete is recorded/purged.
+  /// sync trigger — only moves when a delete is recorded/purged. See
+  /// [DeckDataBaseRepository.watchDirtyDeckCount] for why `distinct()` is
+  /// required on top of the count query itself.
   Stream<int> watchTombstoneCount() {
     final countExp = appDatabase.syncTombstoneTable.id.count();
     final query = appDatabase.selectOnly(appDatabase.syncTombstoneTable)
       ..addColumns([countExp]);
-    return query.map((row) => row.read(countExp) ?? 0).watchSingle();
+    return query.map((row) => row.read(countExp) ?? 0).watchSingle().distinct();
   }
 }
