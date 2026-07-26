@@ -65,7 +65,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
   }
 
   Future<void> _loadPurchaseOptions() async {
-    _logger.d('Loading purchase options for quizzyAi');
+    _logger.i('Loading purchase options for quizzyAi');
     try {
       final options = await inAppPurchaseService
           .getPurchaseOptions(InAppPurchaseFeature.quizzyAi);
@@ -84,7 +84,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
   void selectOption(String packageIdentifier) {
     final currentState = state;
     if (currentState is! InAppFeaturesQuizzyAiState) return;
-    _logger.d('Selected purchase option: $packageIdentifier');
+    _logger.i('Selected purchase option: $packageIdentifier');
     _selectedPackageIdentifier = packageIdentifier;
     emit(InAppFeaturesQuizzyAiState(
       isSubscribed: currentState.isSubscribed,
@@ -126,7 +126,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
   }
 
   Future<void> _setQuizzyAiAsDefault() async {
-    _logger.d('Setting Quizzy AI as default validator and deck generator');
+    _logger.i('Setting Quizzy AI as default validator and deck generator');
     try {
       await settingsService.updateValidatorType(AnswerValidatorType.quizzyAI);
       await settingsService
@@ -142,7 +142,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
     final currentState = state;
     if (currentState is! InAppFeaturesDataState) return;
 
-    _logger.d('manageSubscription: fetching management URL');
+    _logger.i('manageSubscription: fetching management URL');
     try {
       final url = await inAppPurchaseService.getManagementUrl();
       _logger.i('manageSubscription: resolved url=$url');

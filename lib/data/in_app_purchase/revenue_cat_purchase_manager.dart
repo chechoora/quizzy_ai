@@ -32,23 +32,23 @@ class RevenueCatPurchaseManager {
   RevenueCatPurchaseManager(this._logger, this._flavor);
 
   Future<void> initialize() async {
-    _logger.d('Initializing RevenueCat for flavor: $_flavor');
+    _logger.i('Initializing RevenueCat for flavor: $_flavor');
     await Purchases.setLogLevel(LogLevel.debug);
 
     final isPro = _flavor == Flavor.quizzyPro;
     PurchasesConfiguration configuration;
     if (kDebugMode) {
-      _logger.d('Configuring with debug test key');
+      _logger.i('Configuring with debug test key');
       configuration = PurchasesConfiguration(
         isPro ? RevenueCat.testApiKeyPro : RevenueCat.testApiKey,
       );
     } else if (Platform.isAndroid) {
-      _logger.d('Configuring for Android');
+      _logger.i('Configuring for Android');
       configuration = PurchasesConfiguration(
         isPro ? RevenueCat.androidApiKeyPro : RevenueCat.androidApiKey,
       );
     } else if (Platform.isIOS) {
-      _logger.d('Configuring for iOS');
+      _logger.i('Configuring for iOS');
       configuration = PurchasesConfiguration(
         isPro ? RevenueCat.iOSApiKeyPro : RevenueCat.iOSApiKey,
       );
@@ -61,24 +61,24 @@ class RevenueCatPurchaseManager {
   }
 
   Future<bool> isFeaturePurchased(String entitlementIdentifier) async {
-    _logger.d('Checking if feature purchased: $entitlementIdentifier');
+    _logger.i('Checking if feature purchased: $entitlementIdentifier');
     final customerInfo = await Purchases.getCustomerInfo();
     final isActive =
         customerInfo.entitlements.all[entitlementIdentifier]?.isActive ??
             false;
-    _logger.d('Feature $entitlementIdentifier is active: $isActive');
+    _logger.i('Feature $entitlementIdentifier is active: $isActive');
     return isActive;
   }
 
   Future<List<Package>> getOfferingPackages(String offeringIdentifier) async {
-    _logger.d('Fetching packages for offering: $offeringIdentifier');
+    _logger.i('Fetching packages for offering: $offeringIdentifier');
     final offerings = await Purchases.getOfferings();
     final offering = offerings.all[offeringIdentifier];
     if (offering == null) {
       _logger.e('No current offering available');
       throw Exception('No current offering available');
     }
-    _logger.d(
+    _logger.i(
         'Found ${offering.availablePackages.length} packages for offering $offeringIdentifier');
     return offering.availablePackages;
   }
@@ -88,7 +88,7 @@ class RevenueCatPurchaseManager {
     String entitlementIdentifier, {
     String? packageIdentifier,
   }) async {
-    _logger.d('Purchasing offering: $offeringIdentifier, package: '
+    _logger.i('Purchasing offering: $offeringIdentifier, package: '
         '${packageIdentifier ?? '(default)'}');
     final offerings = await Purchases.getOfferings();
     final offering = offerings.all[offeringIdentifier];
@@ -118,7 +118,7 @@ class RevenueCatPurchaseManager {
   }
 
   Future<void> restorePurchases() async {
-    _logger.d('Restoring purchases');
+    _logger.i('Restoring purchases');
     await Purchases.restorePurchases();
     _logger.i('Purchases restored');
   }
@@ -128,19 +128,19 @@ class RevenueCatPurchaseManager {
   }
 
   Future<void> logIn(String appUserId) async {
-    _logger.d('Logging in RevenueCat user: $appUserId');
+    _logger.i('Logging in RevenueCat user: $appUserId');
     await Purchases.logIn(appUserId);
     _logger.i('RevenueCat user logged in: $appUserId');
   }
 
   Future<void> logOut() async {
-    _logger.d('Logging out RevenueCat user');
+    _logger.i('Logging out RevenueCat user');
     await Purchases.logOut();
     _logger.i('RevenueCat user logged out');
   }
 
   Future<String> getManagementUrl() async {
-    _logger.d('Fetching subscription management URL');
+    _logger.i('Fetching subscription management URL');
     final customerInfo = await Purchases.getCustomerInfo();
     final url = customerInfo.managementURL ??
         (Platform.isIOS ? _iosSubscriptionsUrl : _androidSubscriptionsUrl);

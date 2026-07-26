@@ -31,7 +31,7 @@ class PaywallCubit extends Cubit<PaywallState> {
   String? _selectedPackageIdentifier;
 
   Future<void> _loadOptions() async {
-    _logger.d('Loading purchase options for $feature');
+    _logger.i('Loading purchase options for $feature');
     emit(const PaywallLoadingState());
     try {
       final options = await inAppPurchaseService.getPurchaseOptions(feature);
@@ -50,7 +50,7 @@ class PaywallCubit extends Cubit<PaywallState> {
   }
 
   void selectOption(String packageIdentifier) {
-    _logger.d('Selected purchase option: $packageIdentifier');
+    _logger.i('Selected purchase option: $packageIdentifier');
     _selectedPackageIdentifier = packageIdentifier;
     emit(_idleState());
   }
