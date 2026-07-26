@@ -2,11 +2,18 @@ import 'package:chopper/chopper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:get_it/get_it.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/data/api/api_logging_interceptor.dart';
+import 'package:poc_ai_quiz/data/api/quizzy_backend/analytics_api_service.dart';
 import 'package:poc_ai_quiz/data/auth/firebase_auth_service.dart';
+import 'package:poc_ai_quiz/data/db/analytics/analytics_event_database_repository.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
+import 'package:poc_ai_quiz/domain/analytics/noop_analytics_service.dart';
+import 'package:poc_ai_quiz/domain/analytics/remote_analytics_service.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
+import 'package:poc_ai_quiz/domain/quizzy_backend/analytics_repository.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_answer_validator.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_api_service.dart';
 import 'package:poc_ai_quiz/data/api/claude/claude_header_interceptor.dart';
@@ -132,6 +139,11 @@ Future<void> _setupDataBase() async {
       UserSettingsDataBaseRepository(database);
   getIt.registerSingleton<UserSettingsDataBaseRepository>(
       userSettingsDataBaseRepository);
+
+  final analyticsEventDataBaseRepository =
+      AnalyticsEventDataBaseRepository(database);
+  getIt.registerSingleton<AnalyticsEventDataBaseRepository>(
+      analyticsEventDataBaseRepository);
 }
 
 Future<void> _setupRepositories() async {
@@ -260,6 +272,7 @@ Future<void> _setupAPI() async {
       AiTutorApiService.create(),
       UserApiService.create(),
       PublicDecksApiService.create(),
+      AnalyticsApiService.create(),
     ],
     interceptors: [
       QuizzyBackendAuthInterceptor(
@@ -354,6 +367,30 @@ Future<void> _setupServices() async {
     logger: Logger.withTag('PublicDecksRepository'),
   );
   getIt.registerSingleton<PublicDecksRepository>(publicDecksRepository);
+
+  // Analytics — quizzyPro uploads to the quizzy-ai-pro backend; quizzy has no
+  // backend account to attribute events to, so it gets a no-op.
+  final AnalyticsService analyticsService;
+  if (getIt<AppConfig>().enableAnalytics) {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final analyticsRepository = AnalyticsRepository(
+      apiService: quizzyBackendClient.getService<AnalyticsApiService>(),
+      logger: Logger.withTag('AnalyticsRepository'),
+    );
+    getIt.registerSingleton<AnalyticsRepository>(analyticsRepository);
+    analyticsService = RemoteAnalyticsService(
+      eventDataBaseRepository: getIt.get<AnalyticsEventDataBaseRepository>(),
+      analyticsRepository: analyticsRepository,
+      authService: getIt.get<AuthService>(),
+      appVersion: packageInfo.version,
+      logger: Logger.withTag('RemoteAnalyticsService'),
+    );
+  } else {
+    analyticsService =
+        NoopAnalyticsService(logger: Logger.withTag('NoopAnalyticsService'));
+  }
+  getIt.registerSingleton<AnalyticsService>(analyticsService);
+  analyticsService.start();
 
   // AiTutor-backed answer validator & Decks-backed deck generator
   final aiTutorAnswerValidator = AiTutorAnswerValidator(aiTutorRepository);

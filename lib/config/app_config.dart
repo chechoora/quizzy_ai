@@ -37,6 +37,12 @@ class AppConfig {
   /// local-only and stays off.
   final bool enableRemoteSync;
 
+  /// Whether product-usage analytics are uploaded to the quizzy-ai-pro
+  /// backend. `quizzyPro` is account-backed and needs it; `quizzy` has no
+  /// backend account to attribute events to, so it uses a no-op
+  /// [AnalyticsService] instead.
+  final bool enableAnalytics;
+
   const AppConfig({
     required this.appName,
     required this.flavor,
@@ -45,6 +51,7 @@ class AppConfig {
     required this.enableIcloudBackup,
     required this.isSubscriptionOnly,
     required this.enableRemoteSync,
+    required this.enableAnalytics,
   });
 
   bool getIsDeckGeneratorEditEnabled() {

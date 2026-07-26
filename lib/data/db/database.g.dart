@@ -2994,6 +2994,330 @@ class SyncTombstoneTableCompanion
   }
 }
 
+class $AnalyticsEventTableTable extends AnalyticsEventTable
+    with TableInfo<$AnalyticsEventTableTable, AnalyticsEventTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AnalyticsEventTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _timestampMeta =
+      const VerificationMeta('timestamp');
+  @override
+  late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
+      'timestamp', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _propertiesJsonMeta =
+      const VerificationMeta('propertiesJson');
+  @override
+  late final GeneratedColumn<String> propertiesJson = GeneratedColumn<String>(
+      'properties_json', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, name, timestamp, propertiesJson, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'analytics_event_table';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<AnalyticsEventTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('timestamp')) {
+      context.handle(_timestampMeta,
+          timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
+    } else if (isInserting) {
+      context.missing(_timestampMeta);
+    }
+    if (data.containsKey('properties_json')) {
+      context.handle(
+          _propertiesJsonMeta,
+          propertiesJson.isAcceptableOrUnknown(
+              data['properties_json']!, _propertiesJsonMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AnalyticsEventTableData map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AnalyticsEventTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      timestamp: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}timestamp'])!,
+      propertiesJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}properties_json']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $AnalyticsEventTableTable createAlias(String alias) {
+    return $AnalyticsEventTableTable(attachedDatabase, alias);
+  }
+}
+
+class AnalyticsEventTableData extends DataClass
+    implements Insertable<AnalyticsEventTableData> {
+  final String id;
+  final String name;
+
+  /// Device time (UTC), sent to the backend as-is.
+  final DateTime timestamp;
+
+  /// JSON-encoded event properties, or null.
+  final String? propertiesJson;
+
+  /// Local enqueue time, used only to order the outbox — never sent.
+  final DateTime createdAt;
+  const AnalyticsEventTableData(
+      {required this.id,
+      required this.name,
+      required this.timestamp,
+      this.propertiesJson,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['timestamp'] = Variable<DateTime>(timestamp);
+    if (!nullToAbsent || propertiesJson != null) {
+      map['properties_json'] = Variable<String>(propertiesJson);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  AnalyticsEventTableCompanion toCompanion(bool nullToAbsent) {
+    return AnalyticsEventTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      timestamp: Value(timestamp),
+      propertiesJson: propertiesJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(propertiesJson),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory AnalyticsEventTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AnalyticsEventTableData(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      timestamp: serializer.fromJson<DateTime>(json['timestamp']),
+      propertiesJson: serializer.fromJson<String?>(json['propertiesJson']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'timestamp': serializer.toJson<DateTime>(timestamp),
+      'propertiesJson': serializer.toJson<String?>(propertiesJson),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  AnalyticsEventTableData copyWith(
+          {String? id,
+          String? name,
+          DateTime? timestamp,
+          Value<String?> propertiesJson = const Value.absent(),
+          DateTime? createdAt}) =>
+      AnalyticsEventTableData(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        timestamp: timestamp ?? this.timestamp,
+        propertiesJson:
+            propertiesJson.present ? propertiesJson.value : this.propertiesJson,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  AnalyticsEventTableData copyWithCompanion(AnalyticsEventTableCompanion data) {
+    return AnalyticsEventTableData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+      propertiesJson: data.propertiesJson.present
+          ? data.propertiesJson.value
+          : this.propertiesJson,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AnalyticsEventTableData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('propertiesJson: $propertiesJson, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, timestamp, propertiesJson, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AnalyticsEventTableData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.timestamp == this.timestamp &&
+          other.propertiesJson == this.propertiesJson &&
+          other.createdAt == this.createdAt);
+}
+
+class AnalyticsEventTableCompanion
+    extends UpdateCompanion<AnalyticsEventTableData> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<DateTime> timestamp;
+  final Value<String?> propertiesJson;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const AnalyticsEventTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.timestamp = const Value.absent(),
+    this.propertiesJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AnalyticsEventTableCompanion.insert({
+    required String id,
+    required String name,
+    required DateTime timestamp,
+    this.propertiesJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        name = Value(name),
+        timestamp = Value(timestamp);
+  static Insertable<AnalyticsEventTableData> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<DateTime>? timestamp,
+    Expression<String>? propertiesJson,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (timestamp != null) 'timestamp': timestamp,
+      if (propertiesJson != null) 'properties_json': propertiesJson,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AnalyticsEventTableCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? name,
+      Value<DateTime>? timestamp,
+      Value<String?>? propertiesJson,
+      Value<DateTime>? createdAt,
+      Value<int>? rowid}) {
+    return AnalyticsEventTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      timestamp: timestamp ?? this.timestamp,
+      propertiesJson: propertiesJson ?? this.propertiesJson,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (timestamp.present) {
+      map['timestamp'] = Variable<DateTime>(timestamp.value);
+    }
+    if (propertiesJson.present) {
+      map['properties_json'] = Variable<String>(propertiesJson.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AnalyticsEventTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('propertiesJson: $propertiesJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3004,6 +3328,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $UserSettingsTableTable(this);
   late final $SyncTombstoneTableTable syncTombstoneTable =
       $SyncTombstoneTableTable(this);
+  late final $AnalyticsEventTableTable analyticsEventTable =
+      $AnalyticsEventTableTable(this);
   late final Index deckTableUid = Index('deck_table_uid',
       'CREATE UNIQUE INDEX deck_table_uid ON deck_table (uid)');
   late final Index deckTableRemoteId = Index('deck_table_remote_id',
@@ -3025,6 +3351,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         userTable,
         userSettingsTable,
         syncTombstoneTable,
+        analyticsEventTable,
         deckTableUid,
         deckTableRemoteId,
         quizCardTableUid,
@@ -4743,6 +5070,186 @@ typedef $$SyncTombstoneTableTableProcessedTableManager = ProcessedTableManager<
     ),
     SyncTombstoneTableData,
     PrefetchHooks Function()>;
+typedef $$AnalyticsEventTableTableCreateCompanionBuilder
+    = AnalyticsEventTableCompanion Function({
+  required String id,
+  required String name,
+  required DateTime timestamp,
+  Value<String?> propertiesJson,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+typedef $$AnalyticsEventTableTableUpdateCompanionBuilder
+    = AnalyticsEventTableCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<DateTime> timestamp,
+  Value<String?> propertiesJson,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+
+class $$AnalyticsEventTableTableFilterComposer
+    extends Composer<_$AppDatabase, $AnalyticsEventTableTable> {
+  $$AnalyticsEventTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get propertiesJson => $composableBuilder(
+      column: $table.propertiesJson,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$AnalyticsEventTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $AnalyticsEventTableTable> {
+  $$AnalyticsEventTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get propertiesJson => $composableBuilder(
+      column: $table.propertiesJson,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$AnalyticsEventTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AnalyticsEventTableTable> {
+  $$AnalyticsEventTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => column);
+
+  GeneratedColumn<String> get propertiesJson => $composableBuilder(
+      column: $table.propertiesJson, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$AnalyticsEventTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $AnalyticsEventTableTable,
+    AnalyticsEventTableData,
+    $$AnalyticsEventTableTableFilterComposer,
+    $$AnalyticsEventTableTableOrderingComposer,
+    $$AnalyticsEventTableTableAnnotationComposer,
+    $$AnalyticsEventTableTableCreateCompanionBuilder,
+    $$AnalyticsEventTableTableUpdateCompanionBuilder,
+    (
+      AnalyticsEventTableData,
+      BaseReferences<_$AppDatabase, $AnalyticsEventTableTable,
+          AnalyticsEventTableData>
+    ),
+    AnalyticsEventTableData,
+    PrefetchHooks Function()> {
+  $$AnalyticsEventTableTableTableManager(
+      _$AppDatabase db, $AnalyticsEventTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AnalyticsEventTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AnalyticsEventTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AnalyticsEventTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<DateTime> timestamp = const Value.absent(),
+            Value<String?> propertiesJson = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AnalyticsEventTableCompanion(
+            id: id,
+            name: name,
+            timestamp: timestamp,
+            propertiesJson: propertiesJson,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String name,
+            required DateTime timestamp,
+            Value<String?> propertiesJson = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AnalyticsEventTableCompanion.insert(
+            id: id,
+            name: name,
+            timestamp: timestamp,
+            propertiesJson: propertiesJson,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$AnalyticsEventTableTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $AnalyticsEventTableTable,
+    AnalyticsEventTableData,
+    $$AnalyticsEventTableTableFilterComposer,
+    $$AnalyticsEventTableTableOrderingComposer,
+    $$AnalyticsEventTableTableAnnotationComposer,
+    $$AnalyticsEventTableTableCreateCompanionBuilder,
+    $$AnalyticsEventTableTableUpdateCompanionBuilder,
+    (
+      AnalyticsEventTableData,
+      BaseReferences<_$AppDatabase, $AnalyticsEventTableTable,
+          AnalyticsEventTableData>
+    ),
+    AnalyticsEventTableData,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4757,4 +5264,6 @@ class $AppDatabaseManager {
       $$UserSettingsTableTableTableManager(_db, _db.userSettingsTable);
   $$SyncTombstoneTableTableTableManager get syncTombstoneTable =>
       $$SyncTombstoneTableTableTableManager(_db, _db.syncTombstoneTable);
+  $$AnalyticsEventTableTableTableManager get analyticsEventTable =>
+      $$AnalyticsEventTableTableTableManager(_db, _db.analyticsEventTable);
 }

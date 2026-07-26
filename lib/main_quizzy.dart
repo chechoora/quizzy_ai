@@ -11,5 +11,6 @@ Future<void> main() => mainCommon(
         enableIcloudBackup: true,
         isSubscriptionOnly: false,
         enableRemoteSync: false,
+        enableAnalytics: false,
       ),
     );

@@ -515,6 +515,50 @@ class PublicCardDto {
       );
 }
 
+class AnalyticsEventDto {
+  final String id;
+  final String name;
+
+  /// ISO-8601 UTC, e.g. `2026-07-22T10:15:30.123Z`.
+  final String timestamp;
+  final Map<String, dynamic>? properties;
+
+  AnalyticsEventDto({
+    required this.id,
+    required this.name,
+    required this.timestamp,
+    this.properties,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'timestamp': timestamp,
+        if (properties != null) 'properties': properties,
+      };
+}
+
+class TrackEventsDto {
+  final List<AnalyticsEventDto> events;
+
+  TrackEventsDto({required this.events});
+
+  Map<String, dynamic> toJson() => {
+        'events': events.map((e) => e.toJson()).toList(),
+      };
+}
+
+class TrackEventsResponseDto {
+  final int accepted;
+
+  TrackEventsResponseDto({required this.accepted});
+
+  factory TrackEventsResponseDto.fromJson(Map<String, dynamic> json) =>
+      TrackEventsResponseDto(
+        accepted: json['accepted'] as int,
+      );
+}
+
 class PublicDeckDetailDto {
   final String id;
   final String categoryId;

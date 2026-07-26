@@ -6,6 +6,7 @@ import 'package:drift/native.dart';
 import 'package:meta/meta.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:poc_ai_quiz/data/db/analytics/analytics_event_table.dart';
 import 'package:poc_ai_quiz/data/db/deck_table.dart';
 import 'package:poc_ai_quiz/data/db/sync/sync_tombstone_table.dart';
 import 'package:poc_ai_quiz/data/db/user_table.dart';
@@ -21,6 +22,7 @@ part 'database.g.dart';
   UserTable,
   UserSettingsTable,
   SyncTombstoneTable,
+  AnalyticsEventTable,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -32,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration {
@@ -160,6 +162,12 @@ class AppDatabase extends _$AppDatabase {
           // remote deck's updatedAt as of the last successful card pull.
           await m.addColumn(deckTable, deckTable.remoteUpdatedAt);
         }
+        if (from < 14) {
+          // Migration for the local analytics outbox (quizzyPro flavor
+          // only): queues events for POST /api/analytics/events until
+          // they're accepted or dropped as unretriable.
+          await m.createTable(analyticsEventTable);
+        }
       },
     );
   }
@@ -173,6 +181,7 @@ class AppDatabase extends _$AppDatabase {
       await delete(userTable).go();
       await delete(userSettingsTable).go();
       await delete(syncTombstoneTable).go();
+      await delete(analyticsEventTable).go();
     });
   }
 }
