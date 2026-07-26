@@ -41,7 +41,7 @@ class AuthCubit extends Cubit<AuthState> {
     Future<AuthUser> Function() action, {
     required String provider,
   }) async {
-    logger.d('signIn: provider=$provider');
+    logger.i('signIn: provider=$provider');
     emit(const AuthLoadingState());
     try {
       final user = await action();
@@ -69,7 +69,7 @@ class AuthCubit extends Cubit<AuthState> {
   /// else in the login flow (e.g. [_applyQuizzyAiEntitlement]) writes into
   /// user settings. See [SettingsService.initUserRecords].
   Future<void> _initUserRecords() async {
-    logger.d('initUserRecords: ensuring user and settings rows exist');
+    logger.i('initUserRecords: ensuring user and settings rows exist');
     try {
       await settingsService.initUserRecords();
     } catch (e, stackTrace) {
@@ -78,7 +78,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> _linkPurchases(String firebaseUid) async {
-    logger.d('linkPurchases: uid=$firebaseUid');
+    logger.i('linkPurchases: uid=$firebaseUid');
     try {
       await inAppPurchaseService.logInUser(firebaseUid);
       if (isSubscriptionOnly) {
@@ -95,11 +95,11 @@ class AuthCubit extends Cubit<AuthState> {
   /// prior purchase resumes), set it as the default validator and deck
   /// generator right away instead of leaving the `ml` default in place.
   Future<void> _applyQuizzyAiEntitlement() async {
-    logger.d('applyQuizzyAiEntitlement: checking subscription');
+    logger.i('applyQuizzyAiEntitlement: checking subscription');
     final isSubscribed = await inAppPurchaseService
         .isFeaturePurchased(InAppPurchaseFeature.quizzyAi);
     if (!isSubscribed) {
-      logger.d('applyQuizzyAiEntitlement: not subscribed, skipping');
+      logger.i('applyQuizzyAiEntitlement: not subscribed, skipping');
       return;
     }
     await settingsService.updateValidatorType(AnswerValidatorType.quizzyAI);

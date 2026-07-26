@@ -53,7 +53,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   );
 
   void launchQuiz() {
-    _logger.d('Launching quiz with ${quizCardItems.length} cards');
+    _logger.i('Launching quiz with ${quizCardItems.length} cards');
     unawaited(analyticsService.track(AnalyticsEvents.quizStarted, properties: {
       AnalyticsProperties.cardCount: quizCardItems.length,
       AnalyticsProperties.isQuickPlay: isQuickPlay,
@@ -69,7 +69,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   ) async {
     final lastDisplayState = state as QuizExeDisplayCardState;
     try {
-      _logger.d('Checking answer for card: ${quizCardItem.id}');
+      _logger.i('Checking answer for card: ${quizCardItem.id}');
       emit(lastDisplayState.copyWith(
         isProcessing: true,
       ));
@@ -98,7 +98,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
         result.explanation,
       );
       if (isQuickPlay) {
-        _logger.d('Quick play mode, show result briefly');
+        _logger.i('Quick play mode, show result briefly');
         emit(QuizCardResultState(answerResult: result));
         return;
       }
@@ -114,7 +114,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
 
   void nextCard() {
     if (quizEngine.hasNext) {
-      _logger.d('Moving to next card');
+      _logger.i('Moving to next card');
       quizEngine.nextCard();
     } else {
       final results = quizMatchBuilder.getResults();
@@ -155,7 +155,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   }
 
   Future<void> _pullFreshStats() async {
-    _logger.d('_pullFreshStats: syncing on cubit close');
+    _logger.i('_pullFreshStats: syncing on cubit close');
     try {
       await syncScheduler.syncNow();
       _logger.i('_pullFreshStats: complete');

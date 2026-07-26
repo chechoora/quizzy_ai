@@ -36,7 +36,7 @@ class QuotaCubit extends Cubit<QuotaState> {
     _subscription?.cancel();
     _subscription = _repository.fetchQuota().listen(
       (quota) {
-        _logger.d(
+        _logger.i(
             'Quota loaded: ${quota.weeklyPercentUsage}%, ${quota.questionsLeft} left');
         emit(QuotaDataState(quota));
       },

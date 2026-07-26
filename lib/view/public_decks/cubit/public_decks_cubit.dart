@@ -26,7 +26,7 @@ class PublicDecksCubit extends Cubit<PublicDecksState> {
   final List<PublicDeckSummary> _decks = [];
 
   Future<void> loadInitial() async {
-    logger.d('loadInitial: starting');
+    logger.i('loadInitial: starting');
     emit(PublicDecksLoadingState());
     try {
       _categories = await publicDecksRepository.listCategories();
@@ -42,14 +42,13 @@ class PublicDecksCubit extends Cubit<PublicDecksState> {
   }
 
   Future<void> selectCategory(PublicCategory? category) async {
-    logger.d('selectCategory: category=${category?.slug}');
+    logger.i('selectCategory: category=${category?.slug}');
     _selectedCategory = category;
     await _fetchDecks();
   }
 
   void onSearchChanged(String query) {
     final normalized = query.trim().isEmpty ? null : query.trim();
-    logger.d('onSearchChanged: query=$normalized');
     _searchDebounceTimer?.cancel();
     _searchDebounceTimer = Timer(_searchDebounce, () {
       _searchQuery = normalized;

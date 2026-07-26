@@ -20,7 +20,7 @@ class PublicDeckDetailCubit extends Cubit<PublicDeckDetailState> {
   final Logger logger;
 
   Future<void> loadDeck() async {
-    logger.d('loadDeck: deckId=$deckId');
+    logger.i('loadDeck: deckId=$deckId');
     emit(PublicDeckDetailLoadingState());
     try {
       final deckDetail = await publicDecksRepository.getPublicDeck(deckId);
@@ -35,11 +35,11 @@ class PublicDeckDetailCubit extends Cubit<PublicDeckDetailState> {
   Future<void> copyDeck() async {
     final currentState = state;
     if (currentState is! PublicDeckDetailDataState || currentState.isCopying) {
-      logger.d('copyDeck: skipped, currentState=$currentState');
+      logger.i('copyDeck: skipped, currentState=$currentState');
       return;
     }
     final deckDetail = currentState.deckDetail;
-    logger.d('copyDeck: deckId=$deckId');
+    logger.i('copyDeck: deckId=$deckId');
     emit(PublicDeckDetailDataState(deckDetail: deckDetail, isCopying: true));
     try {
       await publicDecksRepository.copyPublicDeck(deckId);

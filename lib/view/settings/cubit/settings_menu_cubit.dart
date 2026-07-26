@@ -27,7 +27,7 @@ class SettingsMenuCubit extends Cubit<SettingsMenuState> {
       );
 
   Future<void> signOut() async {
-    logger.d('signOut: starting');
+    logger.i('signOut: starting');
     emit(const SettingsMenuLoadingState());
     try {
       await authService.signOut();
@@ -45,7 +45,7 @@ class SettingsMenuCubit extends Cubit<SettingsMenuState> {
   }
 
   Future<void> deleteAccount() async {
-    logger.d('deleteAccount: starting');
+    logger.i('deleteAccount: starting');
     emit(const SettingsMenuLoadingState());
     try {
       await authService.deleteAccount();
