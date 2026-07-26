@@ -31,7 +31,7 @@ class AnalyticsRepository {
       final accepted =
           TrackEventsResponseDto.fromJson(body as Map<String, dynamic>)
               .accepted;
-      logger.i('trackEvents: accepted=$accepted of ${events.length}');
+      logger.d('trackEvents: accepted=$accepted of ${events.length}');
       return accepted;
     } catch (e, stackTrace) {
       logger.e('trackEvents: failed', ex: e, stacktrace: stackTrace);

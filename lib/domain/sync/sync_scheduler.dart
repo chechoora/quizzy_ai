@@ -188,7 +188,7 @@ class SyncScheduler with WidgetsBindingObserver {
       return inFlight;
     }
     if (!_signedIn) {
-      logger.w('syncNow: not signed in, skipping');
+      logger.d('syncNow: not signed in, skipping');
       return Future.value();
     }
     // The in-flight future is recorded via a Completer *before* [_runCycle]

@@ -145,7 +145,7 @@ class RemoteAnalyticsService with WidgetsBindingObserver implements AnalyticsSer
 
         try {
           final accepted = await analyticsRepository.trackEvents(dtos);
-          logger.d('_flush: sent ${dtos.length}, accepted=$accepted');
+          logger.i('_flush: sent ${dtos.length}, accepted=$accepted');
           await eventDataBaseRepository.deleteByIds(ids);
         } catch (e, stackTrace) {
           if (e is QuizzyBackendException && e.statusCode == 400) {

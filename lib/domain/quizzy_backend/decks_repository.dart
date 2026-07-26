@@ -86,7 +86,7 @@ class DecksRepository {
       final body = _requireBody(response, 'createDeck');
       final result = _toRemoteDeckWithCards(
           DeckWithCardsResponseDto.fromJson(body as Map<String, dynamic>));
-      logger.i('createDeck: success, id=${result.id}');
+      logger.d('createDeck: success, id=${result.id}');
       return result;
     } catch (e, stackTrace) {
       logger.e('createDeck: failed', ex: e, stacktrace: stackTrace);
@@ -151,7 +151,7 @@ class DecksRepository {
       final body = _requireBody(response, 'updateDeck');
       final result = _toRemoteDeck(
           DeckResponseDto.fromJson(body as Map<String, dynamic>));
-      logger.i('updateDeck: success, id=$id');
+      logger.d('updateDeck: success, id=$id');
       return result;
     } catch (e, stackTrace) {
       logger.e('updateDeck: failed', ex: e, stacktrace: stackTrace);
@@ -164,13 +164,12 @@ class DecksRepository {
     try {
       final response = await apiService.deleteDeck(id: id);
       if (!response.isSuccessful) {
-        logger.e('deleteDeck: failed with status ${response.statusCode}');
         throw QuizzyBackendException(
             'Failed to delete deck: ${response.statusCode}, ${response.error}',
             statusCode: response.statusCode,
             retryAfter: _retryAfterFrom(response));
       }
-      logger.i('deleteDeck: success, id=$id');
+      logger.d('deleteDeck: success, id=$id');
     } catch (e, stackTrace) {
       logger.e('deleteDeck: failed', ex: e, stacktrace: stackTrace);
       rethrow;
@@ -186,7 +185,7 @@ class DecksRepository {
           .map((c) => _toRemoteCard(
               CardResponseDto.fromJson(c as Map<String, dynamic>)))
           .toList();
-      logger.i('listCards: success, ${cards.length} cards');
+      logger.d('listCards: success, ${cards.length} cards');
       return cards;
     } catch (e, stackTrace) {
       logger.e('listCards: failed', ex: e, stacktrace: stackTrace);
@@ -209,7 +208,7 @@ class DecksRepository {
           .map((c) => _toRemoteCard(
               CardResponseDto.fromJson(c as Map<String, dynamic>)))
           .toList();
-      logger.i('addCards: success, ${results.length} cards added');
+      logger.d('addCards: success, ${results.length} cards added');
       return results;
     } catch (e, stackTrace) {
       logger.e('addCards: failed', ex: e, stacktrace: stackTrace);
@@ -241,7 +240,7 @@ class DecksRepository {
         updated: parsed.updated.map(_toRemoteCard).toList(),
         notFound: parsed.notFound,
       );
-      logger.i('updateCards: success, ${result.updated.length} updated, '
+      logger.d('updateCards: success, ${result.updated.length} updated, '
           '${result.notFound.length} notFound');
       return result;
     } catch (e, stackTrace) {
@@ -267,7 +266,7 @@ class DecksRepository {
         deleted: parsed.deleted,
         notFound: parsed.notFound,
       );
-      logger.i('deleteCards: success, ${result.deleted.length} deleted, '
+      logger.d('deleteCards: success, ${result.deleted.length} deleted, '
           '${result.notFound.length} notFound');
       return result;
     } catch (e, stackTrace) {

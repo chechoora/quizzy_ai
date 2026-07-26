@@ -53,7 +53,7 @@ class DeckCardSyncService {
   final Logger logger;
 
   Future<SyncRunResult> runFullSync() async {
-    logger.d('runFullSync: starting');
+    logger.i('runFullSync: starting');
     final push = await pushLocalChanges();
     final pull = await pullRemoteChanges();
     logger.i('runFullSync: complete, push=$push, pull=$pull');

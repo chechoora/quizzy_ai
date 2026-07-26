@@ -23,7 +23,7 @@ class OnDeviceAIAnswerValidator extends IAnswerValidator {
         userAnswer: userAnswer,
         correctAnswer: correctAnswer,
       );
-      _logger.i('On-device AI validation score: ${result.howCorrect}');
+      _logger.d('On-device AI validation score: ${result.howCorrect}');
       return AnswerResult(
         correctAnswer: correctAnswer,
         score: result.howCorrect,

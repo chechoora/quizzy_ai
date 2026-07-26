@@ -103,7 +103,7 @@ class BackupScheduler {
       return;
     }
     _inFlight = true;
-    _logger.d('_runBackup: starting');
+    _logger.i('_runBackup: starting');
     try {
       if (!await icloudBackupService.isAvailable()) {
         _logger.w('_runBackup: iCloud unavailable, skipping upload');

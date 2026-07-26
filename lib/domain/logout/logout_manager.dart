@@ -23,7 +23,7 @@ class LogoutManager {
   final Logger logger;
 
   Future<void> clearLocalData() async {
-    logger.d('clearLocalData: starting');
+    logger.i('clearLocalData: starting');
     try {
       await appDatabase.clearAllTables();
       await userQuotaRepository.clearCache();

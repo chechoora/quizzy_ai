@@ -33,13 +33,12 @@ class AiTutorRepository {
         ),
       );
       if (!response.isSuccessful || response.body == null) {
-        logger.e('checkAnswer: failed with status ${response.statusCode}');
         throw QuizzyBackendException(
             'Failed to check answer: ${response.statusCode}, ${response.error}');
       }
       final dto =
           AnswerResponseDto.fromJson(response.body as Map<String, dynamic>);
-      logger.i('checkAnswer: success, isCorrect=${dto.isCorrect}');
+      logger.d('checkAnswer: success, isCorrect=${dto.isCorrect}');
       return AnswerCheckResult(
         isCorrect: dto.isCorrect,
         feedback: dto.feedback,

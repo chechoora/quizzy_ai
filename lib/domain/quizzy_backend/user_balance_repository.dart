@@ -20,7 +20,6 @@ class UserBalanceRepository {
     try {
       final response = await apiService.getBalance();
       if (!response.isSuccessful || response.body == null) {
-        logger.e('getBalance: failed with status ${response.statusCode}');
         throw QuizzyBackendException(
             'Failed to get balance: ${response.statusCode}, ${response.error}');
       }
