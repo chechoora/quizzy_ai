@@ -44,7 +44,6 @@ class ApiLoggingInterceptor implements RequestInterceptor, ResponseInterceptor {
       '${base.request != null ? _redactUri(base.request!.url) : ''} -> $statusCode',
     );
     _writeHeaders(buffer, response.headers);
-    _writeBody(buffer, response.bodyString);
 
     final message = buffer.toString();
     if (statusCode >= 500) {

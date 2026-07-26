@@ -28,7 +28,7 @@ class GeminiDeckGenerator extends IDeckGenerator {
   @override
   Future<PlainDeckModel> generate(AiGenRequest request) async {
     try {
-      _logger.d('Generating deck with Gemini AI');
+      _logger.i('Generating deck with Gemini AI');
       _logger.v('Prompt: ${request.prompt}');
 
       final config = _configProvider.geminiConfig;

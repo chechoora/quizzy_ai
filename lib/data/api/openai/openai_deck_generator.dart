@@ -28,7 +28,7 @@ class OpenAIDeckGenerator extends IDeckGenerator {
   @override
   Future<PlainDeckModel> generate(AiGenRequest request) async {
     try {
-      _logger.d('Generating deck with OpenAI');
+      _logger.i('Generating deck with OpenAI');
       _logger.v('Prompt: ${request.prompt}');
 
       final config = _configProvider.openAiConfig;

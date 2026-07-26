@@ -52,20 +52,20 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<AuthUser> signInWithGoogle() {
-    logger.d('signInWithGoogle: starting');
+    logger.i('signInWithGoogle: starting');
     return _signInWithProvider(GoogleAuthProvider(), providerName: 'Google');
   }
 
   @override
   Future<AuthUser> signInWithApple() {
-    logger.d('signInWithApple: starting');
+    logger.i('signInWithApple: starting');
     final provider = AppleAuthProvider()..addScope('email');
     return _signInWithProvider(provider, providerName: 'Apple');
   }
 
   @override
   Future<void> signOut() async {
-    logger.d('signOut: starting');
+    logger.i('signOut: starting');
     try {
       await _firebaseAuth.signOut();
       logger.i('signOut: success');
@@ -77,7 +77,7 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<void> deleteAccount() async {
-    logger.d('deleteAccount: starting');
+    logger.i('deleteAccount: starting');
     final user = _firebaseAuth.currentUser;
     if (user == null) {
       logger.w('deleteAccount: no signed-in account');

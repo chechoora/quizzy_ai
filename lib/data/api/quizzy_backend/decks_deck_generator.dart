@@ -18,7 +18,7 @@ class DecksDeckGenerator extends IDeckGenerator {
   @override
   Future<PlainDeckModel> generate(AiGenRequest request) async {
     try {
-      _logger.d('Generating deck with Quizzy AI');
+      _logger.i('Generating deck with Quizzy AI');
       _logger.v('Prompt: ${request.prompt}');
 
       final result = await _repository.generateDeck(

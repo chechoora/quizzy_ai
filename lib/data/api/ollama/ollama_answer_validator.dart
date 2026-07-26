@@ -24,7 +24,7 @@ class OllamaAnswerValidator extends IAnswerValidator {
     String? cardId,
   }) async {
     try {
-      _logger.d('Validating answer with Ollama');
+      _logger.i('Validating answer with Ollama');
       _logger.v('Expected answer: $correctAnswer');
       _logger.v('User answer: $userAnswer');
 

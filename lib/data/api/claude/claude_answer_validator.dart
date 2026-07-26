@@ -30,7 +30,7 @@ class ClaudeAnswerValidator extends IAnswerValidator {
     String? cardId,
   }) async {
     try {
-      _logger.d('Validating answer with Claude');
+      _logger.i('Validating answer with Claude');
       _logger.v('Question: $question');
       _logger.v('Expected answer: $correctAnswer');
       _logger.v('User answer: $userAnswer');

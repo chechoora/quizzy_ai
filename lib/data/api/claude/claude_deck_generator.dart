@@ -27,7 +27,7 @@ class ClaudeDeckGenerator extends IDeckGenerator {
   @override
   Future<PlainDeckModel> generate(AiGenRequest request) async {
     try {
-      _logger.d('Generating deck with Claude');
+      _logger.i('Generating deck with Claude');
       _logger.v('Prompt: ${request.prompt}');
 
       final config = _configProvider.claudeConfig;

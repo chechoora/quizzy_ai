@@ -31,7 +31,7 @@ class OpenAIAnswerValidator extends IAnswerValidator {
     String? cardId,
   }) async {
     try {
-      _logger.d('Validating answer with OpenAI');
+      _logger.i('Validating answer with OpenAI');
       _logger.v('Expected answer: $correctAnswer');
       _logger.v('User answer: $userAnswer');
 
