@@ -33,6 +33,7 @@ import 'package:poc_ai_quiz/view/settings/settings_ai_validator/settings_ai_vali
 import 'package:poc_ai_quiz/view/settings/settings_deck_generation/settings_deck_generation_widget.dart';
 import 'package:poc_ai_quiz/view/auth/auth_widget.dart';
 import 'package:fimber/fimber.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'firebase_options.dart';
 
 import 'l10n/app_localizations.dart';
@@ -66,6 +67,18 @@ Future<void> mainCommon(AppConfig config) async {
       return true;
     };
 
+    // Sentry is only configured for flavors with a Sentry project to
+    // attribute events to (quizzyPro). Runs alongside Crashlytics: Sentry's
+    // Flutter/PlatformDispatcher integrations chain to whatever handler was
+    // already installed above, so both backends receive crash reports.
+    if (config.sentryDsn.isNotEmpty) {
+      await SentryFlutter.init((options) {
+        options.dsn = config.sentryDsn;
+        options.enableLogs = true;
+        options.environment = kDebugMode ? 'debug' : 'production';
+      });
+    }
+
     await setupDi();
 
     // Auth gating: only the flavors that require auth (quizzyPro) start on the
@@ -94,6 +107,9 @@ Future<void> mainCommon(AppConfig config) async {
   } catch (e, stackTrace) {
     if (Firebase.apps.isNotEmpty) {
       FirebaseCrashlytics.instance.recordError(e, stackTrace, fatal: true);
+    }
+    if (config.sentryDsn.isNotEmpty) {
+      await Sentry.captureException(e, stackTrace: stackTrace);
     }
     runApp(ErrorApp(error: e.toString(), stackTrace: stackTrace.toString()));
   }

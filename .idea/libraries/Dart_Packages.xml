@@ -723,14 +723,7 @@
         <entry key="jni">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/jni-1.0.0/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="jni_flutter">
-          <value>
-            <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/jni_flutter-1.0.1/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/jni-0.14.2/lib" />
             </list>
           </value>
         </entry>
@@ -913,7 +906,7 @@
         <entry key="path_provider_android">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_android-2.3.1/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_android-2.2.23/lib" />
             </list>
           </value>
         </entry>
@@ -1035,6 +1028,20 @@
           <value>
             <list>
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/recase-4.1.0/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="sentry">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/sentry-9.25.0/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="sentry_flutter">
+          <value>
+            <list>
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/sentry_flutter-9.25.0/lib" />
             </list>
           </value>
         </entry>
@@ -1616,8 +1623,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/intl-0.20.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/io-1.0.5/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/isolates-3.0.3+8/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/jni-1.0.0/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/jni_flutter-1.0.1/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/jni-0.14.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/js-0.7.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/json_annotation-4.9.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/json_rpc_2-3.0.3/lib" />
@@ -1644,7 +1650,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path-1.9.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_parsing-1.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider-2.1.5/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_android-2.3.1/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_android-2.2.23/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_foundation-2.5.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_platform_interface-2.1.2/lib" />
@@ -1664,6 +1670,8 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/purchases_flutter-9.16.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/qs_dart-1.7.6/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/recase-4.1.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/sentry-9.25.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/sentry_flutter-9.25.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/share_plus-12.0.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/share_plus_platform_interface-6.1.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/shared_preferences-2.5.5/lib" />

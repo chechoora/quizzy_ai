@@ -1,5 +1,6 @@
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/main.dart';
+import 'package:poc_ai_quiz/util/env_hide.dart';
 
 /// Entry point for the future subscription-only "Quizzy AI Pro" flavor.
 Future<void> main() => mainCommon(
@@ -12,5 +13,6 @@ Future<void> main() => mainCommon(
         isSubscriptionOnly: true,
         enableRemoteSync: true,
         enableAnalytics: true,
+        sentryDsn: Sentry.dsnQuizzyPro,
       ),
     );

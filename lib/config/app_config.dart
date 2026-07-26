@@ -43,6 +43,11 @@ class AppConfig {
   /// [AnalyticsService] instead.
   final bool enableAnalytics;
 
+  /// Sentry DSN for error monitoring and logs. Empty string disables Sentry.
+  /// `quizzyPro` has a Sentry project to attribute events to; `quizzy` does
+  /// not, so it stays empty.
+  final String sentryDsn;
+
   const AppConfig({
     required this.appName,
     required this.flavor,
@@ -52,6 +57,7 @@ class AppConfig {
     required this.isSubscriptionOnly,
     required this.enableRemoteSync,
     required this.enableAnalytics,
+    required this.sentryDsn,
   });
 
   bool getIsDeckGeneratorEditEnabled() {

@@ -48,6 +48,7 @@ dependencies:
 
   quizzy_design:
     path: packages/quizzy_design
+  sentry_flutter: ^9.0.0
 
 dev_dependencies:
   flutter_test:
