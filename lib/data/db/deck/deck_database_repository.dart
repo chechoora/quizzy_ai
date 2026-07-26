@@ -200,15 +200,21 @@ class DeckDataBaseRepository {
     return row?.id;
   }
 
-  /// Records the remote deck's `updatedAt` as of a successful card pull, so
-  /// the next pull can skip `listCards` for this deck entirely if it hasn't
-  /// changed remotely.
-  Future<void> updateRemoteUpdatedAt(int id, DateTime remoteUpdatedAt) async {
+  /// Records the remote deck's `updatedAt` and `lastActivityAt` as of a
+  /// successful card pull, so the next pull can skip `listCards` for this
+  /// deck entirely if neither has changed remotely — see
+  /// [DeckTable.remoteUpdatedAt] for why both are tracked.
+  Future<void> updateRemoteSyncMarkers(
+    int id, {
+    required DateTime remoteUpdatedAt,
+    required DateTime remoteLastActivityAt,
+  }) async {
     await (appDatabase.update(appDatabase.deckTable)
           ..where((table) => table.id.isValue(id)))
         .write(
       DeckTableCompanion(
         remoteUpdatedAt: Value(remoteUpdatedAt),
+        remoteLastActivityAt: Value(remoteLastActivityAt),
       ),
     );
   }

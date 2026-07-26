@@ -88,10 +88,19 @@ class DeckRepository {
     return dataBaseRepository.markDeckSynced(id, remoteId);
   }
 
-  /// Records the remote deck's `updatedAt` as of a successful card pull —
-  /// see [DeckDataBaseRepository.updateRemoteUpdatedAt].
-  Future<void> updateRemoteUpdatedAt(int id, DateTime remoteUpdatedAt) {
-    return dataBaseRepository.updateRemoteUpdatedAt(id, remoteUpdatedAt);
+  /// Records the remote deck's `updatedAt` and `lastActivityAt` as of a
+  /// successful card pull — see
+  /// [DeckDataBaseRepository.updateRemoteSyncMarkers].
+  Future<void> updateRemoteSyncMarkers(
+    int id, {
+    required DateTime remoteUpdatedAt,
+    required DateTime remoteLastActivityAt,
+  }) {
+    return dataBaseRepository.updateRemoteSyncMarkers(
+      id,
+      remoteUpdatedAt: remoteUpdatedAt,
+      remoteLastActivityAt: remoteLastActivityAt,
+    );
   }
 
   /// Upserts a local deck by [remoteId] (pull-side, remote wins). Returns

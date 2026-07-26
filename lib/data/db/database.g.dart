@@ -63,6 +63,12 @@ class $DeckTableTable extends DeckTable
   late final GeneratedColumn<DateTime> remoteUpdatedAt =
       GeneratedColumn<DateTime>('remote_updated_at', aliasedName, true,
           type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _remoteLastActivityAtMeta =
+      const VerificationMeta('remoteLastActivityAt');
+  @override
+  late final GeneratedColumn<DateTime> remoteLastActivityAt =
+      GeneratedColumn<DateTime>('remote_last_activity_at', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _statsAccuracyWeekMeta =
       const VerificationMeta('statsAccuracyWeek');
   @override
@@ -132,6 +138,7 @@ class $DeckTableTable extends DeckTable
         remoteId,
         isDirty,
         remoteUpdatedAt,
+        remoteLastActivityAt,
         statsAccuracyWeek,
         statsAccuracyMonth,
         statsAccuracyYear,
@@ -185,6 +192,12 @@ class $DeckTableTable extends DeckTable
           _remoteUpdatedAtMeta,
           remoteUpdatedAt.isAcceptableOrUnknown(
               data['remote_updated_at']!, _remoteUpdatedAtMeta));
+    }
+    if (data.containsKey('remote_last_activity_at')) {
+      context.handle(
+          _remoteLastActivityAtMeta,
+          remoteLastActivityAt.isAcceptableOrUnknown(
+              data['remote_last_activity_at']!, _remoteLastActivityAtMeta));
     }
     if (data.containsKey('stats_accuracy_week')) {
       context.handle(
@@ -269,6 +282,9 @@ class $DeckTableTable extends DeckTable
           .read(DriftSqlType.bool, data['${effectivePrefix}is_dirty'])!,
       remoteUpdatedAt: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}remote_updated_at']),
+      remoteLastActivityAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime,
+          data['${effectivePrefix}remote_last_activity_at']),
       statsAccuracyWeek: attachedDatabase.typeMapping.read(
           DriftSqlType.double, data['${effectivePrefix}stats_accuracy_week']),
       statsAccuracyMonth: attachedDatabase.typeMapping.read(
@@ -318,12 +334,18 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
   /// backfilled by the v10 migration) is picked up by the next push cycle.
   final bool isDirty;
 
-  /// The `updatedAt` of the remote deck as of the last successful card pull
-  /// for it (not the last deck-field upsert — see [DeckCardSyncService.
-  /// _pullCardsForDeck]). Used to skip `listCards` + upserts entirely for a
-  /// deck whose remote copy hasn't changed since last seen. Null for
-  /// local-only rows and for synced rows never card-pulled yet.
+  /// The remote deck's `updatedAt` as of the last successful card pull for
+  /// it (not the last deck-field upsert — see [DeckCardSyncService.
+  /// _pullCardsForDeck]). Paired with [remoteLastActivityAt]: the pull-skip
+  /// gate requires *both* to be unchanged, since `updatedAt` alone misses
+  /// card-only changes and `lastActivityAt` alone is trusting an unverified
+  /// backend guarantee — belt and suspenders. Null for local-only rows and
+  /// for synced rows never card-pulled yet.
   final DateTime? remoteUpdatedAt;
+
+  /// The remote deck's `lastActivityAt` as of the last successful card pull
+  /// for it — see [remoteUpdatedAt] for why both are tracked together.
+  final DateTime? remoteLastActivityAt;
 
   /// quizzy-ai-pro backend play stats (quizzyPro flavor only). Null for
   /// local-only rows and for rows never synced. All ten columns are always
@@ -347,6 +369,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       this.remoteId,
       required this.isDirty,
       this.remoteUpdatedAt,
+      this.remoteLastActivityAt,
       this.statsAccuracyWeek,
       this.statsAccuracyMonth,
       this.statsAccuracyYear,
@@ -372,6 +395,9 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
     map['is_dirty'] = Variable<bool>(isDirty);
     if (!nullToAbsent || remoteUpdatedAt != null) {
       map['remote_updated_at'] = Variable<DateTime>(remoteUpdatedAt);
+    }
+    if (!nullToAbsent || remoteLastActivityAt != null) {
+      map['remote_last_activity_at'] = Variable<DateTime>(remoteLastActivityAt);
     }
     if (!nullToAbsent || statsAccuracyWeek != null) {
       map['stats_accuracy_week'] = Variable<double>(statsAccuracyWeek);
@@ -419,6 +445,9 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       remoteUpdatedAt: remoteUpdatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(remoteUpdatedAt),
+      remoteLastActivityAt: remoteLastActivityAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteLastActivityAt),
       statsAccuracyWeek: statsAccuracyWeek == null && nullToAbsent
           ? const Value.absent()
           : Value(statsAccuracyWeek),
@@ -463,6 +492,8 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       remoteId: serializer.fromJson<String?>(json['remoteId']),
       isDirty: serializer.fromJson<bool>(json['isDirty']),
       remoteUpdatedAt: serializer.fromJson<DateTime?>(json['remoteUpdatedAt']),
+      remoteLastActivityAt:
+          serializer.fromJson<DateTime?>(json['remoteLastActivityAt']),
       statsAccuracyWeek:
           serializer.fromJson<double?>(json['statsAccuracyWeek']),
       statsAccuracyMonth:
@@ -493,6 +524,8 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       'remoteId': serializer.toJson<String?>(remoteId),
       'isDirty': serializer.toJson<bool>(isDirty),
       'remoteUpdatedAt': serializer.toJson<DateTime?>(remoteUpdatedAt),
+      'remoteLastActivityAt':
+          serializer.toJson<DateTime?>(remoteLastActivityAt),
       'statsAccuracyWeek': serializer.toJson<double?>(statsAccuracyWeek),
       'statsAccuracyMonth': serializer.toJson<double?>(statsAccuracyMonth),
       'statsAccuracyYear': serializer.toJson<double?>(statsAccuracyYear),
@@ -514,6 +547,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           Value<String?> remoteId = const Value.absent(),
           bool? isDirty,
           Value<DateTime?> remoteUpdatedAt = const Value.absent(),
+          Value<DateTime?> remoteLastActivityAt = const Value.absent(),
           Value<double?> statsAccuracyWeek = const Value.absent(),
           Value<double?> statsAccuracyMonth = const Value.absent(),
           Value<double?> statsAccuracyYear = const Value.absent(),
@@ -534,6 +568,9 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
         remoteUpdatedAt: remoteUpdatedAt.present
             ? remoteUpdatedAt.value
             : this.remoteUpdatedAt,
+        remoteLastActivityAt: remoteLastActivityAt.present
+            ? remoteLastActivityAt.value
+            : this.remoteLastActivityAt,
         statsAccuracyWeek: statsAccuracyWeek.present
             ? statsAccuracyWeek.value
             : this.statsAccuracyWeek,
@@ -576,6 +613,9 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       remoteUpdatedAt: data.remoteUpdatedAt.present
           ? data.remoteUpdatedAt.value
           : this.remoteUpdatedAt,
+      remoteLastActivityAt: data.remoteLastActivityAt.present
+          ? data.remoteLastActivityAt.value
+          : this.remoteLastActivityAt,
       statsAccuracyWeek: data.statsAccuracyWeek.present
           ? data.statsAccuracyWeek.value
           : this.statsAccuracyWeek,
@@ -619,6 +659,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           ..write('remoteId: $remoteId, ')
           ..write('isDirty: $isDirty, ')
           ..write('remoteUpdatedAt: $remoteUpdatedAt, ')
+          ..write('remoteLastActivityAt: $remoteLastActivityAt, ')
           ..write('statsAccuracyWeek: $statsAccuracyWeek, ')
           ..write('statsAccuracyMonth: $statsAccuracyMonth, ')
           ..write('statsAccuracyYear: $statsAccuracyYear, ')
@@ -642,6 +683,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
       remoteId,
       isDirty,
       remoteUpdatedAt,
+      remoteLastActivityAt,
       statsAccuracyWeek,
       statsAccuracyMonth,
       statsAccuracyYear,
@@ -663,6 +705,7 @@ class DeckTableData extends DataClass implements Insertable<DeckTableData> {
           other.remoteId == this.remoteId &&
           other.isDirty == this.isDirty &&
           other.remoteUpdatedAt == this.remoteUpdatedAt &&
+          other.remoteLastActivityAt == this.remoteLastActivityAt &&
           other.statsAccuracyWeek == this.statsAccuracyWeek &&
           other.statsAccuracyMonth == this.statsAccuracyMonth &&
           other.statsAccuracyYear == this.statsAccuracyYear &&
@@ -683,6 +726,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
   final Value<String?> remoteId;
   final Value<bool> isDirty;
   final Value<DateTime?> remoteUpdatedAt;
+  final Value<DateTime?> remoteLastActivityAt;
   final Value<double?> statsAccuracyWeek;
   final Value<double?> statsAccuracyMonth;
   final Value<double?> statsAccuracyYear;
@@ -701,6 +745,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     this.remoteId = const Value.absent(),
     this.isDirty = const Value.absent(),
     this.remoteUpdatedAt = const Value.absent(),
+    this.remoteLastActivityAt = const Value.absent(),
     this.statsAccuracyWeek = const Value.absent(),
     this.statsAccuracyMonth = const Value.absent(),
     this.statsAccuracyYear = const Value.absent(),
@@ -720,6 +765,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     this.remoteId = const Value.absent(),
     this.isDirty = const Value.absent(),
     this.remoteUpdatedAt = const Value.absent(),
+    this.remoteLastActivityAt = const Value.absent(),
     this.statsAccuracyWeek = const Value.absent(),
     this.statsAccuracyMonth = const Value.absent(),
     this.statsAccuracyYear = const Value.absent(),
@@ -740,6 +786,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     Expression<String>? remoteId,
     Expression<bool>? isDirty,
     Expression<DateTime>? remoteUpdatedAt,
+    Expression<DateTime>? remoteLastActivityAt,
     Expression<double>? statsAccuracyWeek,
     Expression<double>? statsAccuracyMonth,
     Expression<double>? statsAccuracyYear,
@@ -759,6 +806,8 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       if (remoteId != null) 'remote_id': remoteId,
       if (isDirty != null) 'is_dirty': isDirty,
       if (remoteUpdatedAt != null) 'remote_updated_at': remoteUpdatedAt,
+      if (remoteLastActivityAt != null)
+        'remote_last_activity_at': remoteLastActivityAt,
       if (statsAccuracyWeek != null) 'stats_accuracy_week': statsAccuracyWeek,
       if (statsAccuracyMonth != null)
         'stats_accuracy_month': statsAccuracyMonth,
@@ -785,6 +834,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       Value<String?>? remoteId,
       Value<bool>? isDirty,
       Value<DateTime?>? remoteUpdatedAt,
+      Value<DateTime?>? remoteLastActivityAt,
       Value<double?>? statsAccuracyWeek,
       Value<double?>? statsAccuracyMonth,
       Value<double?>? statsAccuracyYear,
@@ -803,6 +853,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
       remoteId: remoteId ?? this.remoteId,
       isDirty: isDirty ?? this.isDirty,
       remoteUpdatedAt: remoteUpdatedAt ?? this.remoteUpdatedAt,
+      remoteLastActivityAt: remoteLastActivityAt ?? this.remoteLastActivityAt,
       statsAccuracyWeek: statsAccuracyWeek ?? this.statsAccuracyWeek,
       statsAccuracyMonth: statsAccuracyMonth ?? this.statsAccuracyMonth,
       statsAccuracyYear: statsAccuracyYear ?? this.statsAccuracyYear,
@@ -839,6 +890,10 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
     }
     if (remoteUpdatedAt.present) {
       map['remote_updated_at'] = Variable<DateTime>(remoteUpdatedAt.value);
+    }
+    if (remoteLastActivityAt.present) {
+      map['remote_last_activity_at'] =
+          Variable<DateTime>(remoteLastActivityAt.value);
     }
     if (statsAccuracyWeek.present) {
       map['stats_accuracy_week'] = Variable<double>(statsAccuracyWeek.value);
@@ -884,6 +939,7 @@ class DeckTableCompanion extends UpdateCompanion<DeckTableData> {
           ..write('remoteId: $remoteId, ')
           ..write('isDirty: $isDirty, ')
           ..write('remoteUpdatedAt: $remoteUpdatedAt, ')
+          ..write('remoteLastActivityAt: $remoteLastActivityAt, ')
           ..write('statsAccuracyWeek: $statsAccuracyWeek, ')
           ..write('statsAccuracyMonth: $statsAccuracyMonth, ')
           ..write('statsAccuracyYear: $statsAccuracyYear, ')
@@ -3368,6 +3424,7 @@ typedef $$DeckTableTableCreateCompanionBuilder = DeckTableCompanion Function({
   Value<String?> remoteId,
   Value<bool> isDirty,
   Value<DateTime?> remoteUpdatedAt,
+  Value<DateTime?> remoteLastActivityAt,
   Value<double?> statsAccuracyWeek,
   Value<double?> statsAccuracyMonth,
   Value<double?> statsAccuracyYear,
@@ -3387,6 +3444,7 @@ typedef $$DeckTableTableUpdateCompanionBuilder = DeckTableCompanion Function({
   Value<String?> remoteId,
   Value<bool> isDirty,
   Value<DateTime?> remoteUpdatedAt,
+  Value<DateTime?> remoteLastActivityAt,
   Value<double?> statsAccuracyWeek,
   Value<double?> statsAccuracyMonth,
   Value<double?> statsAccuracyYear,
@@ -3448,6 +3506,10 @@ class $$DeckTableTableFilterComposer
 
   ColumnFilters<DateTime> get remoteUpdatedAt => $composableBuilder(
       column: $table.remoteUpdatedAt,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get remoteLastActivityAt => $composableBuilder(
+      column: $table.remoteLastActivityAt,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<double> get statsAccuracyWeek => $composableBuilder(
@@ -3543,6 +3605,10 @@ class $$DeckTableTableOrderingComposer
       column: $table.remoteUpdatedAt,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<DateTime> get remoteLastActivityAt => $composableBuilder(
+      column: $table.remoteLastActivityAt,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<double> get statsAccuracyWeek => $composableBuilder(
       column: $table.statsAccuracyWeek,
       builder: (column) => ColumnOrderings(column));
@@ -3613,6 +3679,9 @@ class $$DeckTableTableAnnotationComposer
 
   GeneratedColumn<DateTime> get remoteUpdatedAt => $composableBuilder(
       column: $table.remoteUpdatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get remoteLastActivityAt => $composableBuilder(
+      column: $table.remoteLastActivityAt, builder: (column) => column);
 
   GeneratedColumn<double> get statsAccuracyWeek => $composableBuilder(
       column: $table.statsAccuracyWeek, builder: (column) => column);
@@ -3696,6 +3765,7 @@ class $$DeckTableTableTableManager extends RootTableManager<
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDirty = const Value.absent(),
             Value<DateTime?> remoteUpdatedAt = const Value.absent(),
+            Value<DateTime?> remoteLastActivityAt = const Value.absent(),
             Value<double?> statsAccuracyWeek = const Value.absent(),
             Value<double?> statsAccuracyMonth = const Value.absent(),
             Value<double?> statsAccuracyYear = const Value.absent(),
@@ -3715,6 +3785,7 @@ class $$DeckTableTableTableManager extends RootTableManager<
             remoteId: remoteId,
             isDirty: isDirty,
             remoteUpdatedAt: remoteUpdatedAt,
+            remoteLastActivityAt: remoteLastActivityAt,
             statsAccuracyWeek: statsAccuracyWeek,
             statsAccuracyMonth: statsAccuracyMonth,
             statsAccuracyYear: statsAccuracyYear,
@@ -3734,6 +3805,7 @@ class $$DeckTableTableTableManager extends RootTableManager<
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDirty = const Value.absent(),
             Value<DateTime?> remoteUpdatedAt = const Value.absent(),
+            Value<DateTime?> remoteLastActivityAt = const Value.absent(),
             Value<double?> statsAccuracyWeek = const Value.absent(),
             Value<double?> statsAccuracyMonth = const Value.absent(),
             Value<double?> statsAccuracyYear = const Value.absent(),
@@ -3753,6 +3825,7 @@ class $$DeckTableTableTableManager extends RootTableManager<
             remoteId: remoteId,
             isDirty: isDirty,
             remoteUpdatedAt: remoteUpdatedAt,
+            remoteLastActivityAt: remoteLastActivityAt,
             statsAccuracyWeek: statsAccuracyWeek,
             statsAccuracyMonth: statsAccuracyMonth,
             statsAccuracyYear: statsAccuracyYear,

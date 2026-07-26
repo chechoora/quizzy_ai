@@ -116,6 +116,7 @@ class DeckResponseDto {
   final bool isArchived;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final DateTime lastActivityAt;
   final StatsDto? stats;
 
   DeckResponseDto({
@@ -125,6 +126,7 @@ class DeckResponseDto {
     required this.isArchived,
     required this.createdAt,
     required this.updatedAt,
+    required this.lastActivityAt,
     this.stats,
   });
 
@@ -136,6 +138,7 @@ class DeckResponseDto {
         isArchived: json['isArchived'] as bool,
         createdAt: DateTime.parse(json['createdAt'] as String),
         updatedAt: DateTime.parse(json['updatedAt'] as String),
+        lastActivityAt: DateTime.parse(json['lastActivityAt'] as String),
         stats: json['stats'] == null
             ? null
             : StatsDto.fromJson(json['stats'] as Map<String, dynamic>),

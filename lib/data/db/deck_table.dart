@@ -28,12 +28,18 @@ class DeckTable extends Table {
   /// backfilled by the v10 migration) is picked up by the next push cycle.
   BoolColumn get isDirty => boolean().withDefault(const Constant(true))();
 
-  /// The `updatedAt` of the remote deck as of the last successful card pull
-  /// for it (not the last deck-field upsert — see [DeckCardSyncService.
-  /// _pullCardsForDeck]). Used to skip `listCards` + upserts entirely for a
-  /// deck whose remote copy hasn't changed since last seen. Null for
-  /// local-only rows and for synced rows never card-pulled yet.
+  /// The remote deck's `updatedAt` as of the last successful card pull for
+  /// it (not the last deck-field upsert — see [DeckCardSyncService.
+  /// _pullCardsForDeck]). Paired with [remoteLastActivityAt]: the pull-skip
+  /// gate requires *both* to be unchanged, since `updatedAt` alone misses
+  /// card-only changes and `lastActivityAt` alone is trusting an unverified
+  /// backend guarantee — belt and suspenders. Null for local-only rows and
+  /// for synced rows never card-pulled yet.
   DateTimeColumn get remoteUpdatedAt => dateTime().nullable()();
+
+  /// The remote deck's `lastActivityAt` as of the last successful card pull
+  /// for it — see [remoteUpdatedAt] for why both are tracked together.
+  DateTimeColumn get remoteLastActivityAt => dateTime().nullable()();
 
   /// quizzy-ai-pro backend play stats (quizzyPro flavor only). Null for
   /// local-only rows and for rows never synced. All ten columns are always

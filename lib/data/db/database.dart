@@ -34,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration {
@@ -167,6 +167,13 @@ class AppDatabase extends _$AppDatabase {
           // only): queues events for POST /api/analytics/events until
           // they're accepted or dropped as unretriable.
           await m.createTable(analyticsEventTable);
+        }
+        if (from < 15) {
+          // Migration for the pull-skip gate requiring both the deck's
+          // updatedAt and lastActivityAt to be unchanged (see
+          // deckTable.remoteUpdatedAt): adds the second signal alongside
+          // the pre-existing remoteUpdatedAt column.
+          await m.addColumn(deckTable, deckTable.remoteLastActivityAt);
         }
       },
     );

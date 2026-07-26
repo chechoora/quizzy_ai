@@ -13,9 +13,13 @@ class DeckItem extends Equatable {
   /// True when this deck has local changes not yet pushed to the backend.
   final bool isDirty;
 
-  /// The remote deck's `updatedAt` as of the last successful card pull for
-  /// it. Null for local-only rows and for synced rows never card-pulled yet.
+  /// The remote deck's `updatedAt` and `lastActivityAt` as of the last
+  /// successful card pull for it. Null for local-only rows and for synced
+  /// rows never card-pulled yet. The sync pull-skip gate requires *both* to
+  /// be unchanged before it'll skip re-fetching this deck's cards — see
+  /// [DeckTable.remoteUpdatedAt].
   final DateTime? remoteUpdatedAt;
+  final DateTime? remoteLastActivityAt;
 
   /// quizzy-ai-pro backend play stats, or null on the local-only quizzy
   /// flavor and for decks never synced.
@@ -29,6 +33,7 @@ class DeckItem extends Equatable {
     this.remoteId,
     this.isDirty = false,
     this.remoteUpdatedAt,
+    this.remoteLastActivityAt,
     this.stats,
   });
 
@@ -41,6 +46,7 @@ class DeckItem extends Equatable {
         remoteId,
         isDirty,
         remoteUpdatedAt,
+        remoteLastActivityAt,
         stats,
       ];
 }

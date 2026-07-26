@@ -309,6 +309,7 @@ class DecksRepository {
         isArchived: dto.isArchived,
         createdAt: dto.createdAt,
         updatedAt: dto.updatedAt,
+        lastActivityAt: dto.lastActivityAt,
         stats: _toItemStats(dto.stats),
       );
 

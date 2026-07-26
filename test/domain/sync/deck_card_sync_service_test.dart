@@ -38,7 +38,10 @@ const _testStats = ItemStats(
 );
 
 RemoteDeck _remoteDeck(String id,
-    {String title = 'Deck', bool archived = false, ItemStats? stats}) {
+    {String title = 'Deck',
+    bool archived = false,
+    ItemStats? stats,
+    DateTime? lastActivityAt}) {
   return RemoteDeck(
     id: id,
     userId: 'user-1',
@@ -46,6 +49,7 @@ RemoteDeck _remoteDeck(String id,
     isArchived: archived,
     createdAt: _now(),
     updatedAt: _now(),
+    lastActivityAt: lastActivityAt ?? _now(),
     stats: stats,
   );
 }
@@ -146,8 +150,11 @@ void main() {
     when(() => deckRepository.fetchDecks()).thenAnswer((_) async => const []);
     when(() => deckRepository.fetchSyncedDecks())
         .thenAnswer((_) async => const []);
-    when(() => deckRepository.updateRemoteUpdatedAt(any(), any()))
-        .thenAnswer((_) async {});
+    when(() => deckRepository.updateRemoteSyncMarkers(
+          any(),
+          remoteUpdatedAt: any(named: 'remoteUpdatedAt'),
+          remoteLastActivityAt: any(named: 'remoteLastActivityAt'),
+        )).thenAnswer((_) async {});
   });
 
   group('pushLocalChanges - decks', () {
@@ -573,16 +580,20 @@ void main() {
           .thenAnswer((_) async => const []);
 
       // First cycle: deck is new locally, so it's upserted and its cards
-      // fetched once, recording remoteUpdatedAt == deck.updatedAt.
+      // fetched once, recording remoteUpdatedAt/remoteLastActivityAt ==
+      // deck.updatedAt/deck.lastActivityAt.
       final first = await service.pullRemoteChanges();
       expect(first.decksUpserted, 1);
       verify(() => decksRepository.listCards('d1')).called(1);
-      verify(() => deckRepository.updateRemoteUpdatedAt(10, deck.updatedAt))
-          .called(1);
+      verify(() => deckRepository.updateRemoteSyncMarkers(
+            10,
+            remoteUpdatedAt: deck.updatedAt,
+            remoteLastActivityAt: deck.lastActivityAt,
+          )).called(1);
 
-      // Second cycle: the remote deck is unchanged (same updatedAt) — the
-      // now-synced local deck (with a matching stored remoteUpdatedAt) must
-      // make listCards entirely skippable.
+      // Second cycle: the remote deck is unchanged (same updatedAt and
+      // lastActivityAt) — the now-synced local deck (with matching stored
+      // markers) must make listCards entirely skippable.
       when(() => deckRepository.fetchSyncedDecks()).thenAnswer((_) async => [
             DeckItem(
               id: 10,
@@ -590,6 +601,7 @@ void main() {
               isArchive: false,
               remoteId: 'd1',
               remoteUpdatedAt: deck.updatedAt,
+              remoteLastActivityAt: deck.lastActivityAt,
             ),
           ]);
       when(() => deckRepository.findLocalIdByRemoteId('d1'))
@@ -607,6 +619,7 @@ void main() {
               isArchive: false,
               remoteId: 'd1',
               remoteUpdatedAt: deck.updatedAt,
+              remoteLastActivityAt: deck.lastActivityAt,
             ),
           ]);
 
@@ -632,6 +645,47 @@ void main() {
             isArchive: any(named: 'isArchive'),
             stats: any(named: 'stats'),
           ));
+    });
+
+    test(
+        'a remote change visible in only one of updatedAt/lastActivityAt '
+        'still triggers listCards (defensive dual gate)', () async {
+      final deck = _remoteDeck('d1', lastActivityAt: DateTime(2026, 1, 2));
+      when(() => decksRepository.listDecks())
+          .thenAnswer((_) async => [deck]);
+      when(() => deckRepository.upsertDeckFromRemote(
+            remoteId: 'd1',
+            title: 'Deck',
+            isArchive: false,
+          )).thenAnswer((_) async => 10);
+      when(() => deckRepository.fetchSyncedDecks()).thenAnswer((_) async => [
+            DeckItem(
+              id: 10,
+              title: 'Deck',
+              isArchive: false,
+              remoteId: 'd1',
+              // Matches the deck's unchanged `updatedAt` ...
+              remoteUpdatedAt: deck.updatedAt,
+              // ... but stale against its bumped `lastActivityAt` — one
+              // signal matching isn't enough, the gate requires both.
+              remoteLastActivityAt: DateTime(2026, 1, 1),
+            ),
+          ]);
+      when(() => deckRepository.findLocalIdByRemoteId('d1'))
+          .thenAnswer((_) async => 10);
+      when(() => decksRepository.listCards('d1'))
+          .thenAnswer((_) async => const []);
+      when(() => quizCardRepository.fetchSyncedCardsForDeck(10))
+          .thenAnswer((_) async => const []);
+
+      await service.pullRemoteChanges();
+
+      verify(() => decksRepository.listCards('d1')).called(1);
+      verify(() => deckRepository.updateRemoteSyncMarkers(
+            10,
+            remoteUpdatedAt: deck.updatedAt,
+            remoteLastActivityAt: deck.lastActivityAt,
+          )).called(1);
     });
   });
 

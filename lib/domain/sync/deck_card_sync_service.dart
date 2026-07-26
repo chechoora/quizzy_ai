@@ -325,24 +325,26 @@ class DeckCardSyncService {
     // Fetched once and reused both for the unchanged-deck gate below and for
     // _reconcileDeletedDecks further down.
     final syncedLocalDecks = await deckRepository.fetchSyncedDecks();
-    final remoteUpdatedAtByRemoteId = {
+    final syncedLocalDeckByRemoteId = {
       for (final d in syncedLocalDecks)
-        if (d.remoteId != null) d.remoteId!: d.remoteUpdatedAt,
+        if (d.remoteId != null) d.remoteId!: d,
     };
 
     for (final remoteDeck in remoteDecks) {
       try {
-        // NOTE (unverified backend assumption): this gate assumes the
-        // backend bumps a deck's `updatedAt` whenever one of its cards is
-        // added/updated/deleted, not just on deck-field edits — the swagger
-        // schema doesn't document this either way. If that assumption is
-        // wrong, a card-only change on an otherwise-untouched deck would be
-        // silently skipped here. TODO(backend): confirm this behavior with
-        // the quizzy-ai-pro-be team; until then this is deck-fields-only in
-        // effect, since deck.updatedAt is the only signal being trusted.
-        final storedUpdatedAt = remoteUpdatedAtByRemoteId[remoteDeck.id];
+        // Requires BOTH updatedAt and lastActivityAt to be unchanged before
+        // skipping listCards — belt and suspenders. lastActivityAt alone is
+        // trusting an unverified backend guarantee that it's bumped on
+        // *any* deck or card change (see [RemoteDeck.lastActivityAt]);
+        // updatedAt alone misses card-only changes. Checking both means a
+        // gap in either assumption still gets caught by the other.
+        final syncedLocalDeck = syncedLocalDeckByRemoteId[remoteDeck.id];
+        final storedUpdatedAt = syncedLocalDeck?.remoteUpdatedAt;
+        final storedLastActivityAt = syncedLocalDeck?.remoteLastActivityAt;
         if (storedUpdatedAt != null &&
-            storedUpdatedAt.isAtSameMomentAs(remoteDeck.updatedAt)) {
+            storedLastActivityAt != null &&
+            storedUpdatedAt.isAtSameMomentAs(remoteDeck.updatedAt) &&
+            storedLastActivityAt.isAtSameMomentAs(remoteDeck.lastActivityAt)) {
           final localId =
               await deckRepository.findLocalIdByRemoteId(remoteDeck.id);
           if (localId != null) {
@@ -352,7 +354,7 @@ class DeckCardSyncService {
             unchangedRemoteDeckIds.add(remoteDeck.id);
             continue;
           }
-          // Stored updatedAt but no local row (shouldn't normally happen) —
+          // Stored markers but no local row (shouldn't normally happen) —
           // fall through to a normal upsert below.
         }
 
@@ -395,6 +397,7 @@ class DeckCardSyncService {
         remoteDeckId: remoteDeck.id,
         localDeckId: localDeckId,
         remoteDeckUpdatedAt: remoteDeck.updatedAt,
+        remoteDeckLastActivityAt: remoteDeck.lastActivityAt,
         dirtyCardRemoteIds: dirtyCardRemoteIds,
         result: result,
       );
@@ -426,6 +429,7 @@ class DeckCardSyncService {
     required String remoteDeckId,
     required int localDeckId,
     required DateTime remoteDeckUpdatedAt,
+    required DateTime remoteDeckLastActivityAt,
     required Set<String> dirtyCardRemoteIds,
     required SyncPullResult result,
   }) async {
@@ -441,11 +445,16 @@ class DeckCardSyncService {
     }
 
     // The card list was fetched successfully, so this deck's cards are now
-    // known to be in sync as of remoteDeckUpdatedAt — record that so the
-    // next pull can skip listCards for this deck entirely if it hasn't
-    // changed remotely. Recorded even if individual card upserts below fail,
-    // since it's the listCards call (not the upserts) that this is gating.
-    await deckRepository.updateRemoteUpdatedAt(localDeckId, remoteDeckUpdatedAt);
+    // known to be in sync as of remoteDeckUpdatedAt/remoteDeckLastActivityAt
+    // — record both so the next pull can skip listCards for this deck
+    // entirely if neither has changed remotely. Recorded even if individual
+    // card upserts below fail, since it's the listCards call (not the
+    // upserts) that this is gating.
+    await deckRepository.updateRemoteSyncMarkers(
+      localDeckId,
+      remoteUpdatedAt: remoteDeckUpdatedAt,
+      remoteLastActivityAt: remoteDeckLastActivityAt,
+    );
 
     var upserted = result.cardsUpserted;
     var failures = result.failures;
