@@ -14,5 +14,6 @@ Future<void> main() => mainCommon(
         enableRemoteSync: true,
         enableAnalytics: true,
         sentryDsn: Sentry.dsnQuizzyPro,
+        authDomain: 'auth.quizzyai.app',
       ),
     );

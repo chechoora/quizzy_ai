@@ -103,6 +103,7 @@ Future<void> _setupAuth() async {
   final authService = FirebaseAuthService(
     firebaseAuth: FirebaseAuth.instance,
     logger: Logger.withTag('FirebaseAuthService'),
+    authDomain: getIt<AppConfig>().authDomain,
   );
   getIt.registerSingleton<AuthService>(authService);
 }

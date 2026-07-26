@@ -48,12 +48,12 @@ class LoggerImpl extends Logger {
   }
 
   void _log(
-      String level,
-      String tag,
-      String message, {
-        Object? ex,
-        StackTrace? stacktrace,
-      }) {
+    String level,
+    String tag,
+    String message, {
+    Object? ex,
+    StackTrace? stacktrace,
+  }) {
     Fimber.log(level, message, tag: tag, ex: ex, stacktrace: stacktrace);
     _logToSentry(level, tag, message, ex: ex, stacktrace: stacktrace);
   }
@@ -62,20 +62,20 @@ class LoggerImpl extends Logger {
   // quizzy flavor), so this stays flavor-agnostic. Only 'i' and above are
   // forwarded — 'v'/'d' stay Fimber-only.
   void _logToSentry(
-      String level,
-      String tag,
-      String message, {
-        Object? ex,
-        StackTrace? stacktrace,
-      }) {
+    String level,
+    String tag,
+    String message, {
+    Object? ex,
+    StackTrace? stacktrace,
+  }) {
     final attributes = {'tag': SentryAttribute.string(tag)};
     switch (level) {
       case 'I':
-        Sentry.logger.info(message, attributes: attributes);
+        Sentry.logger.info('$tag: $message', attributes: attributes);
       case 'W':
-        Sentry.logger.warn(message, attributes: attributes);
+        Sentry.logger.warn('$tag: $message', attributes: attributes);
       case 'E':
-        Sentry.logger.error(message, attributes: attributes);
+        Sentry.logger.error('$tag: $message', attributes: attributes);
         if (ex != null) {
           Sentry.captureException(ex, stackTrace: stacktrace);
         }

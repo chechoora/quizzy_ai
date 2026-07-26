@@ -48,6 +48,12 @@ class AppConfig {
   /// not, so it stays empty.
   final String sentryDsn;
 
+  /// Custom Firebase Auth domain shown on the native sign-in sheet, applied
+  /// via `FirebaseAuth.customAuthDomain` (native has no `FirebaseOptions`
+  /// field for this — see `FirebaseAuthService`). `quizzyPro` has a custom
+  /// domain; `quizzy` has none, so it stays null.
+  final String? authDomain;
+
   const AppConfig({
     required this.appName,
     required this.flavor,
@@ -58,6 +64,7 @@ class AppConfig {
     required this.enableRemoteSync,
     required this.enableAnalytics,
     required this.sentryDsn,
+    this.authDomain,
   });
 
   bool getIsDeckGeneratorEditEnabled() {

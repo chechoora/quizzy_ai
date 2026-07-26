@@ -68,6 +68,11 @@ Two build flavors share one codebase (infrastructure in `lib/config/app_config.d
   `ios/config/quizzypro/GoogleService-Info.plist` (see the READMEs there). On iOS the
   "Copy flavor GoogleService-Info.plist" build phase overrides the bundled plist with
   the flavor's copy for any non-`quizzy` flavor.
+- Custom Firebase Auth domain (`quizzypro`'s `auth.quizzyai.app`): do **not** set
+  `authDomain` on the native `FirebaseOptions` in `firebase_options_quizzypro.dart` —
+  it's a web-only field there and gets silently dropped. It's applied at runtime via
+  `FirebaseAuth.customAuthDomain` in `FirebaseAuthService`, driven by
+  `AppConfig.authDomain`.
 - After changing iOS build configurations, run `cd ios && pod install`.
 - Release Android builds are signed using `android/release_key.properties`
   (keystore path + credentials, gitignored), referenced by

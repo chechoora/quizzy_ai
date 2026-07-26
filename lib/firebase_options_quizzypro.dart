@@ -2,6 +2,11 @@
 // (same "Quizzy AI" project, distinct Android/iOS app registrations).
 // Values sourced from android/app/src/quizzypro/google-services.json and
 // ios/config/quizzypro/GoogleService-Info.plist — keep in sync if those change.
+//
+// The custom auth domain ('auth.quizzyai.app') is NOT set here:
+// `FirebaseOptions.authDomain` is a web-only field on native (Android/iOS),
+// so it would be silently dropped. It's applied at runtime instead via
+// `FirebaseAuth.customAuthDomain` in `FirebaseAuthService`.
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
@@ -31,7 +36,6 @@ class DefaultFirebaseOptionsQuizzyPro {
     messagingSenderId: '897552655477',
     projectId: 'quizzy-ai-85865',
     storageBucket: 'quizzy-ai-85865.firebasestorage.app',
-    authDomain: 'auth.quizzyai.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -41,6 +45,5 @@ class DefaultFirebaseOptionsQuizzyPro {
     projectId: 'quizzy-ai-85865',
     storageBucket: 'quizzy-ai-85865.firebasestorage.app',
     iosBundleId: 'com.chechoora.quizzy.pro',
-    authDomain: 'auth.quizzyai.app',
   );
 }

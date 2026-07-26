@@ -11,7 +11,13 @@ class FirebaseAuthService implements AuthService {
   FirebaseAuthService({
     required FirebaseAuth firebaseAuth,
     required this.logger,
-  }) : _firebaseAuth = firebaseAuth;
+    String? authDomain,
+  }) : _firebaseAuth = firebaseAuth {
+    if (authDomain != null && authDomain.isNotEmpty) {
+      _firebaseAuth.customAuthDomain = authDomain;
+      logger.i('FirebaseAuthService: using custom auth domain $authDomain');
+    }
+  }
 
   final FirebaseAuth _firebaseAuth;
   final Logger logger;
