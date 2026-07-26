@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
@@ -20,6 +22,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     required this.deckRepository,
     required this.quizCardPremiumManager,
     required this.quizCardExeValidator,
+    required this.analyticsService,
     required this.isSubscriptionOnly,
   }) : super(QuizCardListLoadingState());
 
@@ -28,6 +31,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   final DeckRepository deckRepository;
   final QuizCardPremiumManager quizCardPremiumManager;
   final QuizCardExeValidator quizCardExeValidator;
+  final AnalyticsService analyticsService;
 
   /// When true (the `quizzypro` flavor) only the Quizzy AI subscription is
   /// offered; when false (the `quizzy` flavor) only the one-time "unlimited
@@ -151,6 +155,16 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       currentCard: card,
       request: quizCardRequestItem,
     );
+    unawaited(analyticsService.track(AnalyticsEvents.cardEdited, properties: {
+      AnalyticsProperties.deckId: deckItem.id,
+      AnalyticsProperties.field: 'question',
+      AnalyticsProperties.wasEdited: card.questionText != quizCardRequestItem.question,
+    }));
+    unawaited(analyticsService.track(AnalyticsEvents.cardEdited, properties: {
+      AnalyticsProperties.deckId: deckItem.id,
+      AnalyticsProperties.field: 'answer',
+      AnalyticsProperties.wasEdited: card.answerText != quizCardRequestItem.answer,
+    }));
   }
 
   Future<void> launchQuizRequest({

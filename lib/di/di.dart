@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:chopper/chopper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -384,6 +387,9 @@ Future<void> _setupServices() async {
       analyticsRepository: analyticsRepository,
       authService: getIt.get<AuthService>(),
       appVersion: packageInfo.version,
+      buildNumber: packageInfo.buildNumber,
+      platform: Platform.isIOS ? 'ios' : 'android',
+      locale: WidgetsBinding.instance.platformDispatcher.locale.toLanguageTag(),
       logger: Logger.withTag('RemoteAnalyticsService'),
     );
   } else {

@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_deck_detail.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/public_decks_repository.dart';
 import 'package:poc_ai_quiz/domain/sync/sync_scheduler.dart';
@@ -11,12 +15,14 @@ class PublicDeckDetailCubit extends Cubit<PublicDeckDetailState> {
     required this.deckId,
     required this.publicDecksRepository,
     required this.syncScheduler,
+    required this.analyticsService,
     required this.logger,
   }) : super(PublicDeckDetailLoadingState());
 
   final String deckId;
   final PublicDecksRepository publicDecksRepository;
   final SyncScheduler syncScheduler;
+  final AnalyticsService analyticsService;
   final Logger logger;
 
   Future<void> loadDeck() async {
@@ -25,6 +31,10 @@ class PublicDeckDetailCubit extends Cubit<PublicDeckDetailState> {
     try {
       final deckDetail = await publicDecksRepository.getPublicDeck(deckId);
       logger.i('loadDeck: success, ${deckDetail.cards.length} cards');
+      unawaited(analyticsService.track(AnalyticsEvents.publicDeckViewed, properties: {
+        AnalyticsProperties.publicDeckId: deckId,
+        AnalyticsProperties.category: deckDetail.categoryId,
+      }));
       emit(PublicDeckDetailDataState(deckDetail: deckDetail));
     } catch (e, stackTrace) {
       logger.e('loadDeck: failed', ex: e, stacktrace: stackTrace);
@@ -45,6 +55,10 @@ class PublicDeckDetailCubit extends Cubit<PublicDeckDetailState> {
       await publicDecksRepository.copyPublicDeck(deckId);
       await syncScheduler.syncNow();
       logger.i('copyDeck: success, deckId=$deckId');
+      unawaited(analyticsService.track(AnalyticsEvents.publicDeckCopied, properties: {
+        AnalyticsProperties.publicDeckId: deckId,
+        AnalyticsProperties.category: deckDetail.categoryId,
+      }));
       emit(PublicDeckDetailCopySuccessState());
       emit(PublicDeckDetailDataState(deckDetail: deckDetail, isCopying: false));
     } catch (e, stackTrace) {

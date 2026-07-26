@@ -69,6 +69,8 @@ class ImportExportScreen extends HookWidget {
                           typeName,
                         ),
                         feature: cubit.unlockFeature,
+                        trigger: 'import_limit',
+                        limitType: type.name,
                       );
                       if (purchased == true && context.mounted) {
                         if (type == ImportExportType.deck) {

@@ -123,6 +123,8 @@ class HomeWidget extends HookWidget {
         context,
         limitMessage: localize(context).homePremiumDeckLimitMessage,
         feature: cubit.unlockFeature,
+        trigger: 'deck_limit',
+        limitType: 'deck',
       );
       if (purchased == true && context.mounted) {
         cubit.addDockRequest();
@@ -207,6 +209,8 @@ class HomeWidget extends HookWidget {
               limitMessage: localize(context)
                   .importLimitExceeded(state.exception.limit, typeName),
               feature: InAppPurchaseFeature.unlimitedDecksCards,
+              trigger: 'icloud_restore_limit',
+              limitType: state.exception.type.name,
             );
           } else if (state is ICloudRestoreErrorState) {
             snackBar(

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_category.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_deck_summary.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/public_decks_repository.dart';
@@ -11,10 +13,12 @@ import 'package:poc_ai_quiz/util/unique_emit.dart';
 class PublicDecksCubit extends Cubit<PublicDecksState> {
   PublicDecksCubit({
     required this.publicDecksRepository,
+    required this.analyticsService,
     required this.logger,
   }) : super(PublicDecksLoadingState());
 
   final PublicDecksRepository publicDecksRepository;
+  final AnalyticsService analyticsService;
   final Logger logger;
 
   static const _searchDebounce = Duration(milliseconds: 400);
@@ -50,9 +54,12 @@ class PublicDecksCubit extends Cubit<PublicDecksState> {
   void onSearchChanged(String query) {
     final normalized = query.trim().isEmpty ? null : query.trim();
     _searchDebounceTimer?.cancel();
-    _searchDebounceTimer = Timer(_searchDebounce, () {
+    _searchDebounceTimer = Timer(_searchDebounce, () async {
       _searchQuery = normalized;
-      unawaited(_fetchDecks());
+      await _fetchDecks();
+      unawaited(analyticsService.track(AnalyticsEvents.publicDecksSearched, properties: {
+        AnalyticsProperties.resultsCount: _decks.length,
+      }));
     });
   }
 

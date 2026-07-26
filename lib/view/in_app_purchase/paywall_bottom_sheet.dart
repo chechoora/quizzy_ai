@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
 import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/purchase_option.dart';
@@ -15,7 +18,14 @@ Future<bool?> showPaywallBottomSheet(
   BuildContext context, {
   required String limitMessage,
   required InAppPurchaseFeature feature,
+  required String trigger,
+  String? limitType,
 }) {
+  unawaited(getIt<AnalyticsService>().track(AnalyticsEvents.paywallShown, properties: {
+    AnalyticsProperties.trigger: trigger,
+    if (limitType != null) AnalyticsProperties.limitType: limitType,
+    AnalyticsProperties.offering: feature.toOfferingId(),
+  }));
   return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,

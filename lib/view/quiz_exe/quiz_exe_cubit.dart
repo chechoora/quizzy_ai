@@ -88,9 +88,16 @@ class QuizExeCubit extends Cubit<QuizExeState> {
         return;
       }
 
+      final stopwatch = Stopwatch()..start();
       final result =
           await quizEngine.checkPossibleAnswer(quizCardItem, possibleAnswer);
+      stopwatch.stop();
       _logger.i('Answer validation result: $result (threshold: 0.6)');
+      unawaited(analyticsService.track(AnalyticsEvents.answerChecked, properties: {
+        AnalyticsProperties.isCorrect: result.score >= 0.6,
+        AnalyticsProperties.hasCardId: quizCardItem.remoteId != null,
+        AnalyticsProperties.durationMs: stopwatch.elapsedMilliseconds,
+      }));
       quizMatchBuilder.saveResult(
         quizCardItem,
         possibleAnswer,

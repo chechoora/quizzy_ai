@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
@@ -29,6 +30,7 @@ class DeckEditWidget extends HookWidget {
         deckItem: deckItem,
         quizCardRepository: getIt<QuizCardRepository>(),
         inAppPurchaseService: getIt<InAppPurchaseService>(),
+        analyticsService: getIt<AnalyticsService>(),
         isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
       ),
     );
@@ -59,6 +61,7 @@ class DeckEditWidget extends HookWidget {
         context,
         limitMessage: l10n.aiGenerateUnlockMessage,
         feature: cubit.unlockFeature,
+        trigger: 'ai_composer_unlock',
       );
       if (purchased == true && context.mounted) {
         cubit.onAiUnlocked();

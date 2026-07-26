@@ -89,7 +89,7 @@ enum InAppPurchaseFeature {
   quizzyAi;
 }
 
-extension on InAppPurchaseFeature {
+extension InAppPurchaseFeatureIds on InAppPurchaseFeature {
   String toOfferingId() {
     switch (this) {
       case InAppPurchaseFeature.unlimitedDecksCards:

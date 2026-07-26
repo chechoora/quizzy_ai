@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
 import 'package:poc_ai_quiz/domain/analytics/analytics_navigator_observer.dart';
 import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
@@ -298,17 +300,46 @@ GoRouter buildAppRouter({required String initialLocation}) {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key, required this.router});
 
   final GoRouter router;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    unawaited(getIt<AnalyticsService>().track(AnalyticsEvents.appOpened, properties: {
+      AnalyticsProperties.isColdStart: true,
+    }));
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(getIt<AnalyticsService>().track(AnalyticsEvents.appOpened, properties: {
+        AnalyticsProperties.isColdStart: false,
+      }));
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: router,
+      routerConfig: widget.router,
       theme: AppTheme.lightTheme,
       localizationsDelegates: const [
         AppLocalizations.delegate,

@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
 import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
@@ -12,6 +15,13 @@ import 'package:poc_ai_quiz/view/settings/in_app_features/cubit/in_app_features_
 import 'package:poc_ai_quiz/view/widgets/feature_purchase_card.dart';
 
 Future<void> showOnboardingPaywallBottomSheet(BuildContext context) {
+  final feature = getIt<AppConfig>().isSubscriptionOnly
+      ? InAppPurchaseFeature.quizzyAi
+      : InAppPurchaseFeature.unlimitedDecksCards;
+  unawaited(getIt<AnalyticsService>().track(AnalyticsEvents.paywallShown, properties: {
+    AnalyticsProperties.trigger: 'onboarding',
+    AnalyticsProperties.offering: feature.toOfferingId(),
+  }));
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,

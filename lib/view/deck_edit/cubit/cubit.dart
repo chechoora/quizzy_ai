@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
@@ -43,6 +47,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
     required this.deckItem,
     required this.quizCardRepository,
     required this.inAppPurchaseService,
+    required this.analyticsService,
     required this.isSubscriptionOnly,
   }) : super(const AiGenerateInitialState());
 
@@ -50,6 +55,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
   final DeckItem deckItem;
   final QuizCardRepository quizCardRepository;
   final InAppPurchaseService inAppPurchaseService;
+  final AnalyticsService analyticsService;
 
   /// When true (the `quizzypro` flavor) only the Quizzy AI subscription is
   /// offered; when false (the `quizzy` flavor) only the one-time "unlimited
@@ -115,6 +121,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       cards: List.from(_cards),
       isPremium: _isPremium,
     ));
+    final stopwatch = Stopwatch()..start();
     try {
       final deck = await aiGenService.generate(
         AiGenRequest(prompt: prompt, deckTitle: deckItem.title),
@@ -122,10 +129,20 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       _cards
         ..clear()
         ..addAll(deck.cards.map(_toEditable));
+      unawaited(analyticsService.track(AnalyticsEvents.deckGenerated, properties: {
+        AnalyticsProperties.cardCount: deck.cards.length,
+        AnalyticsProperties.source: 'manual',
+        AnalyticsProperties.refined: false,
+        AnalyticsProperties.generationMs: stopwatch.elapsedMilliseconds,
+      }));
       emit(AiGenerateSuccessState());
       _emitContent();
     } catch (e, s) {
       _logger.e('generate failed', ex: e, stacktrace: s);
+      unawaited(analyticsService.track(AnalyticsEvents.deckGenerationFailed, properties: {
+        AnalyticsProperties.reason: e.runtimeType.toString(),
+        AnalyticsProperties.stage: 'generate',
+      }));
       emit(AiGenerateErrorState(e.toString()));
       _emitContent();
     }
@@ -138,6 +155,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       cards: List.from(_cards),
       isPremium: _isPremium,
     ));
+    final stopwatch = Stopwatch()..start();
     try {
       final deck = await aiGenService.generate(
         AiGenRequest(
@@ -149,10 +167,20 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       _cards
         ..clear()
         ..addAll(deck.cards.map(_toEditable));
+      unawaited(analyticsService.track(AnalyticsEvents.deckGenerated, properties: {
+        AnalyticsProperties.cardCount: deck.cards.length,
+        AnalyticsProperties.source: 'manual',
+        AnalyticsProperties.refined: true,
+        AnalyticsProperties.generationMs: stopwatch.elapsedMilliseconds,
+      }));
       emit(AiGenerateSuccessState());
       _emitContent();
     } catch (e, s) {
       _logger.e('refine failed', ex: e, stacktrace: s);
+      unawaited(analyticsService.track(AnalyticsEvents.deckGenerationFailed, properties: {
+        AnalyticsProperties.reason: e.runtimeType.toString(),
+        AnalyticsProperties.stage: 'refine',
+      }));
       emit(AiGenerateErrorState(e.toString()));
       _emitContent();
     }

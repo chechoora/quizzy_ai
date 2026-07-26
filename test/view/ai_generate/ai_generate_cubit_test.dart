@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
@@ -13,12 +14,15 @@ class MockInAppPurchaseService extends Mock implements InAppPurchaseService {}
 
 class MockAiGenService extends Mock implements AiGenService {}
 
+class MockAnalyticsService extends Mock implements AnalyticsService {}
+
 void main() {
   const deckItem = DeckItem(id: 42, title: 'Space', isArchive: false);
 
   late MockQuizCardRepository quizCardRepository;
   late MockInAppPurchaseService inAppPurchaseService;
   late MockAiGenService aiGenService;
+  late MockAnalyticsService analyticsService;
 
   setUpAll(() {
     registerFallbackValue(<PlainCardModel>[]);
@@ -30,6 +34,7 @@ void main() {
         deckItem: deckItem,
         quizCardRepository: quizCardRepository,
         inAppPurchaseService: inAppPurchaseService,
+        analyticsService: analyticsService,
         isSubscriptionOnly: isSubscriptionOnly,
       );
 
@@ -37,6 +42,9 @@ void main() {
     quizCardRepository = MockQuizCardRepository();
     inAppPurchaseService = MockInAppPurchaseService();
     aiGenService = MockAiGenService();
+    analyticsService = MockAnalyticsService();
+    when(() => analyticsService.track(any(), properties: any(named: 'properties')))
+        .thenAnswer((_) async {});
 
     // Generation returns a fresh set; refinement returns the cards it was
     // given plus one, so tests can tell the two paths apart.

@@ -64,6 +64,7 @@ class _ValidatorTypeBottomSheet extends StatelessWidget {
                     item.type.toDisplayString(),
                   ),
                   feature: InAppPurchaseFeature.quizzyAi,
+                  trigger: 'validator_locked',
                 );
                 if (purchased == true && context.mounted) {
                   Navigator.of(context).pop(item.type);

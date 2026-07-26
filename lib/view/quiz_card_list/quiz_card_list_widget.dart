@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
@@ -37,6 +38,7 @@ class QuizCardListWidget extends HookWidget {
         deckRepository: getIt<DeckRepository>(),
         quizCardPremiumManager: getIt<QuizCardPremiumManager>(),
         quizCardExeValidator: getIt<QuizCardExeValidator>(),
+        analyticsService: getIt<AnalyticsService>(),
         isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
       ),
     );
@@ -94,6 +96,8 @@ class QuizCardListWidget extends HookWidget {
         context,
         limitMessage: localize(context).quizCardListPremiumCardLimitMessage,
         feature: cubit.unlockFeature,
+        trigger: 'card_limit',
+        limitType: 'card',
       );
       if (purchased == true && context.mounted) {
         cubit.addCardRequest();

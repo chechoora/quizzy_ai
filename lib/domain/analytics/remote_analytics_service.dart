@@ -30,6 +30,9 @@ class RemoteAnalyticsService with WidgetsBindingObserver implements AnalyticsSer
     required this.analyticsRepository,
     required this.authService,
     required this.appVersion,
+    required this.buildNumber,
+    required this.platform,
+    required this.locale,
     required this.logger,
     this.debounce = const Duration(seconds: 3),
     this.flushInterval = const Duration(minutes: 2),
@@ -41,6 +44,9 @@ class RemoteAnalyticsService with WidgetsBindingObserver implements AnalyticsSer
   final AnalyticsRepository analyticsRepository;
   final AuthService authService;
   final String appVersion;
+  final String buildNumber;
+  final String platform;
+  final String locale;
   final Logger logger;
   final Duration debounce;
   final Duration flushInterval;
@@ -98,6 +104,9 @@ class RemoteAnalyticsService with WidgetsBindingObserver implements AnalyticsSer
       final mergedProperties = {
         ...?properties,
         'app_version': appVersion,
+        'build_number': buildNumber,
+        'platform': platform,
+        'locale': locale,
       };
       await eventDataBaseRepository.enqueue(
         id: uuid.v4(),

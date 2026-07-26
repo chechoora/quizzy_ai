@@ -110,8 +110,11 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
         throw Exception('Purchase was not completed successfully');
       }
       emit(const InAppFeaturesPurchaseSuccessState());
-      unawaited(analyticsService.track(AnalyticsEvents.purchaseCompleted, properties: {
-        AnalyticsProperties.feature: feature.name,
+      final option = _options
+          .firstWhereOrNull((o) => o.packageIdentifier == _selectedPackageIdentifier);
+      unawaited(analyticsService.track(AnalyticsEvents.subscriptionStarted, properties: {
+        AnalyticsProperties.offering: feature.toOfferingId(),
+        if (option != null) AnalyticsProperties.plan: option.period.name,
       }));
       _logger.i('Purchased feature $feature');
       if (isSubscriptionOnly) {

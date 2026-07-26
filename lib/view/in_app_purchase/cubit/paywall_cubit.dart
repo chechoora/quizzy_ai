@@ -68,11 +68,9 @@ class PaywallCubit extends Cubit<PaywallState> {
       }
       final option = _options
           .firstWhereOrNull((o) => o.packageIdentifier == _selectedPackageIdentifier);
-      unawaited(analyticsService.track(AnalyticsEvents.purchaseCompleted, properties: {
-        AnalyticsProperties.feature: feature.name,
-        AnalyticsProperties.packageIdentifier: _selectedPackageIdentifier,
-        if (option != null) AnalyticsProperties.price: option.priceString,
-        if (option != null) AnalyticsProperties.period: option.period.name,
+      unawaited(analyticsService.track(AnalyticsEvents.subscriptionStarted, properties: {
+        AnalyticsProperties.offering: feature.toOfferingId(),
+        if (option != null) AnalyticsProperties.plan: option.period.name,
       }));
       emit(const PaywallPurchaseSuccessState());
     } catch (e, st) {
