@@ -212,6 +212,38 @@ with `final _logger = Logger.withTag('ClassName');`.
 - `w` for expected-but-notable conditions (a skipped operation, an unavailable resource).
 - `e` (with `ex:` and `stacktrace:`) in every `catch` block; rethrow if the caller needs to handle it.
 
+## Logging & Sentry levels
+
+Remote logging (Sentry) only ingests `i` (info) and above.
+`d` (debug) is local-only and never reaches Sentry — treat it as invisible in production.
+
+Level policy by layer:
+
+- **Cubits / BLoCs** — `i` and above by default. Every meaningful state transition,
+  guard, and early-return must be observable remotely. No `d` in this layer.
+- **Widgets / UI** — `i` and above. User-triggered actions, navigation, paywall and
+  dialog presentation.
+- **In-app purchases (RevenueCat, paywall, entitlement checks)** — `i` and above,
+  always. Purchase start, success, cancel, restore, entitlement resolution.
+- **Repositories / services** — `d` is the default for routine internal flow, but use
+  `i` *sparingly* for boundary events: the start and outcome of an operation that
+  crosses a process boundary or changes persisted state. Everything between those two
+  points stays `d`.
+
+  `i` examples: sync run started / finished (with counts), auth token refreshed,
+  entitlement resolved, batch push or pull completed, migration applied.
+  `d` examples: individual HTTP request/response, per-row Drift write, cache hit,
+  retry attempt, scheduler tick.
+
+  Rule of thumb: if it fires once per user action or once per sync cycle → `i`.
+  If it fires per item, per row, or per request → `d`.
+
+Independent of layer:
+- Failures, caught exceptions and degraded paths are always `w` or `e` — including
+  inside repositories and services.
+- Never log PII, Firebase ID tokens, API keys, auth headers or full request/response
+  bodies at `i` or above.
+
 ## Testing
 
 - Tests in `test/` directory
