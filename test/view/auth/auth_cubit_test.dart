@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/auth/model/auth_user.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
@@ -14,17 +15,21 @@ class MockInAppPurchaseService extends Mock implements InAppPurchaseService {}
 
 class MockSettingsService extends Mock implements SettingsService {}
 
+class MockAnalyticsService extends Mock implements AnalyticsService {}
+
 class FakeLogger extends Mock implements Logger {}
 
 void main() {
   late MockAuthService authService;
   late MockInAppPurchaseService inAppPurchaseService;
   late MockSettingsService settingsService;
+  late MockAnalyticsService analyticsService;
 
   AuthCubit buildCubit({required bool isSubscriptionOnly}) => AuthCubit(
         authService: authService,
         inAppPurchaseService: inAppPurchaseService,
         settingsService: settingsService,
+        analyticsService: analyticsService,
         isSubscriptionOnly: isSubscriptionOnly,
         logger: FakeLogger(),
       );
@@ -37,6 +42,9 @@ void main() {
     authService = MockAuthService();
     inAppPurchaseService = MockInAppPurchaseService();
     settingsService = MockSettingsService();
+    analyticsService = MockAnalyticsService();
+    when(() => analyticsService.track(any(), properties: any(named: 'properties')))
+        .thenAnswer((_) async {});
     when(() => inAppPurchaseService.logInUser(any()))
         .thenAnswer((_) async {});
     when(() => settingsService.initUserRecords()).thenAnswer((_) async {});

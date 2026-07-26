@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/purchase_option.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
@@ -43,6 +44,7 @@ class _PaywallBottomSheet extends HookWidget {
     final cubit = useMemoized(
       () => PaywallCubit(
         inAppPurchaseService: getIt<InAppPurchaseService>(),
+        analyticsService: getIt<AnalyticsService>(),
         feature: feature,
       ),
     );

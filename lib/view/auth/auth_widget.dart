@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/remote_config/remote_config_service.dart';
@@ -29,6 +30,7 @@ class AuthWidget extends HookWidget {
         authService: getIt<AuthService>(),
         inAppPurchaseService: getIt<InAppPurchaseService>(),
         settingsService: getIt<SettingsService>(),
+        analyticsService: getIt<AnalyticsService>(),
         isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
         logger: Logger.withTag('AuthCubit'),
       ),

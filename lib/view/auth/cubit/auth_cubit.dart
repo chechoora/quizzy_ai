@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/auth/model/auth_user.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
@@ -12,6 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
     required this.authService,
     required this.inAppPurchaseService,
     required this.settingsService,
+    required this.analyticsService,
     required this.isSubscriptionOnly,
     required this.logger,
   }) : super(const AuthIdleState());
@@ -19,6 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthService authService;
   final InAppPurchaseService inAppPurchaseService;
   final SettingsService settingsService;
+  final AnalyticsService analyticsService;
 
   /// When true (the `quizzypro` flavor) a resumed/linked Quizzy AI
   /// subscription should be set as the default validator right after login.
@@ -40,6 +46,10 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final user = await action();
       logger.i('signIn: success provider=$provider uid=${user.uid}');
+      unawaited(analyticsService.track(
+        AnalyticsEvents.login,
+        properties: {AnalyticsProperties.provider: provider},
+      ));
       await _initUserRecords();
       await _linkPurchases(user.uid);
       emit(AuthSignedInState(user));

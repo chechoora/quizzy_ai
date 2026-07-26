@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/exception/in_app_purchase_exception.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/purchase_option.dart';
@@ -13,6 +17,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
   InAppFeaturesCubit({
     required this.inAppPurchaseService,
     required this.settingsService,
+    required this.analyticsService,
     required this.isSubscriptionOnly,
   }) : super(const InAppFeaturesLoadingState()) {
     _logger = Logger.withTag('InAppFeaturesCubit');
@@ -20,6 +25,7 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
 
   final InAppPurchaseService inAppPurchaseService;
   final SettingsService settingsService;
+  final AnalyticsService analyticsService;
 
   /// When true (the `quizzypro` flavor) only the Quizzy AI subscription is
   /// offered; when false (the `quizzy` flavor) only the one-time "unlimited
@@ -104,6 +110,9 @@ class InAppFeaturesCubit extends Cubit<InAppFeaturesState> {
         throw Exception('Purchase was not completed successfully');
       }
       emit(const InAppFeaturesPurchaseSuccessState());
+      unawaited(analyticsService.track(AnalyticsEvents.purchaseCompleted, properties: {
+        AnalyticsProperties.feature: feature.name,
+      }));
       _logger.i('Purchased feature $feature');
       if (isSubscriptionOnly) {
         await _setQuizzyAiAsDefault();

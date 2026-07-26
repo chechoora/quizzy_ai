@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/quiz/initial_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_match_builder.dart';
 import 'package:poc_ai_quiz/domain/quiz/quiz_service.dart';
@@ -37,6 +38,7 @@ class QuizExeWidget extends HookWidget {
         validatorsManager: getIt<ValidatorsManager>(),
         initialAnswerValidator: InitialAnswerValidator(),
         syncScheduler: getIt<SyncScheduler>(),
+        analyticsService: getIt<AnalyticsService>(),
         isQuickPlay: isQuickPlay,
       ),
     );

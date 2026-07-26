@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/purchase_option.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
@@ -9,6 +13,7 @@ import 'package:poc_ai_quiz/util/unique_emit.dart';
 class PaywallCubit extends Cubit<PaywallState> {
   PaywallCubit({
     required this.inAppPurchaseService,
+    required this.analyticsService,
     required this.feature,
   }) : super(const PaywallIdleState()) {
     _logger = Logger.withTag('PaywallCubit');
@@ -18,6 +23,7 @@ class PaywallCubit extends Cubit<PaywallState> {
   }
 
   final InAppPurchaseService inAppPurchaseService;
+  final AnalyticsService analyticsService;
   final InAppPurchaseFeature feature;
   late final Logger _logger;
 
@@ -60,6 +66,14 @@ class PaywallCubit extends Cubit<PaywallState> {
         emit(_idleState());
         return;
       }
+      final option = _options
+          .firstWhereOrNull((o) => o.packageIdentifier == _selectedPackageIdentifier);
+      unawaited(analyticsService.track(AnalyticsEvents.purchaseCompleted, properties: {
+        AnalyticsProperties.feature: feature.name,
+        AnalyticsProperties.packageIdentifier: _selectedPackageIdentifier,
+        if (option != null) AnalyticsProperties.price: option.priceString,
+        if (option != null) AnalyticsProperties.period: option.period.name,
+      }));
       emit(const PaywallPurchaseSuccessState());
     } catch (e, st) {
       _logger.e('Purchase failed', ex: e, stacktrace: st);

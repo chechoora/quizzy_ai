@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
@@ -31,6 +32,7 @@ class _OnboardingPaywallBottomSheet extends HookWidget {
       () => InAppFeaturesCubit(
         inAppPurchaseService: getIt<InAppPurchaseService>(),
         settingsService: getIt<SettingsService>(),
+        analyticsService: getIt<AnalyticsService>(),
         isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
       ),
     );

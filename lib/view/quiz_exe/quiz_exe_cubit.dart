@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/quiz/i_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/initial_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz/model/quiz_results.dart';
@@ -22,6 +24,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     required this.validatorsManager,
     required this.initialAnswerValidator,
     required this.syncScheduler,
+    required this.analyticsService,
     this.isQuickPlay = false,
   }) : super(QuizExeLoadingState());
 
@@ -32,6 +35,7 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   final SettingsService settingsService;
   final ValidatorsManager validatorsManager;
   final SyncScheduler syncScheduler;
+  final AnalyticsService analyticsService;
   final bool isQuickPlay;
 
   final _logger = Logger.withTag('QuizExeCubit');
@@ -50,6 +54,10 @@ class QuizExeCubit extends Cubit<QuizExeState> {
 
   void launchQuiz() {
     _logger.d('Launching quiz with ${quizCardItems.length} cards');
+    unawaited(analyticsService.track(AnalyticsEvents.quizStarted, properties: {
+      AnalyticsProperties.cardCount: quizCardItems.length,
+      AnalyticsProperties.isQuickPlay: isQuickPlay,
+    }));
     if (quizEngine.hasNext) {
       quizEngine.nextCard();
     }
@@ -111,6 +119,13 @@ class QuizExeCubit extends Cubit<QuizExeState> {
     } else {
       final results = quizMatchBuilder.getResults();
       _logger.i('Quiz completed. Results: $results');
+      final correctCount =
+          results.quizMatchList.where((match) => match.ratio >= 0.6).length;
+      unawaited(analyticsService.track(AnalyticsEvents.quizCompleted, properties: {
+        AnalyticsProperties.cardCount: results.quizMatchList.length,
+        AnalyticsProperties.correctCount: correctCount,
+        AnalyticsProperties.isQuickPlay: isQuickPlay,
+      }));
       emit(QuizDoneState(quizResults: results));
     }
   }
@@ -130,6 +145,11 @@ class QuizExeCubit extends Cubit<QuizExeState> {
   /// release before the sync (and its `isSyncing` notification) starts.
   @override
   Future<void> close() {
+    if (state is! QuizDoneState) {
+      unawaited(analyticsService.track(AnalyticsEvents.quizLeft, properties: {
+        AnalyticsProperties.cardCount: quizCardItems.length,
+      }));
+    }
     scheduleMicrotask(() => unawaited(_pullFreshStats()));
     return super.close();
   }

@@ -8,12 +8,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/config/app_config.dart';
 import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_navigator_observer.dart';
+import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/logout/logout_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_deck_summary.dart';
 import 'package:poc_ai_quiz/util/app_theme.dart';
+import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:poc_ai_quiz/view/create_card/create_card_widget.dart';
 import 'package:poc_ai_quiz/view/deck_edit/deck_edit_widget.dart';
@@ -154,6 +157,12 @@ class ErrorApp extends StatelessWidget {
 GoRouter buildAppRouter({required String initialLocation}) {
   return GoRouter(
     initialLocation: initialLocation,
+    observers: [
+      AnalyticsNavigatorObserver(
+        analyticsService: getIt<AnalyticsService>(),
+        logger: Logger.withTag('AnalyticsNavigatorObserver'),
+      ),
+    ],
     routes: [
       GoRoute(
         name: AuthRoute().name,
