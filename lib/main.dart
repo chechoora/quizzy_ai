@@ -35,6 +35,7 @@ import 'package:poc_ai_quiz/view/auth/auth_widget.dart';
 import 'package:fimber/fimber.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'firebase_options.dart';
+import 'firebase_options_quizzypro.dart';
 
 import 'l10n/app_localizations.dart';
 
@@ -51,7 +52,9 @@ Future<void> mainCommon(AppConfig config) async {
     getIt.registerSingleton<AppConfig>(config);
 
     await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
+      options: config.flavor == Flavor.quizzyPro
+          ? DefaultFirebaseOptionsQuizzyPro.currentPlatform
+          : DefaultFirebaseOptions.currentPlatform,
     );
 
     // Disable Crashlytics in debug mode

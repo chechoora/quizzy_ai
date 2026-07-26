@@ -28,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -61,14 +64,5 @@ class DefaultFirebaseOptions {
     projectId: 'quizzy-ai-85865',
     storageBucket: 'quizzy-ai-85865.firebasestorage.app',
     iosBundleId: 'com.chechoora.quizzy',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAJ6F0d_poQUW_1WSjI9J6eR7k1VSis7KE',
-    appId: '1:897552655477:ios:3f0e5e322b1935ce43043c',
-    messagingSenderId: '897552655477',
-    projectId: 'quizzy-ai-85865',
-    storageBucket: 'quizzy-ai-85865.firebasestorage.app',
-    iosBundleId: 'com.example.pocAiQuiz',
   );
 }

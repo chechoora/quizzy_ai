@@ -86,6 +86,20 @@ fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --rele
 > build, add `android/app/src/quizzypro/google-services.json` and
 > `ios/config/quizzypro/GoogleService-Info.plist` (see the READMEs in those
 > folders).
+>
+> **Regenerating Firebase options:** `lib/firebase_options.dart` (the `quizzy`
+> app) is FlutterFire-CLI-generated — re-run it after changing the `quizzy`
+> Firebase app's Android/iOS registration:
+> ```bash
+> dart pub global activate flutterfire_cli
+> flutterfire configure --project=quizzy-ai-85865
+> ```
+> `lib/firebase_options_quizzypro.dart` is **hand-maintained**, not CLI-generated
+> (FlutterFire CLI only manages one app registration per Dart file, and
+> `quizzypro` is a second app under the same project). If `quizzypro`'s Firebase
+> app registration changes, update its values manually from the
+> `android/app/src/quizzypro/google-services.json` /
+> `ios/config/quizzypro/GoogleService-Info.plist` files instead.
 
 ### Versioned release builds
 
