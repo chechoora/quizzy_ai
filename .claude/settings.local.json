@@ -51,7 +51,10 @@
       "Bash(awk 'NR>=95 && NR<=115' lib/view/home_widget/cubit/deck_cubit.dart)",
       "Bash(git *)",
       "Bash(find *)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(sips -g pixelWidth -g pixelHeight \"/Users/kyrylokharchenko/Desktop/easyappicon-icons-1785094454466/android/mipmap-xxxhdpi/ic_launcher.png\" \"android/app/src/quizzypro/res/mipmap-xxxhdpi/ic_launcher.png\" \"/Users/kyrylokharchenko/Desktop/easyappicon-icons-1785094454466/android/mipmap-xxxhdpi/ic_launcher_foreground.png\" \"android/app/src/quizzypro/res/drawable-xxxhdpi/ic_launcher_foreground.png\")",
+      "Bash(rm -f ios/Runner/Assets.xcassets/AppIcon-quizzypro.appiconset/*.png ios/Runner/Assets.xcassets/AppIcon-quizzypro.appiconset/Contents.json)",
+      "Bash(cp /Users/kyrylokharchenko/Desktop/easyappicon-icons-1785094454466/ios/AppIcon.appiconset/*.png /Users/kyrylokharchenko/Desktop/easyappicon-icons-1785094454466/ios/AppIcon.appiconset/Contents.json ios/Runner/Assets.xcassets/AppIcon-quizzypro.appiconset/)"
     ],
     "deny": [],
     "ask": []
