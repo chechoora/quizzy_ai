@@ -10,26 +10,26 @@ flags are wired into Android/iOS.
 ## Current versions
 
 | Flavor      | Version (`--build-name`) | Build number (`--build-number`) |
-|-------------|---------------------------|---------------------------------|
-| `quizzy`    | `2.3.0`                    | `45`                            |
-| `quizzypro` | `1.0.0`                    | `12`                            |
+|-------------|-----------------------|---------------------------------|
+| `quizzy`    | `1.2.5`               | `45`                            |
+| `quizzypro` | `1.0.0`               | `13`                            |
 
 ## Copy-paste commands
 
 ### quizzy — `2.3.0+45`
 
 ```bash
-fvm flutter build apk       --flavor quizzy -t lib/main_quizzy.dart --release --build-name=2.3.0 --build-number=45
-fvm flutter build appbundle --flavor quizzy -t lib/main_quizzy.dart --release --build-name=2.3.0 --build-number=45
-fvm flutter build ipa       --flavor quizzy -t lib/main_quizzy.dart --build-name=2.3.0 --build-number=45 --export-options-plist=ios/ExportOptions.plist
+fvm flutter build apk       --flavor quizzy -t lib/main_quizzy.dart --release --build-name=1.2.5 --build-number=45
+fvm flutter build appbundle --flavor quizzy -t lib/main_quizzy.dart --release --build-name=1.2.5 --build-number=45
+fvm flutter build ipa       --flavor quizzy -t lib/main_quizzy.dart --build-name=1.2.5 --build-number=45 --export-options-plist=ios/ExportOptions.plist
 ```
 
 ### quizzypro — `1.0.0+1`
  
 ```bash
-fvm flutter build apk       --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=12
-fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=12
-fvm flutter build ipa       --flavor quizzypro -t lib/main_quizzypro.dart --build-name=1.0.0 --build-number=12 --export-options-plist=ios/ExportOptions.plist
+fvm flutter build apk       --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=13
+fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=13
+fvm flutter build ipa       --flavor quizzypro -t lib/main_quizzypro.dart --build-name=1.0.0 --build-number=13 --export-options-plist=ios/ExportOptions.plist
 ```
 
 ## Bumping a version

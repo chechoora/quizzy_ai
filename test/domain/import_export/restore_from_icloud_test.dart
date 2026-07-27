@@ -10,6 +10,7 @@ import 'package:poc_ai_quiz/domain/import_export/import_export_service.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
+import 'package:poc_ai_quiz/domain/remote_config/remote_config_service.dart';
 
 class MockDeckRepository extends Mock implements DeckRepository {}
 
@@ -21,6 +22,8 @@ class MockInAppPurchaseService extends Mock implements InAppPurchaseService {}
 
 class MockIcloudBackupService extends Mock implements IcloudBackupService {}
 
+class MockRemoteConfigService extends Mock implements RemoteConfigService {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(<PlainCardModel>[]);
@@ -31,6 +34,7 @@ void main() {
   late MockQuizCardRepository quizCardRepository;
   late MockInAppPurchaseService inAppPurchaseService;
   late MockIcloudBackupService icloudBackupService;
+  late MockRemoteConfigService remoteConfigService;
   late ImportExportService service;
 
   setUp(() {
@@ -38,6 +42,9 @@ void main() {
     quizCardRepository = MockQuizCardRepository();
     inAppPurchaseService = MockInAppPurchaseService();
     icloudBackupService = MockIcloudBackupService();
+    remoteConfigService = MockRemoteConfigService();
+    when(() => remoteConfigService.deckLimit).thenReturn(3);
+    when(() => remoteConfigService.quizCardLimit).thenReturn(8);
     service = ImportExportService(
       importService: ImportService(),
       exportService: MockExportService(),
@@ -45,6 +52,8 @@ void main() {
       quizCardRepository: quizCardRepository,
       inAppPurchaseService: inAppPurchaseService,
       icloudBackupService: icloudBackupService,
+      remoteConfigService: remoteConfigService,
+      isSubscriptionOnly: false,
     );
   });
 

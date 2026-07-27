@@ -469,12 +469,16 @@ Future<void> _setupServices() async {
   final deckManager = DeckPremiumManager(
     inAppPurchaseService: getIt<InAppPurchaseService>(),
     deckRepository: deckRepository,
+    remoteConfigService: getIt<RemoteConfigService>(),
+    isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
   );
   getIt.registerSingleton<DeckPremiumManager>(deckManager);
 
   final quizManager = QuizCardPremiumManager(
     inAppPurchaseService: getIt<InAppPurchaseService>(),
     quizCardRepository: quizCardRepository,
+    remoteConfigService: getIt<RemoteConfigService>(),
+    isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
   );
   getIt.registerSingleton<QuizCardPremiumManager>(quizManager);
 
@@ -548,6 +552,8 @@ Future<void> _setupServices() async {
     quizCardRepository: quizCardRepository,
     inAppPurchaseService: getIt<InAppPurchaseService>(),
     icloudBackupService: icloudBackupService,
+    remoteConfigService: getIt<RemoteConfigService>(),
+    isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
   );
   getIt.registerSingleton<ImportExportService>(importExportService);
 
