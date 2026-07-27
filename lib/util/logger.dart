@@ -1,4 +1,5 @@
 import 'package:fimber/fimber.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 abstract class Logger {
@@ -60,7 +61,8 @@ class LoggerImpl extends Logger {
 
   // Sentry's static API no-ops when SentryFlutter.init was never called (the
   // quizzy flavor), so this stays flavor-agnostic. Only 'i' and above are
-  // forwarded — 'v'/'d' stay Fimber-only.
+  // forwarded — 'v'/'d' stay Fimber-only. Debug builds never forward, so local
+  // dev runs don't pollute Sentry with noise.
   void _logToSentry(
     String level,
     String tag,
@@ -68,6 +70,8 @@ class LoggerImpl extends Logger {
     Object? ex,
     StackTrace? stacktrace,
   }) {
+    if (kDebugMode) return;
+
     final attributes = {'tag': SentryAttribute.string(tag)};
     switch (level) {
       case 'I':
