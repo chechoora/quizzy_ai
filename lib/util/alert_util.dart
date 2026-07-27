@@ -35,6 +35,7 @@ Future alert(
     context: context,
     builder: (_) => AlertDialog(
       actionsAlignment: MainAxisAlignment.spaceBetween,
+      actionsOverflowButtonSpacing: 4,
       title: title,
       content: SingleChildScrollView(child: content),
       actions: <Widget>[
