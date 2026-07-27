@@ -7,6 +7,8 @@ import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
 import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/purchase_option.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
@@ -14,6 +16,7 @@ class PaywallCubit extends Cubit<PaywallState> {
   PaywallCubit({
     required this.inAppPurchaseService,
     required this.analyticsService,
+    required this.settingsService,
     required this.feature,
   }) : super(const PaywallIdleState()) {
     _logger = Logger.withTag('PaywallCubit');
@@ -24,8 +27,13 @@ class PaywallCubit extends Cubit<PaywallState> {
 
   final InAppPurchaseService inAppPurchaseService;
   final AnalyticsService analyticsService;
+  final SettingsService settingsService;
   final InAppPurchaseFeature feature;
   late final Logger _logger;
+
+  /// True when this paywall is offering the Quizzy AI subscription itself
+  /// (as opposed to a one-time "unlimited decks/cards" purchase).
+  bool get isSubscriptionOnly => feature == InAppPurchaseFeature.quizzyAi;
 
   List<PurchaseOption> _options = const [];
   String? _selectedPackageIdentifier;
@@ -72,11 +80,27 @@ class PaywallCubit extends Cubit<PaywallState> {
         AnalyticsProperties.offering: feature.toOfferingId(),
         if (option != null) AnalyticsProperties.plan: option.period.name,
       }));
+      if (isSubscriptionOnly) {
+        await _setQuizzyAiAsDefault();
+      }
       emit(const PaywallPurchaseSuccessState());
     } catch (e, st) {
       _logger.e('Purchase failed', ex: e, stacktrace: st);
       emit(const PaywallErrorState(message: 'Purchase failed'));
       emit(_idleState());
+    }
+  }
+
+  Future<void> _setQuizzyAiAsDefault() async {
+    _logger.i('Setting Quizzy AI as default validator and deck generator');
+    try {
+      await settingsService.updateValidatorType(AnswerValidatorType.quizzyAI);
+      await settingsService
+          .updateDeckGenerationAiType(AnswerValidatorType.quizzyAI);
+      _logger.i('Quizzy AI set as default validator and deck generator');
+    } catch (e, stackTrace) {
+      _logger.e('Failed to set Quizzy AI as default',
+          ex: e, stacktrace: stackTrace);
     }
   }
 
