@@ -96,8 +96,14 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Quizzy AI'**
+  /// **'Quizzy Vanilla'**
   String get appTitle;
+
+  /// No description provided for @appTitlePro.
+  ///
+  /// In en, this message translates to:
+  /// **'Quizzy AI Pro'**
+  String get appTitlePro;
 
   /// No description provided for @homeQuizDecksTitle.
   ///

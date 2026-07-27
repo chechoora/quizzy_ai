@@ -12,6 +12,7 @@ Future<void> main() => mainCommon(
         isSubscriptionOnly: false,
         enableRemoteSync: false,
         enableAnalytics: false,
+        backendSupported: false,
         sentryDsn: '',
       ),
     );

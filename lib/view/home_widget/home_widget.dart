@@ -160,14 +160,15 @@ class HomeWidget extends HookWidget {
                             },
                           ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: AppButton.secondary(
-                      text: localize(context).homePublicDecksButton,
-                      onPressed: () =>
-                          context.push(PublicDecksRoute().path),
+                  if (getIt<AppConfig>().backendSupported)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: AppButton.secondary(
+                        text: localize(context).homePublicDecksButton,
+                        onPressed: () =>
+                            context.push(PublicDecksRoute().path),
+                      ),
                     ),
-                  ),
                 ],
               );
             } else if (selectedIndex.value == 1) {

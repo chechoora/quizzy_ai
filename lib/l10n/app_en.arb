@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
-  "appTitle": "Quizzy AI",
+  "appTitle": "Quizzy Vanilla",
+  "appTitlePro": "Quizzy AI Pro",
   "homeQuizDecksTitle": "Quiz Decks",
   "homeDecksLabel": "Decks",
   "homeSettingsLabel": "Settings",

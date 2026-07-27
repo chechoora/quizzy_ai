@@ -43,6 +43,11 @@ class AppConfig {
   /// [AnalyticsService] instead.
   final bool enableAnalytics;
 
+  /// Whether the quizzy-ai-pro backend is available to this flavor.
+  /// `quizzyPro` is account-backed and has one; `quizzy` is local-only and
+  /// stays off. Gates backend-dependent features like public decks.
+  final bool backendSupported;
+
   /// Sentry DSN for error monitoring and logs. Empty string disables Sentry.
   /// `quizzyPro` has a Sentry project to attribute events to; `quizzy` does
   /// not, so it stays empty.
@@ -63,6 +68,7 @@ class AppConfig {
     required this.isSubscriptionOnly,
     required this.enableRemoteSync,
     required this.enableAnalytics,
+    required this.backendSupported,
     required this.sentryDsn,
     this.authDomain,
   });

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:poc_ai_quiz/config/app_config.dart';
+import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:quizzy_design/quizzy_design.dart';
@@ -21,6 +23,7 @@ class DeckListDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
+    final appConfig = getIt.get<AppConfig>();
     return SafeArea(
       child: Column(
         children: [
@@ -28,7 +31,7 @@ class DeckListDisplayWidget extends StatelessWidget {
             height: 32,
           ),
           Text(
-            'Quizzy AI',
+            appConfig.backendSupported ? l10n.appTitlePro : l10n.appTitle,
             style: AppTypography.h1.copyWith(
               color: AppColors.grayscale600,
             ),

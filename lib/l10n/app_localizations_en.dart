@@ -9,7 +9,10 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Quizzy AI';
+  String get appTitle => 'Quizzy Vanilla';
+
+  @override
+  String get appTitlePro => 'Quizzy AI Pro';
 
   @override
   String get homeQuizDecksTitle => 'Quiz Decks';
