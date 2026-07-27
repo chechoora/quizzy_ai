@@ -506,6 +506,12 @@ Future<void> _setupServices() async {
   );
   getIt.registerSingleton<IcloudBackupService>(icloudBackupService);
 
+  // start() is deliberately NOT called here — it must not begin watching for
+  // local changes until HomeCubit has resolved whether an iCloud restore
+  // needs to be offered first (see HomeCubit.checkICloudRestore /
+  // restoreFromICloud / skipICloudRestore). Starting eagerly here risked
+  // uploading a sparse local snapshot that overwrites a fuller, not-yet
+  // restored cloud backup.
   final backupScheduler = BackupScheduler(
     deckRepository: deckRepository,
     quizCardRepository: quizCardRepository,
@@ -513,7 +519,6 @@ Future<void> _setupServices() async {
     icloudBackupService: icloudBackupService,
   );
   getIt.registerSingleton<BackupScheduler>(backupScheduler);
-  backupScheduler.start();
 
   // Two-way remote sync (quizzyPro only) — mirrors the iCloud backup
   // scheduler above; gated via AppConfig.enableRemoteSync passed as a

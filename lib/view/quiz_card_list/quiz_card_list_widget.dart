@@ -20,6 +20,7 @@ import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
 import 'package:poc_ai_quiz/view/widgets/sync_progress_bar.dart';
+import 'package:solar_icon_pack/solar_icon_pack.dart';
 
 class QuizCardListWidget extends HookWidget {
   const QuizCardListWidget({
@@ -127,7 +128,7 @@ class QuizCardListWidget extends HookWidget {
                   }),
                 ),
                 child: const Icon(
-                  Icons.integration_instructions,
+                  SolarBoldIcons.addSquare,
                   color: AppColors.grayscale600,
                   size: 32 * 0.6,
                 ),

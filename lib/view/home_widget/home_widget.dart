@@ -9,6 +9,7 @@ import 'package:poc_ai_quiz/domain/deck/deck_repository.dart';
 import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/exception/import_export_exception.dart';
+import 'package:poc_ai_quiz/domain/icloud_backup/backup_scheduler.dart';
 import 'package:poc_ai_quiz/domain/icloud_backup/icloud_restore_service.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/onboarding/onboarding_service.dart';
@@ -35,6 +36,7 @@ class HomeWidget extends HookWidget {
         deckPremiumManager: getIt<DeckPremiumManager>(),
         onboardingService: getIt<OnboardingService>(),
         iCloudRestoreService: getIt<ICloudRestoreService>(),
+        backupScheduler: getIt<BackupScheduler>(),
         isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
       ),
     );
@@ -319,6 +321,8 @@ Future<void> _offerICloudRestore(BuildContext context, HomeCubit cubit) async {
 
   if (restore == true) {
     cubit.restoreFromICloud();
+  } else {
+    cubit.skipICloudRestore();
   }
 }
 
