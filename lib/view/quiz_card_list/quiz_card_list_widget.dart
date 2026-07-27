@@ -19,8 +19,7 @@ import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
-import 'package:poc_ai_quiz/view/widgets/sync_progress_bar.dart';
-import 'package:solar_icon_pack/solar_icon_pack.dart';
+import 'package:solar_icons/solar_icons.dart';
 
 class QuizCardListWidget extends HookWidget {
   const QuizCardListWidget({
@@ -113,25 +112,20 @@ class QuizCardListWidget extends HookWidget {
             AppSimpleHeader(
               title: deckItem.title,
               onBackPressed: () => context.pop(),
-              trailing: ElevatedButton(
-                onPressed: () => launchDeckEdit(),
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: EdgeInsets.zero,
-                  elevation: 0,
-                ).copyWith(
-                  backgroundColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return Colors.transparent;
-                    }
-                    return AppColors.grayscaleWhite;
-                  }),
-                ),
-                child: const Icon(
-                  SolarBoldIcons.addSquare,
-                  color: AppColors.grayscale600,
-                  size: 32 * 0.6,
-                ),
+              trailing: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AppCircleIconButton(
+                    icon: SolarIconsOutline.addSquare,
+                    onPressed: () => launchDeckEdit(),
+                  ),
+                  const SizedBox(width: 8),
+                  AppCircleIconButton(
+                    icon: SolarIconsOutline.magicStick_3,
+                    onPressed: () => cubit.addCardRequest(),
+                  ),
+                ],
               ),
             ),
             Expanded(
@@ -157,7 +151,6 @@ class QuizCardListWidget extends HookWidget {
                             onAddCardRequest: () => cubit.addCardRequest(),
                           ),
                         ),
-                        const SyncProgressBar(),
                         if (state.quizCarList.isNotEmpty)
                           _BottomButtons(
                             hasSelection: state.hasSelection,
@@ -309,7 +302,7 @@ class _BottomButtons extends StatelessWidget {
                     switchSides
                         ? l10n.quizCardListSideSwitched
                         : l10n.quizCardListSidesNotSwitched,
-                    style: AppTypography.buttonSmall.copyWith(
+                    style: AppTypography.h3.copyWith(
                       color: AppColors.primary500,
                     ),
                   ),
@@ -327,7 +320,7 @@ class _BottomButtons extends StatelessWidget {
                     shuffleEnabled
                         ? l10n.quizCardListShuffleCards
                         : l10n.quizCardListCardsInOrder,
-                    style: AppTypography.buttonSmall.copyWith(
+                    style: AppTypography.h3.copyWith(
                       color: AppColors.primary500,
                     ),
                   ),
@@ -387,7 +380,7 @@ class _SelectButton extends StatelessWidget {
         ),
         child: Text(
           l10n.quizCardListSelect,
-          style: AppTypography.buttonSmall.copyWith(
+          style: AppTypography.h3.copyWith(
             color: AppColors.primary500,
           ),
         ),
