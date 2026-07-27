@@ -10,11 +10,14 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 class RevenueCatPurchaseManager {
   // Offering for the quizzy (non-pro) flavor.
   static const cardsAndDecksOffering = 'unlimited_cards_decks';
+
   // Entitlement granted by cardsAndDecksOffering (configured in the
   // RevenueCat dashboard — happens to match the offering identifier).
   static const cardsAndDecksEntitlement = 'unlimited_cards_decks';
+
   // Offering for the quizzypro flavor.
   static const quizzyAiOffering = 'default';
+
   // Entitlement granted by quizzyAiOffering (configured in the RevenueCat
   // dashboard — does NOT match the offering identifier, do not assume it does).
   static const quizzyAiEntitlement = 'Quizzy AI Pro Pro';
@@ -64,8 +67,7 @@ class RevenueCatPurchaseManager {
     _logger.i('Checking if feature purchased: $entitlementIdentifier');
     final customerInfo = await Purchases.getCustomerInfo();
     final isActive =
-        customerInfo.entitlements.all[entitlementIdentifier]?.isActive ??
-            false;
+        customerInfo.entitlements.all[entitlementIdentifier]?.isActive ?? false;
     _logger.i('Feature $entitlementIdentifier is active: $isActive');
     return isActive;
   }
@@ -103,14 +105,12 @@ class RevenueCatPurchaseManager {
         : offering.availablePackages.firstOrNull;
     if (package == null) {
       _logger.e('No available packages for offering $offeringIdentifier');
-      throw Exception(
-          'No available packages for offering $offeringIdentifier');
+      throw Exception('No available packages for offering $offeringIdentifier');
     }
     final purchaseParams = PurchaseParams.package(package);
     final result = await Purchases.purchase(purchaseParams);
     final isActive =
-        result.customerInfo.entitlements.all[entitlementIdentifier]
-                ?.isActive ??
+        result.customerInfo.entitlements.all[entitlementIdentifier]?.isActive ??
             false;
     _logger
         .i('Purchase completed for $entitlementIdentifier, active: $isActive');
@@ -135,6 +135,10 @@ class RevenueCatPurchaseManager {
 
   Future<void> logOut() async {
     _logger.i('Logging out RevenueCat user');
+    if (await Purchases.isAnonymous) {
+      _logger.i('RevenueCat user is already anonymous, skipping log out');
+      return;
+    }
     await Purchases.logOut();
     _logger.i('RevenueCat user logged out');
   }
