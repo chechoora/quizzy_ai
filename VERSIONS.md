@@ -16,7 +16,7 @@ flags are wired into Android/iOS.
 
 ## Copy-paste commands
 
-### quizzy — `2.3.0+45`
+### quizzy
 
 ```bash
 fvm flutter build apk       --flavor quizzy -t lib/main_quizzy.dart --release --build-name=1.2.5 --build-number=45
@@ -24,7 +24,7 @@ fvm flutter build appbundle --flavor quizzy -t lib/main_quizzy.dart --release --
 fvm flutter build ipa       --flavor quizzy -t lib/main_quizzy.dart --build-name=1.2.5 --build-number=45 --export-options-plist=ios/ExportOptions.plist
 ```
 
-### quizzypro — `1.0.0+1`
+### quizzypro
  
 ```bash
 fvm flutter build apk       --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=13
