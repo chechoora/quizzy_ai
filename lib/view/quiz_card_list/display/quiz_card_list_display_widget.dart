@@ -14,7 +14,6 @@ class QuizCardListDisplayWidget extends StatelessWidget {
     this.onCardSelectionToggle,
     this.onQuizCardEditRequest,
     this.onQuizCardRemoveRequest,
-    this.onAddCardRequest,
     super.key,
   });
 
@@ -25,14 +24,13 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   final ValueChanged<int>? onCardSelectionToggle;
   final ValueChanged<QuizCardItem>? onQuizCardEditRequest;
   final ValueChanged<QuizCardItem>? onQuizCardRemoveRequest;
-  final VoidCallback? onAddCardRequest;
 
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
     final stats = deckStats;
     final hasStats = stats != null;
-    final itemCount = quizCarList.length + 1 + (hasStats ? 1 : 0);
+    final itemCount = quizCarList.length + (hasStats ? 1 : 0);
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: itemCount,
@@ -58,17 +56,6 @@ class QuizCardListDisplayWidget extends StatelessWidget {
           });
         }
         final cardIndex = hasStats ? index - 1 : index;
-        if (cardIndex == quizCarList.length) {
-          return _AddCardTile(
-            title: l10n.quizCardListAddCardTooltip,
-            icon: const Icon(
-              Icons.add,
-              size: 24,
-              color: AppColors.grayscale500,
-            ),
-            onPressed: onAddCardRequest,
-          );
-        }
         final item = quizCarList[cardIndex];
         final isSelected = selectedCardIds.contains(item.id);
         final itemStats = item.stats;
@@ -268,94 +255,3 @@ class QuizCardTile extends StatelessWidget {
   }
 }
 
-class _AddCardTile extends StatelessWidget {
-  const _AddCardTile({
-    required this.title,
-    required this.icon,
-    this.onPressed,
-  });
-
-  final String title;
-  final Widget icon;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, right: 4, bottom: 2),
-      child: GestureDetector(
-        onTap: onPressed,
-        child: CustomPaint(
-          painter: _DashedBorderPainter(
-            color: AppColors.grayscale500,
-            strokeWidth: 1.5,
-            radius: 15,
-          ),
-          child: SizedBox(
-            height: 64,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                icon,
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: AppTypography.secondaryText.copyWith(
-                    color: AppColors.grayscale500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DashedBorderPainter extends CustomPainter {
-  _DashedBorderPainter({
-    required this.color,
-    required this.strokeWidth,
-    required this.radius,
-  });
-
-  final Color color;
-  final double strokeWidth;
-  final double radius;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-
-    final path = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(0, 0, size.width, size.height),
-          Radius.circular(radius),
-        ),
-      );
-
-    const dashWidth = 8.0;
-    const dashSpace = 4.0;
-
-    final pathMetrics = path.computeMetrics();
-    for (final metric in pathMetrics) {
-      var distance = 0.0;
-      while (distance < metric.length) {
-        final extractPath = metric.extractPath(
-          distance,
-          distance + dashWidth,
-        );
-        canvas.drawPath(extractPath, paint);
-        distance += dashWidth + dashSpace;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

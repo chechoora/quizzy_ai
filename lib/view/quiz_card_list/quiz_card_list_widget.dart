@@ -118,12 +118,12 @@ class QuizCardListWidget extends HookWidget {
                 children: [
                   AppCircleIconButton(
                     icon: SolarIconsOutline.addSquare,
-                    onPressed: () => launchDeckEdit(),
+                    onPressed: () => cubit.addCardRequest(),
                   ),
                   const SizedBox(width: 8),
                   AppCircleIconButton(
                     icon: SolarIconsOutline.magicStick_3,
-                    onPressed: () => cubit.addCardRequest(),
+                    onPressed: () => launchDeckEdit(),
                   ),
                 ],
               ),
@@ -136,6 +136,18 @@ class QuizCardListWidget extends HookWidget {
                 },
                 builder: (context, state) {
                   if (state is QuizCardListDataState) {
+                    if (state.quizCarList.isEmpty) {
+                      return Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.only(bottom: 64),
+                        child: EmptyListWidget(
+                          imageAsset: 'assets/images/cards_empty_state.png',
+                          title: localize(context).quizCardListEmptyStateTitle,
+                          description: localize(context)
+                              .quizCardListEmptyStateDescription,
+                        ),
+                      );
+                    }
                     return Column(
                       children: [
                         Expanded(
@@ -148,7 +160,6 @@ class QuizCardListWidget extends HookWidget {
                                 cubit.toggleCardSelection(cardId),
                             onQuizCardEditRequest: launchEditCardRequest,
                             onQuizCardRemoveRequest: launchConfirmDeleteRequest,
-                            onAddCardRequest: () => cubit.addCardRequest(),
                           ),
                         ),
                         if (state.quizCarList.isNotEmpty)

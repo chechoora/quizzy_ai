@@ -148,7 +148,12 @@ class HomeWidget extends HookWidget {
                 children: [
                   Expanded(
                     child: deckList.isEmpty
-                        ? const _EmptyListWidget()
+                        ? EmptyListWidget(
+                            imageAsset: 'assets/images/decks_empty_state.png',
+                            title: localize(context).homeEmptyStateTitle,
+                            description:
+                                localize(context).homeEmptyStateDescription,
+                          )
                         : DeckListDisplayWidget(
                             deckList: state.deckList,
                             onDeckRemoveRequest: (deck) {
@@ -323,46 +328,6 @@ Future<void> _offerICloudRestore(BuildContext context, HomeCubit cubit) async {
     cubit.restoreFromICloud();
   } else {
     cubit.skipICloudRestore();
-  }
-}
-
-class _EmptyListWidget extends StatelessWidget {
-  const _EmptyListWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      margin: const EdgeInsets.symmetric(
-        horizontal: 52,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/images/decks_empty_state.png',
-            height: 148,
-            fit: BoxFit.fitHeight,
-          ),
-          const SizedBox(height: 24),
-          Text(
-            localize(context).homeEmptyStateTitle,
-            style: AppTypography.h3.copyWith(
-              color: AppColors.grayscale600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            localize(context).homeEmptyStateDescription,
-            textAlign: TextAlign.center,
-            style: AppTypography.h4.copyWith(
-              color: AppColors.grayscale500,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 

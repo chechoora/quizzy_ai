@@ -209,9 +209,8 @@ class _AddCardButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
-    return AppButton.secondary(
-      text: l10n.aiGenerateAddCardLabel,
-      leadingIcon: const Icon(Icons.add, size: 20),
+    return AppAddCardTile(
+      title: l10n.aiGenerateAddCardLabel,
       onPressed: onPressed,
     );
   }

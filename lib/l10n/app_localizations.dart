@@ -729,6 +729,18 @@ abstract class AppLocalizations {
   /// **'All selected cards are locked. Please select at least one unlocked card or unlock premium features.'**
   String get quizCardListNoUnlockedCardsSelected;
 
+  /// No description provided for @quizCardListEmptyStateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No cards yet'**
+  String get quizCardListEmptyStateTitle;
+
+  /// No description provided for @quizCardListEmptyStateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first card and start learning!'**
+  String get quizCardListEmptyStateDescription;
+
   /// No description provided for @quizExeScoreLabel.
   ///
   /// In en, this message translates to:

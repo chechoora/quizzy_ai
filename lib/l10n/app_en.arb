@@ -169,6 +169,8 @@
     }
   },
   "quizCardListNoUnlockedCardsSelected": "All selected cards are locked. Please select at least one unlocked card or unlock premium features.",
+  "quizCardListEmptyStateTitle": "No cards yet",
+  "quizCardListEmptyStateDescription": "Add your first card and start learning!",
   "quizExeScoreLabel": "Score: {score}",
   "@quizExeScoreLabel": {
     "placeholders": {

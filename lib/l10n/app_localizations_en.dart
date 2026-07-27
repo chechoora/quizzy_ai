@@ -345,6 +345,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quizCardListNoUnlockedCardsSelected => 'All selected cards are locked. Please select at least one unlocked card or unlock premium features.';
 
   @override
+  String get quizCardListEmptyStateTitle => 'No cards yet';
+
+  @override
+  String get quizCardListEmptyStateDescription => 'Add your first card and start learning!';
+
+  @override
   String quizExeScoreLabel(int score) {
     return 'Score: $score';
   }
