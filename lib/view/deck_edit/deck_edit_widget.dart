@@ -15,6 +15,7 @@ import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/deck_edit/cubit/cubit.dart';
 import 'package:poc_ai_quiz/view/deck_edit/display/editable_card_tile.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
+import 'package:solar_icons/solar_icons.dart';
 
 class DeckEditWidget extends HookWidget {
   const DeckEditWidget({required this.deckItem, super.key});
@@ -88,6 +89,16 @@ class DeckEditWidget extends HookWidget {
               AppSimpleHeader(
                 title: 'Edit ${deckItem.title}',
                 onBackPressed: () => context.pop(),
+                trailing: BlocBuilder<DeckEditCubit, AiGenerateState>(
+                  bloc: cubit,
+                  buildWhen: (prev, next) => next is BuilderState,
+                  builder: (context, state) {
+                    return AppCircleIconButton(
+                      icon: SolarIconsOutline.checkCircle,
+                      onPressed: cubit.save,
+                    );
+                  },
+                ),
               ),
               Expanded(
                 child: BlocBuilder<DeckEditCubit, AiGenerateState>(
@@ -102,14 +113,8 @@ class DeckEditWidget extends HookWidget {
                 buildWhen: (prev, next) => next is BuilderState,
                 builder: (context, state) {
                   final isGenerating = state is AiGenerateGeneratingState;
-                  final hasContent =
-                      state is AiGenerateContentState && state.cards.isNotEmpty;
                   if (!cubit.isPremium) {
-                    return _FreeBottomBar(
-                      showSave: hasContent,
-                      onSave: cubit.save,
-                      onUnlock: unlockAi,
-                    );
+                    return _FreeBottomBar(onUnlock: unlockAi);
                   }
                   return _Composer(
                     controller: promptController,
@@ -117,9 +122,7 @@ class DeckEditWidget extends HookWidget {
                         ? l10n.aiGenerateRefineHint
                         : l10n.aiGeneratePromptHint,
                     canSend: canSend && !isGenerating,
-                    showSave: hasContent && !isGenerating,
                     onSend: submitPrompt,
-                    onSave: cubit.save,
                   );
                 },
               ),
@@ -217,14 +220,8 @@ class _AddCardButton extends StatelessWidget {
 }
 
 class _FreeBottomBar extends StatelessWidget {
-  const _FreeBottomBar({
-    required this.showSave,
-    required this.onSave,
-    required this.onUnlock,
-  });
+  const _FreeBottomBar({required this.onUnlock});
 
-  final bool showSave;
-  final VoidCallback onSave;
   final VoidCallback onUnlock;
 
   @override
@@ -246,13 +243,6 @@ class _FreeBottomBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (showSave) ...[
-            AppButton.primary(
-              text: l10n.aiGenerateSaveButton,
-              onPressed: onSave,
-            ),
-            const SizedBox(height: 12),
-          ],
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -286,21 +276,16 @@ class _Composer extends StatelessWidget {
     required this.controller,
     required this.hint,
     required this.canSend,
-    required this.showSave,
     required this.onSend,
-    required this.onSave,
   });
 
   final TextEditingController controller;
   final String hint;
   final bool canSend;
-  final bool showSave;
   final VoidCallback onSend;
-  final VoidCallback onSave;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = localize(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       decoration: BoxDecoration(
@@ -316,16 +301,6 @@ class _Composer extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (showSave) ...[
-            SizedBox(
-              width: double.infinity,
-              child: AppButton.primary(
-                text: l10n.aiGenerateSaveButton,
-                onPressed: onSave,
-              ),
-            ),
-            const SizedBox(height: 12),
-          ],
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
