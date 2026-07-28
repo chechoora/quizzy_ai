@@ -26,7 +26,7 @@ def output_dir(flavor)
 end
 
 desc "Build Android APK. Params: flavor:quizzy|quizzypro mode:debug|release (default release)"
-lane :apk do |options|
+lane :build_apk do |options|
   flavor = flavor!(options)
   mode = options[:mode] || "release"
   name, number = build_name_number(flavor)
@@ -40,7 +40,7 @@ lane :apk do |options|
 end
 
 desc "Build Android App Bundle (release). Params: flavor:quizzy|quizzypro"
-lane :appbundle do |options|
+lane :build_appbundle do |options|
   flavor = flavor!(options)
   name, number = build_name_number(flavor)
   Dir.chdir(ROOT) do
@@ -73,7 +73,7 @@ end
 desc "Build apk + appbundle + ipa for one flavor. Params: flavor:quizzy|quizzypro"
 lane :release_all do |options|
   flavor = flavor!(options)
-  apk(flavor: flavor, mode: "release")
-  appbundle(flavor: flavor)
+  build_apk(flavor: flavor, mode: "release")
+  build_appbundle(flavor: flavor)
   build_ipa(flavor: flavor)
 end
