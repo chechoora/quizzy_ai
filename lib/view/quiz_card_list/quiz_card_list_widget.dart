@@ -317,17 +317,16 @@ class _BottomButtons extends StatelessWidget {
                   onPressed: () => onShufflePressed?.call(!shuffleEnabled),
                 ),
                 AppActionText(
+                  text: isAnswerVisible
+                      ? l10n.quizCardListHideAnswers
+                      : l10n.quizCardListShowAnswers,
+                  onPressed: () => onShowAnswersPressed?.call(!isAnswerVisible),
+                ),
+                AppActionText(
                   text: switchSides
                       ? l10n.quizCardListSideSwitched
                       : l10n.quizCardListSidesNotSwitched,
                   onPressed: () => onSwitchSidesPressed?.call(!switchSides),
-                ),
-                AppActionText(
-                  text: isAnswerVisible
-                      ? l10n.quizCardListHideAnswers
-                      : l10n.quizCardListShowAnswers,
-                  onPressed: () =>
-                      onShowAnswersPressed?.call(!isAnswerVisible),
                 ),
               ],
             ),

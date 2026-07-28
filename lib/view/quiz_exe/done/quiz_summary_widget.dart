@@ -4,6 +4,7 @@ import 'package:poc_ai_quiz/domain/quiz/model/quiz_results.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:quizzy_design/quizzy_design.dart';
+import 'package:solar_icons/solar_icons.dart';
 
 const _correctAnswerThreshold = 0.7;
 
@@ -42,6 +43,15 @@ class QuizSummaryWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: 32),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          alignment: Alignment.topLeft,
+          child: AppCircleIconButton(
+            icon: SolarIconsOutline.closeCircle,
+            onPressed: () => context.pop(),
+          ),
+        ),
         const Spacer(),
         Image.asset(
           'assets/images/quiz_done.png',
