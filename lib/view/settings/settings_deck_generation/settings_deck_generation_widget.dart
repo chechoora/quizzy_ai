@@ -12,6 +12,7 @@ import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/settings/settings_deck_generation/cubit/settings_deck_generation_cubit.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_config_content.dart';
+import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_ui_data.dart';
 
 class SettingsDeckGenerationWidget extends HookWidget {
   const SettingsDeckGenerationWidget({super.key});
@@ -91,7 +92,7 @@ class SettingsDeckGenerationWidget extends HookWidget {
                     snackBar(
                       context,
                       message: l10n.settingsDeckGenerationChangedMessage(
-                        state.type.toDisplayString(),
+                        state.type.displayName(l10n),
                       ),
                       duration: const Duration(seconds: 2),
                     );
@@ -99,14 +100,17 @@ class SettingsDeckGenerationWidget extends HookWidget {
                     snackBar(
                       context,
                       message: l10n.settingsAiValidatorApiKeySavedMessage(
-                        state.type.toDisplayString(),
+                        state.type.displayName(l10n),
                       ),
                       duration: const Duration(seconds: 2),
                     );
                   } else if (state is DeckGenerationErrorState) {
                     snackBar(
                       context,
-                      message: state.error,
+                      message: state.isConfigUpdateFailure
+                          ? l10n.settingsConfigUpdateFailedMessage(
+                              state.error)
+                          : state.error,
                       isError: true,
                       duration: const Duration(seconds: 2),
                     );

@@ -399,5 +399,92 @@
   "cleanInstallRestoreTitle": "Restore your decks?",
   "cleanInstallRestoreMessage": "We found an iCloud backup. Would you like to restore your decks and cards?",
   "cleanInstallRestoreButton": "Restore",
-  "cleanInstallSkipButton": "Skip"
+  "cleanInstallSkipButton": "Skip",
+  "createCardEnterQuestionLabel": "Enter question",
+  "createCardQuestionHint": "Add your question here",
+  "createCardEnterAnswerLabel": "Enter answer",
+  "createCardAnswerHint": "Add your answer here",
+  "createCardAddButton": "Add Card",
+  "createCardTitle": "Create card",
+  "quizSummaryHeadlineDefault": "You're doing great, keep going!",
+  "quizSummaryHeadlineAmazing": "Amazing job, you nailed it!",
+  "quizSummaryHeadlineKeepPracticing": "Keep practicing, you'll get there!",
+  "quizSummaryCorrectAnswersLabel": "Correct answers",
+  "quizSummaryScoreLabel": "Score",
+  "quizSummaryPlayAnotherDeckButton": "Play Another Deck",
+  "quizSummaryReviewAnswersButton": "Review answers",
+  "quizDoneReviewProgressTitle": "Review your progress",
+  "quizDoneQuestionLabel": "Question: {question}",
+  "@quizDoneQuestionLabel": {
+    "placeholders": {
+      "question": {
+        "type": "String"
+      }
+    }
+  },
+  "quizDoneAnswerLabel": "Answer: {answer}",
+  "@quizDoneAnswerLabel": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "quizDoneYourAnswerLabel": "Your answer: {answer}",
+  "@quizDoneYourAnswerLabel": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "quizDoneMatchLabel": "Match: {percent}%",
+  "@quizDoneMatchLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "quizDoneExplanationLabel": "Explanation: {explanation}",
+  "@quizDoneExplanationLabel": {
+    "placeholders": {
+      "explanation": {
+        "type": "String"
+      }
+    }
+  },
+  "deckEditTitle": "Edit {deckTitle}",
+  "@deckEditTitle": {
+    "placeholders": {
+      "deckTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsConfigUpdateFailedMessage": "Failed to update config: {error}",
+  "@settingsConfigUpdateFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "aiGenerateNoCardsError": "Add at least one card before saving.",
+  "aiGenerateSaveFailedError": "Failed to save cards. Please try again.",
+  "quizCardListValidatorNotConfiguredMessage": "{validatorName} is not configured.",
+  "@quizCardListValidatorNotConfiguredMessage": {
+    "placeholders": {
+      "validatorName": {
+        "type": "String"
+      }
+    }
+  },
+  "validatorNameGemini": "Gemini AI",
+  "validatorNameOnDeviceAI": "On-Device AI (experimental)",
+  "validatorNameClaude": "Claude AI",
+  "validatorNameOpenAI": "OpenAI",
+  "validatorNameOllama": "Ollama (Local, experimental)",
+  "validatorNameMl": "ML Model",
+  "validatorNameQuizzyAI": "Quizzy AI"
 }

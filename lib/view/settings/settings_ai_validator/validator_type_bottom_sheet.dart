@@ -61,7 +61,7 @@ class _ValidatorTypeBottomSheet extends StatelessWidget {
                 final purchased = await showPaywallBottomSheet(
                   context,
                   limitMessage: l10n.answerValidatorNotAvailableMessage(
-                    item.type.toDisplayString(),
+                    item.type.displayName(l10n),
                   ),
                   feature: InAppPurchaseFeature.quizzyAi,
                   trigger: 'validator_locked',
@@ -135,7 +135,7 @@ class _ValidatorOptionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  validatorItem.type.toDisplayString(),
+                  validatorItem.type.displayName(l10n),
                   style: AppTypography.h4.copyWith(color: textColor),
                 ),
                 const SizedBox(height: 4),

@@ -20,6 +20,7 @@ import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
+import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_ui_data.dart';
 import 'package:solar_icons/solar_icons.dart';
 
 class QuizCardListWidget extends HookWidget {
@@ -110,7 +111,7 @@ class QuizCardListWidget extends HookWidget {
       final purchased = await showPaywallBottomSheet(
         context,
         limitMessage: localize(context).answerValidatorNotAvailableMessage(
-          AnswerValidatorType.quizzyAI.toDisplayString(),
+          AnswerValidatorType.quizzyAI.displayName(localize(context)),
         ),
         feature: state.feature,
         trigger: 'quiz_launch',
@@ -250,7 +251,10 @@ class QuizCardListWidget extends HookWidget {
                   if (state is QuizCardListErrorState) {
                     snackBar(
                       context,
-                      message: state.message,
+                      message:
+                          localize(context).quizCardListValidatorNotConfiguredMessage(
+                        state.validatorType.displayName(localize(context)),
+                      ),
                       isError: true,
                       actionLabel: localize(context).goToSettings,
                       onActionPressed: () => context.pushNamed(

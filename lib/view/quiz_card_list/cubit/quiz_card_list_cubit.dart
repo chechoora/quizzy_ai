@@ -12,6 +12,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.d
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
@@ -217,8 +218,8 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
             switchSides: switchSides,
           ),
         );
-      case QuizCardExeInvalidConfig(:final reason):
-        emit(QuizCardListErrorState(message: reason));
+      case QuizCardExeInvalidConfig(:final validatorType):
+        emit(QuizCardListErrorState(validatorType: validatorType));
     }
   }
 
@@ -307,9 +308,9 @@ class RequestCreateQuizCardState extends ListenerState {
 }
 
 class QuizCardListErrorState extends ListenerState {
-  final String message;
+  final AnswerValidatorType validatorType;
 
-  QuizCardListErrorState({required this.message});
+  QuizCardListErrorState({required this.validatorType});
 }
 
 class QuizCardListPaywallState extends ListenerState {

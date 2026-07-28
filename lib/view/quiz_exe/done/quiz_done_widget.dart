@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/domain/quiz/model/quiz_results.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 
 class QuizDoneWidget extends StatelessWidget {
@@ -52,6 +53,7 @@ class QuizMatchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = localize(context);
     final isLowRatio = quizAnswerMatch.ratio < 0.7;
     final textColor = isLowRatio ? AppColors.error600 : AppColors.success600;
     return Container(
@@ -68,30 +70,30 @@ class QuizMatchWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "Question: ${quizAnswerMatch.question}",
+            l10n.quizDoneQuestionLabel(quizAnswerMatch.question),
             style: AppTypography.h4.copyWith(color: textColor),
           ),
           const SizedBox(height: 8),
           Text(
-            "Answer: ${quizAnswerMatch.correctAnswer}",
+            l10n.quizDoneAnswerLabel(quizAnswerMatch.correctAnswer),
             style: AppTypography.secondaryText.copyWith(
               color: AppColors.grayscale600,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            "Your answer: ${quizAnswerMatch.yourAnswer}",
+            l10n.quizDoneYourAnswerLabel(quizAnswerMatch.yourAnswer),
             style: AppTypography.secondaryText.copyWith(color: textColor),
           ),
           const SizedBox(height: 4),
           Text(
-            "Match: ${(quizAnswerMatch.ratio * 100).toInt()}%",
+            l10n.quizDoneMatchLabel((quizAnswerMatch.ratio * 100).toInt()),
             style: AppTypography.secondaryText.copyWith(color: textColor),
           ),
           if (quizAnswerMatch.explanation != null) ...[
             const SizedBox(height: 4),
             Text(
-              "Explanation: ${quizAnswerMatch.explanation}",
+              l10n.quizDoneExplanationLabel(quizAnswerMatch.explanation!),
               style: AppTypography.secondaryText.copyWith(
                 color: AppColors.grayscale600,
               ),
@@ -119,7 +121,7 @@ class _Header extends StatelessWidget {
           AppCloseButton(onPressed: onClose ?? () => context.pop()),
           const SizedBox(width: 16),
           Text(
-            'Review your progress',
+            localize(context).quizDoneReviewProgressTitle,
             style: AppTypography.h2,
           ),
         ],

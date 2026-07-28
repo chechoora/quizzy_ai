@@ -1634,6 +1634,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip'**
   String get cleanInstallSkipButton;
+
+  /// No description provided for @createCardEnterQuestionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter question'**
+  String get createCardEnterQuestionLabel;
+
+  /// No description provided for @createCardQuestionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your question here'**
+  String get createCardQuestionHint;
+
+  /// No description provided for @createCardEnterAnswerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter answer'**
+  String get createCardEnterAnswerLabel;
+
+  /// No description provided for @createCardAnswerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your answer here'**
+  String get createCardAnswerHint;
+
+  /// No description provided for @createCardAddButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Card'**
+  String get createCardAddButton;
+
+  /// No description provided for @createCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create card'**
+  String get createCardTitle;
+
+  /// No description provided for @quizSummaryHeadlineDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re doing great, keep going!'**
+  String get quizSummaryHeadlineDefault;
+
+  /// No description provided for @quizSummaryHeadlineAmazing.
+  ///
+  /// In en, this message translates to:
+  /// **'Amazing job, you nailed it!'**
+  String get quizSummaryHeadlineAmazing;
+
+  /// No description provided for @quizSummaryHeadlineKeepPracticing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep practicing, you\'ll get there!'**
+  String get quizSummaryHeadlineKeepPracticing;
+
+  /// No description provided for @quizSummaryCorrectAnswersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct answers'**
+  String get quizSummaryCorrectAnswersLabel;
+
+  /// No description provided for @quizSummaryScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Score'**
+  String get quizSummaryScoreLabel;
+
+  /// No description provided for @quizSummaryPlayAnotherDeckButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Play Another Deck'**
+  String get quizSummaryPlayAnotherDeckButton;
+
+  /// No description provided for @quizSummaryReviewAnswersButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Review answers'**
+  String get quizSummaryReviewAnswersButton;
+
+  /// No description provided for @quizDoneReviewProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review your progress'**
+  String get quizDoneReviewProgressTitle;
+
+  /// No description provided for @quizDoneQuestionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Question: {question}'**
+  String quizDoneQuestionLabel(String question);
+
+  /// No description provided for @quizDoneAnswerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer: {answer}'**
+  String quizDoneAnswerLabel(String answer);
+
+  /// No description provided for @quizDoneYourAnswerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your answer: {answer}'**
+  String quizDoneYourAnswerLabel(String answer);
+
+  /// No description provided for @quizDoneMatchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Match: {percent}%'**
+  String quizDoneMatchLabel(int percent);
+
+  /// No description provided for @quizDoneExplanationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Explanation: {explanation}'**
+  String quizDoneExplanationLabel(String explanation);
+
+  /// No description provided for @deckEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {deckTitle}'**
+  String deckEditTitle(String deckTitle);
+
+  /// No description provided for @settingsConfigUpdateFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update config: {error}'**
+  String settingsConfigUpdateFailedMessage(String error);
+
+  /// No description provided for @aiGenerateNoCardsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one card before saving.'**
+  String get aiGenerateNoCardsError;
+
+  /// No description provided for @aiGenerateSaveFailedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save cards. Please try again.'**
+  String get aiGenerateSaveFailedError;
+
+  /// No description provided for @quizCardListValidatorNotConfiguredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{validatorName} is not configured.'**
+  String quizCardListValidatorNotConfiguredMessage(String validatorName);
+
+  /// No description provided for @validatorNameGemini.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini AI'**
+  String get validatorNameGemini;
+
+  /// No description provided for @validatorNameOnDeviceAI.
+  ///
+  /// In en, this message translates to:
+  /// **'On-Device AI (experimental)'**
+  String get validatorNameOnDeviceAI;
+
+  /// No description provided for @validatorNameClaude.
+  ///
+  /// In en, this message translates to:
+  /// **'Claude AI'**
+  String get validatorNameClaude;
+
+  /// No description provided for @validatorNameOpenAI.
+  ///
+  /// In en, this message translates to:
+  /// **'OpenAI'**
+  String get validatorNameOpenAI;
+
+  /// No description provided for @validatorNameOllama.
+  ///
+  /// In en, this message translates to:
+  /// **'Ollama (Local, experimental)'**
+  String get validatorNameOllama;
+
+  /// No description provided for @validatorNameMl.
+  ///
+  /// In en, this message translates to:
+  /// **'ML Model'**
+  String get validatorNameMl;
+
+  /// No description provided for @validatorNameQuizzyAI.
+  ///
+  /// In en, this message translates to:
+  /// **'Quizzy AI'**
+  String get validatorNameQuizzyAI;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

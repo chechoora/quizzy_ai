@@ -12,6 +12,7 @@ import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/cubit/settings_cubit.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_config_content.dart';
+import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_ui_data.dart';
 
 class SettingsAIValidatorWidget extends HookWidget {
   const SettingsAIValidatorWidget({super.key});
@@ -92,7 +93,7 @@ class SettingsAIValidatorWidget extends HookWidget {
                     snackBar(
                       context,
                       message: l10n.settingsAiValidatorChangedMessage(
-                        state.validatorType.toDisplayString(),
+                        state.validatorType.displayName(l10n),
                       ),
                       duration: const Duration(seconds: 2),
                     );
@@ -100,14 +101,17 @@ class SettingsAIValidatorWidget extends HookWidget {
                     snackBar(
                       context,
                       message: l10n.settingsAiValidatorApiKeySavedMessage(
-                        state.validatorType.toDisplayString(),
+                        state.validatorType.displayName(l10n),
                       ),
                       duration: const Duration(seconds: 2),
                     );
                   } else if (state is SettingsErrorState) {
                     snackBar(
                       context,
-                      message: state.error,
+                      message: state.isConfigUpdateFailure
+                          ? l10n.settingsConfigUpdateFailedMessage(
+                              state.error)
+                          : state.error,
                       isError: true,
                       duration: const Duration(seconds: 2),
                     );

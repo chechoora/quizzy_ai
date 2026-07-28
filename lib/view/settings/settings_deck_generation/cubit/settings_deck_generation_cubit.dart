@@ -53,7 +53,7 @@ class DeckGenerationCubit extends Cubit<DeckGenerationState> {
         selectedType: newType,
         providers: currentState.providers,
       ));
-      _logger.i('Updated deck generation AI to: ${newType.toDisplayString()}');
+      _logger.i('Updated deck generation AI to: ${newType.name}');
     } catch (e, stackTrace) {
       _logger.e('Failed to update deck generation AI',
           ex: e, stacktrace: stackTrace);
@@ -93,11 +93,12 @@ class DeckGenerationCubit extends Cubit<DeckGenerationState> {
         selectedType: currentState.selectedType,
         providers: providers,
       ));
-      _logger.i('Updated config for: ${type.toDisplayString()}');
+      _logger.i('Updated config for: ${type.name}');
     } catch (e, stackTrace) {
       _logger.e('Failed to update config', ex: e, stacktrace: stackTrace);
       emit(DeckGenerationErrorState(
-        error: 'Failed to update config: ${e.toString()}',
+        error: e.toString(),
+        isConfigUpdateFailure: true,
       ));
       emit(currentState);
     }
@@ -127,11 +128,12 @@ class DeckGenerationCubit extends Cubit<DeckGenerationState> {
         selectedType: currentState.selectedType,
         providers: providers,
       ));
-      _logger.i('Updated config for: ${type.toDisplayString()}');
+      _logger.i('Updated config for: ${type.name}');
     } catch (e, stackTrace) {
       _logger.e('Failed to update config', ex: e, stacktrace: stackTrace);
       emit(DeckGenerationErrorState(
-        error: 'Failed to update config: ${e.toString()}',
+        error: e.toString(),
+        isConfigUpdateFailure: true,
       ));
       emit(currentState);
     }
@@ -203,9 +205,13 @@ class DeckGenerationApiKeyUpdatedState extends ListenerState {
 
 class DeckGenerationErrorState extends ListenerState {
   final String error;
+  final bool isConfigUpdateFailure;
 
-  const DeckGenerationErrorState({required this.error});
+  const DeckGenerationErrorState({
+    required this.error,
+    this.isConfigUpdateFailure = false,
+  });
 
   @override
-  List<Object?> get props => [error, super.props];
+  List<Object?> get props => [error, isConfigUpdateFailure, super.props];
 }

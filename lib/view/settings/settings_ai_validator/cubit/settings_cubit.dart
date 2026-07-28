@@ -54,7 +54,7 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
         validatorType: newValidator,
         validators: currentState.validators,
       ));
-      _logger.i('Updated validator to: ${newValidator.toDisplayString()}');
+      _logger.i('Updated validator to: ${newValidator.name}');
     } catch (e, stackTrace) {
       _logger.e('Failed to update validator', ex: e, stacktrace: stackTrace);
       emit(SettingsErrorState(
@@ -97,11 +97,12 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
         validatorType: currentState.validatorType,
         validators: validators,
       ));
-      _logger.i('Updated config for: ${validatorType.toDisplayString()}');
+      _logger.i('Updated config for: ${validatorType.name}');
     } catch (e, stackTrace) {
       _logger.e('Failed to update config', ex: e, stacktrace: stackTrace);
       emit(SettingsErrorState(
-        error: 'Failed to update config: ${e.toString()}',
+        error: e.toString(),
+        isConfigUpdateFailure: true,
       ));
       emit(currentState);
     }
@@ -131,11 +132,12 @@ class SettingsAIValidatorCubit extends Cubit<SettingsState> {
         validatorType: currentState.validatorType,
         validators: validators,
       ));
-      _logger.i('Updated config for: ${type.toDisplayString()}');
+      _logger.i('Updated config for: ${type.name}');
     } catch (e, stackTrace) {
       _logger.e('Failed to update config', ex: e, stacktrace: stackTrace);
       emit(SettingsErrorState(
-        error: 'Failed to update config: ${e.toString()}',
+        error: e.toString(),
+        isConfigUpdateFailure: true,
       ));
       emit(currentState);
     }
@@ -197,11 +199,13 @@ class SettingsApiKeyUpdatedState extends ListenerState {
 
 class SettingsErrorState extends ListenerState {
   final String error;
+  final bool isConfigUpdateFailure;
 
   const SettingsErrorState({
     required this.error,
+    this.isConfigUpdateFailure = false,
   });
 
   @override
-  List<Object?> get props => [error, super.props];
+  List<Object?> get props => [error, isConfigUpdateFailure, super.props];
 }

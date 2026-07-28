@@ -48,16 +48,12 @@ class QuizCardExeValidator {
                 .isFeaturePurchased(InAppPurchaseFeature.quizzyAi)
             ? const QuizCardExeValid()
             : const QuizCardExeInvalidNotPurchased(
-                reason:
-                    'Quizzy AI feature is not purchased. Please subscribe to use this validator.',
                 feature: InAppPurchaseFeature.quizzyAi,
               );
     }
 
     if (!config.isValid) {
-      return QuizCardExeInvalidConfig(
-        reason: '${selectedValidator.toDisplayString()} is not configured.',
-      );
+      return QuizCardExeInvalidConfig(validatorType: selectedValidator);
     }
 
     return const QuizCardExeValid();
@@ -73,14 +69,11 @@ class QuizCardExeValid extends QuizCardExeValidationResult {
 }
 
 sealed class QuizCardExeInvalid extends QuizCardExeValidationResult {
-  const QuizCardExeInvalid({required this.reason});
-
-  final String reason;
+  const QuizCardExeInvalid();
 }
 
 class QuizCardExeInvalidNotPurchased extends QuizCardExeInvalid {
   const QuizCardExeInvalidNotPurchased({
-    required super.reason,
     required this.feature,
   });
 
@@ -88,5 +81,7 @@ class QuizCardExeInvalidNotPurchased extends QuizCardExeInvalid {
 }
 
 class QuizCardExeInvalidConfig extends QuizCardExeInvalid {
-  const QuizCardExeInvalidConfig({required super.reason});
+  const QuizCardExeInvalidConfig({required this.validatorType});
+
+  final AnswerValidatorType validatorType;
 }

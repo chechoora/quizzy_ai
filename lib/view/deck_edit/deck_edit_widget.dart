@@ -80,7 +80,13 @@ class DeckEditWidget extends HookWidget {
             if (state is AiGenerateSavedState) {
               context.pop();
             } else if (state is AiGenerateErrorState) {
-              snackBar(context, message: state.message, isError: true);
+              final message = switch (state.reason) {
+                AiGenerateErrorReason.noCards => l10n.aiGenerateNoCardsError,
+                AiGenerateErrorReason.saveFailed =>
+                  l10n.aiGenerateSaveFailedError,
+                AiGenerateErrorReason.generic => state.message,
+              };
+              snackBar(context, message: message, isError: true);
             } else if (state is AiGenerateNoConfigState) {
               snackBar(
                 context,
@@ -98,7 +104,7 @@ class DeckEditWidget extends HookWidget {
           child: Column(
             children: [
               AppSimpleHeader(
-                title: 'Edit ${deckItem.title}',
+                title: l10n.deckEditTitle(deckItem.title),
                 onBackPressed: () => context.pop(),
                 trailing: BlocBuilder<DeckEditCubit, AiGenerateState>(
                   bloc: cubit,

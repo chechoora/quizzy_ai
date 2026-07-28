@@ -5,26 +5,7 @@ enum AnswerValidatorType {
   openAI,
   gemini,
   ollama,
-  ml;
-
-  String toDisplayString() {
-    switch (this) {
-      case AnswerValidatorType.gemini:
-        return 'Gemini AI';
-      case AnswerValidatorType.onDeviceAI:
-        return 'On-Device AI (experimental)';
-      case AnswerValidatorType.claude:
-        return 'Claude AI';
-      case AnswerValidatorType.openAI:
-        return 'OpenAI';
-      case AnswerValidatorType.ollama:
-        return 'Ollama (Local, experimental)';
-      case AnswerValidatorType.ml:
-        return 'ML Model';
-      case AnswerValidatorType.quizzyAI:
-        return 'Quizzy AI';
-    }
-  }
+  ml,
 }
 
 /// Providers offered for AI deck generation. Excludes On-Device AI and the

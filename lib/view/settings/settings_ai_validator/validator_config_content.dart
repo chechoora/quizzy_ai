@@ -7,6 +7,7 @@ import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/quota/quota_display_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_bottom_sheet.dart';
+import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_ui_data.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Shared provider-selection + per-provider config UI, used by both the AI
@@ -342,7 +343,7 @@ class ValidatorDropdownTrigger extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                selectedValidator.toDisplayString(),
+                selectedValidator.displayName(localize(context)),
                 style: AppTypography.mainText.copyWith(
                   color: AppColors.grayscale600,
                 ),

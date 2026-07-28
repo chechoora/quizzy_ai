@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/domain/quiz/model/quiz_results.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:quizzy_design/quizzy_design.dart';
@@ -31,16 +32,17 @@ class QuizSummaryWidget extends StatelessWidget {
     return ((sum / _total) * 100).round();
   }
 
-  String get _headline {
-    if (_total == 0) return "You're doing great, keep going!";
+  String _headline(LocalizedStrings l10n) {
+    if (_total == 0) return l10n.quizSummaryHeadlineDefault;
     final accuracy = _correctCount / _total;
-    if (accuracy >= 0.8) return "Amazing job, you nailed it!";
-    if (accuracy >= 0.5) return "You're doing great, keep going!";
-    return "Keep practicing, you'll get there!";
+    if (accuracy >= 0.8) return l10n.quizSummaryHeadlineAmazing;
+    if (accuracy >= 0.5) return l10n.quizSummaryHeadlineDefault;
+    return l10n.quizSummaryHeadlineKeepPracticing;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = localize(context);
     return Column(
       children: [
         const SizedBox(height: 32),
@@ -62,7 +64,7 @@ class QuizSummaryWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Text(
-            _headline,
+            _headline(l10n),
             textAlign: TextAlign.center,
             style: AppTypography.h1,
           ),
@@ -75,7 +77,7 @@ class QuizSummaryWidget extends StatelessWidget {
               Expanded(
                 child: _StatTile(
                   icon: Icons.check_circle_outline_rounded,
-                  label: 'Correct answers',
+                  label: l10n.quizSummaryCorrectAnswersLabel,
                   value: '$_correctCount/$_total',
                 ),
               ),
@@ -83,7 +85,7 @@ class QuizSummaryWidget extends StatelessWidget {
               Expanded(
                 child: _StatTile(
                   icon: Icons.percent_rounded,
-                  label: 'Score',
+                  label: l10n.quizSummaryScoreLabel,
                   value: '$_averageScore/100',
                 ),
               ),
@@ -98,7 +100,7 @@ class QuizSummaryWidget extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: AppButton.primary(
-                  text: 'Play Another Deck',
+                  text: l10n.quizSummaryPlayAnotherDeckButton,
                   leadingIcon: const Icon(
                     Icons.play_arrow_rounded,
                     color: AppColors.grayscaleWhite,
@@ -111,7 +113,7 @@ class QuizSummaryWidget extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               AppButton.tertiary(
-                text: 'Review answers',
+                text: l10n.quizSummaryReviewAnswersButton,
                 onPressed: () {
                   logger.i('Review answers pressed, opening review screen');
                   context.push(QuizReviewRoute().path, extra: quizResults);

@@ -818,4 +818,113 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cleanInstallSkipButton => 'Skip';
+
+  @override
+  String get createCardEnterQuestionLabel => 'Enter question';
+
+  @override
+  String get createCardQuestionHint => 'Add your question here';
+
+  @override
+  String get createCardEnterAnswerLabel => 'Enter answer';
+
+  @override
+  String get createCardAnswerHint => 'Add your answer here';
+
+  @override
+  String get createCardAddButton => 'Add Card';
+
+  @override
+  String get createCardTitle => 'Create card';
+
+  @override
+  String get quizSummaryHeadlineDefault => 'You\'re doing great, keep going!';
+
+  @override
+  String get quizSummaryHeadlineAmazing => 'Amazing job, you nailed it!';
+
+  @override
+  String get quizSummaryHeadlineKeepPracticing => 'Keep practicing, you\'ll get there!';
+
+  @override
+  String get quizSummaryCorrectAnswersLabel => 'Correct answers';
+
+  @override
+  String get quizSummaryScoreLabel => 'Score';
+
+  @override
+  String get quizSummaryPlayAnotherDeckButton => 'Play Another Deck';
+
+  @override
+  String get quizSummaryReviewAnswersButton => 'Review answers';
+
+  @override
+  String get quizDoneReviewProgressTitle => 'Review your progress';
+
+  @override
+  String quizDoneQuestionLabel(String question) {
+    return 'Question: $question';
+  }
+
+  @override
+  String quizDoneAnswerLabel(String answer) {
+    return 'Answer: $answer';
+  }
+
+  @override
+  String quizDoneYourAnswerLabel(String answer) {
+    return 'Your answer: $answer';
+  }
+
+  @override
+  String quizDoneMatchLabel(int percent) {
+    return 'Match: $percent%';
+  }
+
+  @override
+  String quizDoneExplanationLabel(String explanation) {
+    return 'Explanation: $explanation';
+  }
+
+  @override
+  String deckEditTitle(String deckTitle) {
+    return 'Edit $deckTitle';
+  }
+
+  @override
+  String settingsConfigUpdateFailedMessage(String error) {
+    return 'Failed to update config: $error';
+  }
+
+  @override
+  String get aiGenerateNoCardsError => 'Add at least one card before saving.';
+
+  @override
+  String get aiGenerateSaveFailedError => 'Failed to save cards. Please try again.';
+
+  @override
+  String quizCardListValidatorNotConfiguredMessage(String validatorName) {
+    return '$validatorName is not configured.';
+  }
+
+  @override
+  String get validatorNameGemini => 'Gemini AI';
+
+  @override
+  String get validatorNameOnDeviceAI => 'On-Device AI (experimental)';
+
+  @override
+  String get validatorNameClaude => 'Claude AI';
+
+  @override
+  String get validatorNameOpenAI => 'OpenAI';
+
+  @override
+  String get validatorNameOllama => 'Ollama (Local, experimental)';
+
+  @override
+  String get validatorNameMl => 'ML Model';
+
+  @override
+  String get validatorNameQuizzyAI => 'Quizzy AI';
 }

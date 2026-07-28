@@ -1,6 +1,27 @@
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/l10n/app_localizations.dart';
 
+extension AnswerValidatorTypeDisplayName on AnswerValidatorType {
+  String displayName(AppLocalizations l10n) {
+    switch (this) {
+      case AnswerValidatorType.gemini:
+        return l10n.validatorNameGemini;
+      case AnswerValidatorType.onDeviceAI:
+        return l10n.validatorNameOnDeviceAI;
+      case AnswerValidatorType.claude:
+        return l10n.validatorNameClaude;
+      case AnswerValidatorType.openAI:
+        return l10n.validatorNameOpenAI;
+      case AnswerValidatorType.ollama:
+        return l10n.validatorNameOllama;
+      case AnswerValidatorType.ml:
+        return l10n.validatorNameMl;
+      case AnswerValidatorType.quizzyAI:
+        return l10n.validatorNameQuizzyAI;
+    }
+  }
+}
+
 class ValidatorTypeUIData {
   final String iconAsset;
   final String Function(AppLocalizations l10n) getDescription;

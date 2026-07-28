@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
+import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 
 class CreateCardDisplayWidget extends HookWidget {
@@ -15,6 +16,7 @@ class CreateCardDisplayWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = localize(context);
     final questionController = useTextEditingController(
       text: cardToEdit?.questionText,
     );
@@ -43,15 +45,15 @@ class CreateCardDisplayWidget extends HookWidget {
                   ),
                   const SizedBox(height: 24),
                   _TextAreaSection(
-                    label: 'Enter question',
-                    hint: 'Add your question here',
+                    label: l10n.createCardEnterQuestionLabel,
+                    hint: l10n.createCardQuestionHint,
                     controller: questionController,
                     onChanged: (value) => questionText.value = value,
                   ),
                   const SizedBox(height: 24),
                   _TextAreaSection(
-                    label: 'Enter answer',
-                    hint: 'Add your answer here',
+                    label: l10n.createCardEnterAnswerLabel,
+                    hint: l10n.createCardAnswerHint,
                     controller: answerController,
                     onChanged: (value) => answerText.value = value,
                   ),
@@ -60,7 +62,7 @@ class CreateCardDisplayWidget extends HookWidget {
                     width: double.infinity,
                     height: 56,
                     child: AppButton.primary(
-                      text: 'Add Card',
+                      text: l10n.createCardAddButton,
                       onPressed: isFormValid
                           ? () {
                               context.pop(
@@ -104,7 +106,7 @@ class _Header extends StatelessWidget {
           ),
           Center(
             child: Text(
-              'Create card',
+              localize(context).createCardTitle,
               style: AppTypography.h2.copyWith(
                 color: AppColors.grayscale600,
               ),

@@ -232,7 +232,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
         .map((c) => c.toPlain())
         .toList();
     if (cards.isEmpty) {
-      emit(AiGenerateErrorState('Add at least one card before saving.'));
+      emit(AiGenerateErrorState('', reason: AiGenerateErrorReason.noCards));
       _emitContent();
       return;
     }
@@ -246,7 +246,7 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       emit(AiGenerateSavedState());
     } catch (e, s) {
       _logger.e('save failed', ex: e, stacktrace: s);
-      emit(AiGenerateErrorState('Failed to save cards. Please try again.'));
+      emit(AiGenerateErrorState('', reason: AiGenerateErrorReason.saveFailed));
       _emitContent();
     }
   }
@@ -330,10 +330,14 @@ class AiGenerateSavedState extends ListenerState {
   AiGenerateSavedState();
 }
 
+enum AiGenerateErrorReason { generic, noCards, saveFailed }
+
 class AiGenerateErrorState extends ListenerState {
-  AiGenerateErrorState(this.message);
+  AiGenerateErrorState(this.message,
+      {this.reason = AiGenerateErrorReason.generic});
 
   final String message;
+  final AiGenerateErrorReason reason;
 }
 
 class AiGenerateNoConfigState extends ListenerState {
