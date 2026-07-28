@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:poc_ai_quiz/config/app_config.dart';
+import 'package:poc_ai_quiz/di/di.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,11 +18,10 @@ class AppCreditsWidget extends StatelessWidget {
   static const _alinaName = 'Alina Fedorenko';
   static const _alinaUrl = 'https://www.linkedin.com/in/a-fedorenko/';
 
-  static const _contactEmail = 'kharchenko.kir@gmail.com';
-
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
+    final contactEmail = getIt<AppConfig>().contactEmail;
     return Scaffold(
       backgroundColor: AppColors.backgroundSecondary,
       body: SafeArea(
@@ -60,7 +61,7 @@ class AppCreditsWidget extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () => launchUrl(
-                Uri.parse('mailto:$_contactEmail'),
+                Uri.parse('mailto:$contactEmail'),
                 mode: LaunchMode.externalApplication,
               ),
               child: Text(

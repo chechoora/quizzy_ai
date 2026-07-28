@@ -14,5 +14,6 @@ Future<void> main() => mainCommon(
         enableAnalytics: false,
         backendSupported: false,
         sentryDsn: '',
+        contactEmail: 'kharchenko.kir@gmail.com',
       ),
     );

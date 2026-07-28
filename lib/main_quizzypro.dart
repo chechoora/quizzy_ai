@@ -15,6 +15,7 @@ Future<void> main() => mainCommon(
         enableAnalytics: true,
         backendSupported: true,
         sentryDsn: Sentry.dsnQuizzyPro,
+        contactEmail: 'quizzyai.dev@gmail.com',
         authDomain: 'auth.quizzyai.app',
       ),
     );

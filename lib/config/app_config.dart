@@ -59,6 +59,9 @@ class AppConfig {
   /// domain; `quizzy` has none, so it stays null.
   final String? authDomain;
 
+  /// Support/contact email shown in the app credits screen.
+  final String contactEmail;
+
   const AppConfig({
     required this.appName,
     required this.flavor,
@@ -70,6 +73,7 @@ class AppConfig {
     required this.enableAnalytics,
     required this.backendSupported,
     required this.sentryDsn,
+    required this.contactEmail,
     this.authDomain,
   });
 
