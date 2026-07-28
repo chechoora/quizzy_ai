@@ -303,24 +303,6 @@ class _BottomButtons extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    onSwitchSidesPressed?.call(!switchSides);
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Text(
-                    switchSides
-                        ? l10n.quizCardListSideSwitched
-                        : l10n.quizCardListSidesNotSwitched,
-                    style: AppTypography.h3.copyWith(
-                      color: AppColors.primary500,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
                     onShufflePressed?.call(!shuffleEnabled);
                   },
                   style: TextButton.styleFrom(
@@ -332,6 +314,24 @@ class _BottomButtons extends StatelessWidget {
                     shuffleEnabled
                         ? l10n.quizCardListShuffleCards
                         : l10n.quizCardListCardsInOrder,
+                    style: AppTypography.h3.copyWith(
+                      color: AppColors.primary500,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    onSwitchSidesPressed?.call(!switchSides);
+                  },
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    switchSides
+                        ? l10n.quizCardListSideSwitched
+                        : l10n.quizCardListSidesNotSwitched,
                     style: AppTypography.h3.copyWith(
                       color: AppColors.primary500,
                     ),

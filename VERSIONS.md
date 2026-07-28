@@ -29,18 +29,18 @@ Build outputs land in `builds/<flavor>/` (gitignored), named
 
 ```bash
 bundle exec fastlane release_all flavor:quizzy   # apk + appbundle + ipa
-bundle exec fastlane apk         flavor:quizzy mode:release   # or mode:debug
-bundle exec fastlane appbundle   flavor:quizzy
-bundle exec fastlane build_ipa   flavor:quizzy
+bundle exec fastlane build_apk       flavor:quizzy mode:release   # or mode:debug
+bundle exec fastlane build_appbundle flavor:quizzy
+bundle exec fastlane build_ipa       flavor:quizzy
 ```
 
 ### quizzypro
 
 ```bash
 bundle exec fastlane release_all flavor:quizzypro   # apk + appbundle + ipa
-bundle exec fastlane apk         flavor:quizzypro mode:release   # or mode:debug
-bundle exec fastlane appbundle   flavor:quizzypro
-bundle exec fastlane build_ipa   flavor:quizzypro
+bundle exec fastlane build_apk       flavor:quizzypro mode:release   # or mode:debug
+bundle exec fastlane build_appbundle flavor:quizzypro
+bundle exec fastlane build_ipa       flavor:quizzypro
 ```
 
 ## Bumping a version
