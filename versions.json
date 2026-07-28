@@ -1,10 +1,10 @@
 {
   "quizzy": {
-    "version": "1.2.6",
-    "build": "46"
+    "version": "1.2.7",
+    "build": "47"
   },
   "quizzypro": {
     "version": "1.0.0",
-    "build": "15"
+    "build": "16"
   }
 }

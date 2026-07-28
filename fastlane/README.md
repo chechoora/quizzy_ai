@@ -13,18 +13,18 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
-### apk
+### build_apk
 
 ```sh
-[bundle exec] fastlane apk
+[bundle exec] fastlane build_apk
 ```
 
 Build Android APK. Params: flavor:quizzy|quizzypro mode:debug|release (default release)
 
-### appbundle
+### build_appbundle
 
 ```sh
-[bundle exec] fastlane appbundle
+[bundle exec] fastlane build_appbundle
 ```
 
 Build Android App Bundle (release). Params: flavor:quizzy|quizzypro
