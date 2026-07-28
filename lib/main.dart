@@ -15,6 +15,7 @@ import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/auth/auth_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/logout/logout_manager.dart';
+import 'package:poc_ai_quiz/domain/quiz/model/quiz_results.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
 import 'package:poc_ai_quiz/domain/quizzy_backend/model/public_deck_summary.dart';
 import 'package:poc_ai_quiz/util/app_theme.dart';
@@ -28,6 +29,7 @@ import 'package:poc_ai_quiz/view/onboarding/pro/onboarding_pro_widget.dart';
 import 'package:poc_ai_quiz/view/public_deck_detail/public_deck_detail_widget.dart';
 import 'package:poc_ai_quiz/view/public_decks/public_decks_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_widget.dart';
+import 'package:poc_ai_quiz/view/quiz_exe/done/quiz_done_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_widget.dart';
 import 'package:poc_ai_quiz/view/settings/in_app_features/in_app_features_widget.dart';
 import 'package:poc_ai_quiz/view/settings/app_credits/app_credits_widget.dart';
@@ -209,6 +211,14 @@ GoRouter buildAppRouter({required String initialLocation}) {
               extras[QuizExeRoute.quizCardsKey] as List<QuizCardItem>;
           final isQuickPlay = extras[QuizExeRoute.isQuickPlayKey] as bool;
           return QuizExeWidget(cards: quizCards, isQuickPlay: isQuickPlay);
+        },
+      ),
+      GoRoute(
+        name: QuizReviewRoute().name,
+        path: QuizReviewRoute().path,
+        builder: (context, state) {
+          final quizResults = state.extra as QuizResults;
+          return QuizDoneWidget(quizResults: quizResults);
         },
       ),
       GoRoute(

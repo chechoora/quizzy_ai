@@ -27,6 +27,10 @@ final class QuizExeRoute extends NavigationRoute {
   static const quizCardsKey = 'quizCards';
 }
 
+final class QuizReviewRoute extends NavigationRoute {
+  QuizReviewRoute() : super(name: 'quizReview', path: '/quizReview');
+}
+
 final class CreateDeckRoute extends NavigationRoute {
   CreateDeckRoute() : super(name: 'createDeck', path: '/createDeck');
 }

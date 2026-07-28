@@ -14,25 +14,30 @@ class QuizDoneWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final quizMatchList = quizResults.quizMatchList;
-    return Column(
-      children: [
-        const SizedBox(height: 32),
-        _Header(
-          onClose: () {
-            Navigator.of(context).pop();
-          },
+    return Scaffold(
+      backgroundColor: AppColors.backgroundSecondary,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 32),
+            _Header(
+              onClose: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: quizMatchList.length,
+                itemBuilder: (context, index) {
+                  return QuizMatchWidget(
+                    quizAnswerMatch: quizMatchList[index],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: quizMatchList.length,
-            itemBuilder: (context, index) {
-              return QuizMatchWidget(
-                quizAnswerMatch: quizMatchList[index],
-              );
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -51,7 +56,7 @@ class QuizMatchWidget extends StatelessWidget {
     final textColor = isLowRatio ? AppColors.error600 : AppColors.success600;
     return Container(
       padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
           color: AppColors.grayscaleWhite,
           borderRadius: BorderRadius.circular(15),

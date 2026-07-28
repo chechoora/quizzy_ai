@@ -12,9 +12,10 @@ import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
 import 'package:poc_ai_quiz/domain/sync/sync_scheduler.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/display/quiz_display_widget.dart';
-import 'package:poc_ai_quiz/view/quiz_exe/done/quiz_done_widget.dart';
+import 'package:poc_ai_quiz/view/quiz_exe/done/quiz_summary_widget.dart';
 import 'package:poc_ai_quiz/view/quiz_exe/quiz_exe_cubit.dart';
 
 class QuizExeWidget extends HookWidget {
@@ -81,8 +82,9 @@ class QuizExeWidget extends HookWidget {
               return const SimpleLoadingWidget();
             }
             if (state is QuizDoneState) {
-              return QuizDoneWidget(
+              return QuizSummaryWidget(
                 quizResults: state.quizResults,
+                logger: Logger.withTag('QuizSummaryWidget'),
               );
             }
             throw ArgumentError('Wrong state');
