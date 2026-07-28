@@ -11,6 +11,7 @@ import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart'
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/deck_edit/cubit/cubit.dart';
 import 'package:poc_ai_quiz/view/deck_edit/display/editable_card_tile.dart';
@@ -80,6 +81,16 @@ class DeckEditWidget extends HookWidget {
               context.pop();
             } else if (state is AiGenerateErrorState) {
               snackBar(context, message: state.message, isError: true);
+            } else if (state is AiGenerateNoConfigState) {
+              snackBar(
+                context,
+                message: state.message,
+                isError: true,
+                actionLabel: l10n.goToSettings,
+                onActionPressed: () => context.pushNamed(
+                  SettingsAIValidatorRoute().name,
+                ),
+              );
             } else if (state is AiGenerateSuccessState) {
               promptController.clear();
             }

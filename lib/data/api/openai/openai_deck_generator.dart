@@ -33,11 +33,11 @@ class OpenAIDeckGenerator extends IDeckGenerator {
 
       final config = _configProvider.openAiConfig;
       if (config == null || config is! ApiKeyConfig) {
-        throw DeckGenerationException('OpenAI configuration not found');
+        throw DeckGenerationConfigException('OpenAI configuration not found');
       }
 
       if (!config.isValid) {
-        throw DeckGenerationException(
+        throw DeckGenerationConfigException(
             'Invalid OpenAI configuration: API key or model is empty');
       }
 

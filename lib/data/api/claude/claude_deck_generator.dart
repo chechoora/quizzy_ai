@@ -32,11 +32,11 @@ class ClaudeDeckGenerator extends IDeckGenerator {
 
       final config = _configProvider.claudeConfig;
       if (config == null || config is! ApiKeyConfig) {
-        throw DeckGenerationException('Claude configuration not found');
+        throw DeckGenerationConfigException('Claude configuration not found');
       }
 
       if (!config.isValid) {
-        throw DeckGenerationException(
+        throw DeckGenerationConfigException(
             'Invalid Claude configuration: API key or model is empty');
       }
 

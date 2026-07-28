@@ -26,11 +26,11 @@ class OllamaDeckGenerator extends IDeckGenerator {
 
       final config = _configProvider.ollamaConfig;
       if (config == null || config is! OpenSourceConfig) {
-        throw DeckGenerationException('Ollama configuration not found');
+        throw DeckGenerationConfigException('Ollama configuration not found');
       }
 
       if (!config.isValid) {
-        throw DeckGenerationException(
+        throw DeckGenerationConfigException(
             'Invalid Ollama configuration: URL or model is empty');
       }
 

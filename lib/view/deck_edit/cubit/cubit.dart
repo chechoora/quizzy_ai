@@ -6,6 +6,7 @@ import 'package:poc_ai_quiz/domain/ai_gen/ai_gen_service.dart';
 import 'package:poc_ai_quiz/domain/analytics/analytics_events.dart';
 import 'package:poc_ai_quiz/domain/analytics/analytics_service.dart';
 import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
+import 'package:poc_ai_quiz/domain/exception/deck_generation_exception.dart';
 import 'package:poc_ai_quiz/domain/import_export/model.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_item.dart';
@@ -137,6 +138,14 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
       }));
       emit(AiGenerateSuccessState());
       _emitContent();
+    } on DeckGenerationConfigException catch (e, s) {
+      _logger.w('generate failed: no config', ex: e, stacktrace: s);
+      unawaited(analyticsService.track(AnalyticsEvents.deckGenerationFailed, properties: {
+        AnalyticsProperties.reason: e.runtimeType.toString(),
+        AnalyticsProperties.stage: 'generate',
+      }));
+      emit(AiGenerateNoConfigState(e.message));
+      _emitContent();
     } catch (e, s) {
       _logger.e('generate failed', ex: e, stacktrace: s);
       unawaited(analyticsService.track(AnalyticsEvents.deckGenerationFailed, properties: {
@@ -174,6 +183,14 @@ class DeckEditCubit extends Cubit<AiGenerateState> {
         AnalyticsProperties.generationMs: stopwatch.elapsedMilliseconds,
       }));
       emit(AiGenerateSuccessState());
+      _emitContent();
+    } on DeckGenerationConfigException catch (e, s) {
+      _logger.w('refine failed: no config', ex: e, stacktrace: s);
+      unawaited(analyticsService.track(AnalyticsEvents.deckGenerationFailed, properties: {
+        AnalyticsProperties.reason: e.runtimeType.toString(),
+        AnalyticsProperties.stage: 'refine',
+      }));
+      emit(AiGenerateNoConfigState(e.message));
       _emitContent();
     } catch (e, s) {
       _logger.e('refine failed', ex: e, stacktrace: s);
@@ -315,6 +332,12 @@ class AiGenerateSavedState extends ListenerState {
 
 class AiGenerateErrorState extends ListenerState {
   AiGenerateErrorState(this.message);
+
+  final String message;
+}
+
+class AiGenerateNoConfigState extends ListenerState {
+  AiGenerateNoConfigState(this.message);
 
   final String message;
 }

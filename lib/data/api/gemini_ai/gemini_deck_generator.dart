@@ -33,11 +33,11 @@ class GeminiDeckGenerator extends IDeckGenerator {
 
       final config = _configProvider.geminiConfig;
       if (config == null || config is! ApiKeyConfig) {
-        throw DeckGenerationException('Gemini configuration not found');
+        throw DeckGenerationConfigException('Gemini configuration not found');
       }
 
       if (!config.isValid) {
-        throw DeckGenerationException(
+        throw DeckGenerationConfigException(
             'Invalid Gemini configuration: API key or model is empty');
       }
 
