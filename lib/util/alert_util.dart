@@ -51,6 +51,8 @@ void snackBar(
   required String message,
   Duration duration = const Duration(seconds: 4),
   bool isError = false,
+  String? actionLabel,
+  VoidCallback? onActionPressed,
 }) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -63,10 +65,11 @@ void snackBar(
       backgroundColor: isError ? AppColors.error500 : AppColors.grayscale500,
       duration: duration,
       action: SnackBarAction(
-        label: localize(context).dismiss,
+        label: actionLabel ?? localize(context).dismiss,
         textColor: isError ? AppColors.error100 : AppColors.grayscale100,
         onPressed: () {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          onActionPressed?.call();
         },
       ),
     ),

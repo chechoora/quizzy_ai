@@ -226,6 +226,7 @@
   "quizDisplayAnswerButton": "Answer",
   "quizDisplayDontKnowButton": "Don't know",
   "dismiss": "Dismiss",
+  "goToSettings": "Go to settings",
   "importExportImportTitle": "Import",
   "importExportImportDescription": "Import from a JSON file or clipboard. Use the matching format:",
   "importExportImportSourceTitle": "Import source",

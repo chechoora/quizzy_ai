@@ -12,6 +12,7 @@ import 'package:poc_ai_quiz/domain/quiz_card/model/quiz_card_request_item.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
+import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
@@ -102,6 +103,24 @@ class QuizCardListWidget extends HookWidget {
       );
       if (purchased == true && context.mounted) {
         cubit.addCardRequest();
+      }
+    }
+
+    Future<void> showQuizPaywall(QuizCardListPaywallState state) async {
+      final purchased = await showPaywallBottomSheet(
+        context,
+        limitMessage: localize(context).answerValidatorNotAvailableMessage(
+          AnswerValidatorType.quizzyAI.toDisplayString(),
+        ),
+        feature: state.feature,
+        trigger: 'quiz_launch',
+      );
+      if (purchased == true && context.mounted) {
+        cubit.launchQuizRequest(
+          isQuickPlay: state.isQuickPlay,
+          isShuffle: state.isShuffle,
+          switchSides: state.switchSides,
+        );
       }
     }
 
@@ -233,7 +252,14 @@ class QuizCardListWidget extends HookWidget {
                       context,
                       message: state.message,
                       isError: true,
+                      actionLabel: localize(context).goToSettings,
+                      onActionPressed: () => context.pushNamed(
+                        SettingsAIValidatorRoute().name,
+                      ),
                     );
+                  }
+                  if (state is QuizCardListPaywallState) {
+                    showQuizPaywall(state);
                   }
                 },
               ),

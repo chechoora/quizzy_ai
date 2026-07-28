@@ -459,6 +459,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dismiss => 'Dismiss';
 
   @override
+  String get goToSettings => 'Go to settings';
+
+  @override
   String get importExportImportTitle => 'Import';
 
   @override

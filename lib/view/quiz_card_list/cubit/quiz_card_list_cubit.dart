@@ -200,19 +200,25 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
         ..clear()
         ..addAll(switchedCards);
     }
-    if (result is QuizCardExeValid) {
-      emit(
-        QuizCardLaunchState(
-          quizCarList: cards,
-          isQuickPlay: isQuickPlay,
-        ),
-      );
-    } else {
-      emit(
-        QuizCardListErrorState(
-          message: (result as QuizCardExeInvalid).reason,
-        ),
-      );
+    switch (result) {
+      case QuizCardExeValid():
+        emit(
+          QuizCardLaunchState(
+            quizCarList: cards,
+            isQuickPlay: isQuickPlay,
+          ),
+        );
+      case QuizCardExeInvalidNotPurchased(:final feature):
+        emit(
+          QuizCardListPaywallState(
+            feature: feature,
+            isQuickPlay: isQuickPlay,
+            isShuffle: isShuffle,
+            switchSides: switchSides,
+          ),
+        );
+      case QuizCardExeInvalidConfig(:final reason):
+        emit(QuizCardListErrorState(message: reason));
     }
   }
 
@@ -304,4 +310,18 @@ class QuizCardListErrorState extends ListenerState {
   final String message;
 
   QuizCardListErrorState({required this.message});
+}
+
+class QuizCardListPaywallState extends ListenerState {
+  QuizCardListPaywallState({
+    required this.feature,
+    this.isQuickPlay = false,
+    this.isShuffle = false,
+    this.switchSides = false,
+  });
+
+  final InAppPurchaseFeature feature;
+  final bool isQuickPlay;
+  final bool isShuffle;
+  final bool switchSides;
 }

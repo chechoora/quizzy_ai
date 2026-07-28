@@ -945,6 +945,12 @@ abstract class AppLocalizations {
   /// **'Dismiss'**
   String get dismiss;
 
+  /// No description provided for @goToSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to settings'**
+  String get goToSettings;
+
   /// No description provided for @importExportImportTitle.
   ///
   /// In en, this message translates to:
