@@ -11,6 +11,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
     this.deckStats,
     this.selectedCardIds = const {},
     this.isSelectionModeActive = false,
+    this.isAnswerVisible = false,
     this.onCardSelectionToggle,
     this.onQuizCardEditRequest,
     this.onQuizCardRemoveRequest,
@@ -21,6 +22,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   final ItemStats? deckStats;
   final Set<int> selectedCardIds;
   final bool isSelectionModeActive;
+  final bool isAnswerVisible;
   final ValueChanged<int>? onCardSelectionToggle;
   final ValueChanged<QuizCardItem>? onQuizCardEditRequest;
   final ValueChanged<QuizCardItem>? onQuizCardRemoveRequest;
@@ -67,6 +69,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
           stats: item.stats,
           isSelected: isSelected,
           showCheckbox: isSelectionModeActive,
+          isAnswerVisible: isAnswerVisible,
           onTap: isSelectionModeActive
               ? () => onCardSelectionToggle?.call(item.id)
               : null,
@@ -162,6 +165,7 @@ class QuizCardTile extends StatelessWidget {
     this.stats,
     this.isSelected = false,
     this.showCheckbox = true,
+    this.isAnswerVisible = false,
     this.onTap,
     this.trailing,
     super.key,
@@ -172,6 +176,7 @@ class QuizCardTile extends StatelessWidget {
   final ItemStats? stats;
   final bool isSelected;
   final bool showCheckbox;
+  final bool isAnswerVisible;
   final VoidCallback? onTap;
   final Widget? trailing;
 
@@ -219,15 +224,17 @@ class QuizCardTile extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    answer,
-                    style: AppTypography.secondaryText.copyWith(
-                      color: AppColors.grayscale500,
+                  if (isAnswerVisible) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      answer,
+                      style: AppTypography.secondaryText.copyWith(
+                        color: AppColors.grayscale500,
+                      ),
+                      maxLines: 10,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 10,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  ],
                   if (stats != null) ...[
                     const SizedBox(height: 8),
                     AppStatsSummaryRow(

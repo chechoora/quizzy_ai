@@ -292,6 +292,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quizCardListCardsInOrder => 'Cards in Order';
 
   @override
+  String get quizCardListShowAnswers => 'Show Answers';
+
+  @override
+  String get quizCardListHideAnswers => 'Hide Answers';
+
+  @override
   String get quizCardListEditCardAction => 'Edit card';
 
   @override

@@ -145,6 +145,8 @@
   "quizCardListSidesNotSwitched": "Sides not switched",
   "quizCardListShuffleCards": "Cards Shuffled",
   "quizCardListCardsInOrder": "Cards in Order",
+  "quizCardListShowAnswers": "Show Answers",
+  "quizCardListHideAnswers": "Hide Answers",
   "quizCardListEditCardAction": "Edit card",
   "quizCardListDeleteCardAction": "Delete card",
   "quizCardListShowStatsAction": "Show stats",

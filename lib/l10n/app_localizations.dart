@@ -627,6 +627,18 @@ abstract class AppLocalizations {
   /// **'Cards in Order'**
   String get quizCardListCardsInOrder;
 
+  /// No description provided for @quizCardListShowAnswers.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Answers'**
+  String get quizCardListShowAnswers;
+
+  /// No description provided for @quizCardListHideAnswers.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Answers'**
+  String get quizCardListHideAnswers;
+
   /// No description provided for @quizCardListEditCardAction.
   ///
   /// In en, this message translates to:

@@ -55,6 +55,7 @@ class QuizCardListWidget extends HookWidget {
     final shuffleValue = useState(false);
     final switchSidesValue = useState(false);
     final isSelectionModeActive = useState(false);
+    final isAnswerVisibleValue = useState(false);
 
     void addCardRequest() {
       context.push(CreateCardRoute().path).then((cardRequest) {
@@ -157,6 +158,7 @@ class QuizCardListWidget extends HookWidget {
                             deckStats: state.deckStats,
                             selectedCardIds: state.selectedCardIds,
                             isSelectionModeActive: isSelectionModeActive.value,
+                            isAnswerVisible: isAnswerVisibleValue.value,
                             onCardSelectionToggle: (cardId) =>
                                 cubit.toggleCardSelection(cardId),
                             onQuizCardEditRequest: launchEditCardRequest,
@@ -194,6 +196,9 @@ class QuizCardListWidget extends HookWidget {
                                 switchSidesValue.value = isSwitched,
                             shuffleEnabled: shuffleValue.value,
                             switchSides: switchSidesValue.value,
+                            isAnswerVisible: isAnswerVisibleValue.value,
+                            onShowAnswersPressed: (isVisible) =>
+                                isAnswerVisibleValue.value = isVisible,
                           ),
                       ],
                     );
@@ -255,6 +260,8 @@ class _BottomButtons extends StatelessWidget {
     this.onSwitchSidesPressed,
     this.shuffleEnabled = false,
     this.switchSides = false,
+    this.isAnswerVisible = false,
+    this.onShowAnswersPressed,
   });
 
   final bool hasSelection;
@@ -270,6 +277,8 @@ class _BottomButtons extends StatelessWidget {
   final bool shuffleEnabled;
   final ValueChanged<bool>? onSwitchSidesPressed;
   final bool switchSides;
+  final bool isAnswerVisible;
+  final ValueChanged<bool>? onShowAnswersPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -301,41 +310,24 @@ class _BottomButtons extends StatelessWidget {
                   onSelectAllPressed: onSelectAllPressed,
                   onClearSelectionPressed: onClearSelectionPressed,
                 ),
-                TextButton(
-                  onPressed: () {
-                    onShufflePressed?.call(!shuffleEnabled);
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Text(
-                    shuffleEnabled
-                        ? l10n.quizCardListShuffleCards
-                        : l10n.quizCardListCardsInOrder,
-                    style: AppTypography.h3.copyWith(
-                      color: AppColors.primary500,
-                    ),
-                  ),
+                AppActionText(
+                  text: shuffleEnabled
+                      ? l10n.quizCardListShuffleCards
+                      : l10n.quizCardListCardsInOrder,
+                  onPressed: () => onShufflePressed?.call(!shuffleEnabled),
                 ),
-                TextButton(
-                  onPressed: () {
-                    onSwitchSidesPressed?.call(!switchSides);
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Text(
-                    switchSides
-                        ? l10n.quizCardListSideSwitched
-                        : l10n.quizCardListSidesNotSwitched,
-                    style: AppTypography.h3.copyWith(
-                      color: AppColors.primary500,
-                    ),
-                  ),
+                AppActionText(
+                  text: switchSides
+                      ? l10n.quizCardListSideSwitched
+                      : l10n.quizCardListSidesNotSwitched,
+                  onPressed: () => onSwitchSidesPressed?.call(!switchSides),
+                ),
+                AppActionText(
+                  text: isAnswerVisible
+                      ? l10n.quizCardListHideAnswers
+                      : l10n.quizCardListShowAnswers,
+                  onPressed: () =>
+                      onShowAnswersPressed?.call(!isAnswerVisible),
                 ),
               ],
             ),
@@ -422,7 +414,7 @@ class _SelectButton extends StatelessWidget {
             allSelected
                 ? l10n.quizCardListClearSelection
                 : l10n.quizCardListSelectAll,
-            style: AppTypography.buttonSmall.copyWith(
+            style: AppTypography.h3.copyWith(
               color: AppColors.primary500,
             ),
           ),
