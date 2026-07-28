@@ -1,0 +1,79 @@
+require "json"
+require "fileutils"
+
+ROOT = File.expand_path("..", __dir__)
+VERSIONS = JSON.parse(File.read(File.join(ROOT, "versions.json")))
+ENTRY_POINTS = {
+  "quizzy" => "lib/main_quizzy.dart",
+  "quizzypro" => "lib/main_quizzypro.dart"
+}.freeze
+
+def flavor!(options)
+  flavor = options[:flavor]
+  UI.user_error!("Pass flavor: quizzy or quizzypro") unless ENTRY_POINTS.key?(flavor)
+  flavor
+end
+
+def build_name_number(flavor)
+  v = VERSIONS.fetch(flavor)
+  [v.fetch("version"), v.fetch("build")]
+end
+
+def output_dir(flavor)
+  dir = File.join(ROOT, "builds", flavor)
+  FileUtils.mkdir_p(dir)
+  dir
+end
+
+desc "Build Android APK. Params: flavor:quizzy|quizzypro mode:debug|release (default release)"
+lane :apk do |options|
+  flavor = flavor!(options)
+  mode = options[:mode] || "release"
+  name, number = build_name_number(flavor)
+  Dir.chdir(ROOT) do
+    sh("fvm flutter build apk --flavor #{flavor} -t #{ENTRY_POINTS[flavor]} --#{mode} --build-name=#{name} --build-number=#{number}")
+  end
+  src = File.join(ROOT, "build/app/outputs/flutter-apk/app-#{flavor}-#{mode}.apk")
+  dest = File.join(output_dir(flavor), "#{flavor}-#{name}+#{number}-#{mode}.apk")
+  FileUtils.cp(src, dest)
+  UI.success("APK copied to #{dest}")
+end
+
+desc "Build Android App Bundle (release). Params: flavor:quizzy|quizzypro"
+lane :appbundle do |options|
+  flavor = flavor!(options)
+  name, number = build_name_number(flavor)
+  Dir.chdir(ROOT) do
+    sh("fvm flutter build appbundle --flavor #{flavor} -t #{ENTRY_POINTS[flavor]} --release --build-name=#{name} --build-number=#{number}")
+  end
+  src = File.join(ROOT, "build/app/outputs/bundle/#{flavor}Release/app-#{flavor}-release.aab")
+  dest = File.join(output_dir(flavor), "#{flavor}-#{name}+#{number}.aab")
+  FileUtils.cp(src, dest)
+  UI.success("AAB copied to #{dest}")
+end
+
+desc "Build iOS IPA (release). Params: flavor:quizzy|quizzypro"
+lane :build_ipa do |options|
+  flavor = flavor!(options)
+  name, number = build_name_number(flavor)
+  ipa_dir = File.join(ROOT, "build/ios/ipa")
+  # flutter build ipa doesn't name the output per-flavor, so clear the dir first
+  # to make sure we pick up this build's artifact and not a stale one.
+  FileUtils.rm_rf(ipa_dir)
+  Dir.chdir(ROOT) do
+    sh("fvm flutter build ipa --flavor #{flavor} -t #{ENTRY_POINTS[flavor]} --build-name=#{name} --build-number=#{number} --export-options-plist=ios/ExportOptions.plist")
+  end
+  src = Dir.glob(File.join(ipa_dir, "*.ipa")).first
+  UI.user_error!("No .ipa produced in #{ipa_dir}") unless src
+  dest = File.join(output_dir(flavor), "#{flavor}-#{name}+#{number}.ipa")
+  FileUtils.cp(src, dest)
+  UI.success("IPA copied to #{dest}")
+end
+
+desc "Build apk + appbundle + ipa for one flavor. Params: flavor:quizzy|quizzypro"
+lane :release_all do |options|
+  flavor = flavor!(options)
+  apk(flavor: flavor, mode: "release")
+  appbundle(flavor: flavor)
+  build_ipa(flavor: flavor)
+end

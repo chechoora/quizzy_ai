@@ -38,3 +38,6 @@ android/.idea
 android/release_key.properties
 android/release_key.jks
 lib/util/env_hide.dart
+
+# Fastlane release artifacts (see fastlane/Fastfile)
+builds/
