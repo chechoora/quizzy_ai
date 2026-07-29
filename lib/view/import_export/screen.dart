@@ -53,45 +53,9 @@ class ImportExportScreen extends HookWidget {
                 bloc: cubit,
                 buildWhen: (_, next) => next is BuilderState,
                 listenWhen: (_, next) => next is ListenerState,
-                listener: (context, state) async {
+                listener: (context, state) {
                   if (state is ImportExportErrorState) {
-                    final exception = state.exception;
-                    if (exception is ImportLimitExceededException) {
-                      final type = exception.type;
-                      final limit = exception.limit;
-                      final typeName = type == ImportExportType.card
-                          ? localize(context).card
-                          : localize(context).deck;
-                      final purchased = await showPaywallBottomSheet(
-                        context,
-                        limitMessage: localize(context).importLimitExceeded(
-                          limit,
-                          typeName,
-                        ),
-                        feature: cubit.unlockFeature,
-                        trigger: 'import_limit',
-                        limitType: type.name,
-                      );
-                      if (purchased == true && context.mounted) {
-                        if (type == ImportExportType.deck) {
-                          _showImportSourceSheet(
-                            context,
-                            onFile: () => cubit.importDecksFromFile(),
-                            onClipboard: () => cubit.importDecksFromClipboard(),
-                          );
-                        } else {
-                          _showImportSourceSheet(
-                            context,
-                            onFile: () => cubit.importCardsFromFile(),
-                            onClipboard: () => cubit.importCardsFromClipboard(),
-                          );
-                        }
-                      }
-                    } else {
-                      snackBar(context,
-                          message: localize(context).importExportError,
-                          isError: true);
-                    }
+                    _handleErrorState(context, cubit, state);
                   }
                   if (state is ImportExportImportSuccessState) {
                     snackBar(
@@ -147,6 +111,50 @@ class ImportExportScreen extends HookWidget {
         ),
       ),
     );
+  }
+}
+
+Future<void> _handleErrorState(
+  BuildContext context,
+  ImportExportCubit cubit,
+  ImportExportErrorState state,
+) async {
+  final exception = state.exception;
+  if (exception is ImportLimitExceededException) {
+    final type = exception.type;
+    final limit = exception.limit;
+    final typeName = type == ImportExportType.card
+        ? localize(context).card
+        : localize(context).deck;
+    final purchased = await showPaywallBottomSheet(
+      context,
+      limitMessage: localize(context).importLimitExceeded(
+        limit,
+        typeName,
+      ),
+      feature: cubit.unlockFeature,
+      trigger: 'import_limit',
+      limitType: type.name,
+    );
+    if (!context.mounted) return;
+    if (purchased == true) {
+      if (type == ImportExportType.deck) {
+        _showImportSourceSheet(
+          context,
+          onFile: () => cubit.importDecksFromFile(),
+          onClipboard: () => cubit.importDecksFromClipboard(),
+        );
+      } else {
+        _showImportSourceSheet(
+          context,
+          onFile: () => cubit.importCardsFromFile(),
+          onClipboard: () => cubit.importCardsFromClipboard(),
+        );
+      }
+    }
+  } else {
+    snackBar(context,
+        message: localize(context).importExportError, isError: true);
   }
 }
 
