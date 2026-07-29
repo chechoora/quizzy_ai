@@ -70,10 +70,9 @@ lane :build_ipa do |options|
   UI.success("IPA copied to #{dest}")
 end
 
-desc "Build apk + appbundle + ipa for one flavor. Params: flavor:quizzy|quizzypro"
+desc "Build appbundle + ipa for one flavor. Params: flavor:quizzy|quizzypro"
 lane :release_all do |options|
   flavor = flavor!(options)
-  build_apk(flavor: flavor, mode: "release")
   build_appbundle(flavor: flavor)
   build_ipa(flavor: flavor)
 end
