@@ -68,7 +68,9 @@ void snackBar(
         label: actionLabel ?? localize(context).dismiss,
         textColor: isError ? AppColors.error100 : AppColors.grayscale100,
         onPressed: () {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          }
           onActionPressed?.call();
         },
       ),
