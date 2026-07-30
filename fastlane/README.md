@@ -43,7 +43,7 @@ Build iOS IPA (release). Params: flavor:quizzy|quizzypro
 [bundle exec] fastlane release_all
 ```
 
-Build apk + appbundle + ipa for one flavor. Params: flavor:quizzy|quizzypro
+Build appbundle + ipa for one flavor. Params: flavor:quizzy|quizzypro
 
 ----
 
