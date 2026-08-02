@@ -251,8 +251,8 @@ class QuizCardListWidget extends HookWidget {
                   if (state is QuizCardListErrorState) {
                     snackBar(
                       context,
-                      message:
-                          localize(context).quizCardListValidatorNotConfiguredMessage(
+                      message: localize(context)
+                          .quizCardListValidatorNotConfiguredMessage(
                         state.validatorType.displayName(localize(context)),
                       ),
                       isError: true,
@@ -340,22 +340,22 @@ class _BottomButtons extends StatelessWidget {
                   onSelectAllPressed: onSelectAllPressed,
                   onClearSelectionPressed: onClearSelectionPressed,
                 ),
-                AppActionText(
-                  text: shuffleEnabled
-                      ? l10n.quizCardListShuffleCards
-                      : l10n.quizCardListCardsInOrder,
+                AppIconAction(
+                  enabled: shuffleEnabled,
+                  enabledIcon: SolarIconsBold.shuffle,
+                  disabledIcon: SolarIconsBold.doubleAltArrowRight,
                   onPressed: () => onShufflePressed?.call(!shuffleEnabled),
                 ),
-                AppActionText(
-                  text: isAnswerVisible
-                      ? l10n.quizCardListHideAnswers
-                      : l10n.quizCardListShowAnswers,
+                AppIconAction(
+                  enabled: isAnswerVisible,
+                  enabledIcon: SolarIconsBold.eye,
+                  disabledIcon: SolarIconsBold.eyeClosed,
                   onPressed: () => onShowAnswersPressed?.call(!isAnswerVisible),
                 ),
-                AppActionText(
-                  text: switchSides
-                      ? l10n.quizCardListSideSwitched
-                      : l10n.quizCardListSidesNotSwitched,
+                AppIconAction(
+                  enabled: switchSides,
+                  enabledIcon: SolarIconsBold.arrowUp,
+                  disabledIcon: SolarIconsBold.arrowDown,
                   onPressed: () => onSwitchSidesPressed?.call(!switchSides),
                 ),
               ],
@@ -413,7 +413,7 @@ class _SelectButton extends StatelessWidget {
         ),
         child: Text(
           l10n.quizCardListSelect,
-          style: AppTypography.h3.copyWith(
+          style: AppTypography.h2.copyWith(
             color: AppColors.primary500,
           ),
         ),
@@ -443,7 +443,7 @@ class _SelectButton extends StatelessWidget {
             allSelected
                 ? l10n.quizCardListClearSelection
                 : l10n.quizCardListSelectAll,
-            style: AppTypography.h3.copyWith(
+            style: AppTypography.h2.copyWith(
               color: AppColors.primary500,
             ),
           ),
@@ -461,7 +461,7 @@ class _SelectButton extends StatelessWidget {
           icon: const Icon(
             Icons.close,
             color: AppColors.primary500,
-            size: 20,
+            size: 24,
           ),
         ),
         const SizedBox(width: 8),
