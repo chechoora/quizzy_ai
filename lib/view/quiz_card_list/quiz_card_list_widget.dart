@@ -183,6 +183,7 @@ class QuizCardListWidget extends HookWidget {
                             selectedCardIds: state.selectedCardIds,
                             isSelectionModeActive: isSelectionModeActive.value,
                             isAnswerVisible: state.isAnswerVisible,
+                            switchSides: state.switchSides,
                             onCardSelectionToggle: (cardId) =>
                                 cubit.toggleCardSelection(cardId),
                             onQuizCardEditRequest: launchEditCardRequest,

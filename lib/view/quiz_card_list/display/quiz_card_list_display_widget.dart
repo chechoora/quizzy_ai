@@ -12,6 +12,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
     this.selectedCardIds = const {},
     this.isSelectionModeActive = false,
     this.isAnswerVisible = false,
+    this.switchSides = false,
     this.onCardSelectionToggle,
     this.onQuizCardEditRequest,
     this.onQuizCardRemoveRequest,
@@ -23,6 +24,7 @@ class QuizCardListDisplayWidget extends StatelessWidget {
   final Set<int> selectedCardIds;
   final bool isSelectionModeActive;
   final bool isAnswerVisible;
+  final bool switchSides;
   final ValueChanged<int>? onCardSelectionToggle;
   final ValueChanged<QuizCardItem>? onQuizCardEditRequest;
   final ValueChanged<QuizCardItem>? onQuizCardRemoveRequest;
@@ -64,8 +66,8 @@ class QuizCardListDisplayWidget extends StatelessWidget {
         final hasCardStats =
             itemStats != null && _buildStatsRows(itemStats, l10n).isNotEmpty;
         return QuizCardTile(
-          question: item.questionText,
-          answer: item.answerText,
+          question: switchSides ? item.answerText : item.questionText,
+          answer: switchSides ? item.questionText : item.answerText,
           stats: item.stats,
           isSelected: isSelected,
           showCheckbox: isSelectionModeActive,
