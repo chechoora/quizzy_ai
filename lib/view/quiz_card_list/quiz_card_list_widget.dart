@@ -13,8 +13,11 @@ import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.d
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
+import 'package:poc_ai_quiz/domain/user/user_repository.dart';
+import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/view/in_app_purchase/paywall_bottom_sheet.dart';
 import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:quizzy_design/quizzy_design.dart';
@@ -41,6 +44,9 @@ class QuizCardListWidget extends HookWidget {
         quizCardPremiumManager: getIt<QuizCardPremiumManager>(),
         quizCardExeValidator: getIt<QuizCardExeValidator>(),
         analyticsService: getIt<AnalyticsService>(),
+        userRepository: getIt<UserRepository>(),
+        userSettingsRepository: getIt<UserSettingsRepository>(),
+        logger: Logger.withTag('QuizCardListCubit'),
         isSubscriptionOnly: getIt<AppConfig>().isSubscriptionOnly,
       ),
     );
@@ -49,15 +55,13 @@ class QuizCardListWidget extends HookWidget {
       () {
         cubit.watchCards();
         cubit.watchDeck();
+        cubit.loadSettings();
         return cubit.close;
       },
       [cubit],
     );
 
-    final shuffleValue = useState(false);
-    final switchSidesValue = useState(false);
     final isSelectionModeActive = useState(false);
-    final isAnswerVisibleValue = useState(false);
 
     void addCardRequest() {
       context.push(CreateCardRoute().path).then((cardRequest) {
@@ -178,7 +182,7 @@ class QuizCardListWidget extends HookWidget {
                             deckStats: state.deckStats,
                             selectedCardIds: state.selectedCardIds,
                             isSelectionModeActive: isSelectionModeActive.value,
-                            isAnswerVisible: isAnswerVisibleValue.value,
+                            isAnswerVisible: state.isAnswerVisible,
                             onCardSelectionToggle: (cardId) =>
                                 cubit.toggleCardSelection(cardId),
                             onQuizCardEditRequest: launchEditCardRequest,
@@ -203,22 +207,22 @@ class QuizCardListWidget extends HookWidget {
                             },
                             onQuickPlayPressed: () => cubit.launchQuizRequest(
                               isQuickPlay: true,
-                              isShuffle: shuffleValue.value,
-                              switchSides: switchSidesValue.value,
+                              isShuffle: state.shuffleEnabled,
+                              switchSides: state.switchSides,
                             ),
                             onPlayDeckPressed: () => cubit.launchQuizRequest(
-                              isShuffle: shuffleValue.value,
-                              switchSides: switchSidesValue.value,
+                              isShuffle: state.shuffleEnabled,
+                              switchSides: state.switchSides,
                             ),
                             onShufflePressed: (isShuffle) =>
-                                shuffleValue.value = isShuffle,
+                                cubit.setShuffleEnabled(isShuffle),
                             onSwitchSidesPressed: (isSwitched) =>
-                                switchSidesValue.value = isSwitched,
-                            shuffleEnabled: shuffleValue.value,
-                            switchSides: switchSidesValue.value,
-                            isAnswerVisible: isAnswerVisibleValue.value,
+                                cubit.setSwitchSides(isSwitched),
+                            shuffleEnabled: state.shuffleEnabled,
+                            switchSides: state.switchSides,
+                            isAnswerVisible: state.isAnswerVisible,
                             onShowAnswersPressed: (isVisible) =>
-                                isAnswerVisibleValue.value = isVisible,
+                                cubit.setAnswerVisible(isVisible),
                           ),
                       ],
                     );

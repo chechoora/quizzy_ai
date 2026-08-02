@@ -11,6 +11,9 @@ class UserSettingsItem {
     required this.openConfig,
     required this.ollamaConfig,
     required this.onboardingCompleted,
+    required this.shuffleEnabled,
+    required this.switchSides,
+    required this.isAnswerVisible,
   });
 
   final int id;
@@ -22,4 +25,7 @@ class UserSettingsItem {
   final ApiKeyConfig openConfig;
   final OpenSourceConfig ollamaConfig;
   final bool onboardingCompleted;
+  final bool shuffleEnabled;
+  final bool switchSides;
+  final bool isAnswerVisible;
 }

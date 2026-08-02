@@ -2128,6 +2128,36 @@ class $UserSettingsTableTable extends UserSettingsTable
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("onboarding_completed" IN (0, 1))'),
       defaultValue: const Constant(false));
+  static const VerificationMeta _shuffleEnabledMeta =
+      const VerificationMeta('shuffleEnabled');
+  @override
+  late final GeneratedColumn<bool> shuffleEnabled = GeneratedColumn<bool>(
+      'shuffle_enabled', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("shuffle_enabled" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _switchSidesMeta =
+      const VerificationMeta('switchSides');
+  @override
+  late final GeneratedColumn<bool> switchSides = GeneratedColumn<bool>(
+      'switch_sides', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("switch_sides" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _isAnswerVisibleMeta =
+      const VerificationMeta('isAnswerVisible');
+  @override
+  late final GeneratedColumn<bool> isAnswerVisible = GeneratedColumn<bool>(
+      'is_answer_visible', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_answer_visible" IN (0, 1))'),
+      defaultValue: const Constant(false));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -2142,7 +2172,10 @@ class $UserSettingsTableTable extends UserSettingsTable
         openAiModelName,
         ollamaModelUrl,
         ollamaModelName,
-        onboardingCompleted
+        onboardingCompleted,
+        shuffleEnabled,
+        switchSides,
+        isAnswerVisible
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2230,6 +2263,24 @@ class $UserSettingsTableTable extends UserSettingsTable
           onboardingCompleted.isAcceptableOrUnknown(
               data['onboarding_completed']!, _onboardingCompletedMeta));
     }
+    if (data.containsKey('shuffle_enabled')) {
+      context.handle(
+          _shuffleEnabledMeta,
+          shuffleEnabled.isAcceptableOrUnknown(
+              data['shuffle_enabled']!, _shuffleEnabledMeta));
+    }
+    if (data.containsKey('switch_sides')) {
+      context.handle(
+          _switchSidesMeta,
+          switchSides.isAcceptableOrUnknown(
+              data['switch_sides']!, _switchSidesMeta));
+    }
+    if (data.containsKey('is_answer_visible')) {
+      context.handle(
+          _isAnswerVisibleMeta,
+          isAnswerVisible.isAcceptableOrUnknown(
+              data['is_answer_visible']!, _isAnswerVisibleMeta));
+    }
     return context;
   }
 
@@ -2267,6 +2318,12 @@ class $UserSettingsTableTable extends UserSettingsTable
           DriftSqlType.string, data['${effectivePrefix}ollama_model_name']),
       onboardingCompleted: attachedDatabase.typeMapping.read(
           DriftSqlType.bool, data['${effectivePrefix}onboarding_completed'])!,
+      shuffleEnabled: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}shuffle_enabled'])!,
+      switchSides: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}switch_sides'])!,
+      isAnswerVisible: attachedDatabase.typeMapping.read(
+          DriftSqlType.bool, data['${effectivePrefix}is_answer_visible'])!,
     );
   }
 
@@ -2291,6 +2348,9 @@ class UserSettingsTableData extends DataClass
   final String? ollamaModelUrl;
   final String? ollamaModelName;
   final bool onboardingCompleted;
+  final bool shuffleEnabled;
+  final bool switchSides;
+  final bool isAnswerVisible;
   const UserSettingsTableData(
       {required this.id,
       required this.userId,
@@ -2304,7 +2364,10 @@ class UserSettingsTableData extends DataClass
       this.openAiModelName,
       this.ollamaModelUrl,
       this.ollamaModelName,
-      required this.onboardingCompleted});
+      required this.onboardingCompleted,
+      required this.shuffleEnabled,
+      required this.switchSides,
+      required this.isAnswerVisible});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2337,6 +2400,9 @@ class UserSettingsTableData extends DataClass
       map['ollama_model_name'] = Variable<String>(ollamaModelName);
     }
     map['onboarding_completed'] = Variable<bool>(onboardingCompleted);
+    map['shuffle_enabled'] = Variable<bool>(shuffleEnabled);
+    map['switch_sides'] = Variable<bool>(switchSides);
+    map['is_answer_visible'] = Variable<bool>(isAnswerVisible);
     return map;
   }
 
@@ -2371,6 +2437,9 @@ class UserSettingsTableData extends DataClass
           ? const Value.absent()
           : Value(ollamaModelName),
       onboardingCompleted: Value(onboardingCompleted),
+      shuffleEnabled: Value(shuffleEnabled),
+      switchSides: Value(switchSides),
+      isAnswerVisible: Value(isAnswerVisible),
     );
   }
 
@@ -2394,6 +2463,9 @@ class UserSettingsTableData extends DataClass
       ollamaModelName: serializer.fromJson<String?>(json['ollamaModelName']),
       onboardingCompleted:
           serializer.fromJson<bool>(json['onboardingCompleted']),
+      shuffleEnabled: serializer.fromJson<bool>(json['shuffleEnabled']),
+      switchSides: serializer.fromJson<bool>(json['switchSides']),
+      isAnswerVisible: serializer.fromJson<bool>(json['isAnswerVisible']),
     );
   }
   @override
@@ -2413,6 +2485,9 @@ class UserSettingsTableData extends DataClass
       'ollamaModelUrl': serializer.toJson<String?>(ollamaModelUrl),
       'ollamaModelName': serializer.toJson<String?>(ollamaModelName),
       'onboardingCompleted': serializer.toJson<bool>(onboardingCompleted),
+      'shuffleEnabled': serializer.toJson<bool>(shuffleEnabled),
+      'switchSides': serializer.toJson<bool>(switchSides),
+      'isAnswerVisible': serializer.toJson<bool>(isAnswerVisible),
     };
   }
 
@@ -2429,7 +2504,10 @@ class UserSettingsTableData extends DataClass
           Value<String?> openAiModelName = const Value.absent(),
           Value<String?> ollamaModelUrl = const Value.absent(),
           Value<String?> ollamaModelName = const Value.absent(),
-          bool? onboardingCompleted}) =>
+          bool? onboardingCompleted,
+          bool? shuffleEnabled,
+          bool? switchSides,
+          bool? isAnswerVisible}) =>
       UserSettingsTableData(
         id: id ?? this.id,
         userId: userId ?? this.userId,
@@ -2456,6 +2534,9 @@ class UserSettingsTableData extends DataClass
             ? ollamaModelName.value
             : this.ollamaModelName,
         onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
+        shuffleEnabled: shuffleEnabled ?? this.shuffleEnabled,
+        switchSides: switchSides ?? this.switchSides,
+        isAnswerVisible: isAnswerVisible ?? this.isAnswerVisible,
       );
   UserSettingsTableData copyWithCompanion(UserSettingsTableCompanion data) {
     return UserSettingsTableData(
@@ -2494,6 +2575,14 @@ class UserSettingsTableData extends DataClass
       onboardingCompleted: data.onboardingCompleted.present
           ? data.onboardingCompleted.value
           : this.onboardingCompleted,
+      shuffleEnabled: data.shuffleEnabled.present
+          ? data.shuffleEnabled.value
+          : this.shuffleEnabled,
+      switchSides:
+          data.switchSides.present ? data.switchSides.value : this.switchSides,
+      isAnswerVisible: data.isAnswerVisible.present
+          ? data.isAnswerVisible.value
+          : this.isAnswerVisible,
     );
   }
 
@@ -2512,7 +2601,10 @@ class UserSettingsTableData extends DataClass
           ..write('openAiModelName: $openAiModelName, ')
           ..write('ollamaModelUrl: $ollamaModelUrl, ')
           ..write('ollamaModelName: $ollamaModelName, ')
-          ..write('onboardingCompleted: $onboardingCompleted')
+          ..write('onboardingCompleted: $onboardingCompleted, ')
+          ..write('shuffleEnabled: $shuffleEnabled, ')
+          ..write('switchSides: $switchSides, ')
+          ..write('isAnswerVisible: $isAnswerVisible')
           ..write(')'))
         .toString();
   }
@@ -2531,7 +2623,10 @@ class UserSettingsTableData extends DataClass
       openAiModelName,
       ollamaModelUrl,
       ollamaModelName,
-      onboardingCompleted);
+      onboardingCompleted,
+      shuffleEnabled,
+      switchSides,
+      isAnswerVisible);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2548,7 +2643,10 @@ class UserSettingsTableData extends DataClass
           other.openAiModelName == this.openAiModelName &&
           other.ollamaModelUrl == this.ollamaModelUrl &&
           other.ollamaModelName == this.ollamaModelName &&
-          other.onboardingCompleted == this.onboardingCompleted);
+          other.onboardingCompleted == this.onboardingCompleted &&
+          other.shuffleEnabled == this.shuffleEnabled &&
+          other.switchSides == this.switchSides &&
+          other.isAnswerVisible == this.isAnswerVisible);
 }
 
 class UserSettingsTableCompanion
@@ -2566,6 +2664,9 @@ class UserSettingsTableCompanion
   final Value<String?> ollamaModelUrl;
   final Value<String?> ollamaModelName;
   final Value<bool> onboardingCompleted;
+  final Value<bool> shuffleEnabled;
+  final Value<bool> switchSides;
+  final Value<bool> isAnswerVisible;
   const UserSettingsTableCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
@@ -2580,6 +2681,9 @@ class UserSettingsTableCompanion
     this.ollamaModelUrl = const Value.absent(),
     this.ollamaModelName = const Value.absent(),
     this.onboardingCompleted = const Value.absent(),
+    this.shuffleEnabled = const Value.absent(),
+    this.switchSides = const Value.absent(),
+    this.isAnswerVisible = const Value.absent(),
   });
   UserSettingsTableCompanion.insert({
     this.id = const Value.absent(),
@@ -2595,6 +2699,9 @@ class UserSettingsTableCompanion
     this.ollamaModelUrl = const Value.absent(),
     this.ollamaModelName = const Value.absent(),
     this.onboardingCompleted = const Value.absent(),
+    this.shuffleEnabled = const Value.absent(),
+    this.switchSides = const Value.absent(),
+    this.isAnswerVisible = const Value.absent(),
   }) : userId = Value(userId);
   static Insertable<UserSettingsTableData> custom({
     Expression<int>? id,
@@ -2610,6 +2717,9 @@ class UserSettingsTableCompanion
     Expression<String>? ollamaModelUrl,
     Expression<String>? ollamaModelName,
     Expression<bool>? onboardingCompleted,
+    Expression<bool>? shuffleEnabled,
+    Expression<bool>? switchSides,
+    Expression<bool>? isAnswerVisible,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2628,6 +2738,9 @@ class UserSettingsTableCompanion
       if (ollamaModelName != null) 'ollama_model_name': ollamaModelName,
       if (onboardingCompleted != null)
         'onboarding_completed': onboardingCompleted,
+      if (shuffleEnabled != null) 'shuffle_enabled': shuffleEnabled,
+      if (switchSides != null) 'switch_sides': switchSides,
+      if (isAnswerVisible != null) 'is_answer_visible': isAnswerVisible,
     });
   }
 
@@ -2644,7 +2757,10 @@ class UserSettingsTableCompanion
       Value<String?>? openAiModelName,
       Value<String?>? ollamaModelUrl,
       Value<String?>? ollamaModelName,
-      Value<bool>? onboardingCompleted}) {
+      Value<bool>? onboardingCompleted,
+      Value<bool>? shuffleEnabled,
+      Value<bool>? switchSides,
+      Value<bool>? isAnswerVisible}) {
     return UserSettingsTableCompanion(
       id: id ?? this.id,
       userId: userId ?? this.userId,
@@ -2659,6 +2775,9 @@ class UserSettingsTableCompanion
       ollamaModelUrl: ollamaModelUrl ?? this.ollamaModelUrl,
       ollamaModelName: ollamaModelName ?? this.ollamaModelName,
       onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
+      shuffleEnabled: shuffleEnabled ?? this.shuffleEnabled,
+      switchSides: switchSides ?? this.switchSides,
+      isAnswerVisible: isAnswerVisible ?? this.isAnswerVisible,
     );
   }
 
@@ -2706,6 +2825,15 @@ class UserSettingsTableCompanion
     if (onboardingCompleted.present) {
       map['onboarding_completed'] = Variable<bool>(onboardingCompleted.value);
     }
+    if (shuffleEnabled.present) {
+      map['shuffle_enabled'] = Variable<bool>(shuffleEnabled.value);
+    }
+    if (switchSides.present) {
+      map['switch_sides'] = Variable<bool>(switchSides.value);
+    }
+    if (isAnswerVisible.present) {
+      map['is_answer_visible'] = Variable<bool>(isAnswerVisible.value);
+    }
     return map;
   }
 
@@ -2724,7 +2852,10 @@ class UserSettingsTableCompanion
           ..write('openAiModelName: $openAiModelName, ')
           ..write('ollamaModelUrl: $ollamaModelUrl, ')
           ..write('ollamaModelName: $ollamaModelName, ')
-          ..write('onboardingCompleted: $onboardingCompleted')
+          ..write('onboardingCompleted: $onboardingCompleted, ')
+          ..write('shuffleEnabled: $shuffleEnabled, ')
+          ..write('switchSides: $switchSides, ')
+          ..write('isAnswerVisible: $isAnswerVisible')
           ..write(')'))
         .toString();
   }
@@ -4575,6 +4706,9 @@ typedef $$UserSettingsTableTableCreateCompanionBuilder
   Value<String?> ollamaModelUrl,
   Value<String?> ollamaModelName,
   Value<bool> onboardingCompleted,
+  Value<bool> shuffleEnabled,
+  Value<bool> switchSides,
+  Value<bool> isAnswerVisible,
 });
 typedef $$UserSettingsTableTableUpdateCompanionBuilder
     = UserSettingsTableCompanion Function({
@@ -4591,6 +4725,9 @@ typedef $$UserSettingsTableTableUpdateCompanionBuilder
   Value<String?> ollamaModelUrl,
   Value<String?> ollamaModelName,
   Value<bool> onboardingCompleted,
+  Value<bool> shuffleEnabled,
+  Value<bool> switchSides,
+  Value<bool> isAnswerVisible,
 });
 
 final class $$UserSettingsTableTableReferences extends BaseReferences<
@@ -4664,6 +4801,17 @@ class $$UserSettingsTableTableFilterComposer
 
   ColumnFilters<bool> get onboardingCompleted => $composableBuilder(
       column: $table.onboardingCompleted,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get shuffleEnabled => $composableBuilder(
+      column: $table.shuffleEnabled,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get switchSides => $composableBuilder(
+      column: $table.switchSides, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isAnswerVisible => $composableBuilder(
+      column: $table.isAnswerVisible,
       builder: (column) => ColumnFilters(column));
 
   $$UserTableTableFilterComposer get userId {
@@ -4743,6 +4891,17 @@ class $$UserSettingsTableTableOrderingComposer
       column: $table.onboardingCompleted,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get shuffleEnabled => $composableBuilder(
+      column: $table.shuffleEnabled,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get switchSides => $composableBuilder(
+      column: $table.switchSides, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isAnswerVisible => $composableBuilder(
+      column: $table.isAnswerVisible,
+      builder: (column) => ColumnOrderings(column));
+
   $$UserTableTableOrderingComposer get userId {
     final $$UserTableTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -4809,6 +4968,15 @@ class $$UserSettingsTableTableAnnotationComposer
   GeneratedColumn<bool> get onboardingCompleted => $composableBuilder(
       column: $table.onboardingCompleted, builder: (column) => column);
 
+  GeneratedColumn<bool> get shuffleEnabled => $composableBuilder(
+      column: $table.shuffleEnabled, builder: (column) => column);
+
+  GeneratedColumn<bool> get switchSides => $composableBuilder(
+      column: $table.switchSides, builder: (column) => column);
+
+  GeneratedColumn<bool> get isAnswerVisible => $composableBuilder(
+      column: $table.isAnswerVisible, builder: (column) => column);
+
   $$UserTableTableAnnotationComposer get userId {
     final $$UserTableTableAnnotationComposer composer = $composerBuilder(
         composer: this,
@@ -4868,6 +5036,9 @@ class $$UserSettingsTableTableTableManager extends RootTableManager<
             Value<String?> ollamaModelUrl = const Value.absent(),
             Value<String?> ollamaModelName = const Value.absent(),
             Value<bool> onboardingCompleted = const Value.absent(),
+            Value<bool> shuffleEnabled = const Value.absent(),
+            Value<bool> switchSides = const Value.absent(),
+            Value<bool> isAnswerVisible = const Value.absent(),
           }) =>
               UserSettingsTableCompanion(
             id: id,
@@ -4883,6 +5054,9 @@ class $$UserSettingsTableTableTableManager extends RootTableManager<
             ollamaModelUrl: ollamaModelUrl,
             ollamaModelName: ollamaModelName,
             onboardingCompleted: onboardingCompleted,
+            shuffleEnabled: shuffleEnabled,
+            switchSides: switchSides,
+            isAnswerVisible: isAnswerVisible,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -4898,6 +5072,9 @@ class $$UserSettingsTableTableTableManager extends RootTableManager<
             Value<String?> ollamaModelUrl = const Value.absent(),
             Value<String?> ollamaModelName = const Value.absent(),
             Value<bool> onboardingCompleted = const Value.absent(),
+            Value<bool> shuffleEnabled = const Value.absent(),
+            Value<bool> switchSides = const Value.absent(),
+            Value<bool> isAnswerVisible = const Value.absent(),
           }) =>
               UserSettingsTableCompanion.insert(
             id: id,
@@ -4913,6 +5090,9 @@ class $$UserSettingsTableTableTableManager extends RootTableManager<
             ollamaModelUrl: ollamaModelUrl,
             ollamaModelName: ollamaModelName,
             onboardingCompleted: onboardingCompleted,
+            shuffleEnabled: shuffleEnabled,
+            switchSides: switchSides,
+            isAnswerVisible: isAnswerVisible,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

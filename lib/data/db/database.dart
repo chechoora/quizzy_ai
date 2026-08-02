@@ -34,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   @override
   MigrationStrategy get migration {
@@ -174,6 +174,15 @@ class AppDatabase extends _$AppDatabase {
           // deckTable.remoteUpdatedAt): adds the second signal alongside
           // the pre-existing remoteUpdatedAt column.
           await m.addColumn(deckTable, deckTable.remoteLastActivityAt);
+        }
+        if (from < 16) {
+          // Migration for persisting the quiz card list's playback
+          // preferences (shuffle, switch sides, show answers) per user so
+          // they survive across sessions and decks instead of resetting on
+          // every navigation into a deck.
+          await m.addColumn(userSettingsTable, userSettingsTable.shuffleEnabled);
+          await m.addColumn(userSettingsTable, userSettingsTable.switchSides);
+          await m.addColumn(userSettingsTable, userSettingsTable.isAnswerVisible);
         }
       },
     );

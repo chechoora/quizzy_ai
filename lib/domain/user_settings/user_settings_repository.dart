@@ -90,4 +90,16 @@ class UserSettingsRepository {
   Future<void> setOnboardingCompleted(int userId) async {
     await dataBaseRepository.updateOnboardingCompleted(userId, true);
   }
+
+  Future<void> setShuffleEnabled(int userId, bool value) async {
+    await dataBaseRepository.updateShuffleEnabled(userId, value);
+  }
+
+  Future<void> setSwitchSides(int userId, bool value) async {
+    await dataBaseRepository.updateSwitchSides(userId, value);
+  }
+
+  Future<void> setAnswerVisible(int userId, bool value) async {
+    await dataBaseRepository.updateIsAnswerVisible(userId, value);
+  }
 }

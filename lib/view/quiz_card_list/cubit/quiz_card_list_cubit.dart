@@ -14,6 +14,9 @@ import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_repository.dart';
 import 'package:poc_ai_quiz/domain/in_app_purchase/in_app_purchase_service.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
+import 'package:poc_ai_quiz/domain/user/user_repository.dart';
+import 'package:poc_ai_quiz/domain/user_settings/user_settings_repository.dart';
+import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:poc_ai_quiz/util/unique_emit.dart';
 
 class QuizCardListCubit extends Cubit<QuizCardListState> {
@@ -24,6 +27,9 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     required this.quizCardPremiumManager,
     required this.quizCardExeValidator,
     required this.analyticsService,
+    required this.userRepository,
+    required this.userSettingsRepository,
+    required this.logger,
     required this.isSubscriptionOnly,
   }) : super(QuizCardListLoadingState());
 
@@ -33,6 +39,9 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   final QuizCardPremiumManager quizCardPremiumManager;
   final QuizCardExeValidator quizCardExeValidator;
   final AnalyticsService analyticsService;
+  final UserRepository userRepository;
+  final UserSettingsRepository userSettingsRepository;
+  final Logger logger;
 
   /// When true (the `quizzypro` flavor) only the Quizzy AI subscription is
   /// offered; when false (the `quizzy` flavor) only the one-time "unlimited
@@ -43,6 +52,13 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   final _selectedCardIds = <int>{};
   StreamSubscription<List<QuizCardItem>>? _cardsSubscription;
   StreamSubscription<DeckItem?>? _deckSubscription;
+
+  /// Quiz playback preferences, persisted per user in [UserSettingsRepository]
+  /// via [loadSettings] / [setShuffleEnabled] / [setSwitchSides] /
+  /// [setAnswerVisible] so they survive across sessions and decks.
+  bool _shuffleEnabled = false;
+  bool _switchSides = false;
+  bool _isAnswerVisible = false;
 
   /// Latest deck stats seen from [watchDeck]. Falls back to the stats the
   /// screen was opened with until the deck's own watch stream emits.
@@ -56,43 +72,38 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       ? InAppPurchaseFeature.quizzyAi
       : InAppPurchaseFeature.unlimitedDecksCards;
 
+  void _emitDataState() {
+    emit(
+      QuizCardListDataState(
+        quizCarList: List.from(items),
+        selectedCardIds: Set.from(_selectedCardIds),
+        deckStats: _deckStats,
+        shuffleEnabled: _shuffleEnabled,
+        switchSides: _switchSides,
+        isAnswerVisible: _isAnswerVisible,
+      ),
+    );
+  }
+
   void toggleCardSelection(int cardId) {
     if (_selectedCardIds.contains(cardId)) {
       _selectedCardIds.remove(cardId);
     } else {
       _selectedCardIds.add(cardId);
     }
-    emit(
-      QuizCardListDataState(
-        quizCarList: List.from(items),
-        selectedCardIds: Set.from(_selectedCardIds),
-        deckStats: _deckStats,
-      ),
-    );
+    _emitDataState();
   }
 
   void selectAllCards() {
     _selectedCardIds
       ..clear()
       ..addAll(items.map((card) => card.id));
-    emit(
-      QuizCardListDataState(
-        quizCarList: List.from(items),
-        selectedCardIds: Set.from(_selectedCardIds),
-        deckStats: _deckStats,
-      ),
-    );
+    _emitDataState();
   }
 
   void clearSelection() {
     _selectedCardIds.clear();
-    emit(
-      QuizCardListDataState(
-        quizCarList: List.from(items),
-        selectedCardIds: const {},
-        deckStats: _deckStats,
-      ),
-    );
+    _emitDataState();
   }
 
   void watchCards() {
@@ -105,13 +116,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
           ..addAll(data);
         final validIds = data.map((card) => card.id).toSet();
         _selectedCardIds.retainWhere(validIds.contains);
-        emit(
-          QuizCardListDataState(
-            quizCarList: List.from(items),
-            selectedCardIds: Set.from(_selectedCardIds),
-            deckStats: _deckStats,
-          ),
-        );
+        _emitDataState();
       },
     );
   }
@@ -126,15 +131,81 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       (data) {
         _deckStatsOverride = data?.stats;
         if (state is QuizCardListDataState) {
-          emit(
-            QuizCardListDataState(
-              quizCarList: List.from(items),
-              selectedCardIds: Set.from(_selectedCardIds),
-              deckStats: _deckStats,
-            ),
-          );
+          _emitDataState();
         }
       },
+    );
+  }
+
+  /// Loads the persisted quiz playback preferences (shuffle, switch sides,
+  /// show answers) for the current user. Only re-emits if cards have already
+  /// loaded at least once (mirroring [watchDeck]'s guard), so this doesn't
+  /// race an empty list ahead of [watchCards]'s first emission.
+  Future<void> loadSettings() async {
+    try {
+      final user = await userRepository.fetchCurrentUser();
+      final settings = await userSettingsRepository.fetchUserSettings(user.id);
+      _shuffleEnabled = settings.shuffleEnabled;
+      _switchSides = settings.switchSides;
+      _isAnswerVisible = settings.isAnswerVisible;
+      logger.i('Loaded quiz playback settings for user ${user.id}');
+      if (state is QuizCardListDataState) {
+        _emitDataState();
+      }
+    } catch (e, stackTrace) {
+      logger.e(
+        'Failed to load quiz playback settings',
+        ex: e,
+        stacktrace: stackTrace,
+      );
+    }
+  }
+
+  Future<void> _persistSetting(
+    Future<void> Function(int userId) update,
+  ) async {
+    try {
+      final user = await userRepository.fetchCurrentUser();
+      await update(user.id);
+    } catch (e, stackTrace) {
+      logger.e(
+        'Failed to persist quiz playback setting',
+        ex: e,
+        stacktrace: stackTrace,
+      );
+    }
+  }
+
+  void setShuffleEnabled(bool value) {
+    _shuffleEnabled = value;
+    _emitDataState();
+    logger.i('Shuffle enabled set to $value');
+    unawaited(
+      _persistSetting(
+        (userId) => userSettingsRepository.setShuffleEnabled(userId, value),
+      ),
+    );
+  }
+
+  void setSwitchSides(bool value) {
+    _switchSides = value;
+    _emitDataState();
+    logger.i('Switch sides set to $value');
+    unawaited(
+      _persistSetting(
+        (userId) => userSettingsRepository.setSwitchSides(userId, value),
+      ),
+    );
+  }
+
+  void setAnswerVisible(bool value) {
+    _isAnswerVisible = value;
+    _emitDataState();
+    logger.i('Answer visibility set to $value');
+    unawaited(
+      _persistSetting(
+        (userId) => userSettingsRepository.setAnswerVisible(userId, value),
+      ),
     );
   }
 
@@ -265,11 +336,17 @@ class QuizCardListDataState extends BuilderState {
     required this.quizCarList,
     this.selectedCardIds = const {},
     this.deckStats,
+    this.shuffleEnabled = false,
+    this.switchSides = false,
+    this.isAnswerVisible = false,
   });
 
   final List<QuizCardItem> quizCarList;
   final Set<int> selectedCardIds;
   final ItemStats? deckStats;
+  final bool shuffleEnabled;
+  final bool switchSides;
+  final bool isAnswerVisible;
 
   bool get hasSelection => selectedCardIds.isNotEmpty;
 
@@ -286,7 +363,14 @@ class QuizCardListDataState extends BuilderState {
   }
 
   @override
-  List<Object?> get props => [quizCarList, selectedCardIds, deckStats];
+  List<Object?> get props => [
+        quizCarList,
+        selectedCardIds,
+        deckStats,
+        shuffleEnabled,
+        switchSides,
+        isAnswerVisible,
+      ];
 }
 
 class QuizCardLaunchState extends ListenerState {

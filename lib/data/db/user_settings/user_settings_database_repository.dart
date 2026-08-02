@@ -109,6 +109,30 @@ class UserSettingsDataBaseRepository {
     ));
   }
 
+  Future<void> updateShuffleEnabled(int userId, bool value) async {
+    await (appDatabase.update(appDatabase.userSettingsTable)
+          ..where((tbl) => tbl.userId.equals(userId)))
+        .write(UserSettingsTableCompanion(
+      shuffleEnabled: Value(value),
+    ));
+  }
+
+  Future<void> updateSwitchSides(int userId, bool value) async {
+    await (appDatabase.update(appDatabase.userSettingsTable)
+          ..where((tbl) => tbl.userId.equals(userId)))
+        .write(UserSettingsTableCompanion(
+      switchSides: Value(value),
+    ));
+  }
+
+  Future<void> updateIsAnswerVisible(int userId, bool value) async {
+    await (appDatabase.update(appDatabase.userSettingsTable)
+          ..where((tbl) => tbl.userId.equals(userId)))
+        .write(UserSettingsTableCompanion(
+      isAnswerVisible: Value(value),
+    ));
+  }
+
   Future<void> updateOllamaConfig(
     int userId,
     String? url,

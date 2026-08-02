@@ -43,6 +43,9 @@ class UserSettingsDataBaseMapper {
                 )
               : OpenSourceConfig.empty(),
       onboardingCompleted: data.onboardingCompleted,
+      shuffleEnabled: data.shuffleEnabled,
+      switchSides: data.switchSides,
+      isAnswerVisible: data.isAnswerVisible,
     );
   }
 }

@@ -29,4 +29,13 @@ class UserSettingsTable extends Table {
 
   BoolColumn get onboardingCompleted =>
       boolean().withDefault(const Constant(false))();
+
+  BoolColumn get shuffleEnabled =>
+      boolean().withDefault(const Constant(false))();
+
+  BoolColumn get switchSides =>
+      boolean().withDefault(const Constant(false))();
+
+  BoolColumn get isAnswerVisible =>
+      boolean().withDefault(const Constant(false))();
 }

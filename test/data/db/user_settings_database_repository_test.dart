@@ -38,4 +38,26 @@ void main() {
     final settings = await repo.fetchUserSettings(1);
     expect(settings.answerValidatorType, 'quizzyAI');
   });
+
+  test(
+      'shuffleEnabled, switchSides and isAnswerVisible default to false and '
+      'persist once set', () async {
+    final db = AppDatabase.withExecutor(NativeDatabase.memory());
+    addTearDown(db.close);
+    final repo = UserSettingsDataBaseRepository(db);
+
+    final defaults = await repo.fetchUserSettings(1);
+    expect(defaults.shuffleEnabled, false);
+    expect(defaults.switchSides, false);
+    expect(defaults.isAnswerVisible, false);
+
+    await repo.updateShuffleEnabled(1, true);
+    await repo.updateSwitchSides(1, true);
+    await repo.updateIsAnswerVisible(1, true);
+
+    final settings = await repo.fetchUserSettings(1);
+    expect(settings.shuffleEnabled, true);
+    expect(settings.switchSides, true);
+    expect(settings.isAnswerVisible, true);
+  });
 }
