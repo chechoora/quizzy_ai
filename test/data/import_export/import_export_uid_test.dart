@@ -62,7 +62,7 @@ void main() {
       );
 
       final json = await exportService.exportDecksToJson(const [
-        DeckItem(id: 1, uid: 555, title: 'Deck', isArchive: false),
+        DeckItem(id: 1, uid: 555, title: 'Deck', isArchive: false, cardCount: 0),
       ]);
 
       final decoded = jsonDecode(json) as Map<String, dynamic>;

@@ -45,6 +45,7 @@ class DeckListDisplayWidget extends StatelessWidget {
                 final deck = deckList[index];
                 return DeckListItemWidget(
                   title: deck.title,
+                  cardCount: deck.cardCount,
                   onTap: () => onDeckClicked?.call(deck),
                   trailing: AppMoreButton(
                     actions: [

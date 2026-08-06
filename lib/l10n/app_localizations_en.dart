@@ -27,6 +27,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeAddDeckTooltip => 'Add Deck';
 
   @override
+  String homeDeckCardCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '$count card',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String homeDeleteDeckConfirmation(String deckTitle) {
     return 'Are you sure you want to delete $deckTitle, all your quiz cards also will be deleted';
   }

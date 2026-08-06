@@ -5,39 +5,92 @@ import 'package:poc_ai_quiz/domain/deck/model/deck_item.dart';
 import 'package:poc_ai_quiz/domain/stats/model/item_stats.dart';
 import 'package:poc_ai_quiz/util/uid_generator.dart';
 
+/// A deck row paired with its live count of child [QuizCardTable] rows.
+typedef DeckWithCardCount = ({DeckTableData deck, int cardCount});
+
 class DeckDataBaseRepository {
   final AppDatabase appDatabase;
 
-  static const _listEquality = ListEquality<DeckTableData>();
+  static const _listEquality = ListEquality<DeckWithCardCount>();
 
   DeckDataBaseRepository(this.appDatabase);
 
-  /// `.watch()` re-emits on every write to the table, including no-op
+  /// `.watch()` re-emits on every write to either table, including no-op
   /// updates that write back identical values (e.g. sync's remote-wins
   /// upsert). `distinct()` needs an explicit equality here because
-  /// `List<DeckTableData>`'s default `==` is identity, not element-wise —
+  /// `List<DeckWithCardCount>`'s default `==` is identity, not element-wise —
   /// without it every emission is a new list instance and distinct() never
   /// suppresses anything, defeating its purpose.
-  Stream<List<DeckTableData>> watchAllDecks() {
-    return appDatabase
-        .select(appDatabase.deckTable)
+  Stream<List<DeckWithCardCount>> watchAllDecks() {
+    final countExp = appDatabase.quizCardTable.id.count();
+    final query = appDatabase.select(appDatabase.deckTable).join([
+      leftOuterJoin(
+        appDatabase.quizCardTable,
+        appDatabase.quizCardTable.deckId.equalsExp(appDatabase.deckTable.id),
+      ),
+    ])
+      ..addColumns([countExp])
+      ..groupBy([appDatabase.deckTable.id]);
+    return query
         .watch()
+        .map(
+          (rows) => rows
+              .map(
+                (row) => (
+                  deck: row.readTable(appDatabase.deckTable),
+                  cardCount: row.read(countExp) ?? 0,
+                ),
+              )
+              .toList(),
+        )
         .distinct(_listEquality.equals);
   }
 
-  Future<List<DeckTableData>> fetchAllDecks() {
-    return appDatabase.select(appDatabase.deckTable).get();
+  Future<List<DeckWithCardCount>> fetchAllDecks() async {
+    final countExp = appDatabase.quizCardTable.id.count();
+    final query = appDatabase.select(appDatabase.deckTable).join([
+      leftOuterJoin(
+        appDatabase.quizCardTable,
+        appDatabase.quizCardTable.deckId.equalsExp(appDatabase.deckTable.id),
+      ),
+    ])
+      ..addColumns([countExp])
+      ..groupBy([appDatabase.deckTable.id]);
+    final rows = await query.get();
+    return rows
+        .map(
+          (row) => (
+            deck: row.readTable(appDatabase.deckTable),
+            cardCount: row.read(countExp) ?? 0,
+          ),
+        )
+        .toList();
   }
 
-  /// Watches the single deck [id] (its title, stats, etc.), so a screen
-  /// showing one deck can stay live as stats get synced in. Emits `null` if
-  /// the deck is deleted. Drift-generated row data classes already have
-  /// field-wise `==`, so `distinct()` needs no explicit equality here, unlike
-  /// the list-returning watch methods above.
-  Stream<DeckTableData?> watchDeck(int id) {
-    return (appDatabase.select(appDatabase.deckTable)
-          ..where((table) => table.id.isValue(id)))
+  /// Watches the single deck [id] (its title, stats, card count, etc.), so a
+  /// screen showing one deck can stay live as stats get synced in. Emits
+  /// `null` if the deck is deleted.
+  Stream<DeckWithCardCount?> watchDeck(int id) {
+    final countExp = appDatabase.quizCardTable.id.count();
+    final query = appDatabase.select(appDatabase.deckTable).join([
+      leftOuterJoin(
+        appDatabase.quizCardTable,
+        appDatabase.quizCardTable.deckId.equalsExp(appDatabase.deckTable.id),
+      ),
+    ])
+      ..addColumns([countExp])
+      ..where(appDatabase.deckTable.id.equals(id))
+      ..groupBy([appDatabase.deckTable.id]);
+    return query
         .watchSingleOrNull()
+        .map(
+          (row) => row == null
+              ? null
+              : (
+                  deck: row.readTable(appDatabase.deckTable),
+                  cardCount: row.read(countExp) ?? 0,
+                ),
+        )
         .distinct();
   }
 

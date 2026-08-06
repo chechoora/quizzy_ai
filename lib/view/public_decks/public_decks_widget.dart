@@ -86,14 +86,8 @@ class PublicDecksWidget extends HookWidget {
                                     final deck = state.decks[index];
                                     return DeckListItemWidget(
                                       title: deck.title,
+                                      cardCount: deck.cardCount.toInt(),
                                       onTap: () => openDeck(deck),
-                                      trailing: Text(
-                                        '${deck.cardCount}',
-                                        style: AppTypography.secondaryText
-                                            .copyWith(
-                                          color: AppColors.grayscale500,
-                                        ),
-                                      ),
                                     );
                                   },
                                 ),

@@ -129,6 +129,12 @@ abstract class AppLocalizations {
   /// **'Add Deck'**
   String get homeAddDeckTooltip;
 
+  /// No description provided for @homeDeckCardCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} card} other{{count} cards}}'**
+  String homeDeckCardCount(int count);
+
   /// No description provided for @homeDeleteDeckConfirmation.
   ///
   /// In en, this message translates to:

@@ -6,6 +6,14 @@
   "homeDecksLabel": "Decks",
   "homeSettingsLabel": "Settings",
   "homeAddDeckTooltip": "Add Deck",
+  "homeDeckCardCount": "{count, plural, one{{count} card} other{{count} cards}}",
+  "@homeDeckCardCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "homeDeleteDeckConfirmation": "Are you sure you want to delete {deckTitle}, all your quiz cards also will be deleted",
   "@homeDeleteDeckConfirmation": {
     "placeholders": {

@@ -17,7 +17,8 @@ class MockAiGenService extends Mock implements AiGenService {}
 class MockAnalyticsService extends Mock implements AnalyticsService {}
 
 void main() {
-  const deckItem = DeckItem(id: 42, title: 'Space', isArchive: false);
+  const deckItem =
+      DeckItem(id: 42, title: 'Space', isArchive: false, cardCount: 0);
 
   late MockQuizCardRepository quizCardRepository;
   late MockInAppPurchaseService inAppPurchaseService;

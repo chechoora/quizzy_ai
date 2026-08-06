@@ -160,8 +160,8 @@ void main() {
   group('pushLocalChanges - decks', () {
     test('a failing deck does not stop the next deck from being pushed',
         () async {
-      const deckA = DeckItem(id: 1, title: 'A', isArchive: false);
-      const deckB = DeckItem(id: 2, title: 'B', isArchive: false);
+      const deckA = DeckItem(id: 1, title: 'A', isArchive: false, cardCount: 0);
+      const deckB = DeckItem(id: 2, title: 'B', isArchive: false, cardCount: 0);
       when(() => deckRepository.fetchDirtyDecks())
           .thenAnswer((_) async => const [deckA, deckB]);
 
@@ -218,7 +218,12 @@ void main() {
     test('new cards are pushed via addCards and marked synced by array order',
         () async {
       const deck =
-          DeckItem(id: 1, title: 'Deck', isArchive: false, remoteId: 'rd1');
+          DeckItem(
+              id: 1,
+              title: 'Deck',
+              isArchive: false,
+              cardCount: 0,
+              remoteId: 'rd1');
       final card1 = _newCard(1, 1, question: 'Q1');
       final card2 = _newCard(2, 1, question: 'Q2');
       when(() => deckRepository.fetchDecks())
@@ -241,7 +246,7 @@ void main() {
     test('skips a card whose deck is not yet synced', () async {
       final card = _newCard(2, 5);
       when(() => deckRepository.fetchDecks()).thenAnswer((_) async => const [
-            DeckItem(id: 5, title: 'Deck', isArchive: false),
+            DeckItem(id: 5, title: 'Deck', isArchive: false, cardCount: 0),
           ]);
       when(() => quizCardRepository.fetchDirtyCards())
           .thenAnswer((_) async => [card]);
@@ -257,7 +262,12 @@ void main() {
     test('new cards for the same deck are chunked at 100 per addCards call',
         () async {
       const deck =
-          DeckItem(id: 1, title: 'Deck', isArchive: false, remoteId: 'rd1');
+          DeckItem(
+              id: 1,
+              title: 'Deck',
+              isArchive: false,
+              cardCount: 0,
+              remoteId: 'rd1');
       final cards = List.generate(150, (i) => _newCard(i, 1, question: 'Q$i'));
       when(() => deckRepository.fetchDecks())
           .thenAnswer((_) async => const [deck]);
@@ -287,7 +297,12 @@ void main() {
         'edited cards are pushed via updateCards; updated cards are marked '
         'synced, notFound cards count as failures and stay dirty', () async {
       const deck =
-          DeckItem(id: 1, title: 'Deck', isArchive: false, remoteId: 'rd1');
+          DeckItem(
+              id: 1,
+              title: 'Deck',
+              isArchive: false,
+              cardCount: 0,
+              remoteId: 'rd1');
       final cardA = _editedCard(1, 1, 'rcA');
       final cardB = _editedCard(2, 1, 'rcB');
       when(() => deckRepository.fetchDecks())
@@ -461,6 +476,7 @@ void main() {
                 id: 7,
                 title: 'Gone',
                 isArchive: false,
+                cardCount: 0,
                 remoteId: 'gone',
                 isDirty: true),
           ]);
@@ -504,6 +520,7 @@ void main() {
           id: 10,
           title: 'Local edit',
           isArchive: false,
+          cardCount: 0,
           remoteId: 'd1',
           isDirty: true);
       when(() => deckRepository.fetchDirtyDecks())
@@ -599,6 +616,7 @@ void main() {
               id: 10,
               title: 'Deck',
               isArchive: false,
+              cardCount: 0,
               remoteId: 'd1',
               remoteUpdatedAt: deck.updatedAt,
               remoteLastActivityAt: deck.lastActivityAt,
@@ -617,6 +635,7 @@ void main() {
               id: 10,
               title: 'Deck',
               isArchive: false,
+              cardCount: 0,
               remoteId: 'd1',
               remoteUpdatedAt: deck.updatedAt,
               remoteLastActivityAt: deck.lastActivityAt,
@@ -663,6 +682,7 @@ void main() {
               id: 10,
               title: 'Deck',
               isArchive: false,
+              cardCount: 0,
               remoteId: 'd1',
               // Matches the deck's unchanged `updatedAt` ...
               remoteUpdatedAt: deck.updatedAt,

@@ -25,10 +25,14 @@ class DeckItem extends Equatable {
   /// flavor and for decks never synced.
   final ItemStats? stats;
 
+  /// Live count of this deck's quiz cards, computed from the local DB.
+  final int cardCount;
+
   const DeckItem({
     required this.id,
     required this.title,
     required this.isArchive,
+    required this.cardCount,
     this.uid,
     this.remoteId,
     this.isDirty = false,
@@ -48,5 +52,6 @@ class DeckItem extends Equatable {
         remoteUpdatedAt,
         remoteLastActivityAt,
         stats,
+        cardCount,
       ];
 }

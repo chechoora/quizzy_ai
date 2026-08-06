@@ -61,13 +61,13 @@ class DeckRepository {
   /// Local decks with unpushed changes, for the sync push cycle.
   Future<List<DeckItem>> fetchDirtyDecks() async {
     final databaseData = await dataBaseRepository.fetchDirtyDecks();
-    return deckDatBaseMapper.mapToDeckItemList(databaseData);
+    return deckDatBaseMapper.mapPlainToDeckItemList(databaseData);
   }
 
   /// Local decks already linked to a remote deck.
   Future<List<DeckItem>> fetchSyncedDecks() async {
     final databaseData = await dataBaseRepository.fetchSyncedDecks();
-    return deckDatBaseMapper.mapToDeckItemList(databaseData);
+    return deckDatBaseMapper.mapPlainToDeckItemList(databaseData);
   }
 
   /// Returns the local row id of the deck linked to [remoteId], or null.

@@ -102,7 +102,7 @@ void main() {
     );
     when(() => deckRepository.fetchDecks()).thenAnswer(
       (_) async => const [
-        DeckItem(id: 1, uid: 100, title: 'Deck', isArchive: false),
+        DeckItem(id: 1, uid: 100, title: 'Deck', isArchive: false, cardCount: 0),
       ],
     );
     stubPremium(true);
