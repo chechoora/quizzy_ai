@@ -104,8 +104,11 @@ class HomeWidget extends HookWidget {
       );
     }
 
-    void openDeck(DeckItem deck) {
-      context.push(QuizCardListRoute().path, extra: deck);
+    void openDeck(DeckItem deck, {bool showHeaderActionsOnOpen = false}) {
+      context.push(
+        QuizCardListRoute().path,
+        extra: (deck, showHeaderActionsOnOpen),
+      );
     }
 
     void startOnboardingFlow() async {
@@ -193,7 +196,7 @@ class HomeWidget extends HookWidget {
         },
         listener: (BuildContext context, DeckState state) {
           if (state is DeckCreatedState) {
-            openDeck(state.deck);
+            openDeck(state.deck, showHeaderActionsOnOpen: true);
           } else if (state is RequestCreateDeckState) {
             if (state.canCreateDeck) {
               addDockRequest();

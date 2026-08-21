@@ -30,10 +30,12 @@ import 'package:solar_icons/solar_icons.dart';
 class QuizCardListWidget extends HookWidget {
   const QuizCardListWidget({
     required this.deckItem,
+    this.showHeaderActionsOnOpen = false,
     super.key,
   });
 
   final DeckItem deckItem;
+  final bool showHeaderActionsOnOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +88,18 @@ class QuizCardListWidget extends HookWidget {
           launchDeckEdit();
       }
     }
+
+    useEffect(
+      () {
+        if (showHeaderActionsOnOpen) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) showHeaderActions();
+          });
+        }
+        return null;
+      },
+      const [],
+    );
 
     void launchConfirmDeleteRequest(QuizCardItem card) {
       alert(

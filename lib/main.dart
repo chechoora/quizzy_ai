@@ -225,9 +225,11 @@ GoRouter buildAppRouter({required String initialLocation}) {
         name: QuizCardListRoute().name,
         path: QuizCardListRoute().path,
         builder: (context, state) {
-          final deckItem = state.extra as DeckItem;
+          final (deckItem, showHeaderActionsOnOpen) =
+              state.extra as (DeckItem, bool);
           return QuizCardListWidget(
             deckItem: deckItem,
+            showHeaderActionsOnOpen: showHeaderActionsOnOpen,
           );
         },
       ),
