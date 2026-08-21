@@ -23,6 +23,7 @@ import 'package:poc_ai_quiz/util/navigation.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/cubit/quiz_card_list_cubit.dart';
 import 'package:poc_ai_quiz/view/quiz_card_list/display/quiz_card_list_display_widget.dart';
+import 'package:poc_ai_quiz/view/quiz_card_list/quiz_card_list_action_bottom_sheet.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_ui_data.dart';
 import 'package:solar_icons/solar_icons.dart';
 
@@ -73,6 +74,17 @@ class QuizCardListWidget extends HookWidget {
 
     void launchDeckEdit() {
       context.push(DeckEditRoute().path, extra: deckItem);
+    }
+
+    Future<void> showHeaderActions() async {
+      final action = await showQuizCardListActionBottomSheet(context);
+      if (!context.mounted || action == null) return;
+      switch (action) {
+        case QuizCardListHeaderAction.addCard:
+          cubit.addCardRequest();
+        case QuizCardListHeaderAction.aiDeckEdit:
+          launchDeckEdit();
+      }
     }
 
     void launchConfirmDeleteRequest(QuizCardItem card) {
@@ -138,20 +150,9 @@ class QuizCardListWidget extends HookWidget {
               title: deckItem.title,
               onBackPressed: () => context.pop(),
               leadingWeight: const SizedBox(width: 48),
-              trailing: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppCircleIconButton(
-                    icon: SolarIconsOutline.addSquare,
-                    onPressed: () => cubit.addCardRequest(),
-                  ),
-                  const SizedBox(width: 8),
-                  AppCircleIconButton(
-                    icon: SolarIconsOutline.magicStick_3,
-                    onPressed: () => launchDeckEdit(),
-                  ),
-                ],
+              trailing: AppCircleIconButton(
+                icon: SolarIconsOutline.magicStick_3,
+                onPressed: () => showHeaderActions(),
               ),
             ),
             Expanded(

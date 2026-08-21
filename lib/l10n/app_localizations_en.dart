@@ -280,6 +280,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quizCardListAddCardTooltip => 'Add Card';
 
   @override
+  String get quizCardListActionSheetTitle => 'Add cards';
+
+  @override
+  String get quizCardListAddCardOption => 'Add card';
+
+  @override
+  String get quizCardListAiDeckEditOption => 'AI deck editor';
+
+  @override
   String get quizCardListPlayDeckButton => 'Play the Deck';
 
   @override

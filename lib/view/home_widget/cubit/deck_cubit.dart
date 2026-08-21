@@ -55,7 +55,11 @@ class HomeCubit extends Cubit<DeckState> {
   }
 
   Future<void> createDeck(String deckName) async {
-    deckRepository.saveDeck(deckName);
+    final deckId = await deckRepository.saveDeck(deckName);
+    final deck = await deckRepository.watchDeck(deckId).first;
+    if (deck != null) {
+      emit(DeckCreatedState(deck));
+    }
   }
 
   void deleteDeck(DeckItem deck) {
@@ -165,6 +169,12 @@ class DeckDataState extends BuilderState {
 
   @override
   List<Object?> get props => [deckList];
+}
+
+class DeckCreatedState extends ListenerState {
+  final DeckItem deck;
+
+  const DeckCreatedState(this.deck);
 }
 
 class RequestCreateDeckState extends ListenerState {

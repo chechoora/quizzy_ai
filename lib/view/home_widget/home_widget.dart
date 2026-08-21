@@ -192,7 +192,9 @@ class HomeWidget extends HookWidget {
           return nextState is ListenerState;
         },
         listener: (BuildContext context, DeckState state) {
-          if (state is RequestCreateDeckState) {
+          if (state is DeckCreatedState) {
+            openDeck(state.deck);
+          } else if (state is RequestCreateDeckState) {
             if (state.canCreateDeck) {
               addDockRequest();
             } else {

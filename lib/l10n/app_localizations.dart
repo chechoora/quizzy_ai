@@ -591,6 +591,24 @@ abstract class AppLocalizations {
   /// **'Add Card'**
   String get quizCardListAddCardTooltip;
 
+  /// No description provided for @quizCardListActionSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add cards'**
+  String get quizCardListActionSheetTitle;
+
+  /// No description provided for @quizCardListAddCardOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Add card'**
+  String get quizCardListAddCardOption;
+
+  /// No description provided for @quizCardListAiDeckEditOption.
+  ///
+  /// In en, this message translates to:
+  /// **'AI deck editor'**
+  String get quizCardListAiDeckEditOption;
+
   /// No description provided for @quizCardListPlayDeckButton.
   ///
   /// In en, this message translates to:
