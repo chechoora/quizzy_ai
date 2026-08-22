@@ -5,7 +5,12 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=18" time="104.459118">
+      <testcase classname="fastlane.lanes" name="0: Switch to build_appbundle lane" time="0.00019">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="1: fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=18" time="5.645717">
         
       </testcase>
     
