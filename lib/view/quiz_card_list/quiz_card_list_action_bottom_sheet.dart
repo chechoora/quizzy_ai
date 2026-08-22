@@ -68,18 +68,10 @@ class _ActionOption extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Row(
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: AppColors.grayscaleWhite,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: AppColors.grayscale600,
-            ),
+          Icon(
+            icon,
+            size: 20,
+            color: AppColors.grayscale600,
           ),
           const SizedBox(width: 16),
           Expanded(
