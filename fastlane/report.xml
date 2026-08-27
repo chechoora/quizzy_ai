@@ -5,12 +5,22 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: Switch to build_appbundle lane" time="0.00019">
+      <testcase classname="fastlane.lanes" name="0: Switch to build_appbundle lane" time="0.000159">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=18" time="5.645717">
+      <testcase classname="fastlane.lanes" name="1: fvm flutter build appbundle --flavor quizzypro -t lib/main_quizzypro.dart --release --build-name=1.0.0 --build-number=20" time="100.651764">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: Switch to build_ipa lane" time="0.000152">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: fvm flutter build ipa --flavor quizzypro -t lib/main_quizzypro.dart --build-name=1.0.0 --build-number=20 --export-options-plist=ios/ExportOptions.plist" time="155.973982">
         
       </testcase>
     
