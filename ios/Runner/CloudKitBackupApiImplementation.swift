@@ -35,17 +35,16 @@ class CloudKitBackupApiImplementation: CloudKitBackupApi {
 
     // MARK: - CloudKitBackupApi
 
-    func accountStatus(completion: @escaping (Result<IcloudAccountStatus, Error>) -> Void) {
-        container.accountStatus { status, error in
-            if let error = error {
-                completion(.failure(CloudKitBackupError(
-                    code: "ACCOUNT_STATUS_ERROR",
-                    message: error.localizedDescription,
-                    details: nil
-                )))
-                return
-            }
-            completion(.success(self.mapAccountStatus(status)))
+    func accountStatus() async throws -> IcloudAccountStatus {
+        do {
+            let status = try await container.accountStatus()
+            return mapAccountStatus(status)
+        } catch {
+            throw CloudKitBackupError(
+                code: "ACCOUNT_STATUS_ERROR",
+                message: error.localizedDescription,
+                details: nil
+            )
         }
     }
 
@@ -53,135 +52,100 @@ class CloudKitBackupApiImplementation: CloudKitBackupApi {
         jsonPayload: String,
         deckCount: Int64,
         cardCount: Int64,
-        version: String,
-        completion: @escaping (Result<Void, Error>) -> Void
-    ) {
+        version: String
+    ) async throws {
         // Write the payload to a temporary file for the CKAsset.
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("deck_backup_\(UUID().uuidString).json")
         do {
             try jsonPayload.write(to: tempURL, atomically: true, encoding: .utf8)
         } catch {
-            completion(.failure(CloudKitBackupError(
+            throw CloudKitBackupError(
                 code: "WRITE_TEMP_FAILED",
                 message: error.localizedDescription,
                 details: nil
-            )))
-            return
+            )
         }
+        defer { try? FileManager.default.removeItem(at: tempURL) }
 
-        fetchRecord { result in
-            let record: CKRecord
-            switch result {
-            case .success(let existing):
-                record = existing ?? CKRecord(recordType: self.recordType, recordID: self.recordID)
-            case .failure(let error):
-                completion(.failure(error))
-                return
-            }
+        let record = try await fetchRecord()
+            ?? CKRecord(recordType: recordType, recordID: recordID)
 
-            record[self.fieldPayload] = CKAsset(fileURL: tempURL)
-            record[self.fieldUpdatedAt] = Date() as CKRecordValue
-            record[self.fieldDeviceName] = UIDevice.current.name as CKRecordValue
-            record[self.fieldDeckCount] = NSNumber(value: deckCount)
-            record[self.fieldCardCount] = NSNumber(value: cardCount)
-            record[self.fieldVersion] = version as CKRecordValue
+        let deviceName = await MainActor.run { UIDevice.current.name }
+        record[fieldPayload] = CKAsset(fileURL: tempURL)
+        record[fieldUpdatedAt] = Date() as CKRecordValue
+        record[fieldDeviceName] = deviceName as CKRecordValue
+        record[fieldDeckCount] = NSNumber(value: deckCount)
+        record[fieldCardCount] = NSNumber(value: cardCount)
+        record[fieldVersion] = version as CKRecordValue
 
-            let operation = CKModifyRecordsOperation(recordsToSave: [record], recordIDsToDelete: nil)
+        do {
             // Overwrite the server record unconditionally — one backup, no history.
-            operation.savePolicy = .allKeys
-            // `modifyRecordsCompletionBlock` (deprecated in iOS 15) is used for
-            // iOS 13 compatibility; `modifyRecordsResultBlock` needs iOS 15+.
-            operation.modifyRecordsCompletionBlock = { _, _, error in
-                try? FileManager.default.removeItem(at: tempURL)
-                if let error = error {
-                    completion(.failure(CloudKitBackupError(
-                        code: "SAVE_FAILED",
-                        message: error.localizedDescription,
-                        details: nil
-                    )))
-                } else {
-                    completion(.success(()))
-                }
+            let (saveResults, _) = try await privateDatabase.modifyRecords(
+                saving: [record],
+                deleting: [],
+                savePolicy: .allKeys
+            )
+            // Per-record failures are reported in the results, not thrown.
+            if case .failure(let error) = saveResults[record.recordID] {
+                throw error
             }
-            self.privateDatabase.add(operation)
+        } catch {
+            throw CloudKitBackupError(
+                code: "SAVE_FAILED",
+                message: error.localizedDescription,
+                details: nil
+            )
         }
     }
 
-    func fetchBackupMetadata(completion: @escaping (Result<BackupMetadata?, Error>) -> Void) {
-        fetchRecord { result in
-            switch result {
-            case .success(let record):
-                guard let record = record else {
-                    completion(.success(nil))
-                    return
-                }
-                let updatedAt = (record[self.fieldUpdatedAt] as? Date) ?? Date()
-                let metadata = BackupMetadata(
-                    updatedAtEpochMs: Int64(updatedAt.timeIntervalSince1970 * 1000),
-                    deviceName: (record[self.fieldDeviceName] as? String) ?? "",
-                    deckCount: (record[self.fieldDeckCount] as? NSNumber)?.int64Value ?? 0,
-                    cardCount: (record[self.fieldCardCount] as? NSNumber)?.int64Value ?? 0,
-                    version: (record[self.fieldVersion] as? String) ?? ""
-                )
-                completion(.success(metadata))
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+    func fetchBackupMetadata() async throws -> BackupMetadata? {
+        guard let record = try await fetchRecord() else { return nil }
+        let updatedAt = (record[fieldUpdatedAt] as? Date) ?? Date()
+        return BackupMetadata(
+            updatedAtEpochMs: Int64(updatedAt.timeIntervalSince1970 * 1000),
+            deviceName: (record[fieldDeviceName] as? String) ?? "",
+            deckCount: (record[fieldDeckCount] as? NSNumber)?.int64Value ?? 0,
+            cardCount: (record[fieldCardCount] as? NSNumber)?.int64Value ?? 0,
+            version: (record[fieldVersion] as? String) ?? ""
+        )
     }
 
-    func fetchBackupPayload(completion: @escaping (Result<String?, Error>) -> Void) {
-        fetchRecord { result in
-            switch result {
-            case .success(let record):
-                guard let record = record,
-                      let asset = record[self.fieldPayload] as? CKAsset,
-                      let fileURL = asset.fileURL else {
-                    completion(.success(nil))
-                    return
-                }
-                do {
-                    let payload = try String(contentsOf: fileURL, encoding: .utf8)
-                    completion(.success(payload))
-                } catch {
-                    completion(.failure(CloudKitBackupError(
-                        code: "READ_ASSET_FAILED",
-                        message: error.localizedDescription,
-                        details: nil
-                    )))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
+    func fetchBackupPayload() async throws -> String? {
+        guard let record = try await fetchRecord(),
+              let asset = record[fieldPayload] as? CKAsset,
+              let fileURL = asset.fileURL else {
+            return nil
+        }
+        do {
+            return try String(contentsOf: fileURL, encoding: .utf8)
+        } catch {
+            throw CloudKitBackupError(
+                code: "READ_ASSET_FAILED",
+                message: error.localizedDescription,
+                details: nil
+            )
         }
     }
 
     // MARK: - Helpers
 
     /// Fetches the single backup record, returning nil when it doesn't exist yet.
-    private func fetchRecord(completion: @escaping (Result<CKRecord?, Error>) -> Void) {
-        privateDatabase.fetch(withRecordID: recordID) { record, error in
-            if let error = error {
-                if let ckError = error as? CKError, ckError.code == .unknownItem {
-                    completion(.success(nil))
-                    return
-                }
-                completion(.failure(CloudKitBackupError(
-                    code: "FETCH_FAILED",
-                    message: error.localizedDescription,
-                    details: nil
-                )))
-                return
-            }
-            completion(.success(record))
+    private func fetchRecord() async throws -> CKRecord? {
+        do {
+            return try await privateDatabase.record(for: recordID)
+        } catch let ckError as CKError where ckError.code == .unknownItem {
+            return nil
+        } catch {
+            throw CloudKitBackupError(
+                code: "FETCH_FAILED",
+                message: error.localizedDescription,
+                details: nil
+            )
         }
     }
 
     private func mapAccountStatus(_ status: CKAccountStatus) -> IcloudAccountStatus {
-        // Note: `.temporarilyUnavailable` (iOS 15+) is intentionally not matched
-        // explicitly so this compiles for the iOS 13 deployment target; it falls
-        // through to `@unknown default`.
         switch status {
         case .available:
             return .available
@@ -189,7 +153,7 @@ class CloudKitBackupApiImplementation: CloudKitBackupApi {
             return .noAccount
         case .restricted:
             return .restricted
-        case .couldNotDetermine:
+        case .couldNotDetermine, .temporarilyUnavailable:
             return .couldNotDetermine
         @unknown default:
             return .couldNotDetermine

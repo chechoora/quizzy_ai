@@ -8,27 +8,29 @@ import 'package:poc_ai_quiz/domain/import_export/model.dart';
 
 class ImportService {
   Future<List<PlainDeckModel>?> importDecksFromFile() async {
-    final result = await FilePicker.platform.pickFiles(
+    final picked = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
 
-    if (result == null || result.files.single.path == null) return null;
+    final path = picked?.path;
+    if (path == null) return null;
 
-    final file = File(result.files.single.path!);
+    final file = File(path);
     final jsonString = await file.readAsString();
     return parseDecksFromJson(jsonString);
   }
 
   Future<List<PlainCardModel>?> importCardsFromFile() async {
-    final result = await FilePicker.platform.pickFiles(
+    final picked = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
 
-    if (result == null || result.files.single.path == null) return null;
+    final path = picked?.path;
+    if (path == null) return null;
 
-    final file = File(result.files.single.path!);
+    final file = File(path);
     final jsonString = await file.readAsString();
     return parseCardsFromJson(jsonString);
   }

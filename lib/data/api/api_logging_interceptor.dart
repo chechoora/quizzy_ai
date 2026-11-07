@@ -18,13 +18,20 @@ const _redacted = '***REDACTED***';
 /// Credential-bearing headers and query parameters are redacted before
 /// logging; everything else (including request/response bodies, which may
 /// contain answer content) is logged as-is.
-class ApiLoggingInterceptor implements RequestInterceptor, ResponseInterceptor {
+class ApiLoggingInterceptor implements Interceptor {
   ApiLoggingInterceptor(this.logger);
 
   final Logger logger;
 
   @override
-  FutureOr<Request> onRequest(Request request) {
+  FutureOr<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) async {
+    _logRequest(chain.request);
+    final response = await chain.proceed(chain.request);
+    _logResponse(response);
+    return response;
+  }
+
+  void _logRequest(Request request) {
     final buffer = StringBuffer(
       'onRequest: ${request.method} ${_redactUri(request.uri)}',
     );
@@ -32,11 +39,9 @@ class ApiLoggingInterceptor implements RequestInterceptor, ResponseInterceptor {
     _writeBody(buffer, request.body?.toString());
 
     logger.d(buffer.toString());
-    return request;
   }
 
-  @override
-  FutureOr<Response> onResponse(Response response) {
+  void _logResponse(Response response) {
     final base = response.base;
     final statusCode = response.statusCode;
     final buffer = StringBuffer(
@@ -53,8 +58,6 @@ class ApiLoggingInterceptor implements RequestInterceptor, ResponseInterceptor {
     } else {
       logger.i(message);
     }
-
-    return response;
   }
 
   void _writeHeaders(StringBuffer buffer, Map<String, String> headers) {

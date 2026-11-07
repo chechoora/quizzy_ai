@@ -5,7 +5,7 @@ import 'package:poc_ai_quiz/util/logger.dart';
 
 /// Attaches the current Firebase ID token as a Bearer token on every request
 /// to the quizzy-ai-pro-be backend.
-class QuizzyBackendAuthInterceptor implements RequestInterceptor {
+class QuizzyBackendAuthInterceptor implements Interceptor {
   QuizzyBackendAuthInterceptor({
     required this.authService,
     required this.logger,
@@ -15,7 +15,11 @@ class QuizzyBackendAuthInterceptor implements RequestInterceptor {
   final Logger logger;
 
   @override
-  FutureOr<Request> onRequest(Request request) async {
+  FutureOr<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) async {
+    return chain.proceed(await _withHeaders(chain.request));
+  }
+
+  Future<Request> _withHeaders(Request request) async {
     final headers = Map<String, String>.from(request.headers);
     headers['Content-Type'] = 'application/json';
 

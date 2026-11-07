@@ -84,6 +84,27 @@ Two build flavors share one codebase (infrastructure in `lib/config/app_config.d
   `ios/ExportOptions.plist` sets `uploadSymbols` to `false` to sidestep it (do not hardcode
   this again as a one-off flag — it's fixed to actually work — reuse the checked-in plist).
 
+## iOS Toolchain (Xcode 27 / iOS 27 SDK)
+
+- Flutter is pinned to **3.47.9** via `.fvmrc`. Minimum iOS stays **16.0** (Podfile
+  `post_install` also forces every pod up to 16.0 — some pods still declare 15.0 and
+  fail to compile against 16.0-only dependencies).
+- The app uses the **UIScene lifecycle** (required when building with the iOS 27 SDK):
+  `UIApplicationSceneManifest` in both `Info.plist` and `Info-quizzypro.plist`, plus
+  `ios/Runner/SceneDelegate.swift` (`FlutterSceneDelegate`). Plugin registration and the
+  Pigeon channels (`OnDeviceAiApi`, `CloudKitBackupApi`) are set up in
+  `AppDelegate.didInitializeImplicitFlutterEngine(_:)` — **not** in
+  `didFinishLaunching`, where `window`/`rootViewController` are nil under UIScene.
+- iOS dependencies stay on **CocoaPods**: Swift Package Manager is disabled per-project
+  in `pubspec.yaml` (`flutter: config: enable-swift-package-manager: false`). With SPM
+  on, Flutter 3.47's `pub get` fails copying plugins into `build/ios/SourcePackages`.
+  Because of this, two plugins are held back to their last CocoaPods-compatible majors:
+  `purchases_flutter` ^10 (11.x needs a pod not published on trunk) and
+  `sentry_flutter` ^9 (10.x is SPM-only). CocoaPods trunk goes read-only on
+  2026-12-02, so moving to SPM is the follow-up that unblocks those upgrades.
+- Pigeon (v29) generates `async throws` Swift / `suspend` Kotlin handlers for `@async`
+  methods — implementations must use that shape, not completion callbacks.
+
 ## Release Versioning
 
 `quizzy` and `quizzypro` are versioned **independently**. There is no per-flavor

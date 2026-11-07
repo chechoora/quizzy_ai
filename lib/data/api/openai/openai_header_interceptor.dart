@@ -3,13 +3,17 @@ import 'package:chopper/chopper.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 
-class OpenAIHeaderInterceptor implements RequestInterceptor {
+class OpenAIHeaderInterceptor implements Interceptor {
   final ValidatorConfigProvider apiKeysProvider;
 
   OpenAIHeaderInterceptor(this.apiKeysProvider);
 
   @override
-  FutureOr<Request> onRequest(Request request) async {
+  FutureOr<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) async {
+    return chain.proceed(await _withHeaders(chain.request));
+  }
+
+  Future<Request> _withHeaders(Request request) async {
     final config = apiKeysProvider.openAiConfig as ApiKeyConfig?;
 
     // Add headers for OpenAI API

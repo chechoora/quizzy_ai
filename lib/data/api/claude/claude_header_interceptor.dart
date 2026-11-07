@@ -3,7 +3,7 @@ import 'package:chopper/chopper.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/user_settings/api_keys_provider.dart';
 
-class ClaudeHeaderInterceptor implements RequestInterceptor {
+class ClaudeHeaderInterceptor implements Interceptor {
   final ValidatorConfigProvider apiKeysProvider;
   final String apiVersion;
 
@@ -13,7 +13,11 @@ class ClaudeHeaderInterceptor implements RequestInterceptor {
   });
 
   @override
-  FutureOr<Request> onRequest(Request request) async {
+  FutureOr<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) async {
+    return chain.proceed(await _withHeaders(chain.request));
+  }
+
+  Future<Request> _withHeaders(Request request) async {
     final config = apiKeysProvider.claudeConfig as ApiKeyConfig?;
 
     // Add headers for Claude API

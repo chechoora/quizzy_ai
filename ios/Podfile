@@ -46,5 +46,13 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    # Align every pod with the app's minimum iOS (16.0). Some pods (e.g.
+    # FirebaseSessions) still declare 15.0 but depend on pods built for 16.0,
+    # which fails to compile with Xcode 27.
+    target.build_configurations.each do |config|
+      if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 16.0
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+      end
+    end
   end
 end

@@ -3595,12 +3595,11 @@ final class $$DeckTableTableReferences
   static MultiTypedResultKey<$QuizCardTableTable, List<QuizCardTableData>>
       _quizCardTableRefsTable(_$AppDatabase db) =>
           MultiTypedResultKey.fromTable(db.quizCardTable,
-              aliasName: $_aliasNameGenerator(
-                  db.deckTable.id, db.quizCardTable.deckId));
+              aliasName: 'deck_table__id__quiz_card_table__deck_id');
 
   $$QuizCardTableTableProcessedTableManager get quizCardTableRefs {
     final manager = $$QuizCardTableTableTableManager($_db, $_db.quizCardTable)
-        .filter((f) => f.deckId.id($_item.id));
+        .filter((f) => f.deckId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_quizCardTableRefsTable($_db));
     return ProcessedTableManager(
@@ -3970,7 +3969,7 @@ class $$DeckTableTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable(table),
+                    e.readTable<$DeckTableTable, DeckTableData>(table),
                     $$DeckTableTableReferences(db, table, e)
                   ))
               .toList(),
@@ -3984,16 +3983,19 @@ class $$DeckTableTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (quizCardTableRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedDataByColumns<
+                            DeckTableData,
+                            $DeckTableTable,
+                            QuizCardTableData,
+                            $QuizCardTableTable>(
                         currentTable: table,
                         referencedTable: $$DeckTableTableReferences
                             ._quizCardTableRefsTable(db),
                         managerFromTypedResult: (p0) =>
                             $$DeckTableTableReferences(db, table, p0)
                                 .quizCardTableRefs,
-                        referencedItemsForCurrentItem: (item,
-                                referencedItems) =>
-                            referencedItems.where((e) => e.deckId == item.id),
+                        currentColumn: 'id',
+                        referencedColumn: 'deck_id',
                         typedResults: items)
                 ];
               },
@@ -4063,13 +4065,13 @@ final class $$QuizCardTableTableReferences extends BaseReferences<_$AppDatabase,
       super.$_db, super.$_table, super.$_typedResult);
 
   static $DeckTableTable _deckIdTable(_$AppDatabase db) =>
-      db.deckTable.createAlias(
-          $_aliasNameGenerator(db.quizCardTable.deckId, db.deckTable.id));
+      db.deckTable.createAlias('quiz_card_table__deck_id__deck_table__id');
 
-  $$DeckTableTableProcessedTableManager? get deckId {
-    if ($_item.deckId == null) return null;
+  $$DeckTableTableProcessedTableManager get deckId {
+    final $_column = $_itemColumn<int>('deck_id')!;
+
     final manager = $$DeckTableTableTableManager($_db, $_db.deckTable)
-        .filter((f) => f.id($_item.deckId!));
+        .filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_deckIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -4445,7 +4447,7 @@ class $$QuizCardTableTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable(table),
+                    e.readTable<$QuizCardTableTable, QuizCardTableData>(table),
                     $$QuizCardTableTableReferences(db, table, e)
                   ))
               .toList(),
@@ -4514,13 +4516,12 @@ final class $$UserTableTableReferences
       List<UserSettingsTableData>> _userSettingsTableRefsTable(
           _$AppDatabase db) =>
       MultiTypedResultKey.fromTable(db.userSettingsTable,
-          aliasName: $_aliasNameGenerator(
-              db.userTable.id, db.userSettingsTable.userId));
+          aliasName: 'user_table__id__user_settings_table__user_id');
 
   $$UserSettingsTableTableProcessedTableManager get userSettingsTableRefs {
     final manager =
         $$UserSettingsTableTableTableManager($_db, $_db.userSettingsTable)
-            .filter((f) => f.userId.id($_item.id));
+            .filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache =
         $_typedResult.readTableOrNull(_userSettingsTableRefsTable($_db));
@@ -4647,7 +4648,7 @@ class $$UserTableTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable(table),
+                    e.readTable<$UserTableTable, UserTableData>(table),
                     $$UserTableTableReferences(db, table, e)
                   ))
               .toList(),
@@ -4661,16 +4662,19 @@ class $$UserTableTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (userSettingsTableRefs)
-                    await $_getPrefetchedData(
+                    await $_getPrefetchedDataByColumns<
+                            UserTableData,
+                            $UserTableTable,
+                            UserSettingsTableData,
+                            $UserSettingsTableTable>(
                         currentTable: table,
                         referencedTable: $$UserTableTableReferences
                             ._userSettingsTableRefsTable(db),
                         managerFromTypedResult: (p0) =>
                             $$UserTableTableReferences(db, table, p0)
                                 .userSettingsTableRefs,
-                        referencedItemsForCurrentItem: (item,
-                                referencedItems) =>
-                            referencedItems.where((e) => e.userId == item.id),
+                        currentColumn: 'id',
+                        referencedColumn: 'user_id',
                         typedResults: items)
                 ];
               },
@@ -4736,13 +4740,13 @@ final class $$UserSettingsTableTableReferences extends BaseReferences<
       super.$_db, super.$_table, super.$_typedResult);
 
   static $UserTableTable _userIdTable(_$AppDatabase db) =>
-      db.userTable.createAlias(
-          $_aliasNameGenerator(db.userSettingsTable.userId, db.userTable.id));
+      db.userTable.createAlias('user_settings_table__user_id__user_table__id');
 
-  $$UserTableTableProcessedTableManager? get userId {
-    if ($_item.userId == null) return null;
+  $$UserTableTableProcessedTableManager get userId {
+    final $_column = $_itemColumn<int>('user_id')!;
+
     final manager = $$UserTableTableTableManager($_db, $_db.userTable)
-        .filter((f) => f.id($_item.userId!));
+        .filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_userIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -5096,7 +5100,8 @@ class $$UserSettingsTableTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable(table),
+                    e.readTable<$UserSettingsTableTable, UserSettingsTableData>(
+                        table),
                     $$UserSettingsTableTableReferences(db, table, e)
                   ))
               .toList(),
@@ -5301,7 +5306,12 @@ class $$SyncTombstoneTableTableTableManager extends RootTableManager<
             createdAt: createdAt,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable<$SyncTombstoneTableTable,
+                        SyncTombstoneTableData>(table),
+                    BaseReferences<_$AppDatabase, $SyncTombstoneTableTable,
+                        SyncTombstoneTableData>(db, table, e)
+                  ))
               .toList(),
           prefetchHooksCallback: null,
         ));
@@ -5481,7 +5491,12 @@ class $$AnalyticsEventTableTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable<$AnalyticsEventTableTable,
+                        AnalyticsEventTableData>(table),
+                    BaseReferences<_$AppDatabase, $AnalyticsEventTableTable,
+                        AnalyticsEventTableData>(db, table, e)
+                  ))
               .toList(),
           prefetchHooksCallback: null,
         ));

@@ -12,7 +12,6 @@ import 'package:poc_ai_quiz/data/db/sync/sync_tombstone_table.dart';
 import 'package:poc_ai_quiz/data/db/user_table.dart';
 import 'package:poc_ai_quiz/data/db/user_settings_table.dart';
 import 'package:sqlite3/sqlite3.dart' show sqlite3;
-import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
 part 'database.g.dart';
 
@@ -209,11 +208,6 @@ LazyDatabase _openConnection() {
     // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
-
-    // Also work around limitations on old Android versions
-    if (Platform.isAndroid) {
-      await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
-    }
 
     // Make sqlite3 pick a more suitable location for temporary files - the
     // one from the system may be inaccessible due to sandboxing.
