@@ -292,10 +292,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quizCardListPlayDeckButton => 'Play the Deck';
 
   @override
-  String get quizCardListSideSwitched => 'Side switched';
+  String get quizCardListSideSwitched => 'Sides Switched';
 
   @override
-  String get quizCardListSidesNotSwitched => 'Sides not switched';
+  String get quizCardListSidesNotSwitched => 'Sides Normal';
 
   @override
   String get quizCardListShuffleCards => 'Cards Shuffled';
@@ -308,6 +308,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quizCardListHideAnswers => 'Hide Answers';
+
+  @override
+  String get quizCardListQuickPlayOn => 'Instant Results';
+
+  @override
+  String get quizCardListQuickPlayOff => 'Results at End';
 
   @override
   String get quizCardListEditCardAction => 'Edit card';

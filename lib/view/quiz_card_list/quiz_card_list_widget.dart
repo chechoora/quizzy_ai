@@ -342,52 +342,71 @@ class _BottomButtons extends StatelessWidget {
         : l10n.quizCardListPlayDeckButton;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _SelectButton(
-                  isSelectionModeActive: isSelectionModeActive,
-                  hasSelection: hasSelection,
-                  allSelected: allSelected,
-                  onEnterSelectionMode: onEnterSelectionMode,
-                  onSelectAllPressed: onSelectAllPressed,
-                  onClearSelectionPressed: onClearSelectionPressed,
-                ),
-                AppIconAction(
+          // Fixed 2x2 grid: every pill takes half the row, so toggling an
+          // option (and its label length) never reflows the layout.
+          Row(
+            children: [
+              Expanded(
+                child: _TogglePill(
                   enabled: shuffleEnabled,
+                  text: shuffleEnabled
+                      ? l10n.quizCardListShuffleCards
+                      : l10n.quizCardListCardsInOrder,
                   enabledIcon: SolarIconsBold.shuffle,
                   disabledIcon: SolarIconsBold.doubleAltArrowRight,
                   onPressed: () => onShufflePressed?.call(!shuffleEnabled),
                 ),
-                AppIconAction(
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _TogglePill(
                   enabled: isAnswerVisible,
+                  text: isAnswerVisible
+                      ? l10n.quizCardListHideAnswers
+                      : l10n.quizCardListShowAnswers,
                   enabledIcon: SolarIconsBold.eye,
                   disabledIcon: SolarIconsBold.eyeClosed,
-                  onPressed: () => onShowAnswersPressed?.call(!isAnswerVisible),
+                  onPressed: () =>
+                      onShowAnswersPressed?.call(!isAnswerVisible),
                 ),
-                AppIconAction(
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _TogglePill(
                   enabled: quickPlayEnabled,
+                  text: quickPlayEnabled
+                      ? l10n.quizCardListQuickPlayOn
+                      : l10n.quizCardListQuickPlayOff,
                   enabledIcon: SolarIconsBold.bolt,
                   disabledIcon: SolarIconsBold.hourglass,
-                  onPressed: () => onQuickPlayToggled?.call(!quickPlayEnabled),
+                  onPressed: () =>
+                      onQuickPlayToggled?.call(!quickPlayEnabled),
                 ),
-                AppIconAction(
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _TogglePill(
                   enabled: switchSides,
+                  text: switchSides
+                      ? l10n.quizCardListSideSwitched
+                      : l10n.quizCardListSidesNotSwitched,
                   enabledIcon: SolarIconsBold.arrowUp,
                   disabledIcon: SolarIconsBold.arrowDown,
                   onPressed: () => onSwitchSidesPressed?.call(!switchSides),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           AppButton.primary(
             text: playButtonText,
             leadingIcon: const Icon(Icons.play_arrow, size: 20),
@@ -395,6 +414,34 @@ class _BottomButtons extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// An on/off quiz option rendered as an [AppPillAction]: filled when on,
+/// soft (tertiary) when off, with an icon reflecting the current state.
+class _TogglePill extends StatelessWidget {
+  const _TogglePill({
+    required this.enabled,
+    required this.text,
+    required this.enabledIcon,
+    required this.disabledIcon,
+    this.onPressed,
+  });
+
+  final bool enabled;
+  final String text;
+  final IconData enabledIcon;
+  final IconData disabledIcon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppPillAction(
+      text: text,
+      variant: enabled ? AppPillVariant.primary : AppPillVariant.tertiary,
+      leadingIcon: Icon(enabled ? enabledIcon : disabledIcon, size: 18),
+      onPressed: onPressed,
     );
   }
 }

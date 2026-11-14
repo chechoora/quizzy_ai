@@ -618,13 +618,13 @@ abstract class AppLocalizations {
   /// No description provided for @quizCardListSideSwitched.
   ///
   /// In en, this message translates to:
-  /// **'Side switched'**
+  /// **'Sides Switched'**
   String get quizCardListSideSwitched;
 
   /// No description provided for @quizCardListSidesNotSwitched.
   ///
   /// In en, this message translates to:
-  /// **'Sides not switched'**
+  /// **'Sides Normal'**
   String get quizCardListSidesNotSwitched;
 
   /// No description provided for @quizCardListShuffleCards.
@@ -650,6 +650,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hide Answers'**
   String get quizCardListHideAnswers;
+
+  /// No description provided for @quizCardListQuickPlayOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant Results'**
+  String get quizCardListQuickPlayOn;
+
+  /// No description provided for @quizCardListQuickPlayOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Results at End'**
+  String get quizCardListQuickPlayOff;
 
   /// No description provided for @quizCardListEditCardAction.
   ///
