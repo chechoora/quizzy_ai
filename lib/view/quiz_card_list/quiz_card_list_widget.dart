@@ -163,7 +163,6 @@ class QuizCardListWidget extends HookWidget {
             AppSimpleHeader(
               title: deckItem.title,
               onBackPressed: () => context.pop(),
-              leadingWeight: const SizedBox(width: 48),
               trailing: AppCircleIconButton(
                 icon: SolarIconsOutline.magicStick_3,
                 onPressed: () => showHeaderActions(),
