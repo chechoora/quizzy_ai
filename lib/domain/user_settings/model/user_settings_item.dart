@@ -14,6 +14,7 @@ class UserSettingsItem {
     required this.shuffleEnabled,
     required this.switchSides,
     required this.isAnswerVisible,
+    required this.quickPlayEnabled,
   });
 
   final int id;
@@ -28,4 +29,5 @@ class UserSettingsItem {
   final bool shuffleEnabled;
   final bool switchSides;
   final bool isAnswerVisible;
+  final bool quickPlayEnabled;
 }

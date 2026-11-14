@@ -33,7 +33,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.withExecutor(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 17;
 
   @override
   MigrationStrategy get migration {
@@ -182,6 +182,13 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(userSettingsTable, userSettingsTable.shuffleEnabled);
           await m.addColumn(userSettingsTable, userSettingsTable.switchSides);
           await m.addColumn(userSettingsTable, userSettingsTable.isAnswerVisible);
+        }
+        if (from < 17) {
+          // Migration for persisting the quiz card list's quick play toggle
+          // (show each card's result right after answering vs. all results
+          // at the end), which replaced the separate "Quick Play" button.
+          await m.addColumn(
+              userSettingsTable, userSettingsTable.quickPlayEnabled);
         }
       },
     );

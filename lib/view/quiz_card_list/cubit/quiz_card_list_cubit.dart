@@ -55,10 +55,12 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
 
   /// Quiz playback preferences, persisted per user in [UserSettingsRepository]
   /// via [loadSettings] / [setShuffleEnabled] / [setSwitchSides] /
-  /// [setAnswerVisible] so they survive across sessions and decks.
+  /// [setAnswerVisible] / [setQuickPlayEnabled] so they survive across
+  /// sessions and decks.
   bool _shuffleEnabled = false;
   bool _switchSides = false;
   bool _isAnswerVisible = false;
+  bool _quickPlayEnabled = false;
 
   /// Latest deck stats seen from [watchDeck]. Falls back to the stats the
   /// screen was opened with until the deck's own watch stream emits.
@@ -81,6 +83,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
         shuffleEnabled: _shuffleEnabled,
         switchSides: _switchSides,
         isAnswerVisible: _isAnswerVisible,
+        quickPlayEnabled: _quickPlayEnabled,
       ),
     );
   }
@@ -138,7 +141,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
   }
 
   /// Loads the persisted quiz playback preferences (shuffle, switch sides,
-  /// show answers) for the current user. Only re-emits if cards have already
+  /// show answers, quick play) for the current user. Only re-emits if cards have already
   /// loaded at least once (mirroring [watchDeck]'s guard), so this doesn't
   /// race an empty list ahead of [watchCards]'s first emission.
   Future<void> loadSettings() async {
@@ -148,6 +151,7 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
       _shuffleEnabled = settings.shuffleEnabled;
       _switchSides = settings.switchSides;
       _isAnswerVisible = settings.isAnswerVisible;
+      _quickPlayEnabled = settings.quickPlayEnabled;
       logger.i('Loaded quiz playback settings for user ${user.id}');
       if (state is QuizCardListDataState) {
         _emitDataState();
@@ -205,6 +209,19 @@ class QuizCardListCubit extends Cubit<QuizCardListState> {
     unawaited(
       _persistSetting(
         (userId) => userSettingsRepository.setAnswerVisible(userId, value),
+      ),
+    );
+  }
+
+  /// Quick play shows each card's result right after it's answered instead
+  /// of all results at the end of the quiz.
+  void setQuickPlayEnabled(bool value) {
+    _quickPlayEnabled = value;
+    _emitDataState();
+    logger.i('Quick play enabled set to $value');
+    unawaited(
+      _persistSetting(
+        (userId) => userSettingsRepository.setQuickPlayEnabled(userId, value),
       ),
     );
   }
@@ -339,6 +356,7 @@ class QuizCardListDataState extends BuilderState {
     this.shuffleEnabled = false,
     this.switchSides = false,
     this.isAnswerVisible = false,
+    this.quickPlayEnabled = false,
   });
 
   final List<QuizCardItem> quizCarList;
@@ -347,6 +365,7 @@ class QuizCardListDataState extends BuilderState {
   final bool shuffleEnabled;
   final bool switchSides;
   final bool isAnswerVisible;
+  final bool quickPlayEnabled;
 
   bool get hasSelection => selectedCardIds.isNotEmpty;
 
@@ -370,6 +389,7 @@ class QuizCardListDataState extends BuilderState {
         shuffleEnabled,
         switchSides,
         isAnswerVisible,
+        quickPlayEnabled,
       ];
 }
 

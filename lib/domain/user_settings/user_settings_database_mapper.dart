@@ -46,6 +46,7 @@ class UserSettingsDataBaseMapper {
       shuffleEnabled: data.shuffleEnabled,
       switchSides: data.switchSides,
       isAnswerVisible: data.isAnswerVisible,
+      quickPlayEnabled: data.quickPlayEnabled,
     );
   }
 }

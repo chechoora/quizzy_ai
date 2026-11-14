@@ -292,14 +292,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quizCardListPlayDeckButton => 'Play the Deck';
 
   @override
-  String get quizCardListQuickPlayButton => 'Quick Play';
-
-  @override
-  String quizCardListQuickPlaySelectedButton(int count) {
-    return 'Quick Play Selected ($count)';
-  }
-
-  @override
   String get quizCardListSideSwitched => 'Side switched';
 
   @override

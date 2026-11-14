@@ -40,7 +40,8 @@ void main() {
   });
 
   test(
-      'shuffleEnabled, switchSides and isAnswerVisible default to false and '
+      'shuffleEnabled, switchSides, isAnswerVisible and quickPlayEnabled '
+      'default to false and '
       'persist once set', () async {
     final db = AppDatabase.withExecutor(NativeDatabase.memory());
     addTearDown(db.close);
@@ -50,14 +51,17 @@ void main() {
     expect(defaults.shuffleEnabled, false);
     expect(defaults.switchSides, false);
     expect(defaults.isAnswerVisible, false);
+    expect(defaults.quickPlayEnabled, false);
 
     await repo.updateShuffleEnabled(1, true);
     await repo.updateSwitchSides(1, true);
     await repo.updateIsAnswerVisible(1, true);
+    await repo.updateQuickPlayEnabled(1, true);
 
     final settings = await repo.fetchUserSettings(1);
     expect(settings.shuffleEnabled, true);
     expect(settings.switchSides, true);
     expect(settings.isAnswerVisible, true);
+    expect(settings.quickPlayEnabled, true);
   });
 }

@@ -2158,6 +2158,16 @@ class $UserSettingsTableTable extends UserSettingsTable
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("is_answer_visible" IN (0, 1))'),
       defaultValue: const Constant(false));
+  static const VerificationMeta _quickPlayEnabledMeta =
+      const VerificationMeta('quickPlayEnabled');
+  @override
+  late final GeneratedColumn<bool> quickPlayEnabled = GeneratedColumn<bool>(
+      'quick_play_enabled', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("quick_play_enabled" IN (0, 1))'),
+      defaultValue: const Constant(false));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -2175,7 +2185,8 @@ class $UserSettingsTableTable extends UserSettingsTable
         onboardingCompleted,
         shuffleEnabled,
         switchSides,
-        isAnswerVisible
+        isAnswerVisible,
+        quickPlayEnabled
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2281,6 +2292,12 @@ class $UserSettingsTableTable extends UserSettingsTable
           isAnswerVisible.isAcceptableOrUnknown(
               data['is_answer_visible']!, _isAnswerVisibleMeta));
     }
+    if (data.containsKey('quick_play_enabled')) {
+      context.handle(
+          _quickPlayEnabledMeta,
+          quickPlayEnabled.isAcceptableOrUnknown(
+              data['quick_play_enabled']!, _quickPlayEnabledMeta));
+    }
     return context;
   }
 
@@ -2324,6 +2341,8 @@ class $UserSettingsTableTable extends UserSettingsTable
           .read(DriftSqlType.bool, data['${effectivePrefix}switch_sides'])!,
       isAnswerVisible: attachedDatabase.typeMapping.read(
           DriftSqlType.bool, data['${effectivePrefix}is_answer_visible'])!,
+      quickPlayEnabled: attachedDatabase.typeMapping.read(
+          DriftSqlType.bool, data['${effectivePrefix}quick_play_enabled'])!,
     );
   }
 
@@ -2351,6 +2370,7 @@ class UserSettingsTableData extends DataClass
   final bool shuffleEnabled;
   final bool switchSides;
   final bool isAnswerVisible;
+  final bool quickPlayEnabled;
   const UserSettingsTableData(
       {required this.id,
       required this.userId,
@@ -2367,7 +2387,8 @@ class UserSettingsTableData extends DataClass
       required this.onboardingCompleted,
       required this.shuffleEnabled,
       required this.switchSides,
-      required this.isAnswerVisible});
+      required this.isAnswerVisible,
+      required this.quickPlayEnabled});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2403,6 +2424,7 @@ class UserSettingsTableData extends DataClass
     map['shuffle_enabled'] = Variable<bool>(shuffleEnabled);
     map['switch_sides'] = Variable<bool>(switchSides);
     map['is_answer_visible'] = Variable<bool>(isAnswerVisible);
+    map['quick_play_enabled'] = Variable<bool>(quickPlayEnabled);
     return map;
   }
 
@@ -2440,6 +2462,7 @@ class UserSettingsTableData extends DataClass
       shuffleEnabled: Value(shuffleEnabled),
       switchSides: Value(switchSides),
       isAnswerVisible: Value(isAnswerVisible),
+      quickPlayEnabled: Value(quickPlayEnabled),
     );
   }
 
@@ -2466,6 +2489,7 @@ class UserSettingsTableData extends DataClass
       shuffleEnabled: serializer.fromJson<bool>(json['shuffleEnabled']),
       switchSides: serializer.fromJson<bool>(json['switchSides']),
       isAnswerVisible: serializer.fromJson<bool>(json['isAnswerVisible']),
+      quickPlayEnabled: serializer.fromJson<bool>(json['quickPlayEnabled']),
     );
   }
   @override
@@ -2488,6 +2512,7 @@ class UserSettingsTableData extends DataClass
       'shuffleEnabled': serializer.toJson<bool>(shuffleEnabled),
       'switchSides': serializer.toJson<bool>(switchSides),
       'isAnswerVisible': serializer.toJson<bool>(isAnswerVisible),
+      'quickPlayEnabled': serializer.toJson<bool>(quickPlayEnabled),
     };
   }
 
@@ -2507,7 +2532,8 @@ class UserSettingsTableData extends DataClass
           bool? onboardingCompleted,
           bool? shuffleEnabled,
           bool? switchSides,
-          bool? isAnswerVisible}) =>
+          bool? isAnswerVisible,
+          bool? quickPlayEnabled}) =>
       UserSettingsTableData(
         id: id ?? this.id,
         userId: userId ?? this.userId,
@@ -2537,6 +2563,7 @@ class UserSettingsTableData extends DataClass
         shuffleEnabled: shuffleEnabled ?? this.shuffleEnabled,
         switchSides: switchSides ?? this.switchSides,
         isAnswerVisible: isAnswerVisible ?? this.isAnswerVisible,
+        quickPlayEnabled: quickPlayEnabled ?? this.quickPlayEnabled,
       );
   UserSettingsTableData copyWithCompanion(UserSettingsTableCompanion data) {
     return UserSettingsTableData(
@@ -2583,6 +2610,9 @@ class UserSettingsTableData extends DataClass
       isAnswerVisible: data.isAnswerVisible.present
           ? data.isAnswerVisible.value
           : this.isAnswerVisible,
+      quickPlayEnabled: data.quickPlayEnabled.present
+          ? data.quickPlayEnabled.value
+          : this.quickPlayEnabled,
     );
   }
 
@@ -2604,7 +2634,8 @@ class UserSettingsTableData extends DataClass
           ..write('onboardingCompleted: $onboardingCompleted, ')
           ..write('shuffleEnabled: $shuffleEnabled, ')
           ..write('switchSides: $switchSides, ')
-          ..write('isAnswerVisible: $isAnswerVisible')
+          ..write('isAnswerVisible: $isAnswerVisible, ')
+          ..write('quickPlayEnabled: $quickPlayEnabled')
           ..write(')'))
         .toString();
   }
@@ -2626,7 +2657,8 @@ class UserSettingsTableData extends DataClass
       onboardingCompleted,
       shuffleEnabled,
       switchSides,
-      isAnswerVisible);
+      isAnswerVisible,
+      quickPlayEnabled);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2646,7 +2678,8 @@ class UserSettingsTableData extends DataClass
           other.onboardingCompleted == this.onboardingCompleted &&
           other.shuffleEnabled == this.shuffleEnabled &&
           other.switchSides == this.switchSides &&
-          other.isAnswerVisible == this.isAnswerVisible);
+          other.isAnswerVisible == this.isAnswerVisible &&
+          other.quickPlayEnabled == this.quickPlayEnabled);
 }
 
 class UserSettingsTableCompanion
@@ -2667,6 +2700,7 @@ class UserSettingsTableCompanion
   final Value<bool> shuffleEnabled;
   final Value<bool> switchSides;
   final Value<bool> isAnswerVisible;
+  final Value<bool> quickPlayEnabled;
   const UserSettingsTableCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
@@ -2684,6 +2718,7 @@ class UserSettingsTableCompanion
     this.shuffleEnabled = const Value.absent(),
     this.switchSides = const Value.absent(),
     this.isAnswerVisible = const Value.absent(),
+    this.quickPlayEnabled = const Value.absent(),
   });
   UserSettingsTableCompanion.insert({
     this.id = const Value.absent(),
@@ -2702,6 +2737,7 @@ class UserSettingsTableCompanion
     this.shuffleEnabled = const Value.absent(),
     this.switchSides = const Value.absent(),
     this.isAnswerVisible = const Value.absent(),
+    this.quickPlayEnabled = const Value.absent(),
   }) : userId = Value(userId);
   static Insertable<UserSettingsTableData> custom({
     Expression<int>? id,
@@ -2720,6 +2756,7 @@ class UserSettingsTableCompanion
     Expression<bool>? shuffleEnabled,
     Expression<bool>? switchSides,
     Expression<bool>? isAnswerVisible,
+    Expression<bool>? quickPlayEnabled,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2741,6 +2778,7 @@ class UserSettingsTableCompanion
       if (shuffleEnabled != null) 'shuffle_enabled': shuffleEnabled,
       if (switchSides != null) 'switch_sides': switchSides,
       if (isAnswerVisible != null) 'is_answer_visible': isAnswerVisible,
+      if (quickPlayEnabled != null) 'quick_play_enabled': quickPlayEnabled,
     });
   }
 
@@ -2760,7 +2798,8 @@ class UserSettingsTableCompanion
       Value<bool>? onboardingCompleted,
       Value<bool>? shuffleEnabled,
       Value<bool>? switchSides,
-      Value<bool>? isAnswerVisible}) {
+      Value<bool>? isAnswerVisible,
+      Value<bool>? quickPlayEnabled}) {
     return UserSettingsTableCompanion(
       id: id ?? this.id,
       userId: userId ?? this.userId,
@@ -2778,6 +2817,7 @@ class UserSettingsTableCompanion
       shuffleEnabled: shuffleEnabled ?? this.shuffleEnabled,
       switchSides: switchSides ?? this.switchSides,
       isAnswerVisible: isAnswerVisible ?? this.isAnswerVisible,
+      quickPlayEnabled: quickPlayEnabled ?? this.quickPlayEnabled,
     );
   }
 
@@ -2834,6 +2874,9 @@ class UserSettingsTableCompanion
     if (isAnswerVisible.present) {
       map['is_answer_visible'] = Variable<bool>(isAnswerVisible.value);
     }
+    if (quickPlayEnabled.present) {
+      map['quick_play_enabled'] = Variable<bool>(quickPlayEnabled.value);
+    }
     return map;
   }
 
@@ -2855,7 +2898,8 @@ class UserSettingsTableCompanion
           ..write('onboardingCompleted: $onboardingCompleted, ')
           ..write('shuffleEnabled: $shuffleEnabled, ')
           ..write('switchSides: $switchSides, ')
-          ..write('isAnswerVisible: $isAnswerVisible')
+          ..write('isAnswerVisible: $isAnswerVisible, ')
+          ..write('quickPlayEnabled: $quickPlayEnabled')
           ..write(')'))
         .toString();
   }
@@ -4713,6 +4757,7 @@ typedef $$UserSettingsTableTableCreateCompanionBuilder
   Value<bool> shuffleEnabled,
   Value<bool> switchSides,
   Value<bool> isAnswerVisible,
+  Value<bool> quickPlayEnabled,
 });
 typedef $$UserSettingsTableTableUpdateCompanionBuilder
     = UserSettingsTableCompanion Function({
@@ -4732,6 +4777,7 @@ typedef $$UserSettingsTableTableUpdateCompanionBuilder
   Value<bool> shuffleEnabled,
   Value<bool> switchSides,
   Value<bool> isAnswerVisible,
+  Value<bool> quickPlayEnabled,
 });
 
 final class $$UserSettingsTableTableReferences extends BaseReferences<
@@ -4816,6 +4862,10 @@ class $$UserSettingsTableTableFilterComposer
 
   ColumnFilters<bool> get isAnswerVisible => $composableBuilder(
       column: $table.isAnswerVisible,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get quickPlayEnabled => $composableBuilder(
+      column: $table.quickPlayEnabled,
       builder: (column) => ColumnFilters(column));
 
   $$UserTableTableFilterComposer get userId {
@@ -4906,6 +4956,10 @@ class $$UserSettingsTableTableOrderingComposer
       column: $table.isAnswerVisible,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get quickPlayEnabled => $composableBuilder(
+      column: $table.quickPlayEnabled,
+      builder: (column) => ColumnOrderings(column));
+
   $$UserTableTableOrderingComposer get userId {
     final $$UserTableTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -4981,6 +5035,9 @@ class $$UserSettingsTableTableAnnotationComposer
   GeneratedColumn<bool> get isAnswerVisible => $composableBuilder(
       column: $table.isAnswerVisible, builder: (column) => column);
 
+  GeneratedColumn<bool> get quickPlayEnabled => $composableBuilder(
+      column: $table.quickPlayEnabled, builder: (column) => column);
+
   $$UserTableTableAnnotationComposer get userId {
     final $$UserTableTableAnnotationComposer composer = $composerBuilder(
         composer: this,
@@ -5043,6 +5100,7 @@ class $$UserSettingsTableTableTableManager extends RootTableManager<
             Value<bool> shuffleEnabled = const Value.absent(),
             Value<bool> switchSides = const Value.absent(),
             Value<bool> isAnswerVisible = const Value.absent(),
+            Value<bool> quickPlayEnabled = const Value.absent(),
           }) =>
               UserSettingsTableCompanion(
             id: id,
@@ -5061,6 +5119,7 @@ class $$UserSettingsTableTableTableManager extends RootTableManager<
             shuffleEnabled: shuffleEnabled,
             switchSides: switchSides,
             isAnswerVisible: isAnswerVisible,
+            quickPlayEnabled: quickPlayEnabled,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -5079,6 +5138,7 @@ class $$UserSettingsTableTableTableManager extends RootTableManager<
             Value<bool> shuffleEnabled = const Value.absent(),
             Value<bool> switchSides = const Value.absent(),
             Value<bool> isAnswerVisible = const Value.absent(),
+            Value<bool> quickPlayEnabled = const Value.absent(),
           }) =>
               UserSettingsTableCompanion.insert(
             id: id,
@@ -5097,6 +5157,7 @@ class $$UserSettingsTableTableTableManager extends RootTableManager<
             shuffleEnabled: shuffleEnabled,
             switchSides: switchSides,
             isAnswerVisible: isAnswerVisible,
+            quickPlayEnabled: quickPlayEnabled,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

@@ -615,18 +615,6 @@ abstract class AppLocalizations {
   /// **'Play the Deck'**
   String get quizCardListPlayDeckButton;
 
-  /// No description provided for @quizCardListQuickPlayButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick Play'**
-  String get quizCardListQuickPlayButton;
-
-  /// No description provided for @quizCardListQuickPlaySelectedButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick Play Selected ({count})'**
-  String quizCardListQuickPlaySelectedButton(int count);
-
   /// No description provided for @quizCardListSideSwitched.
   ///
   /// In en, this message translates to:

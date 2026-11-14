@@ -221,12 +221,8 @@ class QuizCardListWidget extends HookWidget {
                             onClearSelectionPressed: () {
                               cubit.clearSelection();
                             },
-                            onQuickPlayPressed: () => cubit.launchQuizRequest(
-                              isQuickPlay: true,
-                              isShuffle: state.shuffleEnabled,
-                              switchSides: state.switchSides,
-                            ),
                             onPlayDeckPressed: () => cubit.launchQuizRequest(
+                              isQuickPlay: state.quickPlayEnabled,
                               isShuffle: state.shuffleEnabled,
                               switchSides: state.switchSides,
                             ),
@@ -239,6 +235,9 @@ class QuizCardListWidget extends HookWidget {
                             isAnswerVisible: state.isAnswerVisible,
                             onShowAnswersPressed: (isVisible) =>
                                 cubit.setAnswerVisible(isVisible),
+                            quickPlayEnabled: state.quickPlayEnabled,
+                            onQuickPlayToggled: (isQuickPlay) =>
+                                cubit.setQuickPlayEnabled(isQuickPlay),
                           ),
                       ],
                     );
@@ -304,7 +303,6 @@ class _BottomButtons extends StatelessWidget {
     this.onEnterSelectionMode,
     this.onSelectAllPressed,
     this.onClearSelectionPressed,
-    this.onQuickPlayPressed,
     this.onPlayDeckPressed,
     this.onShufflePressed,
     this.onSwitchSidesPressed,
@@ -312,6 +310,8 @@ class _BottomButtons extends StatelessWidget {
     this.switchSides = false,
     this.isAnswerVisible = false,
     this.onShowAnswersPressed,
+    this.quickPlayEnabled = false,
+    this.onQuickPlayToggled,
   });
 
   final bool hasSelection;
@@ -321,7 +321,6 @@ class _BottomButtons extends StatelessWidget {
   final ValueChanged<bool>? onEnterSelectionMode;
   final VoidCallback? onSelectAllPressed;
   final VoidCallback? onClearSelectionPressed;
-  final VoidCallback? onQuickPlayPressed;
   final VoidCallback? onPlayDeckPressed;
   final ValueChanged<bool>? onShufflePressed;
   final bool shuffleEnabled;
@@ -330,16 +329,17 @@ class _BottomButtons extends StatelessWidget {
   final bool isAnswerVisible;
   final ValueChanged<bool>? onShowAnswersPressed;
 
+  /// Quick play: show each card's result right after it's answered instead
+  /// of all results at the end.
+  final bool quickPlayEnabled;
+  final ValueChanged<bool>? onQuickPlayToggled;
+
   @override
   Widget build(BuildContext context) {
     final l10n = localize(context);
     final playButtonText = hasSelection
         ? l10n.quizCardListPlaySelectedButton(selectedCount)
         : l10n.quizCardListPlayDeckButton;
-
-    final quizPlayButtonText = hasSelection
-        ? l10n.quizCardListQuickPlaySelectedButton(selectedCount)
-        : l10n.quizCardListQuickPlayButton;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -373,6 +373,12 @@ class _BottomButtons extends StatelessWidget {
                   onPressed: () => onShowAnswersPressed?.call(!isAnswerVisible),
                 ),
                 AppIconAction(
+                  enabled: quickPlayEnabled,
+                  enabledIcon: SolarIconsBold.bolt,
+                  disabledIcon: SolarIconsBold.hourglass,
+                  onPressed: () => onQuickPlayToggled?.call(!quickPlayEnabled),
+                ),
+                AppIconAction(
                   enabled: switchSides,
                   enabledIcon: SolarIconsBold.arrowUp,
                   disabledIcon: SolarIconsBold.arrowDown,
@@ -383,12 +389,6 @@ class _BottomButtons extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           AppButton.primary(
-            text: quizPlayButtonText,
-            leadingIcon: const Icon(Icons.bolt, size: 20),
-            onPressed: onQuickPlayPressed,
-          ),
-          const SizedBox(height: 16),
-          AppButton.secondary(
             text: playButtonText,
             leadingIcon: const Icon(Icons.play_arrow, size: 20),
             onPressed: onPlayDeckPressed,

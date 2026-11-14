@@ -102,4 +102,8 @@ class UserSettingsRepository {
   Future<void> setAnswerVisible(int userId, bool value) async {
     await dataBaseRepository.updateIsAnswerVisible(userId, value);
   }
+
+  Future<void> setQuickPlayEnabled(int userId, bool value) async {
+    await dataBaseRepository.updateQuickPlayEnabled(userId, value);
+  }
 }

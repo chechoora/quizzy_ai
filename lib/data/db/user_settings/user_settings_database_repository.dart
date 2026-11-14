@@ -133,6 +133,14 @@ class UserSettingsDataBaseRepository {
     ));
   }
 
+  Future<void> updateQuickPlayEnabled(int userId, bool value) async {
+    await (appDatabase.update(appDatabase.userSettingsTable)
+          ..where((tbl) => tbl.userId.equals(userId)))
+        .write(UserSettingsTableCompanion(
+      quickPlayEnabled: Value(value),
+    ));
+  }
+
   Future<void> updateOllamaConfig(
     int userId,
     String? url,

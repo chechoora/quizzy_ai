@@ -38,4 +38,7 @@ class UserSettingsTable extends Table {
 
   BoolColumn get isAnswerVisible =>
       boolean().withDefault(const Constant(false))();
+
+  BoolColumn get quickPlayEnabled =>
+      boolean().withDefault(const Constant(false))();
 }
