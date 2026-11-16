@@ -135,9 +135,6 @@ class DeckEditWidget extends HookWidget {
                   }
                   final isGenerating = state is AiGenerateGeneratingState;
                   if (!cubit.isPremium) {
-                    if (isGenerating) {
-                      return SizedBox.shrink();
-                    }
                     return _FreeBottomBar(onUnlock: unlockAi);
                   }
                   return _Composer(
