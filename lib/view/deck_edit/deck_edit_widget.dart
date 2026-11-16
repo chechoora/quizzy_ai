@@ -129,8 +129,15 @@ class DeckEditWidget extends HookWidget {
                 bloc: cubit,
                 buildWhen: (prev, next) => next is BuilderState,
                 builder: (context, state) {
+                  final isInitial = state is AiGenerateInitialState;
+                  if (isInitial) {
+                    return SizedBox.shrink();
+                  }
                   final isGenerating = state is AiGenerateGeneratingState;
                   if (!cubit.isPremium) {
+                    if (isGenerating) {
+                      return SizedBox.shrink();
+                    }
                     return _FreeBottomBar(onUnlock: unlockAi);
                   }
                   return _Composer(
