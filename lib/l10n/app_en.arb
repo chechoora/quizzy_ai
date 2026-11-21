@@ -117,7 +117,6 @@
   "settingsAiValidatorServerUrlLabel": "Server URL",
   "settingsAiValidatorServerUrlHint": "http://localhost:11434/api",
   "settingsAiValidatorModelNameLabel": "Model Name",
-  "settingsAiValidatorModelNameHint": "llama3.2",
   "settingsAiValidatorFillBothFieldsError": "Please fill in both URL and model name",
   "settingsAiValidatorSaveConfigButton": "Save Configuration",
   "settingsAiValidatorQuotaTitle": "Weekly Usage Quota",

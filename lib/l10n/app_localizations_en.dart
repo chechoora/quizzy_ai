@@ -233,9 +233,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAiValidatorModelNameLabel => 'Model Name';
 
   @override
-  String get settingsAiValidatorModelNameHint => 'llama3.2';
-
-  @override
   String get settingsAiValidatorFillBothFieldsError => 'Please fill in both URL and model name';
 
   @override

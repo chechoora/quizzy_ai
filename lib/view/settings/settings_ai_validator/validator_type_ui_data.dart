@@ -22,6 +22,21 @@ extension AnswerValidatorTypeDisplayName on AnswerValidatorType {
   }
 }
 
+extension AnswerValidatorTypeModelHint on AnswerValidatorType {
+  /// Example model id shown as the model field hint. Model ids are not
+  /// translatable, so these are plain strings rather than l10n entries.
+  String? get modelNameHint => switch (this) {
+        AnswerValidatorType.claude => 'claude-haiku-4-5',
+        AnswerValidatorType.openAI => 'gpt-4o-mini',
+        AnswerValidatorType.gemini => 'gemini-2.5-flash',
+        AnswerValidatorType.ollama => 'llama3.2',
+        AnswerValidatorType.quizzyAI ||
+        AnswerValidatorType.onDeviceAI ||
+        AnswerValidatorType.ml =>
+          null,
+      };
+}
+
 class ValidatorTypeUIData {
   final String iconAsset;
   final String Function(AppLocalizations l10n) getDescription;

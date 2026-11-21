@@ -501,12 +501,6 @@ abstract class AppLocalizations {
   /// **'Model Name'**
   String get settingsAiValidatorModelNameLabel;
 
-  /// No description provided for @settingsAiValidatorModelNameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'llama3.2'**
-  String get settingsAiValidatorModelNameHint;
-
   /// No description provided for @settingsAiValidatorFillBothFieldsError.
   ///
   /// In en, this message translates to:

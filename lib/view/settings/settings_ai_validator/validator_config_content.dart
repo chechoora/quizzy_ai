@@ -201,7 +201,7 @@ class ApiKeyWithModelField extends HookWidget {
         const SizedBox(height: 12),
         AppComboTextField(
           controller: modelController,
-          hint: l10n.settingsAiValidatorModelNameHint,
+          hint: selectedValidator.modelNameHint,
           options: models.value,
           onOptionSelected: (model) => logger.i(
               'Model picked from list: $model (${selectedValidator.name})'),
@@ -302,7 +302,7 @@ class OpenSourceModelConfigField extends HookWidget {
         const SizedBox(height: 12),
         AppTextField(
           controller: modelController,
-          hint: l10n.settingsAiValidatorModelNameHint,
+          hint: AnswerValidatorType.ollama.modelNameHint,
         ),
         const SizedBox(height: 16),
         SizedBox(
