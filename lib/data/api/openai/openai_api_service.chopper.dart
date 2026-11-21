@@ -32,3 +32,30 @@ final class _$OpenAIApiService extends OpenAIApiService {
     return client.send<dynamic, dynamic>($request);
   }
 }
+
+// coverage:ignore-file
+// ignore_for_file: type=lint
+final class _$OpenAIModelsApiService extends OpenAIModelsApiService {
+  _$OpenAIModelsApiService([ChopperClient? client]) {
+    if (client == null) return;
+    this.client = client;
+  }
+
+  @override
+  final Type definitionType = OpenAIModelsApiService;
+
+  @override
+  Future<Response<dynamic>> listModels({required String authorization}) {
+    final Uri $url = Uri.parse('/models');
+    final Map<String, String> $headers = {
+      'Authorization': authorization,
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      headers: $headers,
+    );
+    return client.send<dynamic, dynamic>($request);
+  }
+}

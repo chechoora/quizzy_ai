@@ -13,3 +13,16 @@ abstract class OpenAIApiService extends ChopperService {
     @Body() required Map<String, dynamic> body,
   });
 }
+
+@ChopperApi(baseUrl: '/models')
+abstract class OpenAIModelsApiService extends ChopperService {
+  static OpenAIModelsApiService create([ChopperClient? client]) {
+    return _$OpenAIModelsApiService(client);
+  }
+
+  /// [authorization] is the full header value: `Bearer <apiKey>`.
+  @Get()
+  Future<Response> listModels({
+    @Header('Authorization') required String authorization,
+  });
+}

@@ -23,7 +23,8 @@ class ClaudeHeaderInterceptor implements Interceptor {
     // Add headers for Claude API
     final headers = Map<String, String>.from(request.headers);
     headers['Content-Type'] = 'application/json';
-    if (config != null) {
+    // Keep a key set explicitly on the request (e.g. model listing).
+    if (config != null && !headers.containsKey('x-api-key')) {
       headers['x-api-key'] = config.apiKey;
     }
     headers['anthropic-version'] = apiVersion;

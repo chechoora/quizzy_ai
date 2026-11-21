@@ -58,6 +58,7 @@ import 'package:poc_ai_quiz/domain/deck/premium/deck_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz/on_device_ai_answer_validator.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/premium/quiz_card_premium_manager.dart';
 import 'package:poc_ai_quiz/domain/quiz_card/quiz_card_exe_validator.dart';
+import 'package:poc_ai_quiz/domain/settings/ai_models_repository.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/settings_service.dart';
 import 'package:poc_ai_quiz/domain/settings/validators_manager.dart';
@@ -243,6 +244,7 @@ Future<void> _setupAPI() async {
     baseUrl: Uri.parse('https://api.anthropic.com/v1'),
     services: [
       ClaudeApiService.create(),
+      ClaudeModelsApiService.create(),
     ],
     interceptors: [
       ClaudeHeaderInterceptor(apiKeysProvider),
@@ -258,6 +260,7 @@ Future<void> _setupAPI() async {
     baseUrl: Uri.parse('https://api.openai.com/v1'),
     services: [
       OpenAIApiService.create(),
+      OpenAIModelsApiService.create(),
     ],
     interceptors: [
       OpenAIHeaderInterceptor(apiKeysProvider),
@@ -343,6 +346,20 @@ Future<void> _setupServices() async {
     getIt.get<ValidatorConfigProvider>(),
   );
   getIt.registerSingleton<OpenAIDeckGenerator>(openAIDeckGenerator);
+
+  // Model lists for BYOK providers (Claude / OpenAI / Gemini)
+  final aiModelsRepository = AiModelsRepository(
+    claudeModelsApiService:
+        claudeApiClient.getService<ClaudeModelsApiService>(),
+    openAIModelsApiService:
+        openAIApiClient.getService<OpenAIModelsApiService>(),
+    geminiApiService: geminiApiClient.getService<GeminiApiService>(),
+    validatorConfigProvider: getIt.get<ValidatorConfigProvider>(),
+    remoteConfigService: getIt.get<RemoteConfigService>(),
+    prefs: getIt.get<SharedPreferences>(),
+    logger: Logger.withTag('AiModelsRepository'),
+  );
+  getIt.registerSingleton<AiModelsRepository>(aiModelsRepository);
 
   // Quizzy Pro backend repositories (Decks/Cards/AiTutor/User)
   final quizzyBackendClient =

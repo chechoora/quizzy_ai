@@ -13,3 +13,16 @@ abstract class ClaudeApiService extends ChopperService {
     @Body() required Map<String, dynamic> body,
   });
 }
+
+@ChopperApi(baseUrl: '/models')
+abstract class ClaudeModelsApiService extends ChopperService {
+  static ClaudeModelsApiService create([ChopperClient? client]) {
+    return _$ClaudeModelsApiService(client);
+  }
+
+  @Get()
+  Future<Response> listModels({
+    @Header('x-api-key') required String apiKey,
+    @Query('limit') int limit = 1000,
+  });
+}

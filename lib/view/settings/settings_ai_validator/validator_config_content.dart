@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:poc_ai_quiz/di/di.dart';
+import 'package:poc_ai_quiz/domain/settings/ai_models_repository.dart';
 import 'package:poc_ai_quiz/domain/settings/answer_validator_type.dart';
 import 'package:poc_ai_quiz/domain/settings/model/validator_item.dart';
 import 'package:poc_ai_quiz/l10n/localize.dart';
 import 'package:poc_ai_quiz/util/alert_util.dart';
+import 'package:poc_ai_quiz/util/logger.dart';
 import 'package:quizzy_design/quizzy_design.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/quota/quota_display_widget.dart';
 import 'package:poc_ai_quiz/view/settings/settings_ai_validator/validator_type_bottom_sheet.dart';
@@ -82,6 +85,8 @@ class ValidatorConfigContent extends HookWidget {
               initialConfig: validatorConfig,
               selectedValidator: selectedValidator,
               onConfigUpdate: onApiKeyConfigUpdate,
+              modelsRepository: getIt<AiModelsRepository>(),
+              logger: Logger.withTag('ApiKeyWithModelField'),
             ),
           OpenSourceConfig() => OpenSourceModelConfigField(
               initialConfig:
@@ -103,11 +108,15 @@ class ApiKeyWithModelField extends HookWidget {
     required this.initialConfig,
     required this.selectedValidator,
     required this.onConfigUpdate,
+    required this.modelsRepository,
+    required this.logger,
   });
 
   final ApiKeyConfig? initialConfig;
   final AnswerValidatorType selectedValidator;
   final void Function(AnswerValidatorType, ApiKeyConfig?) onConfigUpdate;
+  final AiModelsRepository modelsRepository;
+  final Logger logger;
 
   String? _getApiKeyUrl(BuildContext context) {
     final l10n = localize(context);
@@ -151,6 +160,20 @@ class ApiKeyWithModelField extends HookWidget {
       return null;
     }, [selectedValidator, initialConfig]);
 
+    // Curated models from Remote Config plus the provider's live list (fetched
+    // with the user's key, or the app key from Remote Config). Refetched when
+    // the saved key changes. Empty → no dropdown arrow.
+    final models = useState<List<String>>(const []);
+    final savedApiKey = initialConfig?.apiKey ?? '';
+    useEffect(() {
+      models.value = const [];
+      var cancelled = false;
+      modelsRepository.getModels(selectedValidator).then((result) {
+        if (!cancelled) models.value = result;
+      });
+      return () => cancelled = true;
+    }, [selectedValidator, savedApiKey]);
+
     final l10n = localize(context);
 
     return Column(
@@ -176,9 +199,12 @@ class ApiKeyWithModelField extends HookWidget {
           ),
         ),
         const SizedBox(height: 12),
-        AppTextField(
+        AppComboTextField(
           controller: modelController,
           hint: l10n.settingsAiValidatorModelNameHint,
+          options: models.value,
+          onOptionSelected: (model) => logger.i(
+              'Model picked from list: $model (${selectedValidator.name})'),
         ),
         const SizedBox(height: 16),
         SizedBox(

@@ -13,6 +13,9 @@ abstract class GeminiApiService extends ChopperService {
     required Map<String, dynamic> body,
     required String model,
   });
+
+  /// Lists the models available for [apiKey].
+  Future<Response> listModels({required String apiKey, int pageSize = 1000});
 }
 
 class _GeminiApiServiceImpl extends GeminiApiService {
@@ -32,6 +35,19 @@ class _GeminiApiServiceImpl extends GeminiApiService {
       body: body,
     );
 
+    return client.send(request);
+  }
+
+  @override
+  Future<Response> listModels({required String apiKey, int pageSize = 1000}) {
+    final request = Request(
+      'GET',
+      client.baseUrl.replace(queryParameters: {
+        'key': apiKey,
+        'pageSize': '$pageSize',
+      }),
+      client.baseUrl,
+    );
     return client.send(request);
   }
 

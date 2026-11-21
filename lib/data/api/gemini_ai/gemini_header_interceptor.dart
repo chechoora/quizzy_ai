@@ -22,7 +22,8 @@ class GeminiHeaderInterceptor implements Interceptor {
 
     // Add API key as query parameter if it exists
     final uri = request.uri;
-    final newUri = apiKey != null
+    // Keep a key set explicitly on the request (e.g. model listing).
+    final newUri = apiKey != null && !uri.queryParameters.containsKey('key')
         ? uri.replace(
             queryParameters: {
               ...uri.queryParameters,
