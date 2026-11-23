@@ -15,7 +15,7 @@ flags are wired into Android/iOS.
 
 | Flavor      | Version (`--build-name`) | Build number (`--build-number`) |
 |-------------|--------------------------|---------------------------------|
-| `quizzy`    | `1.2.8`                  | `48`                            |
+| `quizzy`    | `1.2.9`                  | `49`                            |
 | `quizzypro` | `1.0.1`                  | `22`                            |
 
 ## Fastlane commands
