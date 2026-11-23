@@ -66,10 +66,13 @@ ${DeckGenPrompts.claudeToolUseInstruction}
             content: prompt,
           ),
         ],
-        maxTokens: 4000,
-        temperature: 0.7,
+        // Headroom for adaptive thinking, which is always on for newer models
+        // and counts against max_tokens.
+        maxTokens: 16000,
         tools: tools,
-        toolChoice: {'type': 'tool', 'name': 'record_deck'},
+        // Forced tool choice ({'type': 'tool'}) is rejected by newer models
+        // (Opus 5.5, Sonnet 5.5, Fable 5.1+); the prompt asks for the tool.
+        toolChoice: {'type': 'auto'},
       );
 
       _logger.d('Sending request to Claude API');
@@ -95,7 +98,9 @@ ${DeckGenPrompts.claudeToolUseInstruction}
       final toolUseContent = claudeResponse.content!.firstWhere(
         (content) => content.type == 'tool_use',
         orElse: () =>
-            throw DeckGenerationException('No tool_use block in Claude response'),
+            throw DeckGenerationException(
+                'No tool_use block in Claude response '
+                '(stop_reason: ${claudeResponse.stopReason})'),
       );
 
       if (toolUseContent.input == null) {

@@ -75,7 +75,7 @@ final settingsService = SettingsService(
 
 This validator uses Claude's **tool use** feature for structured JSON output. Instead of relying on prompt engineering alone, it defines a tool called `record_quiz_score` with a JSON schema that matches the `QuizScore` structure.
 
-When you provide `toolChoice: {'type': 'tool', 'name': 'record_quiz_score'}`, Claude is forced to use that specific tool, which ensures the response follows the exact schema with proper types and required fields.
+The request uses `toolChoice: {'type': 'auto'}` and the prompt instructs Claude to call `record_quiz_score`. Forced tool choice (`{'type': 'tool', ...}`) is not used because newer models (Opus 5.5, Sonnet 5.5, Fable 5.1+) reject it with a 400. Sampling params (`temperature`, `top_p`) are also not sent - they are rejected by newer models too.
 
 The tool schema defines:
 - `score`: integer between 0 and 100

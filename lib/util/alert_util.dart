@@ -49,8 +49,9 @@ Future alert(
 void snackBar(
   BuildContext context, {
   required String message,
-  Duration duration = const Duration(seconds: 4),
+  Duration duration = const Duration(seconds: 2),
   bool isError = false,
+  bool persist = false,
   String? actionLabel,
   VoidCallback? onActionPressed,
 }) {
@@ -64,6 +65,7 @@ void snackBar(
       ),
       backgroundColor: isError ? AppColors.error500 : AppColors.grayscale500,
       duration: duration,
+      persist: persist,
       action: SnackBarAction(
         label: actionLabel ?? localize(context).dismiss,
         textColor: isError ? AppColors.error100 : AppColors.grayscale100,

@@ -71,7 +71,7 @@ Respond with a JSON object containing:
 
   /// Instruction for Claude to use the record_deck tool.
   static const String claudeToolUseInstruction =
-      'Please use the record_deck tool to provide the deck.';
+      'You MUST call the record_deck tool to provide the deck. Do not reply with plain text.';
 
   /// Language instruction prefix for Gemini to respond in the request's
   /// language.

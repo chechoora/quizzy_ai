@@ -61,7 +61,7 @@ Please evaluate how well the user answer matches the expected answer and respond
 
   /// Instruction for Claude to use the record_quiz_score tool.
   static const String claudeToolUseInstruction =
-      'Please use the record_quiz_score tool to provide your evaluation.';
+      'You MUST call the record_quiz_score tool to provide your evaluation. Do not reply with plain text.';
 
   /// Language instruction prefix for Gemini to respond in question's language.
   static const String geminiLanguageInstruction =

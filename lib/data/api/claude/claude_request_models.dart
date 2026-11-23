@@ -2,8 +2,6 @@ class ClaudeRequest {
   final String model;
   final List<Message> messages;
   final int maxTokens;
-  final double? temperature;
-  final double? topP;
   final List<String>? stopSequences;
   final Map<String, dynamic>? metadata;
   final String? system;
@@ -14,8 +12,6 @@ class ClaudeRequest {
     required this.model,
     required this.messages,
     required this.maxTokens,
-    this.temperature,
-    this.topP,
     this.stopSequences,
     this.metadata,
     this.system,
@@ -28,8 +24,6 @@ class ClaudeRequest {
       'model': model,
       'messages': messages.map((m) => m.toJson()).toList(),
       'max_tokens': maxTokens,
-      if (temperature != null) 'temperature': temperature,
-      if (topP != null) 'top_p': topP,
       if (stopSequences != null) 'stop_sequences': stopSequences,
       if (metadata != null) 'metadata': metadata,
       if (system != null) 'system': system,
